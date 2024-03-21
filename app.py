@@ -1,18 +1,12 @@
 from PyQt5.QtOpenGL import *
 from node.patanode import PataNode
-from glcontext import GLWindow
+from program.program_manager import ProgramManager, FBOManager
 
 class PataShade(PataNode):
 
     def __init__(self):
         super().__init__()
-        self.initGLWindow()
+        self.fbo_manager = FBOManager(self.ctx)
 
-    
-    def initGLWindow(self):
-        self.glwindow = GLWindow(self)
 
-    def show(self):
-        super().show()
-        #self.glwindow.show()
 

@@ -8,7 +8,9 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 from node.subwindow import PataNodeSubWindow
 from node.drag_listbox import QDMDragListbox
-from node.conf import SHADER_NODES
+from node.node_conf import SHADER_NODES
+
+from node.shader_widget import ShaderWidget
 
 
 DEBUG = False
@@ -46,6 +48,10 @@ class PataNode(NodeEditorWindow):
         self.windowMapper = QSignalMapper(self)
         self.windowMapper.mapped[QWidget].connect(self.setActiveSubWindow)
 
+
+        # Shader Widget and mgl context Initialization
+        self.initShaderWidget()
+
         self.createNodesDock()
 
         self.createActions()
@@ -57,6 +63,17 @@ class PataNode(NodeEditorWindow):
         self.readSettings()
 
         self.setWindowTitle("PataShade NodeEditor Example")
+
+    def initShaderWidget(self):
+        self.gl_widget = ShaderWidget(self)
+        self.ctx = self.gl_widget.ctx
+        self.gl_widget.hide()
+
+    def render(self):
+        current_program = self.getCurrentNodeEditorWidget()
+        if current_program is not None:
+            current_program.render()
+        #print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
 
     def closeEvent(self, event):
         self.mdiArea.closeAllSubWindows()
@@ -85,6 +102,15 @@ class PataNode(NodeEditorWindow):
 
         self.actAbout = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
 
+        self.actHideShaderWindow = QAction("&Hide Shader Screen", self, statusTip="Hide the screen mgl framebuffer", triggered=self.hideShaderWindow, shortcut='Ctrl+H')
+        self.actShowShaderWindow = QAction("&Display Shader Screen", self, statusTip="Hide the screen mgl framebuffer", triggered=self.showShaderWindow, shortcut='Ctrl+D')
+
+    def hideShaderWindow(self):
+        self.gl_widget.hide()
+
+    def showShaderWindow(self):
+        self.gl_widget.show()
+
     def getCurrentNodeEditorWidget(self):
         """ we're returning NodeEditorWidget here... """
         activeSubWindow = self.mdiArea.activeSubWindow()
@@ -111,7 +137,7 @@ class PataNode(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        nodeeditor = PataNodeSubWindow()
+                        nodeeditor = PataNodeSubWindow(self)
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
@@ -141,6 +167,7 @@ class PataNode(NodeEditorWindow):
         self.helpMenu.addAction(self.actAbout)
 
         self.editMenu.aboutToShow.connect(self.updateEditMenu)
+
 
     def updateMenus(self):
         # print("update Menus")
@@ -186,7 +213,6 @@ class PataNode(NodeEditorWindow):
         toolbar_nodes.setChecked(self.nodesDock.isVisible())
 
         self.windowMenu.addSeparator()
-
         self.windowMenu.addAction(self.actClose)
         self.windowMenu.addAction(self.actCloseAll)
         self.windowMenu.addSeparator()
@@ -196,6 +222,9 @@ class PataNode(NodeEditorWindow):
         self.windowMenu.addAction(self.actNext)
         self.windowMenu.addAction(self.actPrevious)
         self.windowMenu.addAction(self.actSeparator)
+        self.windowMenu.addSeparator()
+        self.windowMenu.addAction(self.actHideShaderWindow)
+        self.windowMenu.addAction(self.actShowShaderWindow)
 
         windows = self.mdiArea.subWindowList()
         self.actSeparator.setVisible(len(windows) != 0)
@@ -235,7 +264,7 @@ class PataNode(NodeEditorWindow):
         self.statusBar().showMessage("Ready")
 
     def createMdiChild(self, child_widget=None):
-        nodeeditor = child_widget if child_widget is not None else PataNodeSubWindow()
+        nodeeditor = child_widget if child_widget is not None else PataNodeSubWindow(self)
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
         # nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)

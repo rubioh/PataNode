@@ -5,7 +5,7 @@ from PyQt5.QtCore import Qt
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.utils import dumpException
 # patanode packages
-from node.conf import register_node, OP_NODE_INPUT
+from node.node_conf import register_node, OP_NODE_INPUT
 from node.shader_node_base import ShaderNode, ShaderGraphicsNode
 
 class ShaderInputContent(QDMNodeContentWidget):

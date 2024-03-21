@@ -48,7 +48,7 @@ class ShaderNode(Node):
     op_code = 0
     op_title = "Undefined"
     content_label = ""
-    content_label_objname = "calc_node_bg"
+    content_label_objname = "shader_node_bg"
 
     GraphicsNode_class = ShaderGraphicsNode
     NodeContent_class = ShaderContent
@@ -57,6 +57,8 @@ class ShaderNode(Node):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
         self.value = None
+        # Current OpenGL ctx
+        self.ctx = scene.ctx
 
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
@@ -66,9 +68,6 @@ class ShaderNode(Node):
         super().initSettings()
         self.input_socket_position = LEFT_CENTER
         self.output_socket_position = RIGHT_CENTER
-
-    def evalOperation(self, input1, input2):
-        return 123
 
     def evalImplementation(self):
         i1 = self.getInput(0)
@@ -111,7 +110,6 @@ class ShaderNode(Node):
             dumpException(e)
 
 
-
     def onInputChanged(self, socket=None):
         print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
@@ -128,3 +126,5 @@ class ShaderNode(Node):
         print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
 
+    def render(self):
+        pass

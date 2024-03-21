@@ -7,14 +7,16 @@ from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_S
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 # patanode package
-from node.conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
+from program.shader.screen.screen import ScreenNode
 
 DEBUG = False
 
 
 class PataNodeSubWindow(NodeEditorWidget):
-    def __init__(self):
+    def __init__(self, app=None):
+        self.app = app
         super().__init__()
         # self.setAttribute(Qt.WA_DeleteOnClose)
 
@@ -27,8 +29,33 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.addDragEnterListener(self.onDragEnter)
         self.scene.addDropListener(self.onDrop)
         self.scene.setNodeClassSelector(self.getNodeClassFromData)
+        self.setOpenGLSharedObject()
 
         self._close_event_listeners = []
+
+        self.screen_node = None
+
+    def searchScreenNodes(self):
+        for node in self.scene.nodes:
+            if isinstance(node, ScreenNode):
+                self.screen_node = node
+
+    def render(self):
+        if self.screen_node is None:
+            self.searchScreenNodes()
+        else:
+            self.screen_node.render()
+
+    def setOpenGLSharedObject(self):
+        """
+        Give the ctx reference to the scene
+        """
+        self.ctx = self.app.ctx
+        self.scene.ctx = self.app.ctx
+        self.scene.app = self.app
+        self.scene.gl_widget = self.app.gl_widget
+        self.scene.fbo_manager = self.app.gl_widget.fbo_manager
+        print(self.scene.fbo_manager)
 
     def getNodeClassFromData(self, data):
         if 'op_code' not in data: return Node

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
 
 from nodeeditor.utils import dumpException
 
-from node.conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
 
 class QDMDragListbox(QListWidget):

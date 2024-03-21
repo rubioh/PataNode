@@ -3,7 +3,7 @@ from PyQt5.QtCore import Qt
 # nodeeditor
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 # patanode
-from node.conf import register_node, OP_NODE_OUTPUT
+from node.node_conf import register_node, OP_NODE_OUTPUT
 from node.shader_node_base import ShaderNode, ShaderGraphicsNode
 
 

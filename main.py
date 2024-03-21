@@ -1,11 +1,12 @@
 import os, sys
-from qtpy.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication
+import program.program_conf
 
-sys.path.insert(0, os.path.join( os.path.dirname(__file__), "..", ".." ))
-
+#sys.path.insert(0, os.path.join( os.path.dirname(__file__), "..", ".." ))
+#from app import PataShade
 from app import PataShade
-from node.patanode import PataNode
-
+#from window import Window, WindowSize
+#from glcontext import GLWindow, MGLW, QModernGLWidget
 
 if __name__ == '__main__':
 

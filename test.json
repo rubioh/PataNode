@@ -1,0 +1,51 @@
+{
+    "id": 139806995734928,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 139806860112592,
+            "title": "Screen",
+            "pos_x": 145.0,
+            "pos_y": -72.0,
+            "inputs": [
+                {
+                    "id": 139806857219856,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0
+        },
+        {
+            "id": 139806676977232,
+            "title": "Eye",
+            "pos_x": -143.0,
+            "pos_y": -98.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 139809046744400,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1
+        }
+    ],
+    "edges": [
+        {
+            "id": 139806857926096,
+            "edge_type": 2,
+            "start": 139809046744400,
+            "end": 139806857219856
+        }
+    ]
+}
