@@ -41,7 +41,7 @@ class Eye(ProgramBase):
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
 
     def initParams(self):
-        self.vitesse = 0.7
+        self.vitesse = 0.4
         self.offset = 0
         self.intensity = 5
         self.smooth_fast = 0
@@ -51,6 +51,10 @@ class Eye(ProgramBase):
         self.emid = .2
 
     def updateParams(self, af=None):
+        self.vitesse = np.clip(self.vitesse, 0, 2)
+        self.intensity = np.clip(self.intensity, 2, 10)
+        self.time += 1 / 60 * (1 + self.vitesse)
+        self.tf += 0.01
         if af is None:
             return
         self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * af["full"][3]
@@ -72,7 +76,8 @@ class Eye(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.program["iResolution"] = (self.ctx.screen.width, self.ctx.screen.height)
+        #_,_,w,h = self.ctx.screen.viewport
+        #self.program["iResolution"] = (w,h)
         self.program["iTime"] = self.time
         self.program["energy_fast"] = self.smooth_fast / 2.0
         self.program["energy_slow"] = self.eslow
@@ -98,7 +103,7 @@ class EyeNode(ShaderNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Eye(ctx=self.scene.ctx)
+        self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def evalImplementation(self):

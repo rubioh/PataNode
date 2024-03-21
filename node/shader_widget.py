@@ -15,6 +15,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.width, self.height = int(size[0]), int(size[1])
         self.resizable = resizable
         self.fullscreen = fullscreen
+        self._fixed_aspect_ratio = 16/9
         self._vsync = True
         self._ctx = None
         # Internal states
@@ -100,17 +101,55 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
     def paintGL(self):
         self.makeCurrent()
-        self._ctx.clear(color=(.0,np.cos(time.time())*.5+.5,.0))
-        print(self._ctx.screen.width, self._ctx.screen.height)
+        self._ctx.clear(color=(.0,.0,.0))
         self.app.render()
 
     def resize(self, width: int, height: int) -> None:
         self._width = width * self.devicePixelRatio()
         self._height = height * self.devicePixelRatio()
+        self.width = self._width
+        self.height = self._height
         self._buffer_width = width
         self._buffer_height = height
         if self._ctx is not None:
             self.set_default_viewport()
+
+
+    def set_default_viewport(self) -> None:
+        """
+        Calculates the and sets the viewport based on window configuration.
+
+        The viewport will based on the configured fixed aspect ratio if set.
+        If no fixed aspect ratio is set the viewport will be scaled
+        to the entire window size regardless of size.
+
+        Will add black borders and center the viewport if the window
+        do not match the configured viewport (fixed only)
+        """
+        if self._fixed_aspect_ratio:
+            expected_width = int(self._buffer_height * self._fixed_aspect_ratio)
+            expected_height = int(expected_width / self._fixed_aspect_ratio)
+
+            if expected_width > self._buffer_width:
+                expected_width = self._buffer_width
+                expected_height = int(expected_width / self._fixed_aspect_ratio)
+
+            blank_space_x = self._buffer_width - expected_width
+            blank_space_y = self._buffer_height - expected_height
+
+            blank_space_x = 0
+            blank_space_y = 0
+
+            self._viewport = (
+                blank_space_x // 2,
+                blank_space_y // 2,
+                expected_width,
+                expected_height,
+            )
+        else:
+            self._viewport = (0, 0, self._buffer_width, self._buffer_height)
+
+        self.ctx.screen.viewport = self._viewport
 
     def close_event(self, event) -> None:
         """The standard PyQt close events

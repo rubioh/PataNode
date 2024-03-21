@@ -47,6 +47,8 @@ class Screen(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
+        _,_,w,h = self.ctx.screen.viewport
+        self.program['iResolution'] = (w,h)
         self.program["tex"] = 0
 
     def render(self, texture, af=None):
