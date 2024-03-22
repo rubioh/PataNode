@@ -1,8 +1,11 @@
 import numpy as np
 import moderngl as mgl
+from copy import deepcopy
 
-from program.program_conf import SHADER_PROGRAMS
+from program.program_conf import SHADER_PROGRAMS, LoadingFBOsError
 
+
+DEBUG = True
 
 class ProgramManager:
 
@@ -14,8 +17,22 @@ class FBOManager:
 
     def __init__(self, ctx):
         self.ctx = ctx
-        # Register all current fbo ordered by size
+        # Register lists of FBOs according to the hash of win_size, components and dtype
         self.current_fbos = {}
+        # TODO in_use fbos logic for complex program 
+        self.in_use_fbos = {}
+
+        # base params
+        self._default_dtype = 'f4'
+        self._default_component = 4
+
+
+    def restoreFBOUsability(self):
+        print(self.in_use_fbos)
+        for hashmap, fbos in self.in_use_fbos.items():
+            for i in range(len(fbos)):
+                self.in_use_fbos[hashmap][i] = 0
+        print(self.in_use_fbos)
 
 
     def getFBO(self, win_sizes=[], components=None, dtypes=None):
@@ -25,28 +42,76 @@ class FBOManager:
         if components is not None and len(components) != len(win_sizes):
             print('FBOManager::getFBO lists win_sizes and components are not of the same size')
             return None
-
-        returned_fbos = list()
+        if DEBUG: print("getFBOs:: in current FBOs :", self.current_fbos)
+        if DEBUG: print("getFBOs:: in current in_use:", self.in_use_fbos)
+        hashmaps = self.getHashmaps(win_sizes, components, dtypes)
+        #returned_fbos = [None for i in range(len(hashmaps))]
+        returned_fbos = self.checkForExistingFBOs(hashmaps)
         for i in range(len(win_sizes)):
+            current_hashmap = hashmaps[i]
+            if returned_fbos[i] is not None:
+                continue
             if dtypes is not None:
                 dtype = dtypes[i]
             else:
-                dtype = 'f4'
+                dtype = self._default_dtype
             win_size = win_sizes[i]
             if components is not None:
                 component = components[i]
             else:
-                component = 4
+                component = self._default_component
             new_texture = self.ctx.texture(size=win_size, components=component, dtype=dtype)
             new_fbo = self.ctx.framebuffer(color_attachments=new_texture)
 
-            returned_fbos.append(new_fbo)
-            if not win_size in self.current_fbos.keys():
-                self.current_fbos[str(win_size)] = []
+            returned_fbos[i] = new_fbo
+            if not current_hashmap in self.current_fbos.keys():
+                self.current_fbos[current_hashmap] = []
+                self.in_use_fbos[current_hashmap] = []
 
-            self.current_fbos[str(win_size)].append(new_fbo)
-
+            self.current_fbos[current_hashmap].append(new_fbo)
+            self.in_use_fbos[current_hashmap].append(1)
+        if DEBUG: print("getFBOs:: out current FBOs:", self.current_fbos)
+        if DEBUG: print("getFBOs:: out current in_use:", self.in_use_fbos)
         return returned_fbos
 
 
+    def checkForExistingFBOs(self, hashmaps):
+        returned_fbos = [None for i in range(len(hashmaps))]
+        if DEBUG: print("checkForExistingFBOs:: Current hashmap : ", hashmaps, "\nCurrent fbos", self.current_fbos.keys())
+        for i, hashmap in enumerate(hashmaps):
+            if hashmap in self.current_fbos.keys():
+                for j, fbo in enumerate(self.current_fbos[hashmap]):
+                    # In use logic
+                    if not self.in_use_fbos[hashmap][j]:
+                        returned_fbos[i] = self.current_fbos[hashmap][j]
+                        self.in_use_fbos[hashmap][j] = 1
+                        break
+
+        if DEBUG: print("checkForExistingFBOs:: Returned fbos after checking:", returned_fbos)
+        return returned_fbos
+
+
+    def getHashmaps(self, win_sizes, components=None, dtypes=None):
+        hashmaps = list()
+        for i, win_size in enumerate(win_sizes):
+            if components is not None:
+                component = components[i]
+            else:
+                component = self._default_component
+            if dtypes is not None:
+                dtype = dtypes[i]
+            else:
+                dtype = self._default_dtype
+            hashmap = self.propertiesToHashmap(win_size, component, dtype)
+            hashmaps.append(hashmap)
+        return hashmaps
+
+
+    def propertiesToHashmap(self, win_size, component, dtype):
+        hashmap = str(win_size[0]+win_size[1]*10000)
+        hashmap += str(component)
+        dtype_to_int = [ord(c) for c in dtype]
+        hashmap += str(sum(dtype_to_int))
+        hashmap = int(hashmap)
+        return hashmap
 

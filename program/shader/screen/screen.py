@@ -22,21 +22,14 @@ class Screen(ProgramBase):
         self.initParams()
 
 
-    def initProgram(self):
+    def initProgram(self, init_vbo=True):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "screen.glsl")
         vert = open(vert_path, 'r').read()
         frag = open(frag_path, 'r').read()
         self.program = load_program(self.ctx, vert, frag)
-        self.vbo = self.ctx.buffer(get_square_vertex_data())
-        self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
-
-    def reloadProgram(self):
-        vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "screen.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.program = load_program(self.ctx, vert, frag)
+        if init_vbo:
+            self.vbo = self.ctx.buffer(get_square_vertex_data())
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
 
     def initParams(self):
@@ -70,7 +63,12 @@ class ScreenNode(ShaderNode):
         self.program = Screen(ctx=self.scene.ctx)
         self.program.output_fbo = self.scene.ctx.screen
         self.gl_widget = self.scene.app.gl_widget
+        self.eval()
 
+    def restoreFBODependencies(self):
+        self.scene.fbo_manager.restoreFBOUsability()
+        for node in self.scene.nodes:
+            node.markDirty()
         self.eval()
 
     def evalImplementation(self):
@@ -80,23 +78,23 @@ class ScreenNode(ShaderNode):
             self.markInvalid()
             return
 
-        texture = input_node.eval()
+        success_eval = input_node.eval()
 
-        if texture is None:
+        if not success_eval:
             self.grNode.setToolTip("Input is NaN")
             self.markInvalid()
             return
 
-        self.program.render(texture)
-        self.gl_widget.update()
-        self.markInvalid(False)
-        self.markDirty(False)
+        success_render = self.render()
+        self.markInvalid(not success_render)
+        self.markDirty(not success_render)
         self.grNode.setToolTip("")
         return True
 
     def render(self):
         input_node = self.getInput(0)
         if input_node is None:
-            return
+            return False
         texture = input_node.render()
         self.program.render(texture)
+        return True

@@ -4,6 +4,7 @@ from os.path import dirname, basename, isfile, join
 SHADER_PROGRAMS = {}
 
 class InvalidProgramRegistration(Exception): pass
+class LoadingFBOsError(Exception): pass
 class CTXError(Exception): pass
 
 def register_program_now(op_code, class_reference):
@@ -27,6 +28,10 @@ def get_square_vertex_data():
 
 def load_program(ctx, vert, frag):
     return ctx.program(vertex_shader=vert, fragment_shader=frag)
+
+def name_to_opcode(name):
+    l = [ord(char) for char in name]
+    return sum(l)
 
 SQUARE_VERT_PATH = join(dirname(__file__), 'base/vertex_base.glsl')
 

@@ -12,6 +12,7 @@ from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from program.shader.screen.screen import ScreenNode
 
 DEBUG = False
+DEBUG_CONTEXT = False
 
 
 class PataNodeSubWindow(NodeEditorWidget):
@@ -55,7 +56,6 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.app = self.app
         self.scene.gl_widget = self.app.gl_widget
         self.scene.fbo_manager = self.app.gl_widget.fbo_manager
-        print(self.scene.fbo_manager)
 
     def getNodeClassFromData(self, data):
         if 'op_code' not in data: return Node
@@ -164,6 +164,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         markInvalidAct = context_menu.addAction("Mark Invalid")
         unmarkInvalidAct = context_menu.addAction("Unmark Invalid")
         evalAct = context_menu.addAction("Eval")
+        restoreFBOAct = context_menu.addAction("Restore FBOs dependencies (ScreenNode only)")
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         selected = None
@@ -181,6 +182,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         if selected and action == markDirtyDescendantsAct: selected.markDescendantsDirty()
         if selected and action == markInvalidAct: selected.markInvalid()
         if selected and action == unmarkInvalidAct: selected.markInvalid(False)
+        if selected and action == restoreFBOAct: selected.restoreFBODependencies()
         if selected and action == evalAct:
             val = selected.eval()
             if DEBUG_CONTEXT: print("EVALUATED:", val)

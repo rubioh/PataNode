@@ -30,6 +30,12 @@ class ProgramBase:
         self.frag_path = None
         self.required_fbos = 1
 
+    def initProgram(self, init_vbo=True):
+        raise NotImplementedError
+    
+    def reloadProgram(self):
+        self.initProgram(init_vbo=False)
+
     @property
     def title(self):
         return self._title

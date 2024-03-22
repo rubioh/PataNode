@@ -8,16 +8,13 @@ from program.program_base import ProgramBase
 from node.shader_node_base import ShaderNode
 from node.node_conf import register_node
 
+OP_CODE_SYMETRY = name_to_opcode('symetry')
 
-OP_CODE_EYE = name_to_opcode('eye')
-
-@register_program(OP_CODE_EYE)
-class Eye(ProgramBase):
-
+@register_program(OP_CODE_SYMETRY)
+class Symetry(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
-        self.title = "Eye"
+        self.title = "Symetry"
         self.required_fbos = 1
 
         self.initProgram()
@@ -25,7 +22,7 @@ class Eye(ProgramBase):
 
     def initProgram(self, init_vbo=True):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "eye.glsl")
+        frag_path = join(dirname(__file__), "symetry.glsl")
         vert = open(vert_path, 'r').read()
         frag = open(frag_path, 'r').read()
         self.program = load_program(self.ctx, vert, frag)
@@ -34,72 +31,67 @@ class Eye(ProgramBase):
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
 
     def initParams(self):
-        self.vitesse = 0.4
-        self.offset = 0
-        self.intensity = 5
-        self.smooth_fast = 0
-        self.time = 0
-        self.tf = 0
-        self.eslow = .4
-        self.emid = .2
+        self.program["iChannel0"] = 1
+        self.chill = False
+        self.mode = 0
+        self.t = 0
+        self.t_angle = 0
+        self.smlow = 1
 
     def updateParams(self, af=None):
-        self.vitesse = np.clip(self.vitesse, 0, 2)
-        self.intensity = np.clip(self.intensity, 2, 10)
-        self.time += 1 / 60 * (1 + self.vitesse)
-        self.tf += 0.01
         if af is None:
             return
-        self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * af["full"][3]
-        if af["full"][1] < 1.0 or af["full"][2] < 0.7:
-            self.vitesse += 0.01
-            self.intensity += 0.05
-            if self.time > 500 and self.vitesse > 1.5:
-                self.time = 0
-                self.tf = 0
-        else:
-            self.vitesse -= 0.04
-            self.intensity -= 0.1
-        self.vitesse = np.clip(self.vitesse, 0, 2)
-        self.intensity = np.clip(self.intensity, 2, 10)
-        self.time += 1 / 60 * (1 + self.vitesse)
-        self.tf += 0.01
-        self.eslow = af["full"][1] * .75
-        self.emid = af["low"][2] / 2.
+        self.t += af["smooth_full"]
+        if af["on_chill"] and not self.chill:
+            self.chill = True
+
+        if self.chill and not af["on_chill"]:
+            self.mode ^= 1
+            self.chill = False
+
+        if af["on_chill"] == 0.0:
+            self.t_angle += af["full"][0] * 0.01 * (2.5 * self.camp + 0.5) - 0.03
+
+        self.smlow = af["smooth_low"] * (self.camp * 2.5 + .5)
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        #_,_,w,h = self.ctx.screen.viewport
-        #self.program["iResolution"] = (w,h)
-        self.program["iTime"] = self.time
-        self.program["energy_fast"] = self.smooth_fast / 2.0
-        self.program["energy_slow"] = self.eslow
-        self.program["energy_mid"] = self.emid
-        self.program["tf"] = self.tf
-        self.program["intensity"] = self.intensity
-        self.program["scale"] = 16 + 8 * np.cos(time.time() * 0.1)
+        self.program["smooth_low"] = self.smlow
+        self.program["mode"] = self.mode
+        self.program["t"] = self.t * 5.0
+        self.program["t_angle"] = self.t_angle * 5.0
 
-    def render(self, af=None):
-        self.updateParams(af)
+    def render(self, texture, af=None):
         self.bindUniform(af)
+        texture.use(1)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
 
+    def norender(self):
+        return self.fbos[0].color_attachments[0]
 
-@register_node(OP_CODE_EYE)
+
+@register_node(OP_CODE_SYMETRY)
 class EyeNode(ShaderNode):
-    op_title = "Eye"
-    op_code = OP_CODE_EYE
+    op_title = "Symetry"
+    op_code = OP_CODE_SYMETRY
     content_label = ""
-    content_label_objname = "shader_eye"
+    content_label_objname = "shader_symetry"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1], outputs=[3])
+        self.program = Symetry(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def evalImplementation(self):
+        input_node = self.getInput(0)
+        if not input_node:
+            self.grNode.setToolTip("Input is not connected")
+            self.markInvalid()
+            return
+        texture = input_node.render()
+
         win_sizes = [self.program.win_size]
         components = [4]
         dtypes = ['f4']
@@ -109,14 +101,13 @@ class EyeNode(ShaderNode):
         try:
             self.program.connectFbos(fbos)
             try:
-                self.program.render()
+                self.value = self.program.render(texture)
             except:
                 self.grNode.setToolTip("Rendering error")
                 self.markInvalid()
                 print("Error during rendering")
                 self.value = None
                 return False
-            self.value = self.render()
             self.markInvalid(False)
             self.markDirty(False)
             self.grNode.setToolTip("")
@@ -133,4 +124,8 @@ class EyeNode(ShaderNode):
         return False
 
     def render(self):
-        return self.program.render()
+        input_node = self.getInput(0)
+        if input_node is None:
+            return self.program.norender()
+        texture = input_node.render()
+        return self.program.render(texture)

@@ -21,7 +21,7 @@ class ShaderGraphicsNode(QDMGraphicsNode):
 
     def initAssets(self):
         super().initAssets()
-        self.icons = QImage("icons/status_icons.png")
+        self.icons = QImage("node/icons/status_icons.png")
 
     def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
@@ -63,6 +63,8 @@ class ShaderNode(Node):
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
 
+    def restoreFBODependencies(self):
+        pass
 
     def initSettings(self):
         super().initSettings()
