@@ -8,6 +8,7 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
+DEBUG = False
 
 class ShaderGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
@@ -56,7 +57,8 @@ class ShaderNode(Node):
     def __init__(self, scene, inputs=[2,2], outputs=[1]):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
-        self.value = None
+        self.value = None # Using to store output texture reference
+        self.program = None
         # Current OpenGL ctx
         self.ctx = scene.ctx
 
@@ -71,35 +73,71 @@ class ShaderNode(Node):
         self.input_socket_position = LEFT_CENTER
         self.output_socket_position = RIGHT_CENTER
 
-    def evalImplementation(self):
-        i1 = self.getInput(0)
-        i2 = self.getInput(1)
-
-        if i1 is None or i2 is None:
+    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None):
+        fbos = self.scene.fbo_manager.getFBO(
+                win_sizes, components, dtypes
+        )
+        try:
+            self.program.connectFbos(fbos)
+        except AssertionError:
+            print("Created fbos doesn't match the number of required fbos for %s"%self.program.__class__.__name__)
+            self.grNode.setToolTip("No fbo's found")
             self.markInvalid()
-            self.markDescendantsDirty()
-            self.grNode.setToolTip("Connect all inputs")
+            return False
+        return True
+
+    def evalInputNodes(self):
+        # TODO Several Textures test
+        input_node = self.getInput(0)
+        if not input_node:
+            self.grNode.setToolTip("Input is not connected")
+            self.markInvalid()
             return None
-
         else:
-            val = self.evalOperation(i1.eval(), i2.eval())
-            self.value = val
-            self.markDirty(False)
+            input_node.eval()
+            return input_node.value
+
+    def evalRendering(self, textures=None):
+        try:
+            output_texture = self.program.render(textures)
+            self.value = output_texture
+            return True
+        except:
+            self.grNode.setToolTip("Rendering error")
+            self.markInvalid()
+            print("Error during rendering")
+            self.value = None
+            return False
+        return True
+
+    def evalImplementation(self):
+        # Find and Connect required fbos
+        win_sizes, components, dtypes = self.program.getFBOSpecifications() 
+        success = self.findAndConnectFbos(win_sizes, components, dtypes)
+        if not success:
+            return False
+        # Eval Input Node
+        if self.inputs:
+            inputs_texture = self.evalInputNodes()
+            if inputs_texture is None:
+                return False
+            success = self.evalRendering(inputs_texture)
+        else:
+            success = self.evalRendering()
+        # Eval Rendering
+        if success:
             self.markInvalid(False)
+            self.markDirty(False)
             self.grNode.setToolTip("")
+            return True
+        return False
 
-            self.markDescendantsDirty()
-            self.evalChildren()
-
-            return val
 
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
-            print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+            if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
-
         try:
-
             val = self.evalImplementation()
             return val
         except ValueError as e:
@@ -113,7 +151,7 @@ class ShaderNode(Node):
 
 
     def onInputChanged(self, socket=None):
-        print("%s::__onInputChanged" % self.__class__.__name__)
+        if DEBUG: print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
         self.eval()
 

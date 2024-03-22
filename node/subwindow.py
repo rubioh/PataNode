@@ -8,6 +8,7 @@ from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
 # patanode package
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.inspector import QDMInspector
 
 from program.shader.screen.screen import ScreenNode
 
@@ -31,12 +32,14 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.addDropListener(self.onDrop)
         self.scene.setNodeClassSelector(self.getNodeClassFromData)
         self.setOpenGLSharedObject()
+        self.initInspector()
 
         self._close_event_listeners = []
 
         self.screen_node = None
 
     def searchScreenNodes(self):
+        # TODO better logic if multiple screen or output nodes
         for node in self.scene.nodes:
             if isinstance(node, ScreenNode):
                 self.screen_node = node
@@ -56,6 +59,9 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.app = self.app
         self.scene.gl_widget = self.app.gl_widget
         self.scene.fbo_manager = self.app.gl_widget.fbo_manager
+
+    def initInspector(self):
+        self.inspector_widget = QDMInspector()
 
     def getNodeClassFromData(self, data):
         if 'op_code' not in data: return Node
@@ -158,15 +164,6 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def handleNodeContextMenu(self, event):
         if DEBUG_CONTEXT: print("CONTEXT: NODE")
-        context_menu = QMenu(self)
-        markDirtyAct = context_menu.addAction("Mark Dirty")
-        markDirtyDescendantsAct = context_menu.addAction("Mark Descendant Dirty")
-        markInvalidAct = context_menu.addAction("Mark Invalid")
-        unmarkInvalidAct = context_menu.addAction("Unmark Invalid")
-        evalAct = context_menu.addAction("Eval")
-        restoreFBOAct = context_menu.addAction("Restore FBOs dependencies (ScreenNode only)")
-        action = context_menu.exec_(self.mapToGlobal(event.pos()))
-
         selected = None
         item = self.scene.getItemAt(event.pos())
         if type(item) == QGraphicsProxyWidget:
@@ -177,15 +174,35 @@ class PataNodeSubWindow(NodeEditorWidget):
         if hasattr(item, 'socket'):
             selected = item.socket.node
 
+
+        context_menu = QMenu(self)
+        markDirtyAct = context_menu.addAction("Mark Dirty")
+        markDirtyDescendantsAct = context_menu.addAction("Mark Descendant Dirty")
+        markInvalidAct = context_menu.addAction("Mark Invalid")
+        unmarkInvalidAct = context_menu.addAction("Unmark Invalid")
+        evalAct = context_menu.addAction("Eval")
+
+        context_menu.addSeparator()
+
+        if isinstance(selected, ScreenNode):
+            restoreFBOAct = context_menu.addAction("Restore FBOs dependencies")
+
+        #openInspectorAct = context_menu.addAction("Open Parameters Inspector")
+        
+        action = context_menu.exec_(self.mapToGlobal(event.pos()))
+
+
+
         if DEBUG_CONTEXT: print("got item:", selected)
         if selected and action == markDirtyAct: selected.markDirty()
         if selected and action == markDirtyDescendantsAct: selected.markDescendantsDirty()
         if selected and action == markInvalidAct: selected.markInvalid()
         if selected and action == unmarkInvalidAct: selected.markInvalid(False)
-        if selected and action == restoreFBOAct: selected.restoreFBODependencies()
         if selected and action == evalAct:
             val = selected.eval()
             if DEBUG_CONTEXT: print("EVALUATED:", val)
+
+        if isinstance(selected, ScreenNode) and action == restoreFBOAct: selected.restoreFBODependencies()
 
 
     def handleEdgeContextMenu(self, event):

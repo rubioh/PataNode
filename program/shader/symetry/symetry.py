@@ -15,10 +15,23 @@ class Symetry(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Symetry"
-        self.required_fbos = 1
 
         self.initProgram()
+        self.initFBOSpecifications()
         self.initParams()
+
+    def initFBOSpecifications(self):
+        self.required_fbos = 1
+        fbos_specification = [
+            [self.win_size, 4, 'f4'],
+        ]
+        self.fbos_win_size = list()
+        self.fbos_components = list()
+        self.fbos_dtypes = list()
+        for specification in fbos_specification:
+            self.fbos_win_size.append(specification[0])
+            self.fbos_components.append(specification[1])
+            self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, init_vbo=True):
         vert_path = SQUARE_VERT_PATH
@@ -73,7 +86,7 @@ class Symetry(ProgramBase):
 
 
 @register_node(OP_CODE_SYMETRY)
-class EyeNode(ShaderNode):
+class SymetryNode(ShaderNode):
     op_title = "Symetry"
     op_code = OP_CODE_SYMETRY
     content_label = ""
@@ -83,45 +96,6 @@ class EyeNode(ShaderNode):
         super().__init__(scene, inputs=[1], outputs=[3])
         self.program = Symetry(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
-
-    def evalImplementation(self):
-        input_node = self.getInput(0)
-        if not input_node:
-            self.grNode.setToolTip("Input is not connected")
-            self.markInvalid()
-            return
-        texture = input_node.render()
-
-        win_sizes = [self.program.win_size]
-        components = [4]
-        dtypes = ['f4']
-        fbos = self.scene.fbo_manager.getFBO(
-            win_sizes
-        )
-        try:
-            self.program.connectFbos(fbos)
-            try:
-                self.value = self.program.render(texture)
-            except:
-                self.grNode.setToolTip("Rendering error")
-                self.markInvalid()
-                print("Error during rendering")
-                self.value = None
-                return False
-            self.markInvalid(False)
-            self.markDirty(False)
-            self.grNode.setToolTip("")
-            return True
-        except AssertionError:
-            print("Created fbos doesn't match the number of required fbos for %s"%self.program.__class__.__name__)
-            self.grNode.setToolTip("No fbo's found")
-            self.markInvalid()
-        except:
-            print('No output Fbo found for the program %s'%self.program.__class__.__name__)
-            self.grNode.setToolTip("No fbo's found")
-            self.markInvalid()
-        self.value = None
-        return False
 
     def render(self):
         input_node = self.getInput(0)

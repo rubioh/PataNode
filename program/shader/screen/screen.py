@@ -75,15 +75,15 @@ class ScreenNode(ShaderNode):
         input_node = self.getInput(0)
         if not input_node:
             self.grNode.setToolTip("Input is not connected")
-            self.markInvalid()
-            return
+            self.markDirty()
+            return False
 
         success_eval = input_node.eval()
 
         if not success_eval:
             self.grNode.setToolTip("Input is NaN")
-            self.markInvalid()
-            return
+            self.markDirty()
+            return False
 
         success_render = self.render()
         self.markInvalid(not success_render)

@@ -23,18 +23,28 @@ class ProgramBase:
         self.win_size = win_size
         self._output_fbo = None
         self.vao = None
-
+    
+        # Fbos specification 
+        self.fbos_win_size, self.fbos_components, self.fbos_dtypes = [], [], []
+        self._required_fbos = 1
         self.fbos = None
 
         self.vert_path = None
         self.frag_path = None
-        self.required_fbos = 1
 
     def initProgram(self, init_vbo=True):
         raise NotImplementedError
     
     def reloadProgram(self):
         self.initProgram(init_vbo=False)
+
+    @property
+    def required_fbos(self):
+        return self._required_fbos
+
+    @required_fbos.setter
+    def required_fbos(self, value):
+        self._required_fbos = value
 
     @property
     def title(self):
@@ -53,6 +63,9 @@ class ProgramBase:
         self._width = value[0]
         self._height = value[1]
         self._win_size = (self._width, self._height)
+
+    def getFBOSpecifications(self):
+        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes)
 
     def connectFbos(self, fbos=None):
         assert len(fbos) == self.required_fbos

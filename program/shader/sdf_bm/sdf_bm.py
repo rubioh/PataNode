@@ -17,11 +17,21 @@ class SDF_BM(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
 
         self.title = "Eye"
-        self.required_fbos = 2
         
-        self.initProgram(True)
-
+        self.initProgram()
+        self.initFBOSpecifications()
         self.initParams()
+
+    def initFBOSpecifications(self):
+        self.required_fbos = 2
+        fbos_specification = [
+            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, 'f4']
+        ]
+        for specification in fbos_specification:
+            self.fbos_win_size.append(specification[0])
+            self.fbos_components.append(specification[1])
+            self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, init_vbo=True):
         # INFO PROGRAM
@@ -212,38 +222,6 @@ class SDF_BMNode(ShaderNode):
         super().__init__(scene, inputs=[], outputs=[3])
         self.program = SDF_BM(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
-
-    def evalImplementation(self):
-        win_sizes = [self.program.win_size, self.program.win_size]
-        fbos = self.scene.fbo_manager.getFBO(
-            win_sizes
-        )
-        try:
-            self.program.connectFbos(fbos)
-            try:
-                self.program.render()
-            except Exception as e:
-                dumpException(e)
-                self.grNode.setToolTip("Rendering error")
-                self.markInvalid()
-                print("Error during rendering")
-                self.value = None
-                return False
-            self.value = self.render()
-            self.markInvalid(False)
-            self.markDirty(False)
-            self.grNode.setToolTip("")
-            return True
-        except AssertionError:
-            print("Created fbos doesn't match the number of required fbos for %s"%self.program.__class__.__name__)
-            self.grNode.setToolTip("No fbo's found")
-            self.markInvalid()
-        except:
-            print('No output Fbo found for the program %s'%self.program.__class__.__name__)
-            self.grNode.setToolTip("No fbo's found")
-            self.markInvalid()
-        self.value = None
-        return False
 
     def render(self):
         return self.program.render()

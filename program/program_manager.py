@@ -5,7 +5,7 @@ from copy import deepcopy
 from program.program_conf import SHADER_PROGRAMS, LoadingFBOsError
 
 
-DEBUG = True
+DEBUG = False
 
 class ProgramManager:
 
@@ -28,11 +28,11 @@ class FBOManager:
 
 
     def restoreFBOUsability(self):
-        print(self.in_use_fbos)
+        if DEBUG: print(self.in_use_fbos)
         for hashmap, fbos in self.in_use_fbos.items():
             for i in range(len(fbos)):
                 self.in_use_fbos[hashmap][i] = 0
-        print(self.in_use_fbos)
+        if DEBUG: print(self.in_use_fbos)
 
 
     def getFBO(self, win_sizes=[], components=None, dtypes=None):
