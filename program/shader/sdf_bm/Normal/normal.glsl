@@ -88,5 +88,5 @@ void main()
         goBloom *= .3;
     }
 
-    fragColor = vec4(clamp(vec3(col), vec3(0.), vec3(1.)), goBloom*6. + arms_bloom*5.);
+    fragColor = vec4(clamp(vec3(col), vec3(0.), vec3(1.)), goBloom*6. + arms_bloom*5.)*2.;
 }

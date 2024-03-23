@@ -2,7 +2,7 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, load_program, name_to_opcode
+from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode
@@ -25,21 +25,16 @@ class Symetry(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, 'f4'],
         ]
-        self.fbos_win_size = list()
-        self.fbos_components = list()
-        self.fbos_dtypes = list()
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-    def initProgram(self, init_vbo=True):
+    def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "symetry.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.program = load_program(self.ctx, vert, frag)
-        if init_vbo:
+        self.program = self.loadProgramToCtx(vert_path, frag_path)
+        if not reload:
             self.vbo = self.ctx.buffer(get_square_vertex_data())
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
 

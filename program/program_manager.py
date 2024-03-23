@@ -5,7 +5,7 @@ from copy import deepcopy
 from program.program_conf import SHADER_PROGRAMS, LoadingFBOsError
 
 
-DEBUG = False
+DEBUG = True
 
 class ProgramManager:
 

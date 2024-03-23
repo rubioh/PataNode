@@ -2,7 +2,7 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, load_program, name_to_opcode
+from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode
@@ -33,25 +33,26 @@ class Eye(ProgramBase):
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-    def initProgram(self, init_vbo=True):
+    def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "eye.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.program = load_program(self.ctx, vert, frag)
-        if init_vbo:
+        self.program = self.loadProgramToCtx(vert_path, frag_path, reload)
+        if not reload:
             self.vbo = self.ctx.buffer(get_square_vertex_data())
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
-
+    
     def initParams(self):
-        self.vitesse = 0.4
+        self.initAdaptableParameters("vitesse", .4)
         self.offset = 0
-        self.intensity = 5
+        self.initAdaptableParameters("intensity", 5, minimum=0, maximum=20)
         self.smooth_fast = 0
         self.time = 0
         self.tf = 0
         self.eslow = .4
         self.emid = .2
+
+    def getParameters(self):
+        return self.adaptableParametersDict
 
     def updateParams(self, af=None):
         self.vitesse = np.clip(self.vitesse, 0, 2)
@@ -79,8 +80,6 @@ class Eye(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        #_,_,w,h = self.ctx.screen.viewport
-        #self.program["iResolution"] = (w,h)
         self.program["iTime"] = self.time
         self.program["energy_fast"] = self.smooth_fast / 2.0
         self.program["energy_slow"] = self.eslow

@@ -1,16 +1,16 @@
 {
-    "id": 140017348780688,
+    "id": 140407460814992,
     "scene_width": 64000,
     "scene_height": 64000,
     "nodes": [
         {
-            "id": 140017214053968,
+            "id": 140407411419856,
             "title": "Screen",
-            "pos_x": 107.0,
-            "pos_y": -184.0,
+            "pos_x": 10.0,
+            "pos_y": -81.0,
             "inputs": [
                 {
-                    "id": 140017214079056,
+                    "id": 140407471103184,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -23,33 +23,14 @@
             "adaptable_parameters": {}
         },
         {
-            "id": 140017214084240,
-            "title": "SDF_BM",
-            "pos_x": -324.0,
-            "pos_y": -59.0,
-            "inputs": [],
-            "outputs": [
-                {
-                    "id": 140017534723344,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 3
-                }
-            ],
-            "content": {},
-            "op_code": 459,
-            "adaptable_parameters": {}
-        },
-        {
-            "id": 139701666709776,
+            "id": 140407411465104,
             "title": "Eye",
-            "pos_x": -355.0,
-            "pos_y": -305.0,
+            "pos_x": -548.0,
+            "pos_y": 67.0,
             "inputs": [],
             "outputs": [
                 {
-                    "id": 139701839087888,
+                    "id": 140409737882768,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -59,17 +40,36 @@
             "content": {},
             "op_code": 323,
             "adaptable_parameters": {
-                "vitesse": 99,
-                "intensity": 100
+                "vitesse": 90,
+                "intensity": 1000
             }
+        },
+        {
+            "id": 139783882924368,
+            "title": "SDF_BM",
+            "pos_x": -424.0,
+            "pos_y": -130.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 139783882924432,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 459,
+            "adaptable_parameters": {}
         }
     ],
     "edges": [
         {
-            "id": 139701666667856,
+            "id": 139783882821648,
             "edge_type": 2,
-            "start": 139701839087888,
-            "end": 140017214079056
+            "start": 139783882924432,
+            "end": 140407471103184
         }
     ]
 }

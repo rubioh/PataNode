@@ -8,6 +8,7 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 from node.subwindow import PataNodeSubWindow
 from node.drag_listbox import QDMDragListbox
+from node.inspector import QDMInspector
 from node.node_conf import SHADER_NODES
 
 from node.shader_widget import ShaderWidget
@@ -53,6 +54,7 @@ class PataNode(NodeEditorWindow):
         self.initShaderWidget()
 
         self.createNodesDock()
+        self.createInspectorDock()
 
         self.createActions()
         self.createMenus()
@@ -258,7 +260,17 @@ class PataNode(NodeEditorWindow):
         self.nodesDock.setWidget(self.nodesListWidget)
         self.nodesDock.setFloating(False)
 
-        self.addDockWidget(Qt.RightDockWidgetArea, self.nodesDock)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.nodesDock)
+
+    def createInspectorDock(self):
+        self.inspector_widget = QDMInspector()
+        self.inspectorDock = QDockWidget("Inspector")
+        self.inspectorDock.setWidget(self.inspector_widget)
+        self.inspectorDock.setFloating(False)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.inspectorDock)
+
+    def updateInspector(self, obj):
+        self.inspector_widget.updateParametersToSelectedItems(obj)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")

@@ -8,6 +8,8 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
+from program.program_conf import GLSLImplementationError, UnuseUniformError
+
 DEBUG = False
 
 class ShaderGraphicsNode(QDMGraphicsNode):
@@ -68,12 +70,20 @@ class ShaderNode(Node):
     def restoreFBODependencies(self):
         pass
 
+    def getAdaptableParameters(self):
+        if self.program is not None:
+            return self.program.getAdaptableParameters()
+        return None
+
     def initSettings(self):
         super().initSettings()
         self.input_socket_position = LEFT_CENTER
         self.output_socket_position = RIGHT_CENTER
 
     def findAndConnectFbos(self, win_sizes, components=None, dtypes=None):
+        if self.program.fbos is not None:
+            # fbos already connected
+            return True
         fbos = self.scene.fbo_manager.getFBO(
                 win_sizes, components, dtypes
         )
@@ -138,8 +148,8 @@ class ShaderNode(Node):
             if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
-            val = self.evalImplementation()
-            return val
+            success = self.evalImplementation()
+            return self.value
         except ValueError as e:
             self.markInvalid()
             self.grNode.setToolTip(str(e))
@@ -149,22 +159,52 @@ class ShaderNode(Node):
             self.grNode.setToolTip(str(e))
             dumpException(e)
 
-
     def onInputChanged(self, socket=None):
         if DEBUG: print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
         self.eval()
 
+    def reloadGLSLCode(self):
+        try:
+            self.program.reloadProgramSafely()
+            self.grNode.setToolTip("")
+            self.eval()
+        except GLSLImplementationError as e:
+            dumpException(e)
+            self.grNode.setToolTip("Implementation Error")
+            self.markInvalid()
+        except UnuseUniformError as e:
+            dumpException(e)
+            self.grNode.setToolTip("Unuse Uniform Error")
+            self.markInvalid()
+
+    def getGLSLCodePath(self):
+        return self.program.getGLSLCodePath()
+
+    def render(self):
+        pass
 
     def serialize(self):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
+
+        adapt_params = {}
+        for params, properties in self.getAdaptableParameters().items():
+            minmax_range = properties["maximum"] - properties["minimum"]
+            value = (properties["value"] - properties["minimum"])/minmax_range
+            value = int(value*100)
+            adapt_params[params] = value
+        res['adaptable_parameters'] = adapt_params
         return res
 
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
+
+        all_properties = self.getAdaptableParameters()
+        for name, value in data['adaptable_parameters'].items():
+            properties = all_properties[name]
+            minmax_range = properties["maximum"] - properties["minimum"]
+            value = value*minmax_range + properties["minimum"]
+            self.program.setAdaptableParameters(name, value)
         print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
-
-    def render(self):
-        pass

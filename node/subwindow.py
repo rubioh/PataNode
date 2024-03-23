@@ -1,16 +1,21 @@
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QDataStream, QIODevice, Qt
-from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
+from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QDockWidget
 # nodeeditor package
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
+from nodeeditor.node_graphics_node import QDMGraphicsNode
 # patanode package
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.inspector import QDMInspector
 
 from program.shader.screen.screen import ScreenNode
+from node.shader_node_base import ShaderNode
+
+import os
+import time
+import threading
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -24,6 +29,9 @@ class PataNodeSubWindow(NodeEditorWidget):
 
         self.setTitle()
 
+
+        self.setOpenGLSharedObject()
+
         self.initNewNodeActions()
 
         self.scene.addHasBeenModifiedListener(self.setTitle)
@@ -31,12 +39,13 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.addDragEnterListener(self.onDragEnter)
         self.scene.addDropListener(self.onDrop)
         self.scene.setNodeClassSelector(self.getNodeClassFromData)
-        self.setOpenGLSharedObject()
-        self.initInspector()
+        self.scene.addItemSelectedListener(self.onSelected)
+
 
         self._close_event_listeners = []
 
         self.screen_node = None
+
 
     def searchScreenNodes(self):
         # TODO better logic if multiple screen or output nodes
@@ -46,6 +55,9 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def render(self):
         if self.screen_node is None:
+            self.searchScreenNodes()
+        # Logic when the screen node is remove (he is not destroyed...)
+        elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
             self.screen_node.render()
@@ -59,9 +71,6 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.scene.app = self.app
         self.scene.gl_widget = self.app.gl_widget
         self.scene.fbo_manager = self.app.gl_widget.fbo_manager
-
-    def initInspector(self):
-        self.inspector_widget = QDMInspector()
 
     def getNodeClassFromData(self, data):
         if 'op_code' not in data: return Node
@@ -78,6 +87,7 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def fileLoad(self, filename):
         if super().fileLoad(filename):
+            self.scene.fbo_manager.restoreFBOUsability()
             self.doEvalOutputs()
             return True
 
@@ -101,6 +111,16 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def setTitle(self):
         self.setWindowTitle(self.getUserFriendlyFilename())
+
+    def onSelected(self):
+        items = self.getSelectedItems()
+        item = items[0]
+        if isinstance(item, QDMGraphicsNode):
+            node = item.node
+            self.updateInspector(node)
+
+    def updateInspector(self, node):
+        self.app.updateInspector(node)
 
     def addCloseEventListener(self, callback):
         self._close_event_listeners.append(callback)
@@ -183,15 +203,26 @@ class PataNodeSubWindow(NodeEditorWidget):
         evalAct = context_menu.addAction("Eval")
 
         context_menu.addSeparator()
+        
+        reloadGLSLAct = context_menu.addAction("Reload glsl code")
 
         if isinstance(selected, ScreenNode):
             restoreFBOAct = context_menu.addAction("Restore FBOs dependencies")
+        if isinstance(selected, ShaderNode):
+            open_glsl_menu = context_menu.addMenu("Open glsl code")
+
+            actOpenGLSL = []
+            full_paths = selected.getGLSLCodePath()
+            for path in full_paths:
+                short_path = path.split("/")[-1]
+                actOpenGLSL.append(open_glsl_menu.addAction(short_path))
+            
+
+        #if selected and action == openGLSLAct: selected.openGLSLCode()
 
         #openInspectorAct = context_menu.addAction("Open Parameters Inspector")
         
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
-
-
 
         if DEBUG_CONTEXT: print("got item:", selected)
         if selected and action == markDirtyAct: selected.markDirty()
@@ -201,9 +232,11 @@ class PataNodeSubWindow(NodeEditorWidget):
         if selected and action == evalAct:
             val = selected.eval()
             if DEBUG_CONTEXT: print("EVALUATED:", val)
-
+        if selected and action == reloadGLSLAct: selected.reloadGLSLCode()
         if isinstance(selected, ScreenNode) and action == restoreFBOAct: selected.restoreFBODependencies()
-
+        if isinstance(selected, ShaderNode):
+            for path, act in zip(full_paths, actOpenGLSL):
+                if selected and action == act: self.openInTerminal(path)
 
     def handleEdgeContextMenu(self, event):
         if DEBUG_CONTEXT: print("CONTEXT: EDGE")
@@ -259,3 +292,7 @@ class PataNodeSubWindow(NodeEditorWidget):
             else:
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
 
+
+    def openInTerminal(self, path):
+        # This stop the rendering...
+        os.system('gnome-terminal --command="vim {}"'.format(path))

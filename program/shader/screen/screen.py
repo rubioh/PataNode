@@ -2,7 +2,7 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, load_program
+from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode
@@ -22,13 +22,11 @@ class Screen(ProgramBase):
         self.initParams()
 
 
-    def initProgram(self, init_vbo=True):
+    def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "screen.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.program = load_program(self.ctx, vert, frag)
-        if init_vbo:
+        self.program = self.loadProgramToCtx(vert_path, frag_path, reload)
+        if not reload:
             self.vbo = self.ctx.buffer(get_square_vertex_data())
         self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
 
@@ -50,6 +48,7 @@ class Screen(ProgramBase):
         texture.use(0)
         self.ctx.screen.use()
         self.vao.render()
+        return True
 
 @register_node(OP_CODE_SCREEN)
 class ScreenNode(ShaderNode):
@@ -69,6 +68,7 @@ class ScreenNode(ShaderNode):
         self.scene.fbo_manager.restoreFBOUsability()
         for node in self.scene.nodes:
             node.markDirty()
+            node.program.fbos = None
         self.eval()
 
     def evalImplementation(self):
@@ -78,14 +78,14 @@ class ScreenNode(ShaderNode):
             self.markDirty()
             return False
 
-        success_eval = input_node.eval()
+        input_texture = input_node.eval()
 
-        if not success_eval:
+        if input_texture is None:
             self.grNode.setToolTip("Input is NaN")
             self.markDirty()
             return False
 
-        success_render = self.render()
+        success_render = self.program.render(input_texture)
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
         self.grNode.setToolTip("")

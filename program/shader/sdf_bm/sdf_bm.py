@@ -2,7 +2,7 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, load_program, name_to_opcode
+from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode
@@ -33,28 +33,24 @@ class SDF_BM(ProgramBase):
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-    def initProgram(self, init_vbo=True):
+    def initProgram(self, reload=False):
         # INFO PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Info/info.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.info_program = load_program(self.ctx, vert, frag)
-        if init_vbo:
+        self.info_program = self.loadProgramToCtx(vert_path, frag_path, reload)
+        if not reload:
             self.info_vbo = self.ctx.buffer(get_square_vertex_data())
         self.info_vao = self.ctx.vertex_array(self.info_program, [(self.info_vbo, "2f", "in_position")])
         # NORMAL PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Normal/normal.glsl")
-        vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
-        self.normal_program = load_program(self.ctx, vert, frag)
-        if init_vbo:
+        self.normal_program = self.loadProgramToCtx(vert_path, frag_path, reload)
+        if not reload:
             self.normal_vbo = self.ctx.buffer(get_square_vertex_data())
         self.normal_vao = self.ctx.vertex_array(self.normal_program, [(self.normal_vbo, "2f", "in_position")])
 
     def reloadProgram(self):
-        self.initProgram(init_vbo=False)
+        self.initProgram(reload=True)
 
     def initParams(self):
         self.tm = 150
