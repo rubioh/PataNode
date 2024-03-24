@@ -10,7 +10,7 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 # patanode package
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
-from program.shader.screen.screen import ScreenNode
+from program.output.screen.screen import ScreenNode
 from node.shader_node_base import ShaderNode
 
 import os

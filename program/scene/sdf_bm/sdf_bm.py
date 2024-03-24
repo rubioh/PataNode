@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode
+from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 from nodeeditor.utils import dumpException
 
@@ -208,7 +208,7 @@ class SDF_BM(ProgramBase):
         #self.apply_utils(self.manager.utils["Bloom2"])
 
 @register_node(OP_CODE_SDFBM)
-class SDF_BMNode(ShaderNode):
+class SDF_BMNode(ShaderNode, Scene):
     op_title = "SDF_BM"
     op_code = OP_CODE_SDFBM
     content_label = ""

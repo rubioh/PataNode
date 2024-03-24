@@ -30,6 +30,8 @@ def get_class_from_opcode(op_code):
 
 
 # import all nodes and register them
-import program.shader
+import program.scene
+import program.output
+import program.utils
 
-print(SHADER_NODES)
+#print(SHADER_NODES)

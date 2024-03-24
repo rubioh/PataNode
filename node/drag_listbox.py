@@ -1,20 +1,21 @@
-from PyQt5.QtGui import QPixmap, QIcon, QDrag
+from PyQt5.QtGui import QPixmap, QIcon, QDrag, QColor
 from PyQt5.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice, QPoint
-from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem
+from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem, QTreeWidget, QTreeWidgetItem
+from PyQt5.Qt import *
 
 from nodeeditor.utils import dumpException
 
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
-
-class QDMDragListbox(QListWidget):
+class QDMDragListbox(QTreeWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.initUI()
 
     def initUI(self):
         # init
-        self.setIconSize(QSize(32, 32))
+        self.setColumnCount(2)
+        self.setHeaderLabels(["Node types", "Name"])
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
 
@@ -24,37 +25,58 @@ class QDMDragListbox(QListWidget):
     def addMyItems(self):
         keys = list(SHADER_NODES.keys())
         keys.sort()
+
+        shader_types = {}
         for key in keys:
             node = get_class_from_opcode(key)
-            self.addMyItem(node.op_title, node.icon, node.op_code)
+            node_type_reference = node.node_type_reference
+            if node_type_reference in shader_types.keys():
+                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
+            else:
+                shader_types[node_type_reference] = list()
+                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
+        
+        for shader_type in shader_types:
+            shader_type_item = QTreeWidgetItem(self)
+            shader_type_item.setText(0, shader_type)
+            shader_type_item.setForeground(0, QColor("#E39600"))
+            for data in shader_types[shader_type]:
+                self.addMyItem(*data, shader_type_item)
+            shader_type_item.setChildIndicatorPolicy(0)
+            shader_type_item.sortChildren(1, Qt.AscendingOrder)
+        self.sortItems(0, Qt.AscendingOrder)
 
+    def addMyItem(self, name, icon=None, op_code=0, parent=None):
+        item = QTreeWidgetItem(parent) # can be (icon, text, parent, <int>type)
 
-    def addMyItem(self, name, icon=None, op_code=0):
-        item = QListWidgetItem(name, self) # can be (icon, text, parent, <int>type)
+        #qname.setTextColor()
+        item.setText(1, name)
+        item.setForeground(1, QColor("#BAC18A"))
         pixmap = QPixmap(icon if icon is not None else ".")
-        item.setIcon(QIcon(pixmap))
-        item.setSizeHint(QSize(32, 32))
+        item.setIcon(1, QIcon(pixmap))
+        item.setSizeHint(1, QSize(16, 16))
 
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
-
         # setup data
-        item.setData(Qt.UserRole, pixmap)
-        item.setData(Qt.UserRole + 1, op_code)
-
+        item.setData(1, Qt.UserRole, pixmap)
+        item.setData(1, Qt.UserRole + 1, op_code)
+        #item.setHidden()
 
     def startDrag(self, *args, **kwargs):
         try:
             item = self.currentItem()
-            op_code = item.data(Qt.UserRole + 1)
+            if item.text(0):
+                return
+            op_code = item.data(1, Qt.UserRole + 1)
 
-            pixmap = QPixmap(item.data(Qt.UserRole))
+            pixmap = QPixmap(item.data(1, Qt.UserRole))
 
 
             itemData = QByteArray()
             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
             dataStream << pixmap
             dataStream.writeInt(op_code)
-            dataStream.writeQString(item.text())
+            dataStream.writeQString(item.text(1))
 
             mimeData = QMimeData()
             mimeData.setData(LISTBOX_MIMETYPE, itemData)
@@ -67,4 +89,3 @@ class QDMDragListbox(QListWidget):
             drag.exec_(Qt.MoveAction)
 
         except Exception as e: dumpException(e)
-

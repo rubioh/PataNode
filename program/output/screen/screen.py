@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode
+from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
 
 OP_CODE_SCREEN = 0
@@ -51,7 +51,7 @@ class Screen(ProgramBase):
         return True
 
 @register_node(OP_CODE_SCREEN)
-class ScreenNode(ShaderNode):
+class ScreenNode(ShaderNode, Output):
     op_title = "Screen"
     op_code = OP_CODE_SCREEN
     content_label = ""

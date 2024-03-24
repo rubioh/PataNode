@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode
+from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
@@ -97,7 +97,7 @@ class Eye(ProgramBase):
 
 
 @register_node(OP_CODE_EYE)
-class EyeNode(ShaderNode):
+class EyeNode(ShaderNode, Scene):
     op_title = "Eye"
     op_code = OP_CODE_EYE
     content_label = ""
@@ -105,8 +105,10 @@ class EyeNode(ShaderNode):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
+        self.shader_node_type = dirname(__file__).split('/')[-2]
         self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
+
 
     def render(self):
         return self.program.render()

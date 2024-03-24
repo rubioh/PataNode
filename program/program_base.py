@@ -3,7 +3,7 @@ from program.program_conf import CTXError, SQUARE_VERT_PATH, UnuseUniformError, 
 from nodeeditor.utils import dumpException
 
 
-DEBUG = True
+DEBUG = False
 
 class ProgramBase:
 
@@ -120,6 +120,7 @@ class ProgramBase:
         }
     
     def getAdaptableParameters(self):
+        # Update parameters value in the dictionnary (only here)
         for params in self.adaptable_parameters_dict.keys():
             self.adaptable_parameters_dict[params]["value"] = getattr(self, params)
         return self.adaptable_parameters_dict

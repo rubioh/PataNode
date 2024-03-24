@@ -1,3 +1,6 @@
+from os.path import dirname, basename, isfile, join
+import inspect
+
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QLabel
@@ -63,12 +66,9 @@ class ShaderNode(Node):
         self.program = None
         # Current OpenGL ctx
         self.ctx = scene.ctx
-
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
 
-    def restoreFBODependencies(self):
-        pass
 
     def getAdaptableParameters(self):
         if self.program is not None:
@@ -79,6 +79,9 @@ class ShaderNode(Node):
         super().initSettings()
         self.input_socket_position = LEFT_CENTER
         self.output_socket_position = RIGHT_CENTER
+
+    def restoreFBODependencies(self):
+        pass
 
     def findAndConnectFbos(self, win_sizes, components=None, dtypes=None):
         if self.program.fbos is not None:
@@ -208,3 +211,16 @@ class ShaderNode(Node):
             self.program.setAdaptableParameters(name, value)
         print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
+
+
+
+
+
+class Utils():
+    node_type_reference = "Utils"
+class Scene():
+    node_type_reference = "Scenes"
+class Output():
+    node_type_reference = "Outputs"
+class Texture():
+    node_type_reference = "Textures"

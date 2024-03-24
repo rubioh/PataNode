@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode
+from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 OP_CODE_SYMETRY = name_to_opcode('symetry')
@@ -44,7 +44,8 @@ class Symetry(ProgramBase):
         self.mode = 0
         self.t = 0
         self.t_angle = 0
-        self.smlow = 1
+        self.initAdaptableParameters("smlow", 1, minimum=0, maximum=10)
+        #self.smlow = 1
 
     def updateParams(self, af=None):
         if af is None:
@@ -81,7 +82,7 @@ class Symetry(ProgramBase):
 
 
 @register_node(OP_CODE_SYMETRY)
-class SymetryNode(ShaderNode):
+class SymetryNode(ShaderNode, Utils):
     op_title = "Symetry"
     op_code = OP_CODE_SYMETRY
     content_label = ""

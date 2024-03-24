@@ -2,12 +2,14 @@ import numpy as np
 from os.path import dirname, basename, isfile, join
 
 SHADER_PROGRAMS = {}
+SQUARE_VERT_PATH = join(dirname(__file__), 'base/vertex_base.glsl')
 
 class InvalidProgramRegistration(Exception): pass
 class LoadingFBOsError(Exception): pass
 class GLSLImplementationError(Exception): pass
 class UnuseUniformError(Exception): pass
 class CTXError(Exception): pass
+
 
 def register_program_now(op_code, class_reference):
     if op_code in SHADER_PROGRAMS:
@@ -32,7 +34,8 @@ def name_to_opcode(name):
     l = [ord(char) for char in name]
     return sum(l)
 
-SQUARE_VERT_PATH = join(dirname(__file__), 'base/vertex_base.glsl')
 
-import program.shader
+import program.output
+import program.scene
+import program.utils
 
