@@ -14,6 +14,6 @@ void main()
 
     col = fract(col*4.);
     // Output to screen
-    fragColor = vec4(col,1.0);
+    fragColor = vec4(col, 1.);
 }
 

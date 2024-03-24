@@ -33,10 +33,7 @@ class Symetry(ProgramBase):
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "symetry.glsl")
-        self.program = self.loadProgramToCtx(vert_path, frag_path)
-        if not reload:
-            self.vbo = self.ctx.buffer(get_square_vertex_data())
-        self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
+        self.loadProgramToCtx(vert_path, frag_path)
 
     def initParams(self):
         self.program["iChannel0"] = 1

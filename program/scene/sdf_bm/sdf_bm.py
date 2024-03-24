@@ -37,17 +37,11 @@ class SDF_BM(ProgramBase):
         # INFO PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Info/info.glsl")
-        self.info_program = self.loadProgramToCtx(vert_path, frag_path, reload)
-        if not reload:
-            self.info_vbo = self.ctx.buffer(get_square_vertex_data())
-        self.info_vao = self.ctx.vertex_array(self.info_program, [(self.info_vbo, "2f", "in_position")])
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="info_")
         # NORMAL PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Normal/normal.glsl")
-        self.normal_program = self.loadProgramToCtx(vert_path, frag_path, reload)
-        if not reload:
-            self.normal_vbo = self.ctx.buffer(get_square_vertex_data())
-        self.normal_vao = self.ctx.vertex_array(self.normal_program, [(self.normal_vbo, "2f", "in_position")])
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="normal_")
 
     def reloadProgram(self):
         self.initProgram(reload=True)

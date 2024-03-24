@@ -36,10 +36,7 @@ class Template(ProgramBase):
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "template.glsl")
-        self.program = self.loadProgramToCtx(vert_path, frag_path, reload)
-        if not reload:
-            self.vbo = self.ctx.buffer(get_square_vertex_data())
-        self.vao = self.ctx.vertex_array(self.program, [(self.vbo, "2f", "in_position")])
+        self.loadProgramToCtx(vert_path, frag_path, reload)
     
     def initParams(self):
         self.initAdaptableParameters("vitesse", .4, minimum=.1, maximum=10)
