@@ -217,7 +217,6 @@ class PataNodeSubWindow(NodeEditorWidget):
                 short_path = path.split("/")[-1]
                 actOpenGLSL.append(open_glsl_menu.addAction(short_path))
             
-
         #if selected and action == openGLSLAct: selected.openGLSLCode()
 
         #openInspectorAct = context_menu.addAction("Open Parameters Inspector")
@@ -236,7 +235,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         if isinstance(selected, ScreenNode) and action == restoreFBOAct: selected.restoreFBODependencies()
         if isinstance(selected, ShaderNode):
             for path, act in zip(full_paths, actOpenGLSL):
-                if selected and action == act: self.openInTerminal(path)
+                if selected and action == act: selected.openGLSLInTerminal(path)
 
     def handleEdgeContextMenu(self, event):
         if DEBUG_CONTEXT: print("CONTEXT: EDGE")
@@ -293,6 +292,3 @@ class PataNodeSubWindow(NodeEditorWidget):
                 self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
 
 
-    def openInTerminal(self, path):
-        # This stop the rendering...
-        os.system('gnome-terminal --command="vim {}"'.format(path))

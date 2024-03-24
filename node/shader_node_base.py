@@ -1,9 +1,11 @@
 from os.path import dirname, basename, isfile, join
+import os
 import inspect
+import traceback
 
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QRectF
-from PyQt5.QtWidgets import QLabel
+from PyQt5.QtWidgets import QLabel, QMessageBox
 
 from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
@@ -12,6 +14,8 @@ from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
 from program.program_conf import GLSLImplementationError, UnuseUniformError
+
+
 
 DEBUG = False
 
@@ -41,6 +45,17 @@ class ShaderGraphicsNode(QDMGraphicsNode):
             self.icons,
             QRectF(offset, 0, 24.0, 24.0)
         )
+
+    def openDialog(self, msg): 
+        if isinstance(msg, list):
+            msgs = ''
+            for m in msg:
+                msgs += m
+        else:
+            msgs = msg
+        dialog = QMessageBox()
+        dialog.setText(msgs)
+        dialog.exec()
 
 
 class ShaderContent(QDMNodeContentWidget):
@@ -168,21 +183,29 @@ class ShaderNode(Node):
         self.eval()
 
     def reloadGLSLCode(self):
+        if DEBUG: print("Program before reloading is: ", self.program.program)
         try:
             self.program.reloadProgramSafely()
             self.grNode.setToolTip("")
             self.eval()
         except GLSLImplementationError as e:
-            dumpException(e)
+            self.markInvalid()
             self.grNode.setToolTip("Implementation Error")
-            self.markInvalid()
+            self.grNode.openDialog(traceback.format_exception(e))
+            self.program.reloadPreviousProgramVersion()
         except UnuseUniformError as e:
-            dumpException(e)
-            self.grNode.setToolTip("Unuse Uniform Error")
             self.markInvalid()
+            self.grNode.setToolTip("Unuse Uniform Error")
+            self.grNode.openDialog(traceback.format_exception(e))
+            self.program.reloadPreviousProgramVersion()
+        if DEBUG: print("Program after reloading is: ", self.program.program)
 
     def getGLSLCodePath(self):
         return self.program.getGLSLCodePath()
+
+    def openGLSLInTerminal(self, glsl_path):
+        os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
+        print("Open in Vim the file %s"%glsl_path)
 
     def render(self):
         pass

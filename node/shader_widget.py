@@ -116,6 +116,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.last_snare_count = self.af["snare_count"]
 
     def paintGL(self):
+        #print('tic', time.time())
         self.makeCurrent()
         self._ctx.clear(color=(.0,.0,.0))
         self.set_audio_features()
