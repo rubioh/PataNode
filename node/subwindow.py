@@ -53,14 +53,14 @@ class PataNodeSubWindow(NodeEditorWidget):
             if isinstance(node, ScreenNode):
                 self.screen_node = node
 
-    def render(self):
+    def render(self, audio_features=None):
         if self.screen_node is None:
             self.searchScreenNodes()
         # Logic when the screen node is remove (he is not destroyed...)
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            self.screen_node.render()
+            self.screen_node.render(audio_features)
 
     def setOpenGLSharedObject(self):
         """

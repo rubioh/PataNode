@@ -91,10 +91,10 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self):
+    def render(self, audio_features=None):
         input_node = self.getInput(0)
         if input_node is None:
             return False
-        texture = input_node.render()
-        self.program.render(texture)
+        texture = input_node.render(audio_features)
+        self.program.render(texture, audio_features)
         return True

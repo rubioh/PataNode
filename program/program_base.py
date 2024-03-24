@@ -107,7 +107,7 @@ class ProgramBase:
                     minimum=0, 
                     maximum=1, 
                     type="f4",
-                    widget_type=0):
+                    widget_type="Slider"):
         setattr(self, name, value)
         self.adaptable_parameters_dict[name] = {
             "name": name,
@@ -116,7 +116,7 @@ class ProgramBase:
             "type":  type,
             "value": value,
             "connect": lambda v: self.setAdaptableParameters(name, v),
-            "widget": 0
+            "widget": widget_type
         }
     
     def getAdaptableParameters(self):

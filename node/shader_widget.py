@@ -8,8 +8,9 @@ import PyQt5
 
 
 class ShaderWidget(QtOpenGL.QGLWidget):
-    def __init__(self, app, title='GL Widget', gl_version=(3,3), size=(1280, 720), resizable=True, fullscreen=False):
+    def __init__(self, app, audio_engine=None, title='GL Widget', gl_version=(3,3), size=(1280, 720), resizable=True, fullscreen=False):
         self.app = app
+        self.audio_engine = audio_engine
         self._title = title
         self.gl_version = gl_version
         self.width, self.height = int(size[0]), int(size[1])
@@ -33,6 +34,9 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.init_mgl_context()
         self.initQTimer()
         self.set_default_viewport()
+
+        # Audio features parameters
+        self.last_kick_count = self.last_hat_count = self.last_snare_count = 0
 
 
     @property
@@ -99,10 +103,23 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def init_fbo_manager(self):
         self.fbo_manager = FBOManager(self.ctx)
 
+    def set_audio_features(self):
+        audio_features = self.audio_engine.features
+        self.af = audio_features
+        self.af["on_kick"] = 1 if self.last_kick_count != self.af["kick_count"] else 0
+        self.af["on_hat"] = 1 if self.last_hat_count != self.af["hat_count"] else 0
+        self.af["on_snare"] = (
+            1 if self.last_snare_count != self.af["snare_count"] else 0
+        )
+        self.last_kick_count = self.af["kick_count"]
+        self.last_hat_count = self.af["hat_count"]
+        self.last_snare_count = self.af["snare_count"]
+
     def paintGL(self):
         self.makeCurrent()
         self._ctx.clear(color=(.0,.0,.0))
-        self.app.render()
+        self.set_audio_features()
+        self.app.render(self.af)
 
     def resize(self, width: int, height: int) -> None:
         self._width = width * self.devicePixelRatio()

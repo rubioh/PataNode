@@ -219,5 +219,5 @@ class SDF_BMNode(ShaderNode, Scene):
         self.program = SDF_BM(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
-    def render(self):
-        return self.program.render()
+    def render(self, audio_features=None):
+        return self.program.render(audio_features)

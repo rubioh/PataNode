@@ -24,12 +24,34 @@ class QDMInspector(QWidget):
         self.grid.insertStretch(-1,1)
 
     def createWidget(self, properties):
-        if properties["widget"] == 0:
+        if properties["widget"] == "Slider":
             return self.createSlider(properties)
+        if properties["widget"] == "CheckBox":
+            return self.createCheckBox(properties)
+
+    def createCheckBox(self, properties):
+        name = properties["name"].lower().capitalize()
+        name = name.replace('_', ' ')
+        groupBox = QGroupBox("")
+
+        checkbox = QRadioButton(name)
+        checkbox.setChecked(bool(properties["value"]))
+        connect = properties['connect']
+        fine_connect = lambda v : connect(int(checkbox.isChecked()))
+        checkbox.toggled.connect(fine_connect)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(checkbox)
+        vbox.addStretch(1)
+        groupBox.setLayout(vbox)
+        groupBox.setFlat(True)
+        return groupBox
 
     def createSlider(self, properties):
         name = properties["name"].lower().capitalize()
+        name = name.replace('_', ' ')
         groupBox = QGroupBox(name)
+        #groupBox.setForeground("#FFB500")
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)

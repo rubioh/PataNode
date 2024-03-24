@@ -19,6 +19,10 @@ DEBUG = False
 
 class PataNode(NodeEditorWindow):
 
+    def __init__(self, audio_engine=None):
+        self.audio_engine = audio_engine
+        super().__init__()
+
     def initUI(self):
         self.name_company = 'PataShade'
         self.name_product = 'PataNode'
@@ -67,14 +71,14 @@ class PataNode(NodeEditorWindow):
         self.setWindowTitle("PataShade NodeEditor Example")
 
     def initShaderWidget(self):
-        self.gl_widget = ShaderWidget(self)
+        self.gl_widget = ShaderWidget(self, self.audio_engine)
         self.ctx = self.gl_widget.ctx
         self.gl_widget.hide()
 
-    def render(self):
+    def render(self, audio_features=None):
         current_program = self.getCurrentNodeEditorWidget()
         if current_program is not None:
-            current_program.render()
+            current_program.render(audio_features)
         #print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
 
     def closeEvent(self, event):

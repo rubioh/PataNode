@@ -41,11 +41,13 @@ class Symetry(ProgramBase):
     def initParams(self):
         self.program["iChannel0"] = 1
         self.chill = False
-        self.mode = 0
         self.t = 0
         self.t_angle = 0
-        self.initAdaptableParameters("smlow", 1, minimum=0, maximum=10)
-        #self.smlow = 1
+        self.smlow = 1
+        self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
+        self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
+        self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
+        self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
 
     def updateParams(self, af=None):
         if af is None:
@@ -53,25 +55,27 @@ class Symetry(ProgramBase):
         self.t += af["smooth_full"]
         if af["on_chill"] and not self.chill:
             self.chill = True
-
-        if self.chill and not af["on_chill"]:
-            self.mode ^= 1
-            self.chill = False
+        
+        if self.automatic_mode:
+            if self.chill and not af["on_chill"]:
+                self.symetry_mode ^= 1
+                self.chill = False
 
         if af["on_chill"] == 0.0:
-            self.t_angle += af["full"][0] * 0.01 * (2.5 * self.camp + 0.5) - 0.03
+            self.t_angle += af["full"][0] * 0.01 * (2.5 * self.rotation_amplification + 0.5) - 0.03
 
-        self.smlow = af["smooth_low"] * (self.camp * 2.5 + .5)
+        self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + .5)
 
     def bindUniform(self, af):
         super().bindUniform(af)
         self.program["smooth_low"] = self.smlow
-        self.program["mode"] = self.mode
+        self.program["mode"] = self.symetry_mode
         self.program["t"] = self.t * 5.0
         self.program["t_angle"] = self.t_angle * 5.0
 
     def render(self, texture, af=None):
         self.bindUniform(af)
+        self.updateParams(af)
         texture.use(1)
         self.fbos[0].use()
         self.vao.render()
@@ -93,9 +97,9 @@ class SymetryNode(ShaderNode, Utils):
         self.program = Symetry(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
-    def render(self):
+    def render(self, audio_features=None):
         input_node = self.getInput(0)
         if input_node is None:
             return self.program.norender()
-        texture = input_node.render()
-        return self.program.render(texture)
+        texture = input_node.render(audio_features)
+        return self.program.render(texture, audio_features)
