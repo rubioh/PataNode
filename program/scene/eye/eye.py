@@ -106,6 +106,6 @@ class EyeNode(ShaderNode, Scene):
         self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
-
     def render(self, audio_features=None):
-        return self.program.render(audio_features)
+        output_texture = self.program.render(audio_features)
+        return output_texture

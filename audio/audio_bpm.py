@@ -63,7 +63,7 @@ class BPM_estimator:
                 abs(bpm - self.shortterm_bpm) < self.MAX_RANGE
                 and bpm > self.bpm_min
                 and bpm < self.bpm_max
-            ):
+            ):  
                 # Calculate update's parameters Adagrad (with momentum) like procedure
                 gradient = self.shortterm_bpm - bpm  # Estimated bpm's gradient
                 self.gradient_bpm = (

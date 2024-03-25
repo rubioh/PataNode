@@ -33,10 +33,9 @@ class Symetry(ProgramBase):
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "symetry.glsl")
-        self.loadProgramToCtx(vert_path, frag_path)
+        self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-        self.program["iChannel0"] = 1
         self.chill = False
         self.t = 0
         self.t_angle = 0
@@ -65,6 +64,7 @@ class Symetry(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
+        self.program["iChannel0"] = 1
         self.program["smooth_low"] = self.smlow
         self.program["mode"] = self.symetry_mode
         self.program["t"] = self.t * 5.0
@@ -99,4 +99,5 @@ class SymetryNode(ShaderNode, Utils):
         if input_node is None:
             return self.program.norender()
         texture = input_node.render(audio_features)
-        return self.program.render(texture, audio_features)
+        output_texture = self.program.render(texture, audio_features)
+        return output_texture

@@ -67,7 +67,7 @@ class ProgramBase:
             setattr(self, name+'vbo', self.ctx.buffer(get_square_vertex_data()))
 
         program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)
-        vao = self.ctx.vertex_array(program, [(self.vbo, "2f", "in_position")])
+        vao = self.ctx.vertex_array(program, [(getattr(self, name+'vbo'), "2f", "in_position")])
 
         if reload:
             # Save a copy of the previous program on reload
@@ -113,6 +113,7 @@ class ProgramBase:
 
     def reloadProgramSafely(self):
         if DEBUG: print("Program %s: start reloading safely"%self.__class__.__name__)
+        if DEBUG: print(self.vbo, self.vao, self.program)
         # Try to reload the program
         try:
             self.reloadProgram()
@@ -124,6 +125,7 @@ class ProgramBase:
             self.bindUniform(None) # TODO remove None here 
         except:
             raise UnuseUniformError
+        if DEBUG: print(self.vbo, self.vao, self.program)
         if DEBUG: print("Program %s: success while reloading program"%self.__class__.__name__)
 
     def getGLSLCodePath(self):

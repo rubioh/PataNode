@@ -10,6 +10,7 @@ from node.subwindow import PataNodeSubWindow
 from node.drag_listbox import QDMDragListbox
 from node.inspector import QDMInspector
 from node.node_conf import SHADER_NODES
+from node.audio_widget import AudioLogWidget
 
 from node.shader_widget import ShaderWidget
 
@@ -56,7 +57,7 @@ class PataNode(NodeEditorWindow):
 
         # Shader Widget and mgl context Initialization
         self.initShaderWidget()
-
+        self.initAudioLogDock()
         self.createNodesDock()
         self.createInspectorDock()
 
@@ -68,18 +69,32 @@ class PataNode(NodeEditorWindow):
 
         self.readSettings()
 
-        self.setWindowTitle("PataShade NodeEditor Example")
+        self.setWindowTitle("PataNode")
 
     def initShaderWidget(self):
         self.gl_widget = ShaderWidget(self, self.audio_engine)
         self.ctx = self.gl_widget.ctx
         self.gl_widget.hide()
 
+    def onHideAudioDock(self, value):
+        self.audio_log_widget.setHidden(value)
+
+    def initAudioLogDock(self):
+        self.audio_log_widget = AudioLogWidget(self.audio_engine)
+        self.audioDock = QDockWidget("Audio Features")
+        self.audioDock.setWidget(self.audio_log_widget)
+        self.audioDock.visibilityChanged.connect(self.onHideAudioDock)
+        self.audioDock.setFloating(False)
+        self.audio_log_widget.resize(1000,200)
+        self.addDockWidget(Qt.TopDockWidgetArea, self.audioDock)
+        self.resizeDocks((self.audioDock,), (200,), Qt.Vertical)
+
+
     def render(self, audio_features=None):
         current_program = self.getCurrentNodeEditorWidget()
         if current_program is not None:
             current_program.render(audio_features)
-        #print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
+        if DEBUG: print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
 
     def closeEvent(self, event):
         self.mdiArea.closeAllSubWindows()
@@ -109,13 +124,21 @@ class PataNode(NodeEditorWindow):
         self.actAbout = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
 
         self.actHideShaderWindow = QAction("&Hide Shader Screen", self, statusTip="Hide the screen mgl framebuffer", triggered=self.hideShaderWindow, shortcut='Ctrl+H')
-        self.actShowShaderWindow = QAction("&Display Shader Screen", self, statusTip="Hide the screen mgl framebuffer", triggered=self.showShaderWindow, shortcut='Ctrl+D')
+        self.actShowShaderWindow = QAction("&Display Shader Screen", self, statusTip="Display the screen mgl framebuffer", triggered=self.showShaderWindow, shortcut='Ctrl+D')
+        #self.actHideAudioLogWindow = QAction("&Hide Audio Log Screen", self, statusTip="Hide the audio features logger", triggered=self.hideShaderWindow, shortcut='Ctrl+Alt+H')
+        #self.actShowAudioLogWindow = QAction("&Display Audio Log Screen", self, statusTip="Display the audio features logger", triggered=self.showShaderWindow, shortcut='Ctrl+Alt+D')
 
     def hideShaderWindow(self):
         self.gl_widget.hide()
 
     def showShaderWindow(self):
         self.gl_widget.show()
+
+    def hideAudioLogWindow(self):
+        self.audio_log_widget.setVisible(False)
+
+    def showAudioLogWindow(self):
+        self.audio_log_widget.setVisible(True)
 
     def getCurrentNodeEditorWidget(self):
         """ we're returning NodeEditorWidget here... """
@@ -231,6 +254,8 @@ class PataNode(NodeEditorWindow):
         self.windowMenu.addSeparator()
         self.windowMenu.addAction(self.actHideShaderWindow)
         self.windowMenu.addAction(self.actShowShaderWindow)
+        #self.windowMenu.addAction(self.actHideAudioLogWindow)
+        #self.windowMenu.addAction(self.actShowAudioLogWindow)
 
         windows = self.mdiArea.subWindowList()
         self.actSeparator.setVisible(len(windows) != 0)
@@ -265,6 +290,7 @@ class PataNode(NodeEditorWindow):
         self.nodesDock.setFloating(False)
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.nodesDock)
+        self.resizeDocks((self.nodesDock,), (180,), Qt.Horizontal)
 
     def createInspectorDock(self):
         self.inspector_widget = QDMInspector()
@@ -272,6 +298,7 @@ class PataNode(NodeEditorWindow):
         self.inspectorDock.setWidget(self.inspector_widget)
         self.inspectorDock.setFloating(False)
         self.addDockWidget(Qt.RightDockWidgetArea, self.inspectorDock)
+        self.resizeDocks((self.inspectorDock,), (130,), Qt.Horizontal)
 
     def updateInspector(self, obj):
         self.inspector_widget.updateParametersToSelectedItems(obj)

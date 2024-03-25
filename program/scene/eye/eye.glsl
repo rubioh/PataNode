@@ -11,7 +11,6 @@ uniform float intensity;
 uniform float tf;
 uniform float scale;
 #define PI 3.141593
-
 vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d )
 {
     return a + b*cos(6.28318*(c*t+d));
@@ -98,6 +97,6 @@ void main()
     vec3 col = iris + eye.x*vec3(.5)+pupille.x*vec3(.5);
     // Output to screen
     //col *= 0.;
-    fragColor = vec4(col,1.0);
+    fragColor = vec4(col.brg,1.0);
 }
 

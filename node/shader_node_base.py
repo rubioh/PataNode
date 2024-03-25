@@ -186,6 +186,7 @@ class ShaderNode(Node):
         if DEBUG: print("Program before reloading is: ", self.program.program)
         try:
             self.program.reloadProgramSafely()
+            self.markDirty()
             self.grNode.setToolTip("")
             self.eval()
         except GLSLImplementationError as e:

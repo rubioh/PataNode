@@ -8,7 +8,6 @@ uniform float smooth_low;
 uniform float mode;
 uniform float t;
 uniform float t_angle;
-
 #define R iResolution
 float mask(vec2 uv){
     return step(0, uv.x)*step(uv.x, R.x)*step(0, uv.y)*step(uv.y, R.y);
@@ -44,7 +43,6 @@ void main()
     if (st.y<0) st.y = (1-mod(st.y, 1.));
 
     vec3 col = texture(iChannel0, st).rgb;
-
     fragColor = vec4(col,1.0);
 
 }

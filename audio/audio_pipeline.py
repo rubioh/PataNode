@@ -51,9 +51,11 @@ class AudioEngine:
             print(devices)
             print("hint: `export PATASHADE_INPUT_DEVICE=<index>`")
             exit(1)
+        
 
+        self.log_buffer_size = 250
         # Tracker, estimator and ML models
-        self.logger = AudioLogger(wait=2000, active=get_log)
+        self.logger = AudioLogger(log_buffer_size=self.log_buffer_size, active=get_log)
         self.tracker = AudioEventTracker()
         self.bpm_estimator = BPM_estimator(0.5, 16, 110, 15)
         self.ET = EnergyTracker(sr=self.sr)
@@ -64,6 +66,14 @@ class AudioEngine:
 
         self.bpm = 140
         self.mini_chill = 0
+
+        self.initFeatures()
+
+    def initFeatures(self):
+        self.buffer = np.zeros(2000)
+        self.current_chunk = np.zeros(self.chunk)
+        self.__call__()
+        self.buffer = np.zeros((0))
 
     def start_recording(self):
         self._stream.start()
@@ -149,5 +159,5 @@ class AudioEngine:
         else:
             self.logger.update_info(self.buffer[self.previous_length :], self.features)
         self.previous_length = self.buffer.shape[0]
-
+        
         return self.features

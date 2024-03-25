@@ -53,10 +53,12 @@ class AudioEventTracker:
             self.decaying_hat = 1
             self.event_features["decaying_hat"] = self.decaying_hat
             self.hat_count += 1
+            self.event_features["_on_hat"] = 1
         else:
             self.frames_since_hat += 1
             self.decaying_hat = max(self.decaying_hat - 1.0 / 7.0, 0.0)
             self.event_features["decaying_hat"] = self.decaying_hat
+            self.event_features["_on_hat"] = 0
         self.event_features["hat_count"] = self.hat_count
 
     def get_on_snare(self):
@@ -67,8 +69,10 @@ class AudioEventTracker:
         ):
             self.snare_count += 1
             self.decaying_snare = 1
+            self.event_features["_on_snare"] = 1
         else:
             self.decaying_snare = max(self.decaying_snare - 1.0 / 25.0, 0.0)
+            self.event_features["_on_snare"] = 0
         self.event_features["snare_count"] = self.snare_count
         self.event_features["decaying_snare"] = self.decaying_snare
 
