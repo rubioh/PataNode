@@ -21,6 +21,7 @@ class Eye(ProgramBase):
 
         self.initProgram()
         self.initFBOSpecifications()
+        self.initUniformsBinding()
         self.initParams()
 
     def initFBOSpecifications(self):
@@ -37,7 +38,7 @@ class Eye(ProgramBase):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "eye.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
-    
+
     def initParams(self):
         self.initAdaptableParameters("vitesse", .4)
         self.offset = 0
@@ -47,6 +48,21 @@ class Eye(ProgramBase):
         self.tf = 0
         self.eslow = .4
         self.emid = .2
+
+        self.smooth_fast_final = self.smooth_fast / 2.
+        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+
+    def initUniformsBinding(self):
+        binding = {
+                'iTime': 'time',
+                'energy_fast': 'smooth_fast_final',
+                'energy_slow': 'eslow',
+                'energy_mid': 'emid',
+                'tf' : "tf",
+                'intensity' : "intensity",
+                'scale' : "scale_final"
+                }
+        super().initUniformsBinding(binding, program_name='')
 
     def getParameters(self):
         return self.adaptableParametersDict
@@ -74,16 +90,14 @@ class Eye(ProgramBase):
         self.tf += 0.01
         self.eslow = af["full"][1] * .75
         self.emid = af["low"][2] / 2.
+        
+
+        self.smooth_fast_final = self.smooth_fast / 2.
+        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.program["iTime"] = self.time
-        self.program["energy_fast"] = self.smooth_fast / 2.0
-        self.program["energy_slow"] = self.eslow
-        self.program["energy_mid"] = self.emid
-        self.program["tf"] = self.tf
-        self.program["intensity"] = self.intensity
-        self.program["scale"] = 16 + 8 * np.cos(time.time() * 0.1)
+        self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
     def render(self, af=None):
         self.updateParams(af)

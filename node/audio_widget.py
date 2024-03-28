@@ -14,55 +14,6 @@ from nodeeditor.utils import dumpException
 
 DEBUG = True
 
-class AudioFeaturesDragListBox(QListWidget):
-    def __init__(self, features, parent=None):
-        super().__init__(parent)
-        self.keys = features.keys()
-        self.initUI()
-
-    def initUI(self):
-        self.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.setDragEnabled(True)
-        self.setResizeMode(True)
-        self.setFixedWidth(120)
-        
-        stylesheet = os.path.join(os.path.dirname(__file__), "qss/audiowidget-styl.qss")
-        stylesheet = open(stylesheet, 'r').read()
-        self.setStyleSheet(stylesheet)
-        self.addMyItems()
-
-
-    def addMyItems(self):
-        keys = list(self.keys)
-        keys.sort()
-        for key in keys:
-            self.addMyItem(key)
-
-    def addMyItem(self, name):
-        item = QListWidgetItem(name, self)
-        item.setText(name)
-        item.setForeground(QColor("#FFFFFF"))
-        item.setSizeHint(QSize(16,16))
-        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
-        item.setData(Qt.UserRole, name)
-
-    def startDrag(self, *args, **kwargs):
-        try:
-            item = self.currentItem()
-            
-            item_data = item.data(Qt.UserRole)
-            itemData = QByteArray()
-            dataStream = QDataStream(itemData, QIODevice.WriteOnly)
-            dataStream.writeQString(item.text())
-
-            mimeData = QMimeData()
-            mimeData.setData("application/x-item", itemData)
-
-            drag = QDrag(self)
-            drag.setMimeData(mimeData)
-            drag.exec_(Qt.MoveAction)
-        except Exception as e:
-            dumpException(e)
 
 
 class AudioLogWidget(QWidget):
@@ -74,7 +25,7 @@ class AudioLogWidget(QWidget):
         self.audio_engine = audio_engine
         self.log_buffer_size = self.audio_engine.log_buffer_size
 
-        self.fps_timer = 60
+        self._fps_timer = 30
 
         self.graphs = {}
 
@@ -82,6 +33,14 @@ class AudioLogWidget(QWidget):
         self.data = [0]*self.log_buffer_size
 
         self.initUI()
+
+    @property
+    def fps_timer(self):
+        return self._fps_timer
+    @fps_timer.setter
+    def fps_timer(self, value):
+        self._fps_timer = value
+
         
     def setData(self):
         data1 = self.audio_engine.logger.information["smooth_low"]
@@ -95,7 +54,7 @@ class AudioLogWidget(QWidget):
             graph.plot(self.time, data, pen=self.pen)
 
     def setHidden(self, value):
-        if value:
+        if not value:
             self.show()
             self.timer.start(int(1/self.fps_timer*1000))
             return
@@ -189,6 +148,56 @@ class AudioLogWidget(QWidget):
         else:
             event.ignore()
 
+
+class AudioFeaturesDragListBox(QListWidget):
+    def __init__(self, features, parent=None):
+        super().__init__(parent)
+        self.keys = features.keys()
+        self.initUI()
+
+    def initUI(self):
+        self.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.setDragEnabled(True)
+        self.setResizeMode(True)
+        self.setFixedWidth(120)
+        
+        stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
+        stylesheet = open(stylesheet, 'r').read()
+        self.setStyleSheet(stylesheet)
+        self.addMyItems()
+
+
+    def addMyItems(self):
+        keys = list(self.keys)
+        keys.sort()
+        for key in keys:
+            self.addMyItem(key)
+
+    def addMyItem(self, name):
+        item = QListWidgetItem(name, self)
+        item.setText(name)
+        item.setForeground(QColor("#FFFFFF"))
+        item.setSizeHint(QSize(16,16))
+        item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
+        item.setData(Qt.UserRole, name)
+
+    def startDrag(self, *args, **kwargs):
+        try:
+            item = self.currentItem()
+            
+            item_data = item.data(Qt.UserRole)
+            itemData = QByteArray()
+            dataStream = QDataStream(itemData, QIODevice.WriteOnly)
+            dataStream.writeQString(item.text())
+
+            mimeData = QMimeData()
+            mimeData.setData("application/x-item", itemData)
+
+            drag = QDrag(self)
+            drag.setMimeData(mimeData)
+            drag.exec_(Qt.MoveAction)
+        except Exception as e:
+            dumpException(e)
 
 
 if __name__ == '__main__':

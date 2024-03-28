@@ -20,6 +20,7 @@ class SDF_BM(ProgramBase):
         
         self.initProgram()
         self.initFBOSpecifications()
+        self.initUniformsBinding()
         self.initParams()
 
     def initFBOSpecifications(self):
@@ -43,8 +44,29 @@ class SDF_BM(ProgramBase):
         frag_path = join(dirname(__file__), "Normal/normal.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="normal_")
 
-    def reloadProgram(self):
-        self.initProgram(reload=True)
+    def initUniformsBinding(self):
+        binding = {
+            'tm' : 'tma',
+            'tz' : 'tza',
+            'tp' : 'tp_final',
+            'tptt' : 'tptt',
+            'mode_sym' : 'mode_sym',
+            'go_ptt' : 'go_ptt',
+            'go_arms' : 'go_arms',
+            'mode_ptt' : 'mode_ptt',
+            'iResolution' : 'win_size',
+        }
+        super().initUniformsBinding(binding, program_name='info_')
+        binding = {
+            'iResolution' : 'win_size',
+            'mode_ptt' : 'go_ptt',  # self.mode_ptt
+            'iChannel0' : 'iChannel0',
+            'go_idx' : 'go_bloom',
+            'goBloom_arms' : 'goBloom_arms',
+            'tc' : 'tc',
+            'go_idx2' : 'go_bloom2'
+        }
+        super().initUniformsBinding(binding, program_name='normal_')
 
     def initParams(self):
         self.tm = 150
@@ -70,7 +92,9 @@ class SDF_BM(ProgramBase):
         self.go_arms = 0
         self.cnt_go_arms = 0
         self.cnt_full_ptt = 0
+        self.tp_final = self.tp
         self.wait_to_ptt = 255
+        self.iChannel0 = 1
 
     def updateParams(self, af):
         if af is None:
@@ -163,24 +187,13 @@ class SDF_BM(ProgramBase):
         self.tma = self.tm + af["smooth_low"] * 10.0 * 3.0
         self.tza = self.tz + af["smooth_high"] * 5.0 * 3.0
 
+        self.tp_final = self.tp * 3
+
     def bindUniform(self, af):
-        self.info_program["tm"] = self.tma
-        self.info_program["tz"] = self.tza
-        self.info_program["tp"] = self.tp * 3.0
-        self.info_program["tptt"] = self.tptt
-        self.info_program["mode_sym"] = self.mode_sym
-        self.info_program["go_ptt"] = self.go_ptt
-        self.info_program["go_arms"] = self.go_arms
-        self.info_program["mode_ptt"] = self.mode_ptt
-        self.info_program["iResolution"] = self.win_size
+        super().bindUniform(af)
+        self.programs_uniforms.bindUniformToProgram(af, program_name='info_')
+        self.programs_uniforms.bindUniformToProgram(af, program_name='normal_')
         
-        self.normal_program["iResolution"] = self.win_size
-        self.normal_program["mode_ptt"] = self.go_ptt  # self.mode_ptt
-        self.normal_program["iChannel0"] = 1
-        self.normal_program["go_idx"] = self.go_bloom
-        self.normal_program["goBloom_arms"] = self.goBloom_arms
-        self.normal_program["tc"] = self.tc
-        self.normal_program["go_idx2"] = self.go_bloom2
 
     def render(self, af=None):
         self.updateParams(af)

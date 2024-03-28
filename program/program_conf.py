@@ -38,4 +38,4 @@ def name_to_opcode(name):
 import program.output
 import program.scene
 import program.utils
-
+import program.textures

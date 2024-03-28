@@ -7,7 +7,7 @@ class AudioEventTracker:
         # On Kick Parameters
         self.smooth_low_treshold = 0.1 * 0.5
         self.dlow_treshold = 0.03 * 0.5  # Smooth low derivative
-        self.min_frames_since_kick = 18  # Minimal number of frame between two kick
+        self.min_frames_since_kick = 12  # Minimal number of frame between two kick
         self.frames_since_kick = 0
         self.decaying_kick = 0
 

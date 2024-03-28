@@ -21,7 +21,6 @@ class Screen(ProgramBase):
         self.initProgram()
         self.initParams()
 
-
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "screen.glsl")

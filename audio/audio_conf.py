@@ -1,0 +1,16 @@
+list_audio_features = ['boost', 'bpm', 'decaying_hat', 'decaying_kick', 'decaying_snare', 'dsmooth_full', 'dsmooth_high', 'dsmooth_low', 'dsmooth_mid', 'full_fast', 'full_instaneous', 'full_mid', 'full_slow', 'hat_count', 'high_fast', 'high_instaneous', 'high_mid', 'high_slow', 'kick_count', 'low_fast', 'low_instaneous', 'low_mid', 'low_slow', 'mid_fast', 'mid_instaneous', 'mid_mid', 'mid_slow', 'mini_chill', 'on_chill', 'on_hat', 'on_kick', 'on_snare', 'on_tempo', 'on_tempo16', 'on_tempo2', 'on_tempo32', 'on_tempo4', 'on_tempo8', 'on_tempo_h', 'on_tempo_q', 'pitch', 'shortterm_bpm', 'smooth_full', 'smooth_high', 'smooth_low', 'smooth_mid', 'snare_count', 'time']
+
+dict_audio_features = {
+    "Periodic features": ['on_tempo', 'on_tempo2', 'on_tempo4', 'on_tempo8', 'on_tempo16', 'on_tempo32', 
+                          'on_tempoh', 'on_tempoq'],
+    "Energy relatives features": [ 'full_fast', 'full_instantaneous', 'full_mid', 'full_slow', 
+                                   'high_fast', 'high_instantaneous', 'high_mid', 'high_slow', 
+                                   'low_fast', 'low_instantaneous', 'low_mid', 'low_slow', 
+                                   'mid_fast', 'mid_instantaneous', 'mid_mid', 'mid_slow'],
+    "Smooth energy features" : ['smooth_full', 'smooth_high', 'smooth_low', 'smooth_mid',
+                                'dsmooth_full', 'dsmooth_high', 'dsmooth_low', 'dsmooth_mid'],
+    "Percussive features": ['decaying_kick', 'on_kick', 'decaying_snare', 'on_snare', 'decaying_hat', 'on_hat'],
+    "Mode features": ['mini_chill', 'on_chill'],
+    "Incremental features": ['hat_count', 'kick_count', 'snare_count', 'time'],
+    "Other": ['boost', 'bpm', 'shortterm_bpm', 'pitch']
+}

@@ -52,7 +52,7 @@ class BPM_estimator:
             "on_tempo16": 0.125 * 0.5,
             "on_tempo32": 0.125 * 0.25,
         }
-        self.time = 0
+        self.time = 0.
 
     def update_bpm(self, on_kick):
         # if we are on a kick do things

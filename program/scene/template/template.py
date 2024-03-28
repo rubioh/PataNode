@@ -21,6 +21,7 @@ class Template(ProgramBase):
 
         self.initProgram()
         self.initFBOSpecifications()
+        self.initUniformsBinding()
         self.initParams()
 
     def initFBOSpecifications(self):
@@ -37,6 +38,12 @@ class Template(ProgramBase):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "template.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
+
+    def initUniformsBinding(self):
+        binding = {
+            'iTime' : 'time',
+        }
+        super().initUniformsBinding(binding, program_name='')
     
     def initParams(self):
         self.initAdaptableParameters("vitesse", .4, minimum=.1, maximum=10)
@@ -50,7 +57,7 @@ class Template(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.program["iTime"] = self.time
+        self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
     def render(self, af=None):
         self.updateParams(af)

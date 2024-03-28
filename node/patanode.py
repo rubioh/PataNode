@@ -77,7 +77,7 @@ class PataNode(NodeEditorWindow):
         self.gl_widget.hide()
 
     def onHideAudioDock(self, value):
-        self.audio_log_widget.setHidden(value)
+        self.audio_log_widget.setHidden(not value)
 
     def initAudioLogDock(self):
         self.audio_log_widget = AudioLogWidget(self.audio_engine)
@@ -88,6 +88,8 @@ class PataNode(NodeEditorWindow):
         self.audio_log_widget.resize(1000,200)
         self.addDockWidget(Qt.TopDockWidgetArea, self.audioDock)
         self.resizeDocks((self.audioDock,), (200,), Qt.Vertical)
+        # Hide the audio features on starting the app
+        self.audioDock.setVisible(False)
 
 
     def render(self, audio_features=None):
@@ -290,7 +292,7 @@ class PataNode(NodeEditorWindow):
         self.nodesDock.setFloating(False)
 
         self.addDockWidget(Qt.LeftDockWidgetArea, self.nodesDock)
-        self.resizeDocks((self.nodesDock,), (180,), Qt.Horizontal)
+        self.resizeDocks((self.nodesDock,), (220,), Qt.Horizontal)
 
     def createInspectorDock(self):
         self.inspector_widget = QDMInspector()
@@ -298,7 +300,7 @@ class PataNode(NodeEditorWindow):
         self.inspectorDock.setWidget(self.inspector_widget)
         self.inspectorDock.setFloating(False)
         self.addDockWidget(Qt.RightDockWidgetArea, self.inspectorDock)
-        self.resizeDocks((self.inspectorDock,), (130,), Qt.Horizontal)
+        self.resizeDocks((self.inspectorDock,), (300,), Qt.Horizontal)
 
     def updateInspector(self, obj):
         self.inspector_widget.updateParametersToSelectedItems(obj)

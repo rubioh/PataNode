@@ -18,6 +18,7 @@ class Symetry(ProgramBase):
 
         self.initProgram()
         self.initFBOSpecifications()
+        self.initUniformsBinding()
         self.initParams()
 
     def initFBOSpecifications(self):
@@ -35,10 +36,23 @@ class Symetry(ProgramBase):
         frag_path = join(dirname(__file__), "symetry.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
+    def initUniformsBinding(self):
+        binding = {
+        'iChannel0' : 'iChannel0',
+        'smooth_low' : 'smlow',
+        'mode' : 'symetry_mode',
+        't' : 't_final',
+        't_angle' : 't_angle_final'
+        }
+        super().initUniformsBinding(binding, program_name='')
+
     def initParams(self):
         self.chill = False
         self.t = 0
+        self.t_final = 0
         self.t_angle = 0
+        self.t_angle_final = 0
+        self.iChannel0 = 1
         self.smlow = 1
         self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
         self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
@@ -62,13 +76,12 @@ class Symetry(ProgramBase):
 
         self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + .5)
 
+        self.t_final = self.t * 5.
+        self.t_angle_final = self.t_angle * 5.
+
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.program["iChannel0"] = 1
-        self.program["smooth_low"] = self.smlow
-        self.program["mode"] = self.symetry_mode
-        self.program["t"] = self.t * 5.0
-        self.program["t_angle"] = self.t_angle * 5.0
+        self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
     def render(self, texture, af=None):
         self.bindUniform(af)

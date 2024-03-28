@@ -89,6 +89,11 @@ class ShaderNode(Node):
         if self.program is not None:
             return self.program.getAdaptableParameters()
         return None
+    
+    def getUniformsBinding(self):
+        if self.program is not None:
+            return self.program.getUniformsBinding()
+        return None
 
     def initSettings(self):
         super().initSettings()
@@ -130,9 +135,10 @@ class ShaderNode(Node):
             output_texture = self.program.render(textures)
             self.value = output_texture
             return True
-        except:
+        except Exception as e:
             self.grNode.setToolTip("Rendering error")
             self.markInvalid()
+            self.grNode.openDialog(traceback.format_exception(e))
             print("Error during rendering")
             self.value = None
             return False
@@ -204,11 +210,12 @@ class ShaderNode(Node):
     def getGLSLCodePath(self):
         return self.program.getGLSLCodePath()
 
+
     def openGLSLInTerminal(self, glsl_path):
         os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
         print("Open in Vim the file %s"%glsl_path)
 
-    def render(self):
+    def render(self, audio_features=None):
         pass
 
     def serialize(self):
