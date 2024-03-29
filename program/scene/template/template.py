@@ -44,6 +44,7 @@ class Template(ProgramBase):
             'iTime' : 'time',
         }
         super().initUniformsBinding(binding, program_name='')
+        self.addProtectedUniforms([])
     
     def initParams(self):
         self.initAdaptableParameters("vitesse", .4, minimum=.1, maximum=10)

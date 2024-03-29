@@ -111,7 +111,9 @@ class ProgramBase:
         else:
             setattr(self, name+'program', program)
             setattr(self, name+'vao', vao)
-        self.initUniformsForProgram(frag, name)
+        self.initUniformsForProgram(frag, name, reload)
+        if reload:
+            self.reloadUniformsBinding(None, name)
 
     def storePreviousProgramVersion(self, program, vao, name):
         # Program
@@ -161,6 +163,7 @@ class ProgramBase:
         try:
             self.bindUniform(None) # TODO remove None here 
         except:
+            self.reloadPreviousUniformsState()
             raise UnuseUniformError
         if DEBUG: print(self.vbo, self.vao, self.program)
         if DEBUG: print("Program %s: success while reloading program"%self.__class__.__name__)
@@ -225,14 +228,35 @@ class ProgramBase:
     ###################
     # Uniforms Things #
     ###################
-    def initUniformsForProgram(self, _file, program_name):
-        self.programs_uniforms.addProgram(_file, program_name)
+    def initUniformsForProgram(self, _file, program_name, reload=False):
+        self.programs_uniforms.addProgram(_file, program_name, reload=False)
 
     def initUniformsBinding(self, binding, program_name):
-        self.programs_uniforms.initBinding(program_name, binding)
+        self.programs_uniforms.initBinding(program_name, binding, False)
+
+    def reloadUniformsBinding(self, binding, program_name):
+        """
+            For reloading purpose
+        """
+        self.programs_uniforms.initBinding(program_name, binding, True)
+
+    def reloadPreviousUniformsState(self):
+        """
+            When reloading purpose failed
+        """
+        self.programs_uniforms.reloadPreviousUniformsState()
+
+    def restoreUniformsBinding(self, bindings):
+        """
+            Deserialize purpose
+        """
+        self.programs_uniforms.restoreUniformsBinding(bindings)
 
     def getUniformsBinding(self):
         return self.programs_uniforms.getUniformsBinding()
+
+    def addProtectedUniforms(self, uniforms_name):
+        self.programs_uniforms.addProtectedUniforms(uniforms_name)
 
     def bindUniform(self, af):
         try:
@@ -246,17 +270,29 @@ class ProgramBase:
 
 
 class UniformsLookup():
+    """
+        Uses when we need to expose the uniforms (GUI purpose)
+        self.uniforms for the GUI
+        self._all_bindings for serialization purposes
+    """
     def __init__(self, uniforms, callback, protected):
         self.protected = protected
+        self._all_bindings = None
         self.uniforms = self.protect(uniforms)
         self.callback = callback
     def protect(self, uniforms):
         uniforms_copy = copy.deepcopy(uniforms)
+        if DEBUG: print("Lookup uniforms :", uniforms)
+        self._all_bindings = copy.deepcopy(uniforms)
         for program in uniforms_copy.keys():
             for to_protect in self.protected:
                 if to_protect in uniforms_copy[program].keys():
                     del uniforms_copy[program][to_protect]
         return uniforms_copy
+    def update(self, uniforms):
+        del self._all_bindings
+        del self.uniforms
+        self.uniforms = self.protect(uniforms)
     def __getitem__(self, key):
         return self.uniforms[key]
     def __len__(self):
@@ -265,7 +301,6 @@ class UniformsLookup():
         return iter(self.uniforms)
 
 class ProgramsUniforms():
-
     def __init__(self, parent=None):
         self.parent = parent
         self.init_binding = {}
@@ -274,7 +309,16 @@ class ProgramsUniforms():
         self.lookup = None
         self.protected = ['iResolution']
 
-    def addProgram(self, file, program_name):
+    def addProgram(self, file, program_name, reload=False):
+        """
+            Add Uniforms for program 'program_name' by reading the file fragment programs
+            if reload : store the previous state of uniforms binding before reloading it
+        """
+        if reload:
+            self.previous_programs = self.programs
+            self.previous_uniforms = self.uniforms
+            self.programs = {}
+            self.uniforms = {}
         self.uniforms[program_name] = {}
         self.programs[program_name] = getattr(self.parent, program_name+"program")
         file_lines = file.split(';')
@@ -286,24 +330,57 @@ class ProgramsUniforms():
                 self.addUniform(program_name, uniform_name, type)
 
     def addUniform(self, program_name, uniform_name, type_name):
+        """
+            Add the uniforms 'uniform_name' in the uniforms dictitonnary
+        """
         self.uniforms[program_name][uniform_name] = {
             "type": type_name,
             "param_name": None
         }
 
+    def addProtectedUniforms(self, uniforms_name):
+        """
+            Add protected uniforms (protect from binding change)
+        """
+        self.protected += uniforms_name
+
     def getUniformsBinding(self):
+        """
+            Get the uniforms binding in order to expose it (without protected uniforms)
+        """
         if self.lookup is None:
             self.lookup = UniformsLookup(self.uniforms, self.changeBinding, self.protected)
+        else:
+            self.lookup.update(self.uniforms)
         return self.lookup
 
-    def initBinding(self, program_name, binding):
+    def initBinding(self, program_name, binding, reload=False):
+        """
+            Initialize the binding (params to uniforms) for program 'program_name'
+        """
+        if reload:
+            self.uniforms[program_name] = self.init_binding[program_name]
+            return
         uniforms = self.uniforms[program_name]
         for uniform_name, param_name in binding.items():
             uniforms[uniform_name]["type"] = None
             uniforms[uniform_name]["param_name"] = param_name
         self.init_binding[program_name] = copy.deepcopy(uniforms)
 
+    def reloadPreviousUniformsState(self):
+        """
+            Reload the previous state of binding (use when the program is reloaded)
+        """
+        del self.uniforms
+        del self.programs
+        self.uniforms = self.previous_uniforms
+        self.program = self.previous_programs
+
     def changeBinding(self, program_name, uniform_name, param_name, type):
+        """
+            Change the binding of uniform 'uniform_name' to the parameters 'param_name'
+            if type is 'audio_features' it will look in the audio_features dict to get it
+        """
         if param_name == 'default':
             uniforms = self.uniforms[program_name]
             uniforms[uniform_name]["type"] = None
@@ -313,9 +390,18 @@ class ProgramsUniforms():
             uniforms[uniform_name]["type"] = type if type == 'audio_features' else None
             uniforms[uniform_name]["param_name"] = param_name
 
+    def restoreUniformsBinding(self, bindings):
+        """
+            For deserialize purpose only 
+        """
+        self.uniforms = bindings
 
     def bindUniformToProgram(self, audio_features, program_name=''):
+        """
+            bind all the uniforms to the program 'program_name' for rendering
+        """
         program = self.programs[program_name]
+        if DEBUG: print("Bind uniforms to program :", program)
         for uniform_name, info  in self.uniforms[program_name].items():
             if info["param_name"] is not None: # ie if this uniform is set to a params
                 if info["type"] == 'audio_features':
@@ -325,10 +411,3 @@ class ProgramsUniforms():
                             self.parent, 
                             info["param_name"]
                     )
-
-    
-    #def changeParamBinding(self, program_name, uniform_name, param_name):
-    #    self.uniforms[program][uniform_name] = param_name
-
-    #def getParamName(self, program_name, uniform_name, param_name):
-    #    return self.uniforms[program_name][uniform_name][param_name]

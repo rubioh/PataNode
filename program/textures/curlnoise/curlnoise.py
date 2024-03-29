@@ -60,6 +60,7 @@ class CurlNoise(ProgramBase):
             'iChannel0' : 'iChannel0'
         }
         super().initUniformsBinding(binding, program_name='')
+        self.addProtectedUniforms(['iChannel0', 'UVState'])
 
     def initParams(self):
         self.UVState = 1

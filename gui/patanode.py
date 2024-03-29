@@ -1,4 +1,6 @@
 import os
+import time
+
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog
 from PyQt5.QtCore import Qt, QSignalMapper
@@ -6,13 +8,15 @@ from PyQt5.QtCore import Qt, QSignalMapper
 from nodeeditor.utils import loadStylesheets
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
-from node.subwindow import PataNodeSubWindow
-from node.drag_listbox import QDMDragListbox
-from node.inspector import QDMInspector
-from node.node_conf import SHADER_NODES
-from node.audio_widget import AudioLogWidget
 
-from node.shader_widget import ShaderWidget
+from gui.subwindow import PataNodeSubWindow
+from gui.widgets.drag_listbox_widget import QDMDragListbox
+from gui.widgets.shader_widget import ShaderWidget
+from gui.widgets.inspector_widget import QDMInspector
+from gui.widgets.audio_widget import AudioLogWidget
+
+from node.node_conf import SHADER_NODES
+
 
 
 DEBUG = False
@@ -71,6 +75,8 @@ class PataNode(NodeEditorWindow):
 
         self.setWindowTitle("PataNode")
 
+        self.current_program = None
+
     def initShaderWidget(self):
         self.gl_widget = ShaderWidget(self, self.audio_engine)
         self.ctx = self.gl_widget.ctx
@@ -93,9 +99,11 @@ class PataNode(NodeEditorWindow):
 
 
     def render(self, audio_features=None):
-        current_program = self.getCurrentNodeEditorWidget()
-        if current_program is not None:
-            current_program.render(audio_features)
+        # TODO logic for choosing the rendering program
+        if self.current_program is None:
+            self.current_program = self.getCurrentNodeEditorWidget()
+        if self.current_program is not None:
+            self.current_program.render(audio_features)
         if DEBUG: print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
 
     def closeEvent(self, event):

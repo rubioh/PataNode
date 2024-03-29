@@ -63,6 +63,9 @@ class Eye(ProgramBase):
                 'scale' : "scale_final"
                 }
         super().initUniformsBinding(binding, program_name='')
+        super().addProtectedUniforms(
+                []
+        )
 
     def getParameters(self):
         return self.adaptableParametersDict

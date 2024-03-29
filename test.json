@@ -1,55 +1,17 @@
 {
-    "id": 140017348780688,
+    "id": 139757067214160,
     "scene_width": 64000,
     "scene_height": 64000,
     "nodes": [
         {
-            "id": 140017214053968,
-            "title": "Screen",
-            "pos_x": 107.0,
-            "pos_y": -184.0,
-            "inputs": [
-                {
-                    "id": 140017214079056,
-                    "index": 0,
-                    "multi_edges": false,
-                    "position": 2,
-                    "socket_type": 1
-                }
-            ],
-            "outputs": [],
-            "content": {},
-            "op_code": 0,
-            "adaptable_parameters": {}
-        },
-        {
-            "id": 140017214084240,
-            "title": "SDF_BM",
-            "pos_x": -324.0,
-            "pos_y": -59.0,
-            "inputs": [],
-            "outputs": [
-                {
-                    "id": 140017534723344,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 3
-                }
-            ],
-            "content": {},
-            "op_code": 459,
-            "adaptable_parameters": {}
-        },
-        {
-            "id": 139701666709776,
+            "id": 139757750757136,
             "title": "Eye",
-            "pos_x": -355.0,
-            "pos_y": -305.0,
+            "pos_x": -502.0,
+            "pos_y": -196.0,
             "inputs": [],
             "outputs": [
                 {
-                    "id": 139701839087888,
+                    "id": 139757044666960,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -59,17 +21,150 @@
             "content": {},
             "op_code": 323,
             "adaptable_parameters": {
-                "vitesse": 99,
-                "intensity": 100
+                "vitesse": 4000,
+                "intensity": 2500
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": "audio_features",
+                        "param_name": "on_tempo4"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            }
+        },
+        {
+            "id": 139756907858192,
+            "title": "Eye",
+            "pos_x": -457.0,
+            "pos_y": 75.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 139757044668880,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "adaptable_parameters": {
+                "vitesse": 20000,
+                "intensity": 5000
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": "audio_features",
+                        "param_name": "on_tempo4"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            }
+        },
+        {
+            "id": 139756907992464,
+            "title": "Screen",
+            "pos_x": -34.0,
+            "pos_y": -38.0,
+            "inputs": [
+                {
+                    "id": 139756908418832,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "adaptable_parameters": {},
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
             }
         }
     ],
     "edges": [
         {
-            "id": 139701666667856,
+            "id": 139756909991888,
             "edge_type": 2,
-            "start": 139701839087888,
-            "end": 140017214079056
+            "start": 139757044668880,
+            "end": 139756908418832
         }
     ]
 }

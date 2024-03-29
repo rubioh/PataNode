@@ -50,6 +50,13 @@ vec2 field(vec2 pos)
 	return vec2(-(ny-n),nx-n)*2.;
 }
 
+float length_(vec2 uv){
+    float N = 10.;
+    float x = pow(abs(uv.x), N);
+    float y = pow(abs(uv.y), N);
+    return pow(x+y, 1./N);
+}
+
 void main()
 {
 
@@ -63,9 +70,11 @@ void main()
         return;
     }
     vec2 advection = dt*vel/R*a*50.*(energy+ .2);
-    vec2 last_uv = texture(UVState, uv + advection).rg;
+    vec2 mv_uv = uv + advection;
+    mv_uv = clamp(mv_uv, vec2(0.), vec2(1.));
+    vec2 last_uv = texture(UVState, mv_uv).rg;
     last_uv = clamp(last_uv, vec2(0.), vec2(1.));
-    fragColor = vec4(mix(last_uv, uv, .1), 0., 0.);//*.0001 + vec4(tex, 1.);
+    fragColor = vec4(mix(last_uv, uv, .1 + .2*length_(uv)), 0., 0.);//*.0001 + vec4(tex, 1.);
 }
 
 /*

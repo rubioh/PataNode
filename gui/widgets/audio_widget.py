@@ -30,7 +30,7 @@ class AudioLogWidget(QWidget):
         self.graphs = {}
 
         self.time = [0]*self.log_buffer_size
-        self.data = [0]*self.log_buffer_size
+        self.data1 = [0]
 
         self.initUI()
 
@@ -43,9 +43,10 @@ class AudioLogWidget(QWidget):
 
         
     def setData(self):
-        data1 = self.audio_engine.logger.information["smooth_low"]
-        if len(data1) != self.audio_engine.logger.log_buffer_size+1:
-            self.time = [i/self.fps_timer for i in range(len(data1))]
+        if len(self.data1) != self.audio_engine.logger.log_buffer_size+1:
+            del self.data1
+            self.data1 = self.audio_engine.logger.information["smooth_low"]
+            self.time = [i/self.fps_timer for i in range(len(self.data1))]
 
         #update graph
         for name, graph in self.graphs.items():

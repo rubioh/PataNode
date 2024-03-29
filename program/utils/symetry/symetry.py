@@ -45,6 +45,7 @@ class Symetry(ProgramBase):
         't_angle' : 't_angle_final'
         }
         super().initUniformsBinding(binding, program_name='')
+        self.addProtectedUniforms(['iChannel0'])
 
     def initParams(self):
         self.chill = False

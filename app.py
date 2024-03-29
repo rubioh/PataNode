@@ -1,4 +1,4 @@
-from node.patanode import PataNode
+from gui.patanode import PataNode
 from PyQt5.QtCore import QTimer
 from program.program_manager import ProgramManager, FBOManager
 from audio.audio_pipeline import AudioEngine

@@ -15,7 +15,6 @@ vec3 palette(float t, vec3 a, vec3 b, vec3 c, vec3 d )
 {
     return a + b*cos(6.28318*(c*t+d));
 }
-
 vec2 hash( vec2 p )
 {
     //p = mod(p, 4.0); // tile
@@ -97,6 +96,7 @@ void main()
     vec3 col = iris + eye.x*vec3(.5)+pupille.x*vec3(.5);
     // Output to screen
     //col *= 0.;
-    fragColor = vec4(col.brg,1.0);
+    //fragColor = vec4(col.rgg,1.0);
+    fragColor = vec4(col,1.0);
 }
 

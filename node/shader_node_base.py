@@ -210,7 +210,6 @@ class ShaderNode(Node):
     def getGLSLCodePath(self):
         return self.program.getGLSLCodePath()
 
-
     def openGLSLInTerminal(self, glsl_path):
         os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
         print("Open in Vim the file %s"%glsl_path)
@@ -229,6 +228,9 @@ class ShaderNode(Node):
             value = int(value*100)
             adapt_params[params] = value
         res['adaptable_parameters'] = adapt_params
+
+        uniforms_binding = self.program.getUniformsBinding()._all_bindings
+        res['uniforms_binding'] = uniforms_binding
         return res
 
     def deserialize(self, data, hashmap={}, restore_id=True):
@@ -240,6 +242,10 @@ class ShaderNode(Node):
             minmax_range = properties["maximum"] - properties["minimum"]
             value = value*minmax_range + properties["minimum"]
             self.program.setAdaptableParameters(name, value)
+        
+        uniforms_binding = data['uniforms_binding']
+        self.program.restoreUniformsBinding(uniforms_binding)
+
         print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
 

@@ -169,7 +169,6 @@ class UniformWidget(QTabWidget):
             current_param = "default"
         else:
             current_param = self.uniforms_informations.uniforms[program_name][uniform_name]["param_name"]
-
         button_widget = QToolButton()
         button_widget.setText(current_param)
         button_widget.setPopupMode(QToolButton.MenuButtonPopup)
@@ -182,7 +181,7 @@ class UniformWidget(QTabWidget):
             return lambda : custom_callback(program_name, uniform_name, feature_name, type, current_widget)
 
         menu = QMenu()
-        action = menu.addAction("default")
+        action = menu.addAction(current_param)
         action.triggered.connect(callback_factory("default", None, button_widget))
         audio_features = dict_audio_features
         for i, (audio_feature_type, features_list) in enumerate(audio_features.items()):

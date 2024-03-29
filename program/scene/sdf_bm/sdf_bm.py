@@ -67,6 +67,7 @@ class SDF_BM(ProgramBase):
             'go_idx2' : 'go_bloom2'
         }
         super().initUniformsBinding(binding, program_name='normal_')
+        self.addProtectedUniforms(['iChannel0'])
 
     def initParams(self):
         self.tm = 150
