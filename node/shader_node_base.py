@@ -1,4 +1,5 @@
 from os.path import dirname, basename, isfile, join
+import copy
 import os
 import inspect
 import traceback
@@ -248,14 +249,12 @@ class ShaderNode(Node):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
 
-        #adapt_params = {}
-        #for programs, uniforms in self.getAdaptableParameters().items():
-        #    minmax_range = properties["maximum"] - properties["minimum"]
-        #    value = (properties["value"] - properties["minimum"])/minmax_range
-        #    value = int(value*100)
-        #    adapt_params[params] = value
-        #res['adaptable_parameters'] = adapt_params
-
+        adapt_params = copy.deepcopy(self.getAdaptableParameters())
+        for program in adapt_params.keys():
+            program_params = adapt_params[program]
+            for uniform in program_params.keys():
+                del program_params[uniform]['eval_function']['connect']
+        res['adaptable_parameters'] = adapt_params
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
         res['uniforms_binding'] = uniforms_binding
         return res
@@ -263,16 +262,15 @@ class ShaderNode(Node):
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
 
-        #all_properties = self.getAdaptableParameters()
-        #for name, value in data['adaptable_parameters'].items():
-        #    properties = all_properties[name]
-        #    minmax_range = properties["maximum"] - properties["minimum"]
-        #    value = value*minmax_range + properties["minimum"]
-        #    self.program.setAdaptableParameters(name, value)
-        
+        adapt_params = data['adaptable_parameters']
+        node_params = self.getAdaptableParameters()
+        for program in adapt_params.keys():
+            program_params = adapt_params[program]
+            for uniform in program_params.keys():
+                eval_func = program_params[uniform]['eval_function']['value']
+                node_params[program][uniform]['eval_function']['value'] = eval_func
         uniforms_binding = data['uniforms_binding']
         self.program.restoreUniformsBinding(uniforms_binding)
-
         print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
 

@@ -202,9 +202,9 @@ class ProgramBase:
         uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
         uniform_parameters[name] = {
             "name": name,
-            "minimum": minimum,
-            "maximum": maximum,
-            "type":  type,
+            #"minimum": minimum,
+            #"maximum": maximum,
+            #"type":  type,
             "value": value,
             "connect": lambda v: self.setAdaptableParameters(program_name, uniform_name, name, v),
             "widget": widget_type
