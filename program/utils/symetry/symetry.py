@@ -55,10 +55,14 @@ class Symetry(ProgramBase):
         self.t_angle_final = 0
         self.iChannel0 = 1
         self.smlow = 1
-        self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
-        self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
-        self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
-        self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
+        self.rotation_amplification = 1
+        self.energy_amplification = 1
+        #self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
+        #self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
+        self.automatic_mode = 1
+        self.symetry_mode = 1
+        #self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
+        #self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
 
     def updateParams(self, af=None):
         if af is None:
@@ -84,10 +88,10 @@ class Symetry(ProgramBase):
         super().bindUniform(af)
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
-    def render(self, texture, af=None):
+    def render(self, textures, af=None):
         self.bindUniform(af)
         self.updateParams(af)
-        texture.use(1)
+        textures[0].use(1)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -109,9 +113,9 @@ class SymetryNode(ShaderNode, Utils):
         self.eval()
 
     def render(self, audio_features=None):
-        input_node = self.getInput(0)
-        if input_node is None:
+        input_nodes = self.getShaderInputs()
+        if not len(input_nodes):
             return self.program.norender()
-        texture = input_node.render(audio_features)
-        output_texture = self.program.render(texture, audio_features)
+        texture = input_nodes[0].render(audio_features)
+        output_texture = self.program.render([texture], audio_features)
         return output_texture

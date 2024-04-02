@@ -111,6 +111,7 @@ class ProgramBase:
         else:
             setattr(self, name+'program', program)
             setattr(self, name+'vao', vao)
+        self.adaptable_parameters_dict[name+'program'] = {}
         self.initUniformsForProgram(frag, name, reload)
         if reload:
             self.reloadUniformsBinding(None, name)
@@ -189,39 +190,59 @@ class ProgramBase:
     #####################
     def initAdaptableParameters(self, 
                     name="no_name", 
+                    uniform_name="no_name",
+                    program_name="program",
                     value=0, 
                     minimum=0, 
                     maximum=1, 
                     type="f4",
                     widget_type="Slider"):
-        setattr(self, name, value)
-        self.adaptable_parameters_dict[name] = {
+        if uniform_name not in self.adaptable_parameters_dict[program_name].keys():
+            self.adaptable_parameters_dict[program_name][uniform_name] = {}
+        uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
+        uniform_parameters[name] = {
             "name": name,
             "minimum": minimum,
             "maximum": maximum,
             "type":  type,
             "value": value,
-            "connect": lambda v: self.setAdaptableParameters(name, v),
+            "connect": lambda v: self.setAdaptableParameters(program_name, uniform_name, name, v),
             "widget": widget_type
         }
     
+    def initUniformsAdaptableParameters(self, program_name, uniform_name):
+        self.initAdaptableParameters(
+                name = "eval_function",
+                uniform_name=uniform_name,
+                program_name=program_name,
+                value = "input_data",
+                minimum = .25,
+                maximum = 4.,
+                type="f4",
+                widget_type = "TextEdit")
+
+    def getAdaptableEvaluationForUniform(self, program_name, uniform_name, input_data):
+        evaluation = self.adaptable_parameters_dict[program_name][uniform_name]["eval_function"]["value"]
+        try:
+            modified_data = eval(evaluation)
+            modified_data = float(modified_data)
+        except:
+            print('eval_function %s'%evaluation, "is not correct.")
+            print('giving raw input in uniforms %s'%uniform_name)
+            modified_data = input_data
+        return modified_data
+
     def getAdaptableParameters(self):
-        # Update parameters value in the dictionnary (only here)
-        for params in self.adaptable_parameters_dict.keys():
-            self.adaptable_parameters_dict[params]["value"] = getattr(self, params)
         return self.adaptable_parameters_dict
 
 
-    def setAdaptableParameters(self, params, value):
+    def setAdaptableParameters(self, program_name, uniform_name, params, value):
         """
             params : Parameters name (str)
             value : float or anything...
         """
-        if not hasattr(self, params):
-            print("Params %s"%params, " is not a parameter of program %s"%self.__class__.__name__)
-        else:
-            setattr(self, params, value)
-            if DEBUG: print("Params %s set to value"%params, str(value))
+        if DEBUG: print("Params %s set to value"%params, str(value), "for programs %s"%program_name)
+        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = value
     #####################
 
 
@@ -337,6 +358,8 @@ class ProgramsUniforms():
             "type": type_name,
             "param_name": None
         }
+        if uniform_name not in self.protected:
+            self.parent.initUniformsAdaptableParameters(program_name+"program", uniform_name)
 
     def addProtectedUniforms(self, uniforms_name):
         """
@@ -404,10 +427,18 @@ class ProgramsUniforms():
         if DEBUG: print("Bind uniforms to program :", program)
         for uniform_name, info  in self.uniforms[program_name].items():
             if info["param_name"] is not None: # ie if this uniform is set to a params
-                if info["type"] == 'audio_features':
-                    program[uniform_name] = audio_features[info["param_name"]]
-                else:
-                    program[uniform_name] = getattr(
-                            self.parent, 
-                            info["param_name"]
+                if uniform_name not in self.protected:
+                    if info["type"] == 'audio_features':
+                        data = audio_features[info["param_name"]]
+                    else:
+                        data = getattr(self.parent, info["param_name"])
+                    modified_data = self.parent.getAdaptableEvaluationForUniform(
+                            program_name+'program', 
+                            uniform_name, 
+                            data
                     )
+                    program[uniform_name] = modified_data
+                else:
+                    data = getattr(self.parent, info["param_name"])
+                    program[uniform_name] = data
+                    

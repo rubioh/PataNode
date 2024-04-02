@@ -15,7 +15,7 @@ from gui.widgets.shader_widget import ShaderWidget
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.audio_widget import AudioLogWidget
 
-from node.node_conf import SHADER_NODES
+from node.node_conf import SHADER_NODES, AUDIO_NODES
 
 
 
@@ -311,7 +311,8 @@ class PataNode(NodeEditorWindow):
         self.resizeDocks((self.inspectorDock,), (300,), Qt.Horizontal)
 
     def updateInspector(self, obj):
-        self.inspector_widget.updateParametersToSelectedItems(obj)
+        if obj.__class__ in SHADER_NODES.values():
+            self.inspector_widget.updateParametersToSelectedItems(obj)
 
     def createStatusBar(self):
         self.statusBar().showMessage("Ready")

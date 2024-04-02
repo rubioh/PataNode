@@ -40,9 +40,9 @@ class Eye(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
-        self.initAdaptableParameters("vitesse", .4)
+        self.vitesse = .4
         self.offset = 0
-        self.initAdaptableParameters("intensity", 5, minimum=0, maximum=20)
+        self.intensity = 5
         self.smooth_fast = 0
         self.time = 0
         self.tf = 0

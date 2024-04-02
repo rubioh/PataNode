@@ -75,6 +75,7 @@ class ShaderNode(Node):
     NodeContent_class = ShaderContent
 
     def __init__(self, scene, inputs=[2,2], outputs=[1]):
+        #inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
         self.value = None # Using to store output texture reference
@@ -120,15 +121,28 @@ class ShaderNode(Node):
         return True
 
     def evalInputNodes(self):
+        print("Eval Inputs:", self)
         # TODO Several Textures test
-        input_node = self.getInput(0)
-        if not input_node:
+        input_nodes = self.getShaderInputs()
+        if not input_nodes:
             self.grNode.setToolTip("Input is not connected")
             self.markInvalid()
             return None
         else:
-            input_node.eval()
-            return input_node.value
+            textures = []
+            for input_node in input_nodes:
+                texture = input_node.eval()
+                textures.append(texture)
+            return textures
+
+    def getShaderInputs(self):
+        sockets = self.inputs
+        ins = []
+        for i, sockets in enumerate(sockets):
+            if sockets.socket_type == 0: # socket_type 0 means audio_input
+                continue
+            ins += super().getInputs(i)
+        return ins
 
     def evalRendering(self, textures=None):
         try:
@@ -145,17 +159,24 @@ class ShaderNode(Node):
         return True
 
     def evalImplementation(self):
+        print("Eval Implementation:", self)
         # Find and Connect required fbos
         win_sizes, components, dtypes = self.program.getFBOSpecifications() 
         success = self.findAndConnectFbos(win_sizes, components, dtypes)
         if not success:
             return False
         # Eval Input Node
-        if self.inputs:
+        inputs = []
+        for ins in self.inputs:
+            if ins.socket_type == 0: # socket_type 0 means audio_input
+                continue
+            inputs.append(ins)
+        if inputs:
             inputs_texture = self.evalInputNodes()
             if inputs_texture is None:
                 return False
-            success = self.evalRendering(inputs_texture)
+            for input_texture in inputs_texture:
+                success = self.evalRendering(inputs_texture)
         else:
             success = self.evalRendering()
         # Eval Rendering
@@ -168,10 +189,12 @@ class ShaderNode(Node):
 
 
     def eval(self):
+        print("Eval:", self)
         if not self.isDirty() and not self.isInvalid():
             if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
+            print('Eval Try', self)
             success = self.evalImplementation()
             return self.value
         except ValueError as e:
@@ -214,6 +237,10 @@ class ShaderNode(Node):
         os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
         print("Open in Vim the file %s"%glsl_path)
 
+    def transform_audio_features(self, audio_features):
+        pass
+
+
     def render(self, audio_features=None):
         pass
 
@@ -221,13 +248,13 @@ class ShaderNode(Node):
         res = super().serialize()
         res['op_code'] = self.__class__.op_code
 
-        adapt_params = {}
-        for params, properties in self.getAdaptableParameters().items():
-            minmax_range = properties["maximum"] - properties["minimum"]
-            value = (properties["value"] - properties["minimum"])/minmax_range
-            value = int(value*100)
-            adapt_params[params] = value
-        res['adaptable_parameters'] = adapt_params
+        #adapt_params = {}
+        #for programs, uniforms in self.getAdaptableParameters().items():
+        #    minmax_range = properties["maximum"] - properties["minimum"]
+        #    value = (properties["value"] - properties["minimum"])/minmax_range
+        #    value = int(value*100)
+        #    adapt_params[params] = value
+        #res['adaptable_parameters'] = adapt_params
 
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
         res['uniforms_binding'] = uniforms_binding
@@ -236,12 +263,12 @@ class ShaderNode(Node):
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
 
-        all_properties = self.getAdaptableParameters()
-        for name, value in data['adaptable_parameters'].items():
-            properties = all_properties[name]
-            minmax_range = properties["maximum"] - properties["minimum"]
-            value = value*minmax_range + properties["minimum"]
-            self.program.setAdaptableParameters(name, value)
+        #all_properties = self.getAdaptableParameters()
+        #for name, value in data['adaptable_parameters'].items():
+        #    properties = all_properties[name]
+        #    minmax_range = properties["maximum"] - properties["minimum"]
+        #    value = value*minmax_range + properties["minimum"]
+        #    self.program.setAdaptableParameters(name, value)
         
         uniforms_binding = data['uniforms_binding']
         self.program.restoreUniformsBinding(uniforms_binding)

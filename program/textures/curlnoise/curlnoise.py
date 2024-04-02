@@ -74,8 +74,8 @@ class CurlNoise(ProgramBase):
         self.seed_tex.write(self.seed)
         self.vort_amount = 1.5
         self.dt = 0.1
-        self.initAdaptableParameters('advection_level', 1, minimum=0, maximum=10)
-        self.initAdaptableParameters('scale', 1, minimum=1, maximum=5)
+        self.advection_level = 1
+        self.scale = 1
         self.iFrame = -1
         self.wait = 0
         self.wait2 = 0
@@ -99,7 +99,7 @@ class CurlNoise(ProgramBase):
         self.programs_uniforms.bindUniformToProgram(af, program_name='ink_')
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
-    def render(self, texture, af=None):
+    def render(self, textures, af=None):
         self.bindUniform(af)
         self.updateParams(af)
 
@@ -110,7 +110,7 @@ class CurlNoise(ProgramBase):
         self.ink_vao.render()
 
         self.fbos[1].color_attachments[0].use(2)
-        texture.use(3)
+        textures[0].use(3)
         self.fbos[2].use()
         self.vao.render()
         return self.fbos[2].color_attachments[0]
@@ -131,9 +131,9 @@ class CurlNoiseNode(ShaderNode, Utils):
         self.eval()
 
     def render(self, audio_features=None):
-        input_node = self.getInput(0)
-        if input_node is None:
+        input_nodes = self.getShaderInputs()
+        if not len(input_nodes):
             return self.program.norender()
-        texture = input_node.render(audio_features)
-        output_texture = self.program.render(texture, audio_features)
+        texture = input_nodes[0].render(audio_features)
+        output_texture = self.program.render([texture], audio_features)
         return output_texture

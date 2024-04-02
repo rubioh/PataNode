@@ -5,7 +5,7 @@ from PyQt5.Qt import *
 
 from nodeeditor.utils import dumpException
 
-from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.node_conf import AUDIO_NODES, SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
 class QDMDragListbox(QTreeWidget):
     def __init__(self, parent=None):
@@ -19,13 +19,14 @@ class QDMDragListbox(QTreeWidget):
         self.setSelectionMode(QAbstractItemView.SingleSelection)
         self.setDragEnabled(True)
 
-        self.addMyItems()
+        self.addShaderNodes()
+        self.addAudioNodes()
 
 
-    def addMyItems(self):
+    def addShaderNodes(self):
         keys = list(SHADER_NODES.keys())
         keys.sort()
-
+        
         shader_types = {}
         for key in keys:
             node = get_class_from_opcode(key)
@@ -44,6 +45,20 @@ class QDMDragListbox(QTreeWidget):
                 self.addMyItem(*data, shader_type_item)
             shader_type_item.setChildIndicatorPolicy(0)
             shader_type_item.sortChildren(1, Qt.AscendingOrder)
+        self.sortItems(0, Qt.AscendingOrder)
+
+    def addAudioNodes(self):
+        keys = list(AUDIO_NODES.keys())
+        keys.sort()
+        audio_type_item = QTreeWidgetItem(self)
+        audio_type_item.setText(0, "Audio Features Transform")
+        audio_type_item.setForeground(0, QColor("#E39600"))
+        for key in keys:
+            node = get_class_from_opcode(key)
+            self.addMyItem(node.op_title, node.icon, node.op_code, audio_type_item)
+        audio_type_item.setChildIndicatorPolicy(0)
+        audio_type_item.sortChildren(1, Qt.AscendingOrder)
+
         self.sortItems(0, Qt.AscendingOrder)
 
     def addMyItem(self, name, icon=None, op_code=0, parent=None):

@@ -1,8 +1,13 @@
+from node.shader_node_base import ShaderNode
+from node.audio_node_base import AudioNode
+
 LISTBOX_MIMETYPE = "application/x-item"
 
 SHADER_NODES = {
 }
 
+AUDIO_NODES = {
+}
 
 class ConfException(Exception): pass
 class InvalidNodeRegistration(ConfException): pass
@@ -14,7 +19,14 @@ def register_node_now(op_code, class_reference):
         raise InvalidNodeRegistration("Duplicate node registration of '%s'. There is already %s" %(
             op_code, SHADER_NODES[op_code]
         ))
-    SHADER_NODES[op_code] = class_reference
+    if op_code in AUDIO_NODES:
+        raise InvalidNodeRegistration("Duplicate node registration of '%s'. There is already %s" %(
+            op_code, AUDIO_NODES[op_code]
+        ))
+    if ShaderNode in class_reference.__mro__:
+        SHADER_NODES[op_code] = class_reference
+    if AudioNode in class_reference.__mro__:
+        AUDIO_NODES[op_code] = class_reference
 
 
 def register_node(op_code):
@@ -24,8 +36,11 @@ def register_node(op_code):
     return decorator
 
 def get_class_from_opcode(op_code):
-    if op_code not in SHADER_NODES: raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
-    return SHADER_NODES[op_code]
+    if op_code in SHADER_NODES:
+        return SHADER_NODES[op_code]
+    if op_code in AUDIO_NODES:
+        return AUDIO_NODES[op_code]
+    else: raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
 
 
 
@@ -33,5 +48,6 @@ def get_class_from_opcode(op_code):
 import program.scene
 import program.output
 import program.utils
+import audio.transforms
 
 #print(SHADER_NODES)

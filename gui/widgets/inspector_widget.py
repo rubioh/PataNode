@@ -1,4 +1,5 @@
 import os
+from functools import partial
 
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
@@ -93,6 +94,18 @@ class QDMInspector(QWidget):
     def createUniformWindow(self, uniformsBinding):
         return UniformWidget(uniformsBinding)
 
+    def createParametersToolbox(self, parameters_informations):
+        groupBox = QGroupBox('Transformation parameters')
+        vbox = QVBoxLayout()
+        parameter_window = self.createParametersWindow(parameters_informations)
+        vbox.addWidget(parameter_window)
+        groupBox.setLayout(vbox)
+        self.grid.addWidget(groupBox)
+        self.grid.insertStretch(-1,-1)
+
+    def createParametersWindow(self, parameters_informations):
+        return ParametersWidget(parameters_informations)
+
     def clearLayout(self):
         while self.grid.count():
             child = self.grid.takeAt(0)
@@ -103,11 +116,94 @@ class QDMInspector(QWidget):
         self.clearLayout()
         if self.uniform_window is not None:
             self.uniform_window.deleteLater()
-        parameters_properties = obj.getAdaptableParameters()
-        self.addLayout(parameters_properties)
+        parameters_informations = obj.getAdaptableParameters()
+        #self.addLayout(parameters_properties)
         uniforms_binding = obj.getUniformsBinding()
+        self.createParametersToolbox(parameters_informations)
         self.createUniformsToolbox(uniforms_binding)
 
+
+class ParametersWidget(QTabWidget):
+    def __init__(self, parameters_informations, parent=None):
+        super().__init__(parent)
+        self.parameters_informations = parameters_informations
+        self.n_programs = len(self.parameters_informations)
+        self.initUI()
+
+    def initUI(self):
+        
+        pal = QPalette()
+        pal.setColor(QPalette.Window, QColor(40,40,40))
+        
+        self.setAutoFillBackground(True)
+        self.setPalette(pal)
+        self.setGeometry(800,800, 250 + 50*self.n_programs, 1000)
+        stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
+        stylesheet = open(stylesheet, 'r').read()
+
+        stylesheet_tab = os.path.join(os.path.dirname(__file__), "qss/qtabwidget-styl.qss")
+        stylesheet_tab = open(stylesheet_tab, 'r').read()
+
+        self.setStyleSheet(stylesheet + stylesheet_tab)
+
+        self._all_buttons = {}
+        self._all_line_edit_widgets = {}
+        for program_name in self.parameters_informations:
+            self._all_buttons[program_name] = list()
+            self._all_line_edit_widgets[program_name] = list()
+            displayed_name = program_name.replace('_', ' ').capitalize()
+            program_widget = self.createWidget(program_name)
+            self.addTab(program_widget, displayed_name)
+
+    def createWidget(self, program_name):
+        list_widget = QListWidget()
+        parameters = self.parameters_informations[program_name]
+        
+        for idx, uniform_name in enumerate(parameters.keys()):
+            item = QListWidgetItem()
+            
+            parameter_widget = QWidget()
+            parameter_layout = QHBoxLayout()
+            
+            line_edit_widget = self.getLineEdit(parameters[uniform_name], program_name, uniform_name)
+            button_widget = QPushButton(uniform_name)
+            self._all_buttons[program_name].append(button_widget)
+            self._all_line_edit_widgets[program_name].append(line_edit_widget)
+
+            button_widget.clicked.connect(partial(self.hide_unhide, idx, program_name))
+            
+            parameter_layout.addWidget(button_widget)
+            parameter_layout.addWidget(line_edit_widget)
+            parameter_layout.setSizeConstraint(parameter_layout.SetFixedSize)
+
+            parameter_widget.setLayout(parameter_layout)
+
+            item.setSizeHint(parameter_widget.sizeHint())
+            list_widget.addItem(item)
+            list_widget.setItemWidget(item, parameter_widget)
+
+        return list_widget
+
+    def hide_unhide(self, widget_index, program_name):
+        widget = self._all_line_edit_widgets[program_name][widget_index]
+        if widget.isHidden():
+            widget.show()
+        else:
+            widget.hide()
+
+    def getLineEdit(self, parameter, program_name, uniform_name):
+        textfield = QLineEdit(self)
+        textfield.setText(parameter["eval_function"]["value"])
+
+        callback = parameter["eval_function"]["connect"]
+        def custom_callback():
+            text = textfield.text()
+            callback(text)
+        def get_callback():
+            return lambda : custom_callback()
+        textfield.returnPressed.connect(get_callback())
+        textfield.hide()
+        return textfield
 
 
 

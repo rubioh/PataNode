@@ -47,7 +47,7 @@ class Template(ProgramBase):
         self.addProtectedUniforms([])
     
     def initParams(self):
-        self.initAdaptableParameters("vitesse", .4, minimum=.1, maximum=10)
+        self.vitesse = .4
         self.time = 0
 
     def getParameters(self):

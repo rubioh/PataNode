@@ -38,10 +38,10 @@ class Screen(ProgramBase):
         self.program['iResolution'] = (w,h)
         self.program["tex"] = 0
 
-    def render(self, texture, af=None):
+    def render(self, textures, af=None):
         self.updateParams(af)
         self.bindUniform(af)
-        texture.use(0)
+        textures[0].use(0)
         self.ctx.screen.use()
         self.vao.render()
         return True
@@ -81,16 +81,16 @@ class ScreenNode(ShaderNode, Output):
             self.markDirty()
             return False
 
-        success_render = self.program.render(input_texture)
+        success_render = self.program.render([input_texture])
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
         self.grNode.setToolTip("")
         return True
 
     def render(self, audio_features=None):
-        input_node = self.getInput(0)
-        if input_node is None:
+        input_nodes = self.getShaderInputs()
+        if not len(input_nodes):
             return False
-        texture = input_node.render(audio_features)
-        self.program.render(texture, audio_features)
+        texture = input_nodes[0].render(audio_features)
+        self.program.render([texture], audio_features)
         return True
