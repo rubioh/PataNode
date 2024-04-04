@@ -134,6 +134,10 @@ class ShaderNode(Node):
             for input_node in input_nodes:
                 texture = input_node.eval()
                 textures.append(texture)
+            if len(textures) != len(self.inputs):
+                self.grNode.setToolTip("Input is not connected")
+                self.markInvalid()
+                return None
             return textures
 
     def getShaderInputs(self):

@@ -437,6 +437,7 @@ class ProgramsUniforms():
                             uniform_name, 
                             data
                     )
+                    if DEBUG: print("trying to parameters bind", info['param_name'], "with value ", modified_data, ' to uniform ',  uniform_name, 'in program ', program_name)
                     program[uniform_name] = modified_data
                 else:
                     data = getattr(self.parent, info["param_name"])

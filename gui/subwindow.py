@@ -87,7 +87,7 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def fileLoad(self, filename):
         if super().fileLoad(filename):
-            self.scene.fbo_manager.restoreFBOUsability()
+            #self.scene.fbo_manager.restoreFBOUsability()
             self.doEvalOutputs()
             return True
 
