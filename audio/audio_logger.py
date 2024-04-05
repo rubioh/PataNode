@@ -8,14 +8,15 @@ class AudioLogger:
         self.log_buffer_size = log_buffer_size
         self.information = {}
         self.i = 0
-        self.audio = np.zeros((0))
+        self.audio = np.zeros(log_buffer_size*int(1/60*16000))
 
     def update_info(self, chunk, res):
         """
         data : audio flux for this frame
         chunk : info_dict for frame i
         """
-        self.audio = np.concatenate((self.audio, chunk))
+        
+        size = self.log_buffer_size
         for k, v in res.items():
             # TODO DEGUEULASSE CHANGER CA 
             if k == '_bpm_on_kick':
@@ -31,32 +32,35 @@ class AudioLogger:
                     new_key_fast  = k + '_fast'
                     new_key_instant  = k + '_instaneous'
                     if new_key_slow not in self.information.keys():
-                        self.information[new_key_slow] = list()
-                        self.information[new_key_slow].append(v[1])
-                        self.information[new_key_fast] = list()
-                        self.information[new_key_fast].append(v[3])
-                        self.information[new_key_mid] = list()
-                        self.information[new_key_mid].append(v[2])
-                        self.information[new_key_instant] = list()
-                        self.information[new_key_instant].append(v[0])
+                        self.information[new_key_slow] = np.zeros(size)
+                        self.information[new_key_slow][-1] = v[1]
+                        self.information[new_key_fast] = np.zeros(size)
+                        self.information[new_key_fast][-1] = v[3]
+                        self.information[new_key_mid] = np.zeros(size)
+                        self.information[new_key_mid][-1] = v[2]
+                        self.information[new_key_instant] = np.zeros(size)
+                        self.information[new_key_instant][-1] = v[0]
                     else:
-                        self.information[new_key_slow].append(v[1])
-                        self.information[new_key_fast].append(v[3])
-                        self.information[new_key_mid].append(v[2])
-                        self.information[new_key_instant].append(v[0])
-                    if len(self.information[new_key_slow]) > self.log_buffer_size:
-                        self.information[new_key_slow].pop(0)
-                        self.information[new_key_fast].pop(0)
-                        self.information[new_key_mid].pop(0)
-                        self.information[new_key_instant].pop(0)
+                        tmp = self.information[new_key_slow]
+                        tmp[:-1] = tmp[1:]
+                        tmp[-1] = v[1]
+                        tmp = self.information[new_key_fast]
+                        tmp[:-1] = tmp[1:]
+                        tmp[-1] = v[3]
+                        tmp = self.information[new_key_mid]
+                        tmp[:-1] = tmp[1:]
+                        tmp[-1] = v[2]
+                        tmp = self.information[new_key_instant]
+                        tmp[:-1] = tmp[1:]
+                        tmp[-1] = v[0]
             except:
                 if k not in self.information.keys():
-                    self.information[k] = list()
-                    self.information[k].append(v)
+                    self.information[k] = np.zeros(size)
+                    self.information[k][-1] = v
                 else:
-                    self.information[k].append(v)
-                if len(self.information[k]) > self.log_buffer_size:
-                    self.information[k].pop(0)
+                    tmp = self.information[k]
+                    tmp[:-1] = tmp[1:]
+                    tmp[-1] = v
                 #print(len(self.information[k]))
 
         #self.i += 1

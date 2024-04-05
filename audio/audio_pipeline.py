@@ -67,6 +67,8 @@ class AudioEngine:
         self.bpm = 140
         self.mini_chill = 0
 
+        self.tic = 0
+    
         self.initFeatures()
 
     def initFeatures(self):
