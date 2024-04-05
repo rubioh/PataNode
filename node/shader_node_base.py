@@ -290,3 +290,5 @@ class Output():
     node_type_reference = "Outputs"
 class Texture():
     node_type_reference = "Textures"
+class Effects():
+    node_type_reference = "Effects"

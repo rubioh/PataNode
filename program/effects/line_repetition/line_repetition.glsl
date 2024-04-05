@@ -14,16 +14,19 @@ void main()
     ivec2 uv = ivec2(gl_FragCoord.xy);
     
     int suy = int(start_uy);
-    int s = int(size);
+    int s = int(size/2.);
     int ox = int(offset_x);
-    if (uv.y < suy){
+    if (uv.y < suy + s){
        if (uv.y > (suy - s)){
-            uv.y = suy;
+            uv.y = suy + s;
             uv.x += ox;
        }
        else{
-            uv.y = uv.y + s;
+            uv.y = uv.y;
        }
+    }
+    else{
+        uv.y = uv.y;
     }
     vec4 col = texelFetch(iChannel0, uv, 0);
     fragColor = col;//*.0001  + vec4(size, start_uy, .0,.0);// + start_uy;

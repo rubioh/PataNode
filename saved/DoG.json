@@ -6,8 +6,8 @@
         {
             "id": 140462327679760,
             "title": "DoG",
-            "pos_x": -253.0,
-            "pos_y": -71.0,
+            "pos_x": -71.0,
+            "pos_y": -259.25,
             "inputs": [
                 {
                     "id": 140463062924240,
@@ -68,7 +68,7 @@
                     "k": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*2.",
+                            "value": "input_data*4.",
                             "widget": "TextEdit"
                         }
                     }
@@ -105,7 +105,7 @@
                     "k": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*2.",
+                            "value": "input_data*4.",
                             "widget": "TextEdit"
                         }
                     }
@@ -149,21 +149,21 @@
                     "eps": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*.1",
+                            "value": "input_data",
                             "widget": "TextEdit"
                         }
                     },
                     "phi": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*1.",
+                            "value": "input_data",
                             "widget": "TextEdit"
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "3",
+                            "value": "1",
                             "widget": "TextEdit"
                         }
                     }
@@ -265,8 +265,8 @@
         {
             "id": 140462011773904,
             "title": "Eye",
-            "pos_x": -582.0,
-            "pos_y": -319.0,
+            "pos_x": -620.0,
+            "pos_y": -390.0,
             "inputs": [],
             "outputs": [
                 {
@@ -383,8 +383,8 @@
         {
             "id": 140462007331792,
             "title": "SST",
-            "pos_x": -470.0,
-            "pos_y": 57.0,
+            "pos_x": -383.0,
+            "pos_y": -93.0,
             "inputs": [
                 {
                     "id": 140462007805264,
@@ -456,7 +456,7 @@
                     "sigmaC": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*3.",
+                            "value": "input_data*1.",
                             "widget": "TextEdit"
                         }
                     }
@@ -479,7 +479,7 @@
                     "sigmaC": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*3.",
+                            "value": "input_data*1.",
                             "widget": "TextEdit"
                         }
                     }
@@ -581,8 +581,8 @@
         {
             "id": 140461275666000,
             "title": "Screen",
-            "pos_x": 46.0,
-            "pos_y": 342.0,
+            "pos_x": 256.0,
+            "pos_y": 79.0,
             "inputs": [
                 {
                     "id": 140462007756560,
@@ -622,8 +622,8 @@
         {
             "id": 139886548380176,
             "title": "SDF_BM",
-            "pos_x": -565.0,
-            "pos_y": -180.0,
+            "pos_x": -679.0,
+            "pos_y": -108.0,
             "inputs": [],
             "outputs": [
                 {
@@ -836,8 +836,8 @@
         {
             "id": 139886017278160,
             "title": "Symetry",
-            "pos_x": -145.0,
-            "pos_y": 98.0,
+            "pos_x": 287.0,
+            "pos_y": -229.75,
             "inputs": [
                 {
                     "id": 139887146272784,
@@ -940,8 +940,8 @@
         {
             "id": 139886012286992,
             "title": "LRepet",
-            "pos_x": -535.0,
-            "pos_y": 145.0,
+            "pos_x": -110.0,
+            "pos_y": -23.0,
             "inputs": [
                 {
                     "id": 139886015349648,
@@ -965,13 +965,6 @@
             "adaptable_parameters": {
                 "program": {
                     "iTime": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "input_data",
-                            "widget": "TextEdit"
-                        }
-                    },
-                    "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "input_data",
@@ -1029,8 +1022,8 @@
         {
             "id": 139886548868688,
             "title": "CRepet",
-            "pos_x": -528.0,
-            "pos_y": 274.0,
+            "pos_x": -523.0,
+            "pos_y": 181.0,
             "inputs": [
                 {
                     "id": 139886013732688,
@@ -1054,13 +1047,6 @@
             "adaptable_parameters": {
                 "program": {
                     "iTime": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "input_data",
-                            "widget": "TextEdit"
-                        }
-                    },
-                    "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "input_data",
@@ -1118,8 +1104,8 @@
         {
             "id": 139886013057744,
             "title": "LRepet",
-            "pos_x": -377.0,
-            "pos_y": 365.0,
+            "pos_x": -306.0,
+            "pos_y": 376.0,
             "inputs": [
                 {
                     "id": 139886552937616,
@@ -1143,13 +1129,6 @@
             "adaptable_parameters": {
                 "program": {
                     "iTime": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "input_data",
-                            "widget": "TextEdit"
-                        }
-                    },
-                    "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "input_data",
@@ -1207,8 +1186,8 @@
         {
             "id": 139886548246096,
             "title": "CRepet",
-            "pos_x": -282.0,
-            "pos_y": 232.0,
+            "pos_x": -251.0,
+            "pos_y": 206.0,
             "inputs": [
                 {
                     "id": 139886013659472,
@@ -1232,13 +1211,6 @@
             "adaptable_parameters": {
                 "program": {
                     "iTime": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "input_data",
-                            "widget": "TextEdit"
-                        }
-                    },
-                    "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "input_data",
@@ -1292,6 +1264,559 @@
                     }
                 }
             }
+        },
+        {
+            "id": 139811859015248,
+            "title": "Bloom",
+            "pos_x": -336.0,
+            "pos_y": -243.25,
+            "inputs": [
+                {
+                    "id": 139811993545168,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 139811863625936,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 537,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "Bloom": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data*1.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "compression": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data*.25",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bloom_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data*.5",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "vblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "level": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "Prev": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "hblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "Bloom": {
+                        "type": null,
+                        "param_name": "Bloom"
+                    },
+                    "compression": {
+                        "type": null,
+                        "param_name": "compression"
+                    },
+                    "bloom_rate": {
+                        "type": null,
+                        "param_name": "bloom_rate"
+                    }
+                },
+                "vblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "ViChannel0"
+                    },
+                    "level": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "Prev": {
+                        "type": null,
+                        "param_name": "HPrev"
+                    }
+                },
+                "hblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "HiChannel0"
+                    }
+                }
+            }
+        },
+        {
+            "id": 139811863947792,
+            "title": "LRepet",
+            "pos_x": -6.0,
+            "pos_y": 219.0,
+            "inputs": [
+                {
+                    "id": 139811859907024,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 139812623298128,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 652,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "start_uy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "size": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "offset_x": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "start_uy": {
+                        "type": null,
+                        "param_name": "start_uy"
+                    },
+                    "size": {
+                        "type": null,
+                        "param_name": "size"
+                    },
+                    "offset_x": {
+                        "type": null,
+                        "param_name": "offset_x"
+                    }
+                }
+            }
+        },
+        {
+            "id": 139811863441744,
+            "title": "CRepet",
+            "pos_x": 212.5,
+            "pos_y": 304.5,
+            "inputs": [
+                {
+                    "id": 139811863952848,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 139811863626576,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 643,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "start_ux": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "size": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "offset_y": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "start_ux": {
+                        "type": null,
+                        "param_name": "start_ux"
+                    },
+                    "size": {
+                        "type": null,
+                        "param_name": "size"
+                    },
+                    "offset_y": {
+                        "type": null,
+                        "param_name": "offset_y"
+                    }
+                }
+            }
+        },
+        {
+            "id": 139811860090896,
+            "title": "Eye",
+            "pos_x": -376.0,
+            "pos_y": -352.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 139811860933008,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            }
+        },
+        {
+            "id": 140290883422288,
+            "title": "Abstract SQRT",
+            "pos_x": -682.0,
+            "pos_y": -222.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140290883745232,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1405,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_h": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "count_beat": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thresh": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "nrj_fast"
+                    },
+                    "t_h": {
+                        "type": null,
+                        "param_name": "t_h"
+                    },
+                    "count_beat": {
+                        "type": null,
+                        "param_name": "count_beat"
+                    },
+                    "thresh": {
+                        "type": null,
+                        "param_name": "thresh"
+                    },
+                    "t_rot": {
+                        "type": null,
+                        "param_name": "t_rot"
+                    }
+                }
+            }
         }
     ],
     "edges": [
@@ -1300,30 +1825,6 @@
             "edge_type": 2,
             "start": 140463206958032,
             "end": 140462327542544
-        },
-        {
-            "id": 139887831383760,
-            "edge_type": 2,
-            "start": 139887161471120,
-            "end": 140462007805264
-        },
-        {
-            "id": 139886548158032,
-            "edge_type": 2,
-            "start": 139887161471120,
-            "end": 140463062924240
-        },
-        {
-            "id": 139886015599632,
-            "edge_type": 2,
-            "start": 140462011239632,
-            "end": 139887146272784
-        },
-        {
-            "id": 139886014943760,
-            "edge_type": 2,
-            "start": 139886015678672,
-            "end": 139886015349648
         },
         {
             "id": 139886017277136,
@@ -1344,9 +1845,51 @@
             "end": 139886013659472
         },
         {
-            "id": 139885430847376,
+            "id": 139811860372752,
+            "edge_type": 2,
+            "start": 139811863625936,
+            "end": 140463062924240
+        },
+        {
+            "id": 139811860027088,
             "edge_type": 2,
             "start": 139886552463568,
+            "end": 139811859907024
+        },
+        {
+            "id": 139811860780816,
+            "edge_type": 2,
+            "start": 139812623298128,
+            "end": 139811863952848
+        },
+        {
+            "id": 139811859125008,
+            "edge_type": 2,
+            "start": 140462011239632,
+            "end": 139887146272784
+        },
+        {
+            "id": 140290883489296,
+            "edge_type": 2,
+            "start": 140462011239632,
+            "end": 139886015349648
+        },
+        {
+            "id": 140289878395728,
+            "edge_type": 2,
+            "start": 139887161471120,
+            "end": 139811993545168
+        },
+        {
+            "id": 140289880325264,
+            "edge_type": 2,
+            "start": 139887161471120,
+            "end": 140462007805264
+        },
+        {
+            "id": 140289879337360,
+            "edge_type": 2,
+            "start": 139886015678672,
             "end": 140462007756560
         }
     ]

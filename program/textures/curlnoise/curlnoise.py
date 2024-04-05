@@ -115,7 +115,8 @@ class CurlNoise(ProgramBase):
         self.vao.render()
         return self.fbos[2].color_attachments[0]
 
-
+    def norender(self):
+        return self.fbos[2].color_attachments[0]
 
 
 @register_node(OP_CODE_CURLNOISE)
@@ -132,7 +133,7 @@ class CurlNoiseNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
-        if not len(input_nodes):
+        if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)

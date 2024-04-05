@@ -14,15 +14,15 @@ void main()
     ivec2 uv = ivec2(gl_FragCoord.xy);
     
     int sux = int(start_ux);
-    int s = int(size);
+    int s = int(size/2.);
     int oy = int(offset_y);
-    if (uv.x < sux){
+    if (uv.x < sux + s){
        if (uv.x > (sux - s)){
             uv.x = sux;
             uv.y += oy;
        }
        else{
-            uv.x = uv.x + s;
+            uv.x = uv.x ;
        }
     }
     vec4 col = texelFetch(iChannel0, uv, 0);

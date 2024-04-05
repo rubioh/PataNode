@@ -88,6 +88,8 @@ class ScreenNode(ShaderNode, Output):
         return True
 
     def render(self, audio_features=None):
+        for node in self.scene.nodes:
+            node.program.already_called = False
         input_nodes = self.getShaderInputs()
         if not len(input_nodes):
             return False

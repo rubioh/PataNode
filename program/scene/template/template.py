@@ -67,6 +67,8 @@ class Template(ProgramBase):
         self.vao.render()
         return self.fbos[0].color_attachments[0]
 
+    def norender(self):
+        return self.fbos[0].color_attachments[0]
 
 @register_node(OP_CODE_TEMPLATE)
 class TemplateNode(ShaderNode, Scene):
@@ -83,4 +85,6 @@ class TemplateNode(ShaderNode, Scene):
 
 
     def render(self, audio_features=None):
+        if self.program.already_called:
+            return self.program.norender()
         return self.program.render(audio_features)

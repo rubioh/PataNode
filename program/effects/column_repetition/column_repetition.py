@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode, Utils
+from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
@@ -81,7 +81,7 @@ class CRepet(ProgramBase):
 
 
 @register_node(OP_CODE_CREPET)
-class CRepetNode(ShaderNode, Utils):
+class CRepetNode(ShaderNode, Effects):
     op_title = "CRepet"
     op_code = OP_CODE_CREPET
     content_label = ""
@@ -94,7 +94,7 @@ class CRepetNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
-        if not len(input_nodes):
+        if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)

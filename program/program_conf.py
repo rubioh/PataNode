@@ -39,3 +39,4 @@ import program.output
 import program.scene
 import program.utils
 import program.textures
+import program.effects

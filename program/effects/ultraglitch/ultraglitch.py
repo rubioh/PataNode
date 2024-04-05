@@ -5,16 +5,17 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode, Utils
+from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
-OP_CODE_SYMETRY = name_to_opcode('symetry')
 
-@register_program(OP_CODE_SYMETRY)
-class Symetry(ProgramBase):
+OP_CODE_UGLITCH = name_to_opcode('ultraglitch')
+
+@register_program(OP_CODE_UGLITCH)
+class UltraGlitch(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-        self.title = "Symetry"
+        self.title = "UltraGlitch"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -33,64 +34,56 @@ class Symetry(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "symetry.glsl")
+        frag_path = join(dirname(__file__), "ultraglitch.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
+
+    def initParams(self):
+        self.iChannel0 = 1
+        self.seed = 0
+        self.stop = 0
+        self.tstop = 0
+        self.freq = 1
+        self.time = 0
+        self.go_strobe = True
 
     def initUniformsBinding(self):
         binding = {
-        'iChannel0' : 'iChannel0',
-        'smooth_low' : 'smlow',
-        'mode' : 'symetry_mode',
-        't' : 't_final',
-        't_angle' : 't_angle_final'
+            'iResolution' : 'win_size',
+            'iTime' : 'time',
+            'iChannel0' : 'iChannel0',
+            'on_chill' : 'go_strobe',
+            'change_seed' : 'seed',
+            'stop' : 'tstop'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0'])
 
-    def initParams(self):
-        self.chill = False
-        self.t = 0
-        self.t_final = 0
-        self.t_angle = 0
-        self.t_angle_final = 0
-        self.iChannel0 = 1
-        self.smlow = 1
-        self.rotation_amplification = 1
-        self.energy_amplification = 1
-        #self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
-        #self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
-        self.automatic_mode = 1
-        self.symetry_mode = 1
-        #self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
-        #self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
-
-    def updateParams(self, af=None):
+    def updateParams(self, af):
         if af is None:
             return
-        self.t += af["smooth_full"]
-        if af["on_chill"] and not self.chill:
-            self.chill = True
-        
-        if self.automatic_mode:
-            if self.chill and not af["on_chill"]:
-                self.symetry_mode ^= 1
-                self.chill = False
+        self.time = af['time']
+        if af["on_kick"]:
+            self.seed = np.random.randint(0, 1000)
+            self.stop += 1
 
-        if af["on_chill"] == 0.0:
-            self.t_angle += af["full"][0] * 0.01 * (2.5 * self.rotation_amplification + 0.5) - 0.03
-
-        self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + .5)
-
-        self.t_final = self.t * 5.
-        self.t_angle_final = self.t_angle * 5.
+        if self.go_strobe:
+            self.freq = 10
+        else:
+            self.freq = 1
+        if not af["on_chill"] and self.stop < 16:
+            self.go_strobe = True
+        else:
+            self.go_strobe = False
+        self.tstop = self.stop>16
+        self.tstop = 0
 
     def bindUniform(self, af):
         super().bindUniform(af)
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
     def render(self, textures, af=None):
-        self.bindUniform(af)
         self.updateParams(af)
+        self.bindUniform(af)
         textures[0].use(1)
         self.fbos[0].use()
         self.vao.render()
@@ -100,16 +93,16 @@ class Symetry(ProgramBase):
         return self.fbos[0].color_attachments[0]
 
 
-@register_node(OP_CODE_SYMETRY)
-class SymetryNode(ShaderNode, Utils):
-    op_title = "Symetry"
-    op_code = OP_CODE_SYMETRY
+@register_node(OP_CODE_UGLITCH)
+class UGlitchNode(ShaderNode, Effects):
+    op_title = "UltraGlitch"
+    op_code = OP_CODE_UGLITCH
     content_label = ""
-    content_label_objname = "shader_symetry"
+    content_label_objname = "shader_ultraglitch"
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = Symetry(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = UltraGlitch(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):

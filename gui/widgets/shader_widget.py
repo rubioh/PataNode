@@ -106,8 +106,12 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def set_audio_features(self):
         audio_features = self.audio_engine.features
         self.af = audio_features
-        self.af["on_kick"] = 1 if self.last_kick_count != self.af["kick_count"] else 0
-        self.af["on_hat"] = 1 if self.last_hat_count != self.af["hat_count"] else 0
+        self.af["on_kick"] = (
+            1 if self.last_kick_count != self.af["kick_count"] else 0
+        )
+        self.af["on_hat"] = (
+            1 if self.last_hat_count != self.af["hat_count"] else 0
+        )
         self.af["on_snare"] = (
             1 if self.last_snare_count != self.af["snare_count"] else 0
         )

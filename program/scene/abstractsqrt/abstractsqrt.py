@@ -9,15 +9,14 @@ from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_EYE = name_to_opcode('eye')
+OP_CODE_ABSQRT = name_to_opcode('abstract_sqrt')
 
-@register_program(OP_CODE_EYE)
-class Eye(ProgramBase):
-
+@register_program(OP_CODE_ABSQRT)
+class AbstractSQRT(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
 
-        self.title = "Eye"
+        self.title = "Abstract SQRT"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -36,67 +35,69 @@ class Eye(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "eye.glsl")
+        frag_path = join(dirname(__file__), "AbstractSQRT.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
-        self.vitesse = .4
-        self.offset = 0
-        self.intensity = 5
-        self.smooth_fast = 0
+        self.current_mean = 0.2
+        self.sens = 1
+        self.accel = 0
         self.time = 0
-        self.tf = 0
-        self.eslow = .4
-        self.emid = .2
-
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.t_h = np.array([0], dtype="float32")
+        self.tic = 0
+        self.tc = 0
+        self.offset = 0.4
+        self.count_beat = 0
+        self.thresh = 0.5
+        self.sens_thresh = 1.0
+        self.t_rot = 0
+        self.nrj_fast = 0
 
     def initUniformsBinding(self):
         binding = {
+                'iResolution' : 'win_size',
                 'iTime': 'time',
-                'energy_fast': 'smooth_fast_final',
-                'energy_slow': 'eslow',
-                'energy_mid': 'emid',
-                'tf' : "tf",
-                'intensity' : "intensity",
-                'scale' : "scale_final"
+                'count_beat': 'count_beat',
+                'thresh' : 'thresh',
+                'energy_fast' : 'nrj_fast',
+                't_h' : 't_h',
+                't_rot' : 't_rot'
                 }
         super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+        self.addProtectedUniforms([])
 
-    def getParameters(self):
-        return self.adaptableParametersDict
-
-    def updateParams(self, af=None):
-        self.vitesse = np.clip(self.vitesse, 0, 2)
-        self.intensity = np.clip(self.intensity, 2, 10)
-        self.time += 1 / 60 * (1 + self.vitesse)
-        self.tf += 0.01
+    def updateParams(self, af):
         if af is None:
             return
-        self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * af["full"][3]
-        if af["full"][1] < 1.0 or af["full"][2] < 0.7:
-            self.vitesse += 0.01
-            self.intensity += 0.05
-            if self.time > 500 and self.vitesse > 1.5:
-                self.time = 0
-                self.tf = 0
+        self.nrj_fast = af["smooth_low"] * 2. + .2
+        if af["full"][1] < 0.8:
+            self.accel += 0.002
         else:
-            self.vitesse -= 0.04
-            self.intensity -= 0.1
-        self.vitesse = np.clip(self.vitesse, 0, 2)
-        self.intensity = np.clip(self.intensity, 2, 10)
-        self.time += 1 / 60 * (1 + self.vitesse)
-        self.tf += 0.01
-        self.eslow = af["full"][1] * .75
-        self.emid = af["low"][2] / 2.
-        
+            self.accel -= 0.01
+        self.accel = np.clip(self.accel, 0.0, 3)
+        if af["on_snare"]:
+            self.count_beat += 1
+        if af["on_kick"] == 1:
+            self.sens *= -1
+            self.tic += 1
+            if self.tic == 8:
+                self.tic = 0
+                self.offset *= -1
+            self.thresh += 0.1 * self.sens_thresh
+            if self.thresh >= 0.9:
+                self.thresh = 0.9
+                self.sens_thresh = -1
+            if self.thresh <= 0.1:
+                self.thresh = 0.1
+                self.sens_thresh = 1
+        self.tc += 0.001
+        self.time += (
+            (af["bpm"] / 60 * 2 * np.pi / 60 * 0.5 * np.cos(self.tc))
+            * af["low"][1]
+            * 0.25
+        )
 
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.t_h += (af["smooth_low"] * 0.5 + 0.05 * af["low"][1]) * self.sens * 0.25
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -113,17 +114,17 @@ class Eye(ProgramBase):
         return self.fbos[0].color_attachments[0]
 
 
-@register_node(OP_CODE_EYE)
-class EyeNode(ShaderNode, Scene):
-    op_title = "Eye"
-    op_code = OP_CODE_EYE
+@register_node(OP_CODE_ABSQRT)
+class AbastractSQRTNode(ShaderNode, Scene):
+    op_title = "Abstract SQRT"
+    op_code = OP_CODE_ABSQRT
     content_label = ""
-    content_label_objname = "shader_eye"
+    content_label_objname = "shader_abstract_sqrt"
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
         self.shader_node_type = dirname(__file__).split('/')[-2]
-        self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = AbstractSQRT(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):

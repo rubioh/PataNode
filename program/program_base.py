@@ -43,6 +43,9 @@ class ProgramBase:
         self.previous_programs = {}
         self.previous_vaos = {}
 
+        # Flags for rendering
+        self._already_called = False
+
     ########################
     # Protected parameters #
     ########################
@@ -71,6 +74,14 @@ class ProgramBase:
         self._width = value[0]
         self._height = value[1]
         self._win_size = (self._width, self._height)
+
+    @property
+    def already_called(self):
+        return self._already_called
+
+    @already_called.setter
+    def already_called(self, value):
+        self._already_called = value
     ###########################################
 
 
@@ -280,13 +291,13 @@ class ProgramBase:
         self.programs_uniforms.addProtectedUniforms(uniforms_name)
 
     def bindUniform(self, af):
+        self.already_called = True
         try:
             self.program['iResolution'] = self.win_size
         except:
             pass
     #########################
-
-    def render(self):
+    def render(self, *args):
         raise NotImplementedError
 
 
@@ -386,6 +397,8 @@ class ProgramsUniforms():
             return
         uniforms = self.uniforms[program_name]
         for uniform_name, param_name in binding.items():
+            print(uniforms)
+            print(uniform_name, param_name)
             uniforms[uniform_name]["type"] = None
             uniforms[uniform_name]["param_name"] = param_name
         self.init_binding[program_name] = copy.deepcopy(uniforms)
@@ -424,7 +437,7 @@ class ProgramsUniforms():
             bind all the uniforms to the program 'program_name' for rendering
         """
         program = self.programs[program_name]
-        if DEBUG: print("Bind uniforms to program :", program)
+        if DEBUG: print("Bind uniforms to program :", program, " with name ", program_name, ' for node ', self.parent.__class__.__name__)
         for uniform_name, info  in self.uniforms[program_name].items():
             if info["param_name"] is not None: # ie if this uniform is set to a params
                 if uniform_name not in self.protected:
@@ -437,7 +450,7 @@ class ProgramsUniforms():
                             uniform_name, 
                             data
                     )
-                    if DEBUG: print("trying to parameters bind", info['param_name'], "with value ", modified_data, ' to uniform ',  uniform_name, 'in program ', program_name)
+                    if DEBUG: print("ProgramUniform::bindUniformToProgram Trying to bind parameters ", info['param_name'], " with value ", modified_data, ' to uniform ',  uniform_name, ' in program ', program_name +'program', " for node ", self.parent.__class__.__name__)
                     program[uniform_name] = modified_data
                 else:
                     data = getattr(self.parent, info["param_name"])

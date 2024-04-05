@@ -147,7 +147,7 @@ class SSTNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
-        if not len(input_nodes):
+        if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)

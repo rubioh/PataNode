@@ -6,7 +6,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode, Utils
+from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
@@ -220,7 +220,7 @@ class DoG(ProgramBase):
 
 
 @register_node(OP_CODE_DOG)
-class DoGNode(ShaderNode, Utils):
+class DoGNode(ShaderNode, Effects):
     op_title = "DoG"
     op_code = OP_CODE_DOG
     content_label = ""
@@ -237,7 +237,7 @@ class DoGNode(ShaderNode, Utils):
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         sst = input_nodes[1].render(audio_features)
-        if texture is None or sst is None:
+        if texture is None or sst is None or self.program.already_called:
             return self.program.norender()
         output_texture = self.program.render([texture, sst], audio_features)
         return output_texture
