@@ -34,6 +34,8 @@ class AudioLogWidget(QWidget):
 
         self.initUI()
 
+        self.tic = 0
+
     @property
     def fps_timer(self):
         return self._fps_timer

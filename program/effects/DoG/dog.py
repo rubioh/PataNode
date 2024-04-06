@@ -232,12 +232,14 @@ class DoGNode(ShaderNode, Effects):
         self.eval()
 
     def render(self, audio_features=None):
+        if self.program.already_called:
+            return self.program.norender()
         input_nodes = self.getShaderInputs()
         if len(input_nodes) < 2:
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         sst = input_nodes[1].render(audio_features)
-        if texture is None or sst is None or self.program.already_called:
+        if texture is None or sst is None:
             return self.program.norender()
         output_texture = self.program.render([texture, sst], audio_features)
         return output_texture

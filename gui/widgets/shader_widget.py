@@ -28,6 +28,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         super().__init__(self.fmt)
         self.title = self._title
         
+        self.tic = 0
         self.initUI()
 
         # Attach to the context
