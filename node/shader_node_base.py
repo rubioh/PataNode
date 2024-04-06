@@ -292,3 +292,5 @@ class Texture():
     node_type_reference = "Textures"
 class Effects():
     node_type_reference = "Effects"
+class Colors():
+    node_type_reference = "Colors"
