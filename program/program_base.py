@@ -4,7 +4,7 @@ from program.program_conf import CTXError, SQUARE_VERT_PATH, UnuseUniformError, 
 from nodeeditor.utils import dumpException
 
 
-DEBUG = False
+DEBUG = True
 
 class ProgramBase:
 
@@ -442,7 +442,8 @@ class ProgramsUniforms():
             if info["param_name"] is not None: # ie if this uniform is set to a params
                 if uniform_name not in self.protected:
                     if info["type"] == 'audio_features':
-                        data = audio_features[info["param_name"]]
+                        if audio_features is not None:
+                            data = audio_features[info["param_name"]]
                     else:
                         data = getattr(self.parent, info["param_name"])
                     modified_data = self.parent.getAdaptableEvaluationForUniform(

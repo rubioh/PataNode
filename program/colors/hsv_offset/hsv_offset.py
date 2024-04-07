@@ -9,13 +9,13 @@ from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
 
 
-OP_CODE_HSV = name_to_opcode('hsvhsvhsv')
+OP_CODE_HSVOFFSET = name_to_opcode('hsvhsvhsvoffset')
 
-@register_program(OP_CODE_HSV)
-class HSV(ProgramBase):
+@register_program(OP_CODE_HSVOFFSET)
+class HSVOffset(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-        self.title = "HSV"
+        self.title = "HSV Offset"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -34,7 +34,7 @@ class HSV(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "hsv.glsl")
+        frag_path = join(dirname(__file__), "hsv_offset.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
@@ -74,21 +74,23 @@ class HSV(ProgramBase):
         return self.fbos[0].color_attachments[0]
 
 
-@register_node(OP_CODE_HSV)
+@register_node(OP_CODE_HSVOFFSET)
 class HSVNode(ShaderNode, Colors):
-    op_title = "HSV"
-    op_code = OP_CODE_HSV
+    op_title = "HSV Offset"
+    op_code = OP_CODE_HSVOFFSET
     content_label = ""
-    content_label_objname = "shader_hsv"
+    content_label_objname = "shader_hsv_offset"
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = HSV(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = HSVOffset(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):
+        if self.program.already_called:
+            return self.program.norender()
         input_nodes = self.getShaderInputs()
-        if not len(input_nodes) or self.program.already_called:
+        if not len(input_nodes):
             return self.program.norender()
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
