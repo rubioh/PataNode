@@ -306,5 +306,5 @@ void main()
     }
     float LU = length(uv_tmp*iResolution.y/iResolution.xy);
     col *= 1./(1.+LU*LU*5.);
-    fragColor = vec4(clamp(col, vec3(0.), vec3(1.))*.4, lum*15.* pow(smooth_low, .25));
+    fragColor = vec4(clamp(col, vec3(0.), vec3(1.))*1., lum*15.* pow(smooth_low, .25));
 }

@@ -282,15 +282,9 @@ class ShaderNode(Node):
 
 
 
-class Utils():
-    node_type_reference = "Utils"
-class Scene():
-    node_type_reference = "Scenes"
-class Output():
-    node_type_reference = "Outputs"
-class Texture():
-    node_type_reference = "Textures"
-class Effects():
-    node_type_reference = "Effects"
-class Colors():
-    node_type_reference = "Colors"
+class Utils(): node_type_reference = "Utils"
+class Scene(): node_type_reference = "Scenes"
+class Output(): node_type_reference = "Outputs"
+class Texture(): node_type_reference = "Textures"
+class Effects(): node_type_reference = "Effects"
+class Colors(): node_type_reference = "Colors"

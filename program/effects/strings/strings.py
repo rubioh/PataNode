@@ -9,13 +9,13 @@ from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_UGLITCH = name_to_opcode('ultraglitch')
+OP_CODE_STRINGS = name_to_opcode('strings')
 
-@register_program(OP_CODE_UGLITCH)
-class UltraGlitch(ProgramBase):
+@register_program(OP_CODE_STRINGS)
+class Strings(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-        self.title = "UltraGlitch"
+        self.title = "Strings"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -34,26 +34,26 @@ class UltraGlitch(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "ultraglitch.glsl")
+        frag_path = join(dirname(__file__), "strings.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
         self.iChannel0 = 1
-        self.seed = 0
-        self.stop = 0
-        self.tstop = 0
-        self.freq = 1
-        self.time = 0
-        self.go_strobe = True
+        self.on_tempo = 0
+        self.nrj_low = 0
+        self.n_col = 400
+        self.x_phase_amp = 2.*3.14159
+        self.go_x_phase = .0
 
     def initUniformsBinding(self):
         binding = {
             'iResolution' : 'win_size',
-            'iTime' : 'time',
+            #'on_tempo' : 'on_tempo',
             'iChannel0' : 'iChannel0',
-            'on_chill' : 'go_strobe',
-            'change_seed' : 'seed',
-            'stop' : 'tstop'
+            'nrj_low' : 'nrj_low',
+            'n_col' : 'n_col',
+            'x_phase_amp' : 'x_phase_amp',
+            'go_x_phase' : 'go_x_phase'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0'])
@@ -61,21 +61,9 @@ class UltraGlitch(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
-        self.time = af['time']
-        if af["on_kick"]:
-            self.seed = np.random.randint(0, 1000)
-            self.stop += 1
-
-        if self.go_strobe:
-            self.freq = 10
-        else:
-            self.freq = 1
-        if not af["on_chill"] and self.stop < 16:
-            self.go_strobe = True
-        else:
-            self.go_strobe = False
-        self.tstop = self.stop>16
-        self.tstop = 0
+        self.nrj_low = af['smooth_low']
+        self.on_tempo = af['on_tempo2']
+        self.go_x_phase += af['smooth_low'] + .1
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -93,16 +81,16 @@ class UltraGlitch(ProgramBase):
         return self.fbos[0].color_attachments[0]
 
 
-@register_node(OP_CODE_UGLITCH)
-class UGlitchNode(ShaderNode, Effects):
-    op_title = "UltraGlitch"
-    op_code = OP_CODE_UGLITCH
+@register_node(OP_CODE_STRINGS)
+class StringsNode(ShaderNode, Effects):
+    op_title = "Strings"
+    op_code = OP_CODE_STRINGS
     content_label = ""
-    content_label_objname = "shader_ultraglitch"
+    content_label_objname = "shader_strings"
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = UltraGlitch(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Strings(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):
