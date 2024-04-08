@@ -1,5 +1,6 @@
 from node.shader_node_base import ShaderNode
 from node.audio_node_base import AudioNode
+from node.graph_container_node import GraphContainerNode
 
 LISTBOX_MIMETYPE = "application/x-item"
 
@@ -8,6 +9,8 @@ SHADER_NODES = {
 
 AUDIO_NODES = {
 }
+
+GRAPH_CONTAINER_OPCODE = 666
 
 class ConfException(Exception): pass
 class InvalidNodeRegistration(ConfException): pass
@@ -27,6 +30,8 @@ def register_node_now(op_code, class_reference):
         SHADER_NODES[op_code] = class_reference
     if AudioNode in class_reference.__mro__:
         AUDIO_NODES[op_code] = class_reference
+    if GraphContainerNode in class_reference.__mro__:
+        GRAPH_CONTAINER_NODES[op_code] = class_reference
 
 
 def register_node(op_code):
@@ -40,6 +45,8 @@ def get_class_from_opcode(op_code):
         return SHADER_NODES[op_code]
     if op_code in AUDIO_NODES:
         return AUDIO_NODES[op_code]
+    if op_code == GRAPH_CONTAINER_OPCODE:
+        return GraphContainerNode
     else: raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
 
 

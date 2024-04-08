@@ -10,6 +10,7 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 # patanode package
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from node.shader_node_base import ShaderNode
+from node.graph_container_node import GraphContainerNode
 
 from program.output.screen.screen import ScreenNode
 
@@ -151,6 +152,8 @@ class PataNodeSubWindow(NodeEditorWidget):
 
             try:
                 node = get_class_from_opcode(op_code)(self.scene)
+                if isinstance(node, GraphContainerNode):
+                    node.setApp(self.app)
                 node.setPos(scene_position.x(), scene_position.y())
                 self.scene.history.storeHistory("Created node %s" % node.__class__.__name__)
             except Exception as e: dumpException(e)
@@ -204,18 +207,19 @@ class PataNodeSubWindow(NodeEditorWidget):
 
         context_menu.addSeparator()
         
-        reloadGLSLAct = context_menu.addAction("Reload glsl code")
-
+        if isinstance(selected, ShaderNode):
+            reloadGLSLAct = context_menu.addAction("Reload glsl code")
         if isinstance(selected, ScreenNode):
             restoreFBOAct = context_menu.addAction("Restore FBOs dependencies")
         if isinstance(selected, ShaderNode):
             open_glsl_menu = context_menu.addMenu("Open glsl code")
-
-            actOpenGLSL = []
             full_paths = selected.getGLSLCodePath()
+            actOpenGLSL = []
             for path in full_paths:
                 short_path = path.split("/")[-1]
                 actOpenGLSL.append(open_glsl_menu.addAction(short_path))
+        if isinstance(selected, GraphContainerNode):
+            openSubWindow = context_menu.addAction("Open a new graph")
             
         #if selected and action == openGLSLAct: selected.openGLSLCode()
 
@@ -231,11 +235,13 @@ class PataNodeSubWindow(NodeEditorWidget):
         if selected and action == evalAct:
             val = selected.eval()
             if DEBUG_CONTEXT: print("EVALUATED:", val)
-        if selected and action == reloadGLSLAct: selected.reloadGLSLCode()
+        if isinstance(selected, ShaderNode) and action == reloadGLSLAct: selected.reloadGLSLCode()
         if isinstance(selected, ScreenNode) and action == restoreFBOAct: selected.restoreFBODependencies()
         if isinstance(selected, ShaderNode):
             for path, act in zip(full_paths, actOpenGLSL):
                 if selected and action == act: selected.openGLSLInTerminal(path)
+        if isinstance(selected, GraphContainerNode) and action == openSubWindow:
+            selected.openNewGraph()
 
     def handleEdgeContextMenu(self, event):
         if DEBUG_CONTEXT: print("CONTEXT: EDGE")

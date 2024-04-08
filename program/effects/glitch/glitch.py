@@ -55,13 +55,13 @@ class Glitch(ProgramBase):
             'translate' : 'translate',
         }
         super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        self.addProtectedUniforms(['iChannel0', 'translate'])
 
     def updateParams(self, af):
         if af is None:
             return
         tmp = np.clip(af["low"][3] - af["low"][2], 0, 100000)
-        self.smooth_low = self.smooth_low * 0.5 + 0.5 * tmp
+        self.smooth_low = self.smooth_low * 0.5 + 0.5 * tmp*.5 + af["smooth_high"]*af["smooth_low"]
 
         if af["on_kick"]:
             self.sens *= -1

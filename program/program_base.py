@@ -4,7 +4,7 @@ from program.program_conf import CTXError, SQUARE_VERT_PATH, UnuseUniformError, 
 from nodeeditor.utils import dumpException
 
 
-DEBUG = True
+DEBUG = False
 
 class ProgramBase:
 
@@ -238,7 +238,7 @@ class ProgramBase:
             modified_data = eval(evaluation)
             modified_data = float(modified_data)
         except:
-            print('eval_function %s'%evaluation, "is not correct.")
+            print('eval_function %s'%evaluation, "is not correct.", self.__class__.__name__, "for uniform %s"%uniform_name)
             print('giving raw input in uniforms %s'%uniform_name)
             modified_data = input_data
         return modified_data
@@ -397,8 +397,8 @@ class ProgramsUniforms():
             return
         uniforms = self.uniforms[program_name]
         for uniform_name, param_name in binding.items():
-            print(uniforms)
-            print(uniform_name, param_name)
+            if DEBUG: print(uniforms)
+            if DEBUG: print(uniform_name, param_name)
             uniforms[uniform_name]["type"] = None
             uniforms[uniform_name]["param_name"] = param_name
         self.init_binding[program_name] = copy.deepcopy(uniforms)

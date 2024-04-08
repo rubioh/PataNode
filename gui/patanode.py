@@ -10,12 +10,14 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 
 from gui.subwindow import PataNodeSubWindow
+from gui.graphcontainer import GraphContainerSubWindow
 from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.shader_widget import ShaderWidget
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.audio_widget import AudioLogWidget
 
 from node.node_conf import SHADER_NODES, AUDIO_NODES
+from node.graph_container_node import GraphContainerNode
 
 
 
@@ -165,7 +167,7 @@ class PataNode(NodeEditorWindow):
         except Exception as e: dumpException(e)
 
 
-    def onFileOpen(self):
+    def onFileOpen(self, graph=False):
         fnames, filter = QFileDialog.getOpenFileNames(self, 'Open graph from file', self.getFileDialogDirectory(), self.getFileDialogFilter())
 
         try:
@@ -176,15 +178,19 @@ class PataNode(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        nodeeditor = PataNodeSubWindow(self)
+                        if graph: nodeeditor = GraphContainerSubWindow(self)
+                        else : nodeeditor = PataNodeSubWindow(self)
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
                             subwnd = self.createMdiChild(nodeeditor)
                             subwnd.show()
+                            if graph: nodeeditor.initGraphScene()
                         else:
                             nodeeditor.close()
         except Exception as e: dumpException(e)
+        if graph:
+            return nodeeditor, subwnd
 
 
     def about(self):

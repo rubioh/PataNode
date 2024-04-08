@@ -6,6 +6,7 @@ from PyQt5.Qt import *
 from nodeeditor.utils import dumpException
 
 from node.node_conf import AUDIO_NODES, SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.graph_container_node import GraphContainerNode
 
 class QDMDragListbox(QTreeWidget):
     def __init__(self, parent=None):
@@ -21,6 +22,7 @@ class QDMDragListbox(QTreeWidget):
 
         self.addShaderNodes()
         self.addAudioNodes()
+        self.addContainerNodes()
 
 
     def addShaderNodes(self):
@@ -60,6 +62,16 @@ class QDMDragListbox(QTreeWidget):
         audio_type_item.sortChildren(1, Qt.AscendingOrder)
 
         self.sortItems(0, Qt.AscendingOrder)
+
+    def addContainerNodes(self):
+        container_type_item = QTreeWidgetItem(self)
+        container_type_item.setText(0, "Container")
+        container_type_item.setForeground(0, QColor("#D38600"))
+        node = GraphContainerNode
+        self.addMyItem(node.op_title, node.icon, node.op_code, container_type_item)
+
+        container_type_item.setChildIndicatorPolicy(0)
+        container_type_item.sortChildren(1, Qt.AscendingOrder)
 
     def addMyItem(self, name, icon=None, op_code=0, parent=None):
         item = QTreeWidgetItem(parent) # can be (icon, text, parent, <int>type)

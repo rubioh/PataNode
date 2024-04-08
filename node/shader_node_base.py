@@ -81,10 +81,20 @@ class ShaderNode(Node):
 
         self.value = None # Using to store output texture reference
         self.program = None
+        self._container = None # GraphContainer reference 
         # Current OpenGL ctx
         self.ctx = scene.ctx
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
+
+    @property
+    def container(self):
+        return self._container
+
+    @container.setter
+    def container(self, value):
+        if DEBUG: print("ShaderNode::container.setter bind container ", value, "to ShaderNode", self.__class__.__name__)
+        self._container = value
 
 
     def getAdaptableParameters(self):
@@ -103,7 +113,7 @@ class ShaderNode(Node):
         self.output_socket_position = RIGHT_CENTER
 
     def restoreFBODependencies(self):
-        pass
+        self.program.fbos = None
 
     def findAndConnectFbos(self, win_sizes, components=None, dtypes=None):
         if self.program.fbos is not None:
@@ -122,7 +132,7 @@ class ShaderNode(Node):
         return True
 
     def evalInputNodes(self):
-        print("Eval Inputs:", self)
+        if DEBUG: print("Eval Inputs:", self)
         # TODO Several Textures test
         input_nodes = self.getShaderInputs()
         if not input_nodes:
@@ -152,6 +162,8 @@ class ShaderNode(Node):
     def evalRendering(self, textures=None):
         try:
             output_texture = self.program.render(textures)
+            if DEBUG: print("ShaderNode::evalRendering output_texture is ", output_texture,
+                    "from ShaderNode", self, "of class", self.__class__.__name__)
             self.value = output_texture
             return True
         except Exception as e:
@@ -164,7 +176,7 @@ class ShaderNode(Node):
         return True
 
     def evalImplementation(self):
-        print("Eval Implementation:", self)
+        if DEBUG: print("Eval Implementation:", self)
         # Find and Connect required fbos
         win_sizes, components, dtypes = self.program.getFBOSpecifications() 
         success = self.findAndConnectFbos(win_sizes, components, dtypes)
@@ -194,12 +206,12 @@ class ShaderNode(Node):
 
 
     def eval(self):
-        print("Eval:", self)
+        if DEBUG: print("Eval:", self)
         if not self.isDirty() and not self.isInvalid():
             if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
         try:
-            print('Eval Try', self)
+            if DEBUG: print('Eval Try', self)
             success = self.evalImplementation()
             return self.value
         except ValueError as e:
@@ -240,7 +252,7 @@ class ShaderNode(Node):
 
     def openGLSLInTerminal(self, glsl_path):
         os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
-        print("Open in Vim the file %s"%glsl_path)
+        if DEBUG: print("Open in Vim the file %s"%glsl_path)
 
     def transform_audio_features(self, audio_features):
         pass
@@ -275,7 +287,7 @@ class ShaderNode(Node):
                 node_params[program][uniform]['eval_function']['value'] = eval_func
         uniforms_binding = data['uniforms_binding']
         self.program.restoreUniformsBinding(uniforms_binding)
-        print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
+        if DEBUG: print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
         return res
 
 
@@ -285,6 +297,7 @@ class ShaderNode(Node):
 class Utils(): node_type_reference = "Utils"
 class Scene(): node_type_reference = "Scenes"
 class Output(): node_type_reference = "Outputs"
+class Input(): node_type_reference = "Input"
 class Texture(): node_type_reference = "Textures"
 class Effects(): node_type_reference = "Effects"
 class Colors(): node_type_reference = "Colors"

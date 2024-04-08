@@ -64,7 +64,8 @@ class ScreenNode(ShaderNode, Output):
         self.scene.fbo_manager.restoreFBOUsability()
         for node in self.scene.nodes:
             node.markDirty()
-            node.program.fbos = None
+            if (node != self):
+                node.restoreFBODependencies()
         self.eval()
 
     def evalImplementation(self):
@@ -76,11 +77,10 @@ class ScreenNode(ShaderNode, Output):
 
         input_texture = input_node.eval()
 
-        if input_texture is None:
+        if input_texture is None or not input_texture:
             self.grNode.setToolTip("Input is NaN")
             self.markDirty()
             return False
-
         success_render = self.program.render([input_texture])
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
@@ -89,7 +89,8 @@ class ScreenNode(ShaderNode, Output):
 
     def render(self, audio_features=None):
         for node in self.scene.nodes:
-            node.program.already_called = False
+            if isinstance(node, ShaderNode):
+                node.program.already_called = False
         input_nodes = self.getShaderInputs()
         if not len(input_nodes):
             return False

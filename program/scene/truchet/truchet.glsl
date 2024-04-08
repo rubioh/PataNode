@@ -17,7 +17,7 @@ uniform float K;
 uniform float smooth_low;
 uniform float accum_rot;
 
-const int MAX_MARCHING_STEPS = 25;
+const int MAX_MARCHING_STEPS = 30;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 20.0;
 const float PRECISION = 0.003;
