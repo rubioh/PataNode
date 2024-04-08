@@ -1,0 +1,1 @@
+git+https://github.com/pata-tech/pyqt-node-editor@master
