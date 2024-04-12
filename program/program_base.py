@@ -4,7 +4,7 @@ from program.program_conf import CTXError, SQUARE_VERT_PATH, UnuseUniformError, 
 from nodeeditor.utils import dumpException
 
 
-DEBUG = False
+DEBUG = True
 DEBUG_EVAL = True
 
 class ProgramBase:
@@ -31,7 +31,7 @@ class ProgramBase:
         self.vao = None
     
         # Fbos specification 
-        self.fbos_win_size, self.fbos_components, self.fbos_dtypes = [], [], []
+        self.fbos_win_size, self.fbos_components, self.fbos_dtypes, self.fbos_depth_requirement = [], [], [], []
         self._required_fbos = 1
         self.fbos = None
 
@@ -97,7 +97,7 @@ class ProgramBase:
         """
         raise NotImplementedError
 
-    def loadProgramToCtx(self, vert_path, frag_path, reload=False, name=""):
+    def loadProgramToCtx(self, vert_path, frag_path, reload=False, name="", vao_binding=None, varyings=None):
         """
             Create a program named {name}program
                    a vao     named {name}vao     
@@ -106,16 +106,29 @@ class ProgramBase:
                 Do some stuff to register the previous working state of the program
                 in order to reinstanciate it if the new version failed to compile/execute
         """
+        if DEBUG: print("ProgramBase::loadProgramToCtx  loading program %s"%name, 
+                    " with vert_path %s and frag_path %s"%(vert_path, frag_path), 
+                    " with varyings %s and vao_binding %s"%(str(varyings), str(vao_binding)))
         vert = open(vert_path, 'r').read()
-        frag = open(frag_path, 'r').read()
+        frag = None
+        if frag_path is not None:
+            frag = open(frag_path, 'r').read()
         if not reload:
             if vert_path != SQUARE_VERT_PATH:
                 self.vertex_shader_glsl_paths.append(vert_path)
-            self.fragment_shader_glsl_paths.append(frag_path)
+            else:
+                setattr(self, name+'vbo', self.ctx.buffer(get_square_vertex_data()))
+            if frag_path is not None:
+                self.fragment_shader_glsl_paths.append(frag_path)
             # Instanciate the vertex buffer object {name}vbo
-            setattr(self, name+'vbo', self.ctx.buffer(get_square_vertex_data()))
-        program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)
-        vao = self.ctx.vertex_array(program, [(getattr(self, name+'vbo'), "2f", "in_position")])
+        if varyings is None:
+            program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)
+        else:
+            program = self.ctx.program(vertex_shader=vert, fragment_shader=frag, varyings=varyings)
+        if vao_binding is None:
+            vao = self.ctx.vertex_array(program, [(getattr(self, name+'vbo'), "2f", "in_position")])
+        else:
+            vao = self.ctx.vertex_array(program, vao_binding)
         if reload:
             # Save a copy of the previous program on reload
             self.storePreviousProgramVersion(program, vao, name)
@@ -124,7 +137,10 @@ class ProgramBase:
             setattr(self, name+'program', program)
             setattr(self, name+'vao', vao)
         self.adaptable_parameters_dict[name+'program'] = {}
-        self.initUniformsForProgram(frag, name, reload)
+        if frag is None: frag = ''
+        if vert_path == SQUARE_VERT_PATH: vert = '\n'
+        self.initUniformsForProgram(frag+vert, name, reload)
+        #self.initUniformsForProgram(frag+vert, name, reload)
         if reload:
             self.reloadUniformsBinding(None, name)
 
@@ -189,7 +205,9 @@ class ProgramBase:
     # FBO Things #
     ##############
     def getFBOSpecifications(self):
-        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes)
+        if len(self.fbos_depth_requirement):
+            return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, self.fbos_depth_requirement)
+        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, None)
 
     def connectFbos(self, fbos=None):
         assert len(fbos) == self.required_fbos
@@ -457,5 +475,6 @@ class ProgramsUniforms():
                     program[uniform_name] = modified_data
                 else:
                     data = getattr(self.parent, info["param_name"])
-                    program[uniform_name] = data
-                    
+                    if isinstance(data, np.ndarray):
+                        program[uniform_name].write(data)
+                    else: program[uniform_name] = data

@@ -35,7 +35,7 @@ class FBOManager:
         if DEBUG: print(self.in_use_fbos)
 
 
-    def getFBO(self, win_sizes=[], components=None, dtypes=None):
+    def getFBO(self, win_sizes=[], components=None, dtypes=None, depth_requirements=None):
         if dtypes is not None and len(dtypes) != len(win_sizes):
             print('FBOManager::getFBO lists win_sizes and dtypes are not of the same size')
             return None
@@ -44,7 +44,7 @@ class FBOManager:
             return None
         if DEBUG: print("getFBOs:: in current FBOs :", self.current_fbos)
         if DEBUG: print("getFBOs:: in current in_use:", self.in_use_fbos)
-        hashmaps = self.getHashmaps(win_sizes, components, dtypes)
+        hashmaps = self.getHashmaps(win_sizes, components, dtypes, depth_requirements)
         #returned_fbos = [None for i in range(len(hashmaps))]
         returned_fbos = self.checkForExistingFBOs(hashmaps)
         for i in range(len(win_sizes)):
@@ -61,7 +61,16 @@ class FBOManager:
             else:
                 component = self._default_component
             new_texture = self.ctx.texture(size=win_size, components=component, dtype=dtype)
-            new_fbo = self.ctx.framebuffer(color_attachments=new_texture)
+
+            if depth_requirements is not None:
+                depth = depth_requirements[i]
+            else:
+                depth = False
+            if depth:
+                depth_texture = self.ctx.depth_renderbuffer(size=win_size)
+                new_fbo = self.ctx.framebuffer(color_attachments=new_texture, depth_attachment=depth_texture)
+            else:
+                new_fbo = self.ctx.framebuffer(color_attachments=new_texture)
 
             returned_fbos[i] = new_fbo
             if not current_hashmap in self.current_fbos.keys():
@@ -91,7 +100,7 @@ class FBOManager:
         return returned_fbos
 
 
-    def getHashmaps(self, win_sizes, components=None, dtypes=None):
+    def getHashmaps(self, win_sizes, components=None, dtypes=None, depths=None):
         hashmaps = list()
         for i, win_size in enumerate(win_sizes):
             if components is not None:
@@ -102,16 +111,21 @@ class FBOManager:
                 dtype = dtypes[i]
             else:
                 dtype = self._default_dtype
-            hashmap = self.propertiesToHashmap(win_size, component, dtype)
+            if depths is not None:
+                depth = 1
+            else:
+                depth = 0
+            hashmap = self.propertiesToHashmap(win_size, component, dtype, depth)
             hashmaps.append(hashmap)
         return hashmaps
 
 
-    def propertiesToHashmap(self, win_size, component, dtype):
+    def propertiesToHashmap(self, win_size, component, dtype, depth):
         hashmap = str(win_size[0]+win_size[1]*10000)
         hashmap += str(component)
         dtype_to_int = [ord(c) for c in dtype]
         hashmap += str(sum(dtype_to_int))
+        hashmap += str(depth)
         hashmap = int(hashmap)
         return hashmap
 
