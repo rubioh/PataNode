@@ -110,9 +110,13 @@ class ShaderNode(Node):
         self.reload_program()
 
     def reload_program(self):
+        state = self.serialize()
+
         program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
         del self.program
         self.program = program
+
+        self.deserialize(state, restore_window_size=False)
         self.markDirty()
         self.eval()
 
@@ -291,11 +295,11 @@ class ShaderNode(Node):
         res['adaptable_parameters'] = adapt_params
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
         res['uniforms_binding'] = uniforms_binding
+        res['win_size'] = self.win_size
         return res
 
-    def deserialize(self, data, hashmap={}, restore_id=True):
+    def deserialize(self, data, hashmap={}, restore_id=True, restore_window_size=True):
         res = super().deserialize(data, hashmap, restore_id)
-
         adapt_params = data['adaptable_parameters']
         node_params = self.getAdaptableParameters()
         for program in adapt_params.keys():
@@ -306,6 +310,8 @@ class ShaderNode(Node):
         uniforms_binding = data['uniforms_binding']
         self.program.restoreUniformsBinding(uniforms_binding)
         if DEBUG: print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
+        if restore_window_size and 'win_size' in data.keys():
+            self.changeWindowSize(data['win_size'])
         return res
 
 
