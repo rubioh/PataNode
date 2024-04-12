@@ -5,6 +5,7 @@ from nodeeditor.utils import dumpException
 
 
 DEBUG = False
+DEBUG_EVAL = True
 
 class ProgramBase:
 
@@ -238,8 +239,8 @@ class ProgramBase:
             modified_data = eval(evaluation)
             modified_data = float(modified_data)
         except:
-            print('eval_function %s'%evaluation, "is not correct.", self.__class__.__name__, "for uniform %s"%uniform_name)
-            print('giving raw input in uniforms %s'%uniform_name)
+            if DEBUG_EVAL: print('eval_function %s'%evaluation, "is not correct.", self.__class__.__name__, "for uniform %s"%uniform_name)
+            if DEBUG_EVAL: print('giving raw input in uniforms %s'%uniform_name)
             modified_data = input_data
         return modified_data
 
@@ -331,6 +332,7 @@ class UniformsLookup():
         return len(self.uniforms)
     def __iter__(self):
         return iter(self.uniforms)
+
 
 class ProgramsUniforms():
     def __init__(self, parent=None):

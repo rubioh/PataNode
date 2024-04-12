@@ -6,4 +6,4 @@ import program.scene.truchet.truchet
 import program.scene.lumtriangle.lumtriangle
 import program.scene.gsstylized.gsstylized
 import program.scene.patatrack3d.patatrack3d
-#import program.scene.cube.cube
+import program.scene.cube.cube

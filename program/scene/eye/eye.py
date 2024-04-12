@@ -67,9 +67,6 @@ class Eye(ProgramBase):
                 []
         )
 
-    def getParameters(self):
-        return self.adaptableParametersDict
-
     def updateParams(self, af=None):
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)

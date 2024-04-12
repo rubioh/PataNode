@@ -108,7 +108,7 @@ class QDMInspector(QWidget):
         button_widget.setText(str(win_size_ref))
         button_widget.setPopupMode(QToolButton.MenuButtonPopup)
         menu = QMenu()
-        win_sizes_list = [(1920, 1080), (1280, 720), (960, 540), (640, 360), (480, 270), (320, 180)] 
+        win_sizes_list = [(1920, 1080), (1280, 720), (960, 540), (640, 360), (480, 270), (320, 180), (240, 135), (160, 90), (80, 45), (64, 36)] 
         for j, win_size in enumerate(win_sizes_list):
             action = menu.addAction(str(win_size))
             action.triggered.connect(callback_factory(win_size, button_widget, callback))

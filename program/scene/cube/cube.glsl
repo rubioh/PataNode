@@ -1,3 +1,24 @@
+#version 330 core
+layout (location=0) out vec4 fragColor;
+
+uniform float iTime;
+uniform vec2 iResolution;
+uniform float energy_fast;
+uniform float energy_mid;
+uniform float bpm;
+uniform float sens;
+uniform float intensity;
+uniform float vitesse;
+uniform float trigger;
+uniform float deep;
+uniform float face;
+uniform float go_rot;
+uniform vec3 color;
+
+const int MAX_MARCHING_STEPS = 	100;
+const float MIN_DIST = 1.0;
+const float MAX_DIST = 100.0;
+const float PRECISION = 0.0001;
 
 
 mat3 rotateX(float theta) {
@@ -143,8 +164,6 @@ void main()
 {
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = ( 2.*gl_FragCoord.xy - iResolution.xy ) / iResolution.y;
-    
-    TRANSI_UV;
     vec3 col;
     vec3 color = vec3(.8,.1,.1);
     vec3 normal;
@@ -169,7 +188,5 @@ void main()
     }
     //col = vec3(pattern_border(uv*2.));
     // Output to screen
-       
-    TRANSI_COL;
     fragColor = vec4(col, 1.0);
     }
