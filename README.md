@@ -1,1 +1,3 @@
-TODO : PYQT GRAPH RALENTI LE DELIRE ATTENTION
+TODO : 
+Integration physarum
+Integration Modèle de particules (collision etc...)

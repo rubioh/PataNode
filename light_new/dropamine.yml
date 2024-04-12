@@ -1,0 +1,137 @@
+# 1 dimmer, 2 strobe
+fixtures:
+  - fixture: "cracra"
+    name: "octostrip 1_dim_control"
+    address: [2, 1]
+  - fixture: "cracra"
+    name: "octostrip 2_dim_control"
+    address: [3, 1]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 1"
+    address: [2, 17]
+    position_start: [0.,-.5,.5]
+    position_end: [-.3,-.5,.5]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 2"
+    address: [2, 41]
+    position_start: [-.3,-.5,.5]
+    position_end: [-.3,-.5,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 3"
+    address: [2, 65]
+    position_start: [-.3,-.2,.95]
+    position_end: [-.3,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 4"
+    address: [2, 89]
+    position_start: [-.3,.4,.95]
+    position_end: [-.3,.9,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 5"
+    address: [2, 113]
+    position_start: [-.5,.4,.95]
+    position_end: [-.5,.9,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 6"
+    address: [2, 137]
+    position_start: [-.5,-.2,.95]
+    position_end: [-.5,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 7"
+    address: [2, 161]
+    position_start: [-.7,-.2,.95]
+    position_end: [-.7,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 1 strip 8"
+    address: [2, 185]
+    position_start: [-.9,-.2,.95]
+    position_end: [-.9,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 1"
+    address: [3, 17]
+    position_start: [0.,-.5,.5]
+    position_end: [.3,-.5,.5]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 2"
+    address: [3, 41]
+    position_start: [.3,-.5,.5]
+    position_end: [.3,-.5,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 3"
+    address: [3, 65]
+    position_start: [.3,-.2,.95]
+    position_end: [.3,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 4"
+    address: [3, 89]
+    position_start: [.3,.4,.95]
+    position_end: [.3,.9,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 5"
+    address: [3, 113]
+    position_start: [.5,.4,.95]
+    position_end: [.5,.9,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 6"
+    address: [3, 137]
+    position_start: [.5,-.2,.95]
+    position_end: [.5,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 7"
+    address: [3, 161]
+    position_start: [.7,-.2,.95]
+    position_end: [.7,.3,.95]
+  - fixture: "light_string"
+    length: 8
+    px_per_section: 0
+    name: "octostrip 2 strip 8"
+    address: [3, 185]
+    position_start: [.9,-.2,.95]
+    position_end: [.9,.3,.95]
+  - fixture: "antari_z1020"
+    name: "smoke"
+    address: [1, 1]
+  - fixture: "par2brod"
+    name: "par dj"
+    address: [1, 2]
+outputs:
+  - output: "pataboite"
+    universes: 1
+  - output: "artnet"
+    port_address_start: 0
+    port_address_end: 1
+    ip: 10.2.0.2
+  - output: "artnet"
+    port_address_start: 0
+    port_address_end: 1
+    ip: 10.2.0.3

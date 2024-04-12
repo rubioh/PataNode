@@ -1,0 +1,9 @@
+# LightCube LZR
+fixtures:
+  - fixture: "lightcubelzr"
+    name: "LightCube LZR"
+    address: [1, 1]
+    position: [0,0,0]
+outputs:
+  - output: "pataboite"
+    universes: 1
