@@ -1,0 +1,258 @@
+{
+    "id": 140014841775824,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 140014842002256,
+            "title": "Downscale",
+            "pos_x": -430.0,
+            "pos_y": 53.0,
+            "inputs": [
+                {
+                    "id": 140014841382352,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140014841997648,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 960,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "ddwin_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            }
+        },
+        {
+            "id": 140014841856976,
+            "title": "UpscaleNearest",
+            "pos_x": -57.0,
+            "pos_y": 54.0,
+            "inputs": [
+                {
+                    "id": 140014841890832,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140014842041616,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1598,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            }
+        },
+        {
+            "id": 140014841866960,
+            "title": "Dithering",
+            "pos_x": -245.0,
+            "pos_y": 54.0,
+            "inputs": [
+                {
+                    "id": 140014842037136,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140014808415632,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 958,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            }
+        },
+        {
+            "id": 140014809157264,
+            "title": "Std Input",
+            "pos_x": -652.0,
+            "pos_y": 45.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140014805574864,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 2,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            }
+        },
+        {
+            "id": 140014808902352,
+            "title": "Std Output",
+            "pos_x": 145.0,
+            "pos_y": 51.0,
+            "inputs": [
+                {
+                    "id": 140014805826448,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 1,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": 140014808907728,
+            "edge_type": 2,
+            "start": 140014841997648,
+            "end": 140014842037136
+        },
+        {
+            "id": 140014808562896,
+            "edge_type": 2,
+            "start": 140014808415632,
+            "end": 140014841890832
+        },
+        {
+            "id": 140014808400080,
+            "edge_type": 2,
+            "start": 140014805574864,
+            "end": 140014841382352
+        },
+        {
+            "id": 140014806089168,
+            "edge_type": 2,
+            "start": 140014842041616,
+            "end": 140014805826448
+        }
+    ]
+}

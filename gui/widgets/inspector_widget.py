@@ -91,6 +91,35 @@ class QDMInspector(QWidget):
         self.grid.addWidget(groupBox)
         self.grid.insertStretch(-1,-1)
 
+    def createSetWinSizeToolbox(self, obj):
+        callback = obj.changeWindowSize
+        win_size_ref = obj.win_size
+        
+        groupBox = QGroupBox("Resolution")
+        vbox = QVBoxLayout()
+        
+        def custom_callback(win_size, current_widget, callback):
+            current_widget.setText(str(win_size))
+            callback(win_size)
+        def callback_factory(win_size, current_widget, callback):
+            return lambda : custom_callback(win_size, current_widget, callback)
+
+        button_widget = QToolButton()
+        button_widget.setText(str(win_size_ref))
+        button_widget.setPopupMode(QToolButton.MenuButtonPopup)
+        menu = QMenu()
+        win_sizes_list = [(1920, 1080), (1280, 720), (960, 540), (640, 360), (480, 270), (320, 180)] 
+        for j, win_size in enumerate(win_sizes_list):
+            action = menu.addAction(str(win_size))
+            action.triggered.connect(callback_factory(win_size, button_widget, callback))
+
+        button_widget.setMenu(menu)
+        vbox.addWidget(button_widget)
+        groupBox.setLayout(vbox)
+        self.grid.addWidget(groupBox)
+        self.grid.insertStretch(-1,-1)
+
+
     def createUniformWindow(self, uniformsBinding):
         return UniformWidget(uniformsBinding)
 
@@ -99,6 +128,7 @@ class QDMInspector(QWidget):
         vbox = QVBoxLayout()
         parameter_window = self.createParametersWindow(parameters_informations)
         vbox.addWidget(parameter_window)
+        vbox.sizeHint = lambda : QSize(900, 500)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
         self.grid.insertStretch(-1,-1)
@@ -117,10 +147,12 @@ class QDMInspector(QWidget):
         if self.uniform_window is not None:
             self.uniform_window.deleteLater()
         parameters_informations = obj.getAdaptableParameters()
-        #self.addLayout(parameters_properties)
         uniforms_binding = obj.getUniformsBinding()
+        self.createSetWinSizeToolbox(obj)
         self.createParametersToolbox(parameters_informations)
         self.createUniformsToolbox(uniforms_binding)
+
+
 
 
 class ParametersWidget(QTabWidget):
@@ -221,7 +253,7 @@ class UniformWidget(QTabWidget):
         
         self.setAutoFillBackground(True)
         self.setPalette(pal)
-        self.setGeometry(800,800, 250 + 50*self.n_programs, 500)
+        self.setGeometry(800,800, 250 + 50*self.n_programs, 1500)
         stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
         stylesheet = open(stylesheet, 'r').read()
 

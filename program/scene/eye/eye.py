@@ -122,7 +122,6 @@ class EyeNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.shader_node_type = dirname(__file__).split('/')[-2]
         self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 

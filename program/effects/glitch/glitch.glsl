@@ -87,6 +87,6 @@ void main()
     b.rg *= 0.;
     b = hsv2rgb(rgb2hsv(b) + vec3(phi3,0.,0.));
 
-    fragColor = vec4((r+g+b)*.666,1.0);
+    fragColor = vec4((r+g+b),1.0);
 
 }

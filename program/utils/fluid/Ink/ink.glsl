@@ -25,7 +25,7 @@ void main()
     vec2 vel = texture(FieldState, uv).xy;
 
     vec3 tex = texture(iChannel0, uv).xyz;
-    tex = clamp(tex, vec3(0.), vec3(1.))*.8;
+    tex = clamp(tex, vec3(0.), vec3(1.))*1.;
 
     if (iFrame <= 0){
         fragColor.rgb = tex;

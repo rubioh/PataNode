@@ -68,7 +68,8 @@ class AudioEngine:
         self.mini_chill = 0
 
         self.tic = 0
-    
+        
+        self.features = {}
         self.initFeatures()
 
     def initFeatures(self):
@@ -141,10 +142,15 @@ class AudioEngine:
         self.fft = dft
 
         # Computing audio features
+        if "_on_kick" in self.features.keys():
+            _on_kick = self.features["_on_kick"]
+        else:
+            _on_kick = 0
         self.features = {}
+        self.features["_on_kick"] = _on_kick
         self.features["fft"] = np.abs(self.fft)  # First get dft
         self.features["mini_chill"] = self.mini_chill
-        self.add_to_features(self.ET(dft, self.features))  # Energy things
+        self.add_to_features(self.ET(np.abs(self.fft), self.features, audio=self.buffer))  # Energy things
         self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
         self.add_to_features(
             self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])

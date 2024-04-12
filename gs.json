@@ -1,0 +1,366 @@
+{
+    "id": 140440983657040,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 140440986453904,
+            "title": "Screen",
+            "pos_x": -13.0,
+            "pos_y": 61.0,
+            "inputs": [
+                {
+                    "id": 140440984172112,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            }
+        },
+        {
+            "id": 140440984167504,
+            "title": "GSStylized",
+            "pos_x": -366.0,
+            "pos_y": 111.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140440984074832,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1106,
+            "adaptable_parameters": {
+                "reacdif_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "f": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "k": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "Db": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "Da": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_kick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "center": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "radius_triangle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "init_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "patate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "K": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_flick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dkick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "reacdif_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "bwin_size"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "f": {
+                        "type": null,
+                        "param_name": "f_current"
+                    },
+                    "k": {
+                        "type": null,
+                        "param_name": "k_current"
+                    },
+                    "Db": {
+                        "type": null,
+                        "param_name": "Db"
+                    },
+                    "Da": {
+                        "type": null,
+                        "param_name": "Da"
+                    },
+                    "on_kick": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "center": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "radius_triangle": {
+                        "type": null,
+                        "param_name": "radius_triangle"
+                    }
+                },
+                "init_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "patate": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": null
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy": {
+                        "type": null,
+                        "param_name": "smooth_fast"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "K": {
+                        "type": null,
+                        "param_name": "K"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel1"
+                    },
+                    "mode_flick": {
+                        "type": null,
+                        "param_name": "mode_flick"
+                    },
+                    "dkick": {
+                        "type": null,
+                        "param_name": "dkick"
+                    }
+                }
+            }
+        }
+    ],
+    "edges": [
+        {
+            "id": 140440468006416,
+            "edge_type": 2,
+            "start": 140440984074832,
+            "end": 140440984172112
+        }
+    ]
+}

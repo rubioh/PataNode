@@ -1,3 +1,8 @@
+import librosa
+import numpy as np
+
+melbank = librosa.filters.mel(sr=16000, n_fft=1024)
+
 class AudioEventTracker:
     def __init__(self):
         self.current_state = dict()
@@ -6,6 +11,7 @@ class AudioEventTracker:
 
         # On Kick Parameters
         self.smooth_low_treshold = 0.1 * 0.5
+        self.smooth_very_low_treshold = 0.1 * 0.5
         self.dlow_treshold = 0.03 * 0.5  # Smooth low derivative
         self.min_frames_since_kick = 12  # Minimal number of frame between two kick
         self.frames_since_kick = 0
@@ -25,6 +31,9 @@ class AudioEventTracker:
         self.mini_chill = 0
         self.wait_mini_chill = 0
 
+        # MelThings
+        self.all_mel = np.zeros((240, 513))
+
     def get_on_kick(self, bpm):
         amp = 0.5 if bpm > 160 else 1  # For high BPM the threshold needs to be reduce
         if (
@@ -36,12 +45,29 @@ class AudioEventTracker:
             self.event_features["decaying_kick"] = self.decaying_kick
             self.event_features["_bpm_on_kick"] = 1
             self.kick_count += 1
+            self.event_features["_on_kick"] = 1
         else:
             self.frames_since_kick += 1
             self.decaying_kick = max(self.decaying_kick - 1.0 / 25.0, 0.0)
             self.event_features["decaying_kick"] = self.decaying_kick
             self.event_features["_bpm_on_kick"] = 0
+            self.event_features["_on_kick"] = 0
         self.event_features["kick_count"] = self.kick_count
+
+    def get_on_kick_vl(self, bpm):
+        af = self.current_state
+        dft = af['fft']
+        mel = melbank@dft
+        mel = librosa.core.power_to_db(mel)
+        dft[10:] = 0
+        self.all_mel[1:] = self.all_mel[:-1]
+        self.all_mel[-1] = dft
+    
+        lag = 1
+        onset_env = self.all_mel[lag:] - self.all_mel[:-lag]
+        onset_env = np.maximum(0.0, onset_env)
+        onset_env = np.mean(onset_env, 1)
+        self.event_features['onset_env'] = onset_env[-1]
 
     def get_on_hat(self):
         if (
@@ -93,6 +119,7 @@ class AudioEventTracker:
         """
         self.current_state = af
         self.get_on_kick(bpm=bpm)
+        self.get_on_kick_vl(bpm=bpm)
         self.get_on_hat()
         self.get_on_snare()
         self.get_mini_chill()

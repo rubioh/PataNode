@@ -1,5 +1,6 @@
 import numpy as np
 import pickle
+import scipy
 
 
 class AudioLogger:
@@ -53,15 +54,14 @@ class AudioLogger:
                         tmp = self.information[new_key_instant]
                         tmp[:-1] = tmp[1:]
                         tmp[-1] = v[0]
+                if k == "smooth_dft":
+                    self.information[k] = np.copy(v)
             except:
                 if k not in self.information.keys():
                     self.information[k] = np.zeros(size)
-                    self.information[k][-1] = v
-                else:
-                    tmp = self.information[k]
-                    tmp[:-1] = tmp[1:]
-                    tmp[-1] = v
-                #print(len(self.information[k]))
+                tmp = self.information[k]
+                tmp[:-1] = tmp[1:]
+                tmp[-1] = v
 
         #self.i += 1
         #if self.i > self.wait:

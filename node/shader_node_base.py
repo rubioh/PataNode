@@ -18,7 +18,7 @@ from program.program_conf import GLSLImplementationError, UnuseUniformError
 
 
 
-DEBUG = False
+DEBUG = True
 
 class ShaderGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
@@ -82,6 +82,7 @@ class ShaderNode(Node):
         self.value = None # Using to store output texture reference
         self.program = None
         self._container = None # GraphContainer reference 
+        self._win_size = (1920, 1080)
         # Current OpenGL ctx
         self.ctx = scene.ctx
         # it's really important to mark all nodes Dirty by default
@@ -96,6 +97,24 @@ class ShaderNode(Node):
         if DEBUG: print("ShaderNode::container.setter bind container ", value, "to ShaderNode", self.__class__.__name__)
         self._container = value
 
+    @property
+    def win_size(self):
+        return self._win_size
+
+    @win_size.setter
+    def win_size(self, value):
+        self._win_size = value
+
+    def changeWindowSize(self, win_size):
+        self.win_size = win_size
+        self.reload_program()
+
+    def reload_program(self):
+        program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
+        del self.program
+        self.program = program
+        self.markDirty()
+        self.eval()
 
     def getAdaptableParameters(self):
         if self.program is not None:
@@ -257,7 +276,6 @@ class ShaderNode(Node):
     def transform_audio_features(self, audio_features):
         pass
 
-
     def render(self, audio_features=None):
         pass
 
@@ -302,3 +320,4 @@ class Texture(): node_type_reference = "Textures"
 class Effects(): node_type_reference = "Effects"
 class Colors(): node_type_reference = "Colors"
 class Particles(): node_type_reference = "Particles"
+class Gate(): node_type_reference = "Gate"

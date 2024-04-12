@@ -10,7 +10,7 @@ uniform sampler2D iChannel0;
 #define T(uv, lvl) 10.*pow(dot(texture(iChannel0, uv).rgb, vec3(.299, .587, .114)), lvl)
 
 vec3 calcNormal(vec2 uv){
-    float lvl = 1.;
+    float lvl = 1;
     vec2 e = vec2(1.,-1.)*.0001;
     float orig = T(uv, lvl);
     return normalize(vec3(
@@ -28,6 +28,8 @@ void main()
     vec3 col = texture(iChannel0, uv).rgb;
 
     vec3 sn = calcNormal(uv); // Surface Normal
+    sn.z *= .5;
+    sn = normalize(sn);
     vec3 sp = vec3(uv-.5, 2.); // Surface Position
     vec3 rd = normalize(vec3(uv-.5, 1.)); // Ray direction orig to screen space
     vec3 lp = vec3(.0,.0, 1.9); // Light Position

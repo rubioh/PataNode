@@ -19,7 +19,7 @@ vec4 getCells(vec2 uv){
 
     vec4 col = texture(iChannel0, uvs);
     vec4 col2 = texture(iChannel0, uv);
-    col = col*.9 + .1;
+    col = col*.97 + .03;
 
     //float go_x = dot(col.rgb, vec3(.599, .127, .287));
     float go_x = cos(uv.y*20. + 2.*3.14159*uvs.x*x_phase_amp + go_x_phase)*.5 + .5;

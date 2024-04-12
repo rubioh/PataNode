@@ -6,4 +6,5 @@ import program.effects.glitch.glitch
 import program.effects.ultraglitch.ultraglitch
 import program.effects.bumpmapping.bumpmapping
 import program.effects.strings.strings
+import program.effects.dithering.dithering
 

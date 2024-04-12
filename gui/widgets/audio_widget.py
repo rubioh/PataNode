@@ -54,7 +54,8 @@ class AudioLogWidget(QWidget):
         for name, graph in self.graphs.items():
             data = self.audio_engine.logger.information[name]
             graph.clear()
-            graph.plot(self.time, data, pen=self.pen)
+            time = np.arange(0, len(data))/self.fps_timer
+            graph.plot(time, data, pen=self.pen)
 
     def setHidden(self, value):
         if not value:

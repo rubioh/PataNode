@@ -4,3 +4,5 @@ import program.scene.template.template
 import program.scene.abstractsqrt.abstractsqrt
 import program.scene.truchet.truchet
 import program.scene.lumtriangle.lumtriangle
+import program.scene.gsstylized.gsstylized
+import program.scene.patatrack3d.patatrack3d
