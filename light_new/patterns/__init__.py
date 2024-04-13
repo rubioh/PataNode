@@ -1,4 +1,10 @@
-from light_new.fixture import Fixture, Lyre, LightString, Z1020, Par2Brod, LightCubeLZR
+from light_new.fixture import (
+        Fixture, Lyre, LightString, 
+        Z1020, Par2Brod, LightCubeLZR,
+        CameoThunderWash, Dynamo250,
+        GhostXS70, Kub400RGB, Kub250RGB,
+        XtremLed, AmericanMegaPar
+)
 from light_new.cracra import Cracra
 
 import pickle

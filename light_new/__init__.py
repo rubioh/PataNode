@@ -14,6 +14,20 @@ from light_new.fixture import (
     Par2BrodConfig,
     LightCubeLZR,
     LightCubeLZRConfig,
+    CameoThunderWash,
+    CameoThunderWashConfig,
+    Dynamo250,
+    Dynamo250Config,
+    GhostXS70,
+    GhostXS70Config,
+    Kub400RGB,
+    Kub400RGBConfig,
+    Kub250RGB,
+    Kub250RGBConfig,
+    XtremLed,
+    XtremLedConfig,
+    AmericanMegaPar,
+    AmericanMegaParConfig,
 )
 from light_new.cracra import Cracra, CracraConfig
 from light_new.patterns import PatternManager
@@ -28,7 +42,14 @@ FixtureConfig = Annotated[
     | AlphaspotConfig
     | LightStringConfig
     | Par2BrodConfig
-    | LightCubeLZRConfig,
+    | LightCubeLZRConfig
+    | CameoThunderWashConfig
+    | Dynamo250Config
+    | GhostXS70Config
+    | Kub400RGBConfig
+    | Kub250RGBConfig
+    | XtremLedConfig
+    | AmericanMegaParConfig,
     Field(discriminator="fixture"),
 ]
 
@@ -87,8 +108,24 @@ class LightEngine:
             return Par2Brod(conf)
         elif isinstance(conf, LightCubeLZRConfig):
             return LightCubeLZR(conf)
+        elif isinstance(conf, CameoThunderWashConfig):
+            return CameoThunderWash(conf)
+        elif isinstance(conf, Dynamo250Config):
+            return Dynamo250(conf)
+        elif isinstance(conf, GhostXS70Config):
+            return GhostXS70(conf)
+        elif isinstance(conf, Kub400RGBConfig):
+            return Kub400RGB(conf)
+        elif isinstance(conf, Kub250RGBConfig):
+            return Kub250RGB(conf)
+        elif isinstance(conf, XtremLedConfig):
+            return XtremLed(conf)
+        elif isinstance(conf, AmericanMegaParConfig):
+            return AmericanMegaPar(conf)
 
     def exit(self):
+        buffer = [0]*512
+        self.outputs.write(buffer)
         self.pattern_manager.exit()
 
     def set_audio_features(self, audio_features):

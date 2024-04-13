@@ -4,6 +4,81 @@ fixtures:
     name: "LightCube LZR"
     address: [1, 1]
     position: [0,0,0]
+fixtures:
+  - fixture: "cameothunderwash"
+    name: "CTW 1"
+    address: [1, 10]
+    position: [0,0,0]
+fixtures:
+  - fixture: "cameothunderwash"
+    name: "CTW 2"
+    address: [1, 20]
+    position: [0,0,0]
+fixtures:
+  - fixture: "dynamo250"
+    name: "Dynamo250 1"
+    address: [1, 30]
+    position: [0,0,0]
+fixtures:
+  - fixture: "dynamo250"
+    name: "Dynamo250 2"
+    address: [1, 40]
+    position: [0,0,0]
+fixtures:
+  - fixture: "dynamo250"
+    name: "Dynamo250 3"
+    address: [1, 50]
+    position: [0,0,0]
+fixtures:
+  - fixture: "dynamo250"
+    name: "dynamo250 4"
+    address: [1, 60]
+    position: [0,0,0]
+fixtures:
+  - fixture: "ghostxs70"
+    name: "Ghost XS70 1"
+    address: [1, 70]
+    position: [0,0,0]
+fixtures:
+  - fixture: "ghostxs70"
+    name: "Ghost XS70 2"
+    address: [1, 80]
+    position: [0,0,0]
+fixtures:
+  - fixture: "kub400"
+    name: "BoomTone Dj Kub 400 RGB 1"
+    address: [1, 90]
+    position: [0,0,0]
+fixtures:
+  - fixture: "kub250"
+    name: "BoomTone Dj Kub 250 RGB 1"
+    address: [1, 100]
+    position: [0,0,0]
+fixtures:
+  - fixture: "xtremled"
+    name: "BoomTone Dj Xtrem Led"
+    address: [1, 110]
+    position: [0,0,0]
+fixtures:
+  - fixture: "americanmegapar"
+    name: "American MegaPar 1"
+    address: [1, 120]
+    position: [0,0,0]
+fixtures:
+  - fixture: "americanmegapar"
+    name: "American MegaPar 2"
+    address: [1, 130]
+    position: [0,0,0]
+fixtures:
+  - fixture: "americanmegapar"
+    name: "American MegaPar 3"
+    address: [1, 140]
+    position: [0,0,0]
+fixtures:
+  - fixture: "americanmegapar"
+    name: "American MegaPar 4"
+    address: [1, 150]
+    position: [0,0,0]
 outputs:
   - output: "pataboite"
     universes: 1

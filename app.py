@@ -72,4 +72,6 @@ class PataShade(PataNode):
     def update_audio(self):
         self.audio_engine()
 
-
+    def closeEvent(self, event):
+        self.light_engine.exit()
+        super().closeEvent(event)

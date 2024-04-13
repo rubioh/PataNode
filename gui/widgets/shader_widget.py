@@ -173,18 +173,12 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
         self.ctx.screen.viewport = self._viewport
 
-    def close_event(self, event) -> None:
-        """The standard PyQt close events
-
-        Args:
-            event: The qtevent instance
-        """
-        #TODO ca en propre
+    def closeEvent(self, event):
+        print("ShaderWidget::closeEvent Hide window")
         self.hide()
-        #self.close()
+        event.ignore()
 
     def close(self):
         """Close the window"""
-        self.timer.stop()
-        super().close()
+        self.hide()
 
