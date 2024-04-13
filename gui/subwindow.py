@@ -63,6 +63,12 @@ class PataNodeSubWindow(NodeEditorWidget):
         else:
             self.screen_node.render(audio_features)
 
+    def getLastMainColors(self):
+        if self.screen_node is not None:
+            return self.screen_node.buffer_col
+        else:
+            return None
+
     def setOpenGLSharedObject(self):
         """
         Give the ctx reference to the scene

@@ -318,10 +318,11 @@ class PatternManager:
             elif isinstance(f, Par2Brod):
                 par.append(f)
             elif isinstance(f, LightCubeLZR):
-                pass
-                #f.color = np.array(colors)*.01
-                #f.attrib["laser"] = .99
-                #f.attrib["auto_rotation"] = .51
+                colors = colors**8
+                colors = colors/np.max(colors)
+                f.color = colors
+                f.attrib["laser"] = .99
+                f.attrib["auto_rotation"] = .51
         self.master_effect.update(self.ctrl, cracras, smoke)
         color = self.current_pattern.render(light_strings, af, self.ctrl)
         self.brod_par_effect.update(self.ctrl, par, color)

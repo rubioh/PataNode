@@ -106,6 +106,7 @@ class PataNode(NodeEditorWindow):
             self.current_program = self.getCurrentNodeEditorWidget()
         if self.current_program is not None:
             self.current_program.render(audio_features)
+            self.last_main_colors = self.current_program.getLastMainColors()
         if DEBUG: print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
 
     def closeEvent(self, event):

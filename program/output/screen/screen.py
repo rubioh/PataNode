@@ -4,6 +4,7 @@ from os.path import dirname, basename, isfile, join
 
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
 from program.program_base import ProgramBase
+from program.colors.predominant_color.predominant_color import PredominantColorNode
 
 from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
@@ -58,6 +59,8 @@ class ScreenNode(ShaderNode, Output):
         self.program = Screen(ctx=self.scene.ctx)
         self.program.output_fbo = self.scene.ctx.screen
         self.gl_widget = self.scene.app.gl_widget
+        self.plreturn = None
+        self.buffer_col = None
         self.eval()
 
     def restoreFBODependencies(self):
@@ -91,9 +94,13 @@ class ScreenNode(ShaderNode, Output):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.program.already_called = False
+            if isinstance(node, PredominantColorNode):
+                self.plreturn = node
         input_nodes = self.getShaderInputs()
         if not len(input_nodes):
             return False
         texture = input_nodes[0].render(audio_features)
+        if self.plreturn is not None:
+            self.buffer_col = self.plreturn.render(texture)
         self.program.render([texture], audio_features)
         return True

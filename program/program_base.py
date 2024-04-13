@@ -4,8 +4,8 @@ from program.program_conf import CTXError, SQUARE_VERT_PATH, UnuseUniformError, 
 from nodeeditor.utils import dumpException
 
 
-DEBUG = True
-DEBUG_EVAL = True
+DEBUG = False
+DEBUG_EVAL = False
 
 class ProgramBase:
 
