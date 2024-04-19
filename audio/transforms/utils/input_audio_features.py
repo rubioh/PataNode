@@ -7,7 +7,7 @@ from node.node_conf import register_node
 
 def name_to_opcode(name):
     l = [ord(char) for char in name]
-    return sum(l)
+    return hash(name)
 
 OP_CODE_INPUTAF = name_to_opcode('input_af')
 
