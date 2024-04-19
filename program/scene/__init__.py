@@ -8,3 +8,4 @@ import program.scene.gsstylized.gsstylized
 import program.scene.patatrack3d.patatrack3d
 import program.scene.cube.cube
 import program.scene.rainbowroad.rr
+import program.scene.psyspin.psyspin
