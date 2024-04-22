@@ -7,6 +7,8 @@ uniform sampler2D iChannel0;
 uniform sampler2D iChannel1;
 uniform float baseBlend;
 uniform float bias;
+uniform float baseFactor1;
+uniform float baseFactor2;
 uniform vec2 offset1;
 uniform vec2 offset2;
 
@@ -19,6 +21,6 @@ void main()
     vec3 col2 = texture(iChannel1, uv + offset2).rgb;
 
     float mixFactor = min(1., baseBlend + bias);
-    vec3 col = mix(col1, col2, mixFactor);
+    vec3 col = mix(col1, col2, mixFactor) + col1 * baseFactor1 + col2 * baseFactor2;
     fragColor = vec4(col,1.0);
 }

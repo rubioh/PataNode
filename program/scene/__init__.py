@@ -9,3 +9,7 @@ import program.scene.patatrack3d.patatrack3d
 import program.scene.cube.cube
 import program.scene.rainbowroad.rr
 import program.scene.psyspin.psyspin
+import program.scene.hexshadows.hexshadows
+import program.scene.neonparty.neonparty
+import program.scene.pharmacy.pharmacy
+import program.scene.pingouin.pingouin

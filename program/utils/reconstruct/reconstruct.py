@@ -9,13 +9,13 @@ from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_BLEND = name_to_opcode('blend')
+OP_CODE_RECONSTRUCT = name_to_opcode('Reconstruct')
 
-@register_program(OP_CODE_BLEND)
-class Blend(ProgramBase):
+@register_program(OP_CODE_RECONSTRUCT)
+class Reconstruct(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-        self.title = "blend"
+        self.title = "Reconstruct"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -34,49 +34,42 @@ class Blend(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "blend.glsl")
+        frag_path = join(dirname(__file__), "Reconstruct.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-        self.baseBlend = .5
-        self.bias = 0.
         self.iChannel0 = 1
         self.iChannel1 = 2
-        self.baseFactor1 = 0
-        self.baseFactor2 = 0
-        self.offset1 = (0, 0)
-        self.offset2 = (0, 0)
+        self.texture1 = None
+        self.texture2 = None
+        self.frame = 0
 
     def initUniformsBinding(self):
         binding = {
             'iChannel0' : 'iChannel0',
             'iChannel1' : 'iChannel1',
-            'iResolution': 'win_size',
-            'baseBlend': 'baseBlend',
-            'bias': 'bias',
-            'offset1': 'offset1',
-            'offset2': 'offset2',
-            'baseFactor2': 'baseFactor2',
-            'baseFactor1': 'baseFactor1'
+            'iResolution': 'win_size'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0'])
         self.addProtectedUniforms(['iChannel1'])
 
     def updateParams(self, af):
-        if af is None:
-            return
-        self.bias = af["low"][0]
+        self.iChannel0 = 1
+        self.iChannel1 = 2
+        self.frame = self.frame + 1
 
     def bindUniform(self, af):
         super().bindUniform(af)
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
-    def render(self, textures, af=None):
-        self.bindUniform(af)
+    def render(self, af=None):
         self.updateParams(af)
-        textures[0].use(1)
-        textures[1].use(2)
+        if self.texture1 == None or self.texture2 == None:
+        	return self.fbos[0].color_attachments[0]
+        self.bindUniform(af)
+        self.texture1.use(1)
+        self.texture2.use(2)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -84,23 +77,33 @@ class Blend(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
-@register_node(OP_CODE_BLEND)
-class BlendNode(ShaderNode, Utils):
-    op_title = "Blend"
-    op_code = OP_CODE_BLEND
+@register_node(OP_CODE_RECONSTRUCT)
+class ReconstructNode(ShaderNode, Utils):
+    op_title = "Reconstruct"
+    op_code = OP_CODE_RECONSTRUCT
     content_label = ""
-    content_label_objname = "shader_blend"
+    content_label_objname = "shader_Reconstruct"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1, 2], outputs=[3])
-        self.program = Blend(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1], outputs=[2])
+        self.program = Reconstruct(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
-        texture1 = input_nodes[0].render(audio_features)
-        texture2 = input_nodes[1].render(audio_features)
-        output_texture = self.program.render([texture1, texture2], audio_features)
+        print("frame:", self.program.frame)
+        if self.program.frame % 2:
+            self.program.texture1 = input_nodes[0].render(audio_features, 0)
+            print("oui")
+        else:
+            self.program.texture2 = input_nodes[0].render(audio_features, 1)
+            print("non")
+
+        if self.program.texture1 == None or self.program.texture2 == None:
+            self.program.texture1 = input_nodes[0].render(audio_features, 0)
+            self.program.texture2 = input_nodes[0].render(audio_features, 0)
+
+        output_texture = self.program.render(audio_features)
         return output_texture

@@ -39,7 +39,7 @@ class PsySpin(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'itime' : 'itime',
+            'iTime' : 'iTime',
             'iResolution' : 'iResolution',
             'time_sym_rot': 'time_sym_rot',
             'time_tunnel_depth': 'time_tunnel_depth',
@@ -53,8 +53,13 @@ class PsySpin(ProgramBase):
             'kick': 'kick',
             'onTempo': 'onTempo'
         }
+        super().initUniformsBinding(binding, program_name='')
+        super().addProtectedUniforms(
+                []
+        )
+
     def initParams(self):
-        self.itime = 0.
+        self.iTime = 0.
         self.iResolution = self.bwinsize
         self.time_sym_rot = 0.0
         self.time_tunnel_depth = 0.0
@@ -114,6 +119,9 @@ class PsySpin(ProgramBase):
         self.bindUniform(af)
         self.fbos[0].use()
         self.vao.render()
+        return self.fbos[0].color_attachments[0]
+
+    def norender(self):
         return self.fbos[0].color_attachments[0]
 
 @register_node(OP_CODE_PSYSPIN)
