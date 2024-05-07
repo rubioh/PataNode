@@ -1,0 +1,2 @@
+assets/textures/lichen.jpg filter=lfs diff=lfs merge=lfs -text
+assets/mesh/dome.glb filter=lfs diff=lfs merge=lfs -text
