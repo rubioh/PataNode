@@ -11,13 +11,15 @@ uniform mat4 projection;
 out vec2 tcs;
 out vec3 normal;
 out vec3 p;
+out vec3 col;
 
 void main() {
     vec4 v = vec4(in_position, 1.);
     mat4 mvp = model_transform * model *  view * projection;
     v = v * mvp;
     gl_Position = v;
-    normal = (vec4(in_normal + in_color, 0.) * mvp).xyz;
+	p = v.xyz;
+    col = in_color;
+    normal = (vec4(in_normal, 0.) * mvp).xyz;
     tcs = in_tc;
-    p = v.xyz;
 }

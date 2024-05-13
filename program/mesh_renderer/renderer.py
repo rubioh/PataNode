@@ -1,6 +1,19 @@
 import moderngl as mgl
 import numpy as np
 
+#class RenderNode:
+#	def __init__(self):
+#		self.meshes = []
+#		self.transform = glm.mat4()
+#
+#class Dag:
+#	def __init__(self, scene):
+#		pass
+#
+#class Renderer:
+
+#	def __init__(self, ctx, MeshResourceManager, TextureResourceManager):
+
 def render(transform, mvp_uniform, surface, mesh, ctx):
 	program = mesh.program
 	surface.use()
@@ -10,8 +23,8 @@ def render(transform, mvp_uniform, surface, mesh, ctx):
 	program["model_transform"] = np.array(transform).reshape(1, 16)[0] 
 	for k, v in mvp_uniform.items():
 		mesh.program[k] = np.array(v).reshape(1, 16)[0]
-	for k, v in mesh.uniform.items():
-		mesh.program[k] = np.array(v).reshape(1, 16)[0]
+#	for k, v in mesh.uniform.items():
+#		mesh.program[k] = np.array(v).reshape(1, 16)[0]
 	mesh.vao.render(4)
 	ctx.disable(ctx.CULL_FACE)
 	ctx.disable(mgl.DEPTH_TEST)
