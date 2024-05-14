@@ -2,6 +2,7 @@ uniform sampler2D baseColorTexture;
 uniform sampler2D metallicRoughnessTexture;
 uniform sampler2D normalTexture;
 
+uniform vec3 in_albedo;
 uniform float in_roughness;
 uniform float in_metallic;
 uniform vec3 in_emissive;

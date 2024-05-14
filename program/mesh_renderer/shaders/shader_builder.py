@@ -1,3 +1,5 @@
+# This shaders builder will build a principledBSDF shaders based on gltf2.0's blender specification
+
 layout = "layout (location = "
 
 position = ") in vec3 in_position;\n"
@@ -13,7 +15,7 @@ matrix = "uniform mat4 model_transform; \n\
 out = "out vec2 tcs;\n\
 out vec3 normal;\n\
 out vec3 p;\n\
-out vec3 col;\n"
+out vec3 color;\n"
 
 main = "void main() {\n\
     vec4 v = vec4(in_position, 1.);\n\
@@ -30,9 +32,10 @@ baseColorTexture = "uniform sampler2D baseColorTexture;\n"
 metallicRoughnessTexture = "uniform sampler2D metallicRoughnessTexture;\n"
 normalTexture = "uniform sampler2D normalTexture;\n"
 
+uniform_albedo = "uniform vec4 in_albedo;\n"
 uniform_roughness = "uniform float in_roughness;\n"
 uniform_metallic = "uniform float in_metallic;\n"
-uniform_emissive = "uniform vec3 in_emissive;\n"
+uniform_emissive = "uniform vec4 in_emissive;\n"
 
 uniform_fragment_in = "in vec3 normal;\n\
 in vec3 color;\n\
@@ -46,11 +49,11 @@ layout(location = 2) out vec4 emissive;\n"
 fragment_main = "void main(void) {\n\
 \n"
 
-color_texture =	"vec3 tx_albedo = texture(baseColorTexture, tcs).xyz * color;\n"
-color_no_texture = "vec3 tx_albedo = color;\n"
+color_texture =	"vec3 tx_albedo = texture(baseColorTexture, tcs).xyz * color * in_albedo.xyz;\n"
+color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
-metallic_rougness_texture = "float metallicFactor = texture(metallicRoughnessTexture, tcs).x;\n\
-	float roughnessFactor = texture(metallicRoughnessTexture, tcs).y;\n"
+metallic_rougness_texture = "float metallicFactor = in_metallic * texture(metallicRoughnessTexture, tcs).x;\n\
+	float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
 
 metallic_roughness_no_texture = "	float metallicFactor = in_metallic;\n\
 	float roughnessFactor = in_roughness;\n"
@@ -64,7 +67,7 @@ normal_no_texture = "vec3 bump_normal = normal;\n"
 
 fragment_end = "	albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
 	normalRoughness = vec4( bump_normal, roughnessFactor);\n\
-	emissive.xyz = in_emissive;\n\
+	emissive.xyz = in_emissive.xyz;\n\
 }\n"
 
 def build_vertex_shader(mesh_layout):
@@ -73,13 +76,13 @@ def build_vertex_shader(mesh_layout):
 	layout_index = 1
 	if mesh_layout["vertex_normal"]:
 		shader += layout + str(layout_index) + normal
-		++layout_index
+		layout_index = layout_index + 1
 	if mesh_layout["vertex_tcs"]:
 		shader += layout + str(layout_index) + tc
-		++layout_index
+		layout_index = layout_index + 1
 	if mesh_layout["vertex_color"]:
 		shader += layout + str(layout_index) + color
-		++layout_index
+		layout_index = layout_index + 1
 	shader += matrix
 	shader += out
 	shader += main
@@ -102,32 +105,35 @@ def build_vertex_shader(mesh_layout):
 
 def build_fragment_shader(material):
 	result = ""
-	if material.baseColorTexture != None:
+	if "baseColorTexture" in material.textures:
 		result += baseColorTexture
-	if material.metallicRoughnessTexture != None:
+	if "metallicRoughnessTexture" in material.textures:
 		result += metallicRoughnessTexture
-	if material.normalTexture != None:
+	if "normalTexture" in material.textures:
 		result += normalTexture
 	
-	if material.metallicRoughnessTexture == None:
-		result += uniform_roughness + uniform_metallic
+#	if not "metallicRoughnessTexture" in material.textures:
+#		result += uniform_roughness + uniform_metallic
 
+	result += uniform_albedo
+	result += uniform_roughness
+	result += uniform_metallic
 	result += uniform_emissive
 	result += uniform_fragment_in
 	result += fragment_out
 	result += fragment_main
 
-	if material.baseColorTexture != None:
+	if "baseColorTexture" in material.textures:
 		result += color_texture
 	else:
 		result += color_no_texture
 
-	if material.metallicRoughnessTexture != None:
+	if "metallicRoughnessTexture" in material.textures:
 		result += metallic_rougness_texture
 	else:
 		result += metallic_roughness_no_texture
 
-	if material.normalTexture != None:
+	if "normalTexture" in material.textures:
 		result += normal_texture
 	else:
 		result += normal_no_texture

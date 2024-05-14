@@ -11,8 +11,11 @@ from program.mesh_renderer.texture_loader import load_texture_from_gltf
 
 class Texture:
 	def __init__(self, textureResourceIndex, sampler):
-		self.textureSceneIndex = textureResourceIndex
+		self.textureResourceIndex = textureResourceIndex
 		self.sampler = sampler
+
+	def __str__():
+		return str(self.textureResourceIndex + self.sampler)
 
 class Sampler:
 	def __init__(self, magFilter=9729, minFilter=9987, wrapS=10497, wrapT=10497):
@@ -103,7 +106,7 @@ class MeshScene():
 						accessor = gltf.accessors[accessorID]
 						buffers.append(self.convert_accessor_to_list( gltf, accessor) )
 					else:
-						buffers.append(np.zeros(1))
+						buffers.append(None)
 				indice_type_size = 4
 
 				# if the numbers of indices is < 65535, the component type is gonna be 2 bytes long
@@ -161,7 +164,7 @@ class MeshScene():
 		matrix *= node.transform
 		for mesh_rsc_idx in node.meshes:
 			mesh = self.mesh_resource_manager.get_resource(mesh_rsc_idx)
-			render(matrix, mvp_uniform, surface, mesh, self.ctx)
+			render(matrix, mvp_uniform, surface, mesh, self.ctx, self.mesh_resource_manager, self.texture_resource_manager)
 		for child in node.children:
 			self.render_node(self.dag[child], matrix, mvp_uniform, surface)
 
