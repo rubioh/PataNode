@@ -28,7 +28,7 @@ main = "void main() {\n\
     gl_Position = v;\n\
 	p = v.xyz;\n"
 
-col_inter = "col = in_color;\n"
+col_inter = "color = in_color;\n"
 normal_inter = "normal = (vec4(in_normal, 0.) * mvp).xyz;\n"
 tcs_inter = "tcs = in_tc;\n"
 tangent_inter = "tangent = in_tangent;\n"
@@ -73,8 +73,8 @@ normal_no_texture = "vec3 bump_normal = normal;\n"
 
 fragment_end = "	albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
 	normalRoughness = vec4( bump_normal, roughnessFactor);\n\
-	emissive.xyz = in_emissive.xyz;\n\
-}\n"
+	emissive.xyz = in_emissive.xyz;\n"
+
 
 def build_vertex_shader(mesh_layout):
 	shader = ""
@@ -116,6 +116,7 @@ def build_vertex_shader(mesh_layout):
 	else:
 		shader += "tangent = vec3(1., 0., 0.);\n"
 	shader += "}"
+	print(shader)
 	return shader
 
 def build_fragment_shader(material):
@@ -152,7 +153,12 @@ def build_fragment_shader(material):
 		result += normal_texture
 	else:
 		result += normal_no_texture
+
 	result += fragment_end
+
+	result += "albedoMetallic.x += tcs.x * 0.000001;\n"
+	result += "}"
+	print(result)
 	return result
 
 def build_shaders(mesh_layout, material):

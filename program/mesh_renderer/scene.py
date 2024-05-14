@@ -30,7 +30,6 @@ class Node():
 		self.children = children
 		self.meshes = meshes
 		self.name = name
-		self.root_nodes = []
 
 	def __str__(self):
 		return self.name + "\n"  + "	-transform:"+ str(self.transform)+ "\n" + "	-childs:"+ str(self.children) + "\n" + "	-meshes:"+ str(self.meshes)
@@ -40,6 +39,7 @@ class MeshScene():
 		self.dag = []
 		self.mesh_indices = [] #The indices of meshes relative to the gltf scenes
 		self.materials = []
+		self.root_nodes = []
 		self.samplers = []
 		self.textures = [] # Textures as describe by gltf2.0 : a handlers to a image texture and a sampler
 		self.texture_resource_indices = [] #The indices of textures relative to the gltf scenes
@@ -115,8 +115,10 @@ class MeshScene():
 				if gltf.accessors[primitive.indices].componentType == 5123:
 					indice_type_size = 2
 				material = None
-				if primitive.material != -1:
+				if primitive.material is not None:
 					material = self.materials[primitive.material]
+				else: 
+					material = Material(self.texture_resource_manager) 
 				prim_mesh_indices.append(self.mesh_resource_manager.create_mesh(buffers[0], 
 					buffers[1], buffers[2], buffers[3], buffers[4], buffers[5], indice_type_size, material))
 			self.mesh_indices.append(prim_mesh_indices)
@@ -126,9 +128,6 @@ class MeshScene():
 			new_material = Material(self.texture_resource_manager)
 			new_material.init_from_gltf(gltf, material, self)
 			self.materials.append(new_material)
-
-		for m in self.materials:
-			print(m)
 
 	def get_texture_resource_index_from_gltf_source(self, gltf, index):
 		return self.textures[index]
@@ -153,7 +152,7 @@ class MeshScene():
 		self.load_materials(gltf)
 		self.load_meshes(gltf)
 		self.load_nodes(gltf)
-		print(gltf)
+		#print(gltf)
 #		for n in self.dag:
 #			print(n)
 		del gltf
