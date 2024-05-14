@@ -29,8 +29,8 @@ class Material:
 			self.uniforms["in_metallic"] = 1.
 			self.uniforms["in_roughness"] = 0.
 			self.textures["metallicRoughnessTexture"] = scene.get_texture_resource_index_from_gltf_source(gltf, mat.metallicRoughnessTexture.index)
-	#	if pygltf_material.normalTexture:
-	#		self.normalTexture = scene.get_texture_resource_index_from_gltf_source(gltf, pygltf_material.normalTexture.index)
+		if pygltf_material.normalTexture:
+			self.textures["normalTexture"] = scene.get_texture_resource_index_from_gltf_source(gltf, pygltf_material.normalTexture.index)
 	# TODO COMPUTE TANGENT BITANGENT
 
 	def set_uniform(self, key, value):

@@ -99,7 +99,8 @@ class MeshScene():
 				primitive.attributes.NORMAL, 
 				primitive.attributes.TEXCOORD_0,
 				primitive.indices,
-				primitive.attributes.COLOR_0]
+				primitive.attributes.COLOR_0,
+				primitive.attributes.TANGENT]
 				buffers = []
 				for accessorID in accessors:
 					if accessorID is not None:
@@ -117,7 +118,7 @@ class MeshScene():
 				if primitive.material != -1:
 					material = self.materials[primitive.material]
 				prim_mesh_indices.append(self.mesh_resource_manager.create_mesh(buffers[0], 
-					buffers[1], buffers[2], buffers[3], buffers[4], indice_type_size, material))
+					buffers[1], buffers[2], buffers[3], buffers[4], buffers[5], indice_type_size, material))
 			self.mesh_indices.append(prim_mesh_indices)
 
 	def load_materials(self, gltf):

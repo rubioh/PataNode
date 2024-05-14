@@ -6,20 +6,24 @@ position = ") in vec3 in_position;\n"
 normal = ") in vec3 in_normal;\n"
 tc = ") in vec2 in_tc;\n"
 color = ") in vec3 in_color;\n"
+tangent = ") in vec3 in_tangent;\n"
 
-matrix = "uniform mat4 model_transform; \n\
-			uniform mat4 model;\n\
-			uniform mat4 view;\n\
-			uniform mat4 projection;\n"
+#matrix = "uniform mat4 model_transform; \n\
+#			uniform mat4 model;\n\
+#			uniform mat4 view;\n\
+#			uniform mat4 projection;\n"
+
+matrix = "uniform mat4 mvp;\n"
 
 out = "out vec2 tcs;\n\
 out vec3 normal;\n\
 out vec3 p;\n\
-out vec3 color;\n"
+out vec3 color;\n\
+out vec3 tangent;\n"
 
+#  mat4 mvp = model_transform * model *  view * projection;\n\
 main = "void main() {\n\
     vec4 v = vec4(in_position, 1.);\n\
-    mat4 mvp = model_transform * model *  view * projection;\n\
     v = v * mvp;\n\
     gl_Position = v;\n\
 	p = v.xyz;\n"
@@ -27,6 +31,7 @@ main = "void main() {\n\
 col_inter = "col = in_color;\n"
 normal_inter = "normal = (vec4(in_normal, 0.) * mvp).xyz;\n"
 tcs_inter = "tcs = in_tc;\n"
+tangent_inter = "tangent = in_tangent;\n"
 
 baseColorTexture = "uniform sampler2D baseColorTexture;\n"
 metallicRoughnessTexture = "uniform sampler2D metallicRoughnessTexture;\n"
@@ -41,7 +46,8 @@ uniform_fragment_in = "in vec3 normal;\n\
 in vec3 color;\n\
 in vec2 tcs;\n\
 in vec3 p;\n\
-"
+in vec3 tangent;\n"
+
 fragment_out = "layout(location = 0) out vec4 albedoMetallic;\n\
 layout(location = 1) out vec4 normalRoughness;\n\
 layout(location = 2) out vec4 emissive;\n"
@@ -59,8 +65,8 @@ metallic_roughness_no_texture = "	float metallicFactor = in_metallic;\n\
 	float roughnessFactor = in_roughness;\n"
 
 normal_texture = "	vec3 bump_map = texture(normalTexture, tcs).xyz;\n\
-	vec3 bitangent = cross(n, tangent);\n\
-	mat3 TBN = mat3(tangeant, bitangent, normal);\n\
+	vec3 bitangent = cross(normal, tangent);\n\
+	mat3 TBN = mat3(tangent, bitangent, normal);\n\
 	vec3 bump_normal = TBN * bump_map;\n"
 
 normal_no_texture = "vec3 bump_normal = normal;\n"
@@ -83,6 +89,10 @@ def build_vertex_shader(mesh_layout):
 	if mesh_layout["vertex_color"]:
 		shader += layout + str(layout_index) + color
 		layout_index = layout_index + 1
+	if mesh_layout["vertex_tangent"]:
+		shader += layout + str(layout_index) + tangent
+		layout_index = layout_index + 1
+
 	shader += matrix
 	shader += out
 	shader += main
@@ -100,6 +110,11 @@ def build_vertex_shader(mesh_layout):
 		shader += col_inter
 	else:
 		shader += "color = vec3(1.);\n"
+
+	if mesh_layout["vertex_tangent"]:
+		shader += tangent_inter
+	else:
+		shader += "tangent = vec3(1., 0., 0.);\n"
 	shader += "}"
 	return shader
 

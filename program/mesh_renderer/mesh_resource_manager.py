@@ -1,19 +1,24 @@
 import moderngl as mgl
 import numpy as np
 from program.mesh_renderer.shaders.shader_builder import build_shaders
+from program.mesh_renderer.mesh_utils import compute_tangent
 
 class Mesh():
 	def __init__(self, vertex_position, vertex_normal, 
-		vertex_tcs, indice_buffer, vertex_color, program, ctx, idx_size, material):
+		vertex_tcs, indice_buffer, vertex_color, vertex_tangent, program, ctx, idx_size, material):
 		self.ctx = ctx
 		self.vbo_position = self.ctx.buffer(vertex_position)
 
+#		if vertex_normal:
+#			tangent = compute_tangent(indice_buffer, vertex_tcs, vertex_normal, vertex_position, idx_size)
 		if vertex_normal:
 			self.vbo_normal = self.ctx.buffer(vertex_normal)
 		if vertex_tcs:
 			self.vbo_tcs = self.ctx.buffer(vertex_tcs)
 		if vertex_color:
 			self.vbo_color = self.ctx.buffer(vertex_color)
+		if vertex_tangent:
+			self.vbo_tangent = self.ctx.buffer(vertex_tangent)
 
 		self.vbo_indices = self.ctx.buffer(indice_buffer)
 
@@ -24,10 +29,12 @@ class Mesh():
 			layout.append((self.vbo_tcs, "2f", "in_tc"))
 		if vertex_color:
 			layout.append((self.vbo_color, "3f", "in_color"))
+		if vertex_tangent:
+			layout.append((self.vbo_tangent, "3f", "in_tangent"))
 
 		self.vao = self.ctx.vertex_array(program,
 			layout, 
-			index_buffer = self.vbo_indices, 
+			index_buffer = self.vbo_indices,
 			index_element_size=idx_size)
 		self.program = program
 		self.material = material
@@ -42,20 +49,18 @@ class MeshResourceManager():
 		return self.resources[index]
 
 	def create_mesh(self, vertex_position, vertex_normal, 
-		vertex_tcs, indice_buffer, vertex_color, idx_size, material, program=None):
+		vertex_tcs, indice_buffer, vertex_color, vertex_tangent, idx_size, material, program=None):
 
 		mesh_layout = { "vertex_normal": vertex_normal != None,
 			"vertex_color": vertex_color != None,
 			"vertex_tcs": vertex_tcs != None,
-			"vertex_bitangent": False#vertex_bitangeant != None,
+			"vertex_tangent": vertex_tangent != None,
 		}
-		print(vertex_normal, vertex_color, vertex_tcs)
-		print(mesh_layout)
 		if not program:
 			program = self.load_program(mesh_layout, material)
 
 		mesh = Mesh(vertex_position, vertex_normal, 
-			vertex_tcs, indice_buffer, vertex_color, program, self.ctx, idx_size, material)
+			vertex_tcs, indice_buffer, vertex_color, vertex_tangent, program, self.ctx, idx_size, material)
 		self.resources.append(mesh);
 		return len(self.resources) - 1
 

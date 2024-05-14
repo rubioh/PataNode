@@ -21,9 +21,11 @@ def render(transform, mvp_uniform, surface, mesh, ctx, mesh_resource_manager, te
 	ctx.front_face = 'ccw'
 	ctx.enable(mgl.DEPTH_TEST)
 	ctx.enable(ctx.CULL_FACE)
-	program["model_transform"] = np.array(transform).reshape(1, 16)[0] 
-	for k, v in mvp_uniform.items():
-		mesh.program[k] = np.array(v).reshape(1, 16)[0]
+	#mvp = transform * mvp_uniform["model"] * mvp_uniform["view"] * mvp_uniform["projection"]
+	mvp = mvp_uniform["projection"] * mvp_uniform["view"] * mvp_uniform["model"] * transform
+	program["mvp"] = np.array(mvp).reshape(1, 16)[0]
+#	for k, v in mvp_uniform.items():
+#		mesh.program[k] = np.array(v).reshape(1, 16)[0]
 	for k, v in material.uniforms.items():
 #		print(k, v)
 		# Scalar value dont need to be reshaped, vec3 are automatically cast to vec4
