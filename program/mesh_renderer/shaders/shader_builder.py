@@ -13,7 +13,8 @@ tangent = ") in vec3 in_tangent;\n"
 #			uniform mat4 view;\n\
 #			uniform mat4 projection;\n"
 
-matrix = "uniform mat4 mvp;\n"
+matrix = "uniform mat4 model;\n\
+		  uniform mat4 mvp;\n"
 
 out = "out vec2 tcs;\n\
 out vec3 normal;\n\
@@ -21,6 +22,8 @@ out vec3 p;\n\
 out vec3 color;\n\
 out vec3 tangent;\n"
 
+out_tbn = "out mat3 tbn;\n"
+in_tbn = "in mat3 tbn;\n"
 #  mat4 mvp = model_transform * model *  view * projection;\n\
 main = "void main() {\n\
     vec4 v = vec4(in_position, 1.);\n\
@@ -29,7 +32,14 @@ main = "void main() {\n\
 	p = v.xyz;\n"
 
 col_inter = "color = in_color;\n"
-normal_inter = "normal = (vec4(in_normal, 0.) * mvp).xyz;\n"
+normal_inter = "normal = (vec4(in_normal, 0.) * model).xyz;\n"
+
+tbn_compute = " vec3 bitangent = cross(in_normal, in_tangent);\n\
+   vec3 T = normalize(vec3(model * vec4(in_tangent,   0.0)));\n\
+   vec3 B = normalize(vec3(model * vec4(bitangent, 0.0)));\n\
+   vec3 N = normalize(vec3(model * vec4(in_normal,    0.0)));\n\
+   tbn = mat3(T, B, N);\n"
+
 tcs_inter = "tcs = in_tc;\n"
 tangent_inter = "tangent = in_tangent;\n"
 
@@ -58,16 +68,16 @@ fragment_main = "void main(void) {\n\
 color_texture =	"vec3 tx_albedo = texture(baseColorTexture, tcs).xyz * color * in_albedo.xyz;\n"
 color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
-metallic_rougness_texture = "float metallicFactor = in_metallic * texture(metallicRoughnessTexture, tcs).x;\n\
+#todo metallic
+metallic_rougness_texture = "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
 	float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
 
 metallic_roughness_no_texture = "	float metallicFactor = in_metallic;\n\
 	float roughnessFactor = in_roughness;\n"
 
 normal_texture = "	vec3 bump_map = texture(normalTexture, tcs).xyz;\n\
-	vec3 bitangent = cross(normal, tangent);\n\
-	mat3 TBN = mat3(tangent, bitangent, normal);\n\
-	vec3 bump_normal = TBN * bump_map;\n"
+bump_map = bump_map * 2.0 - 1.0;\n\
+vec3 bump_normal = normalize(tbn * bump_map);\n"
 
 normal_no_texture = "vec3 bump_normal = normal;\n"
 
@@ -95,12 +105,17 @@ def build_vertex_shader(mesh_layout):
 
 	shader += matrix
 	shader += out
+	if mesh_layout["vertex_tangent"]:
+		shader += out_tbn
+
 	shader += main
 	if mesh_layout["vertex_normal"]:
 		shader += normal_inter
 	else:
 		shader += "normal = vec3(1., 0., 0.);\n"
 
+	if mesh_layout["vertex_tangent"]:
+		shader += tbn_compute
 	if mesh_layout["vertex_tcs"]:
 		shader += tcs_inter
 	else:
@@ -136,6 +151,10 @@ def build_fragment_shader(material):
 	result += uniform_metallic
 	result += uniform_emissive
 	result += uniform_fragment_in
+
+	if "normalTexture" in material.textures:
+		result += in_tbn
+
 	result += fragment_out
 	result += fragment_main
 

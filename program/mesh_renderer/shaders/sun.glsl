@@ -23,7 +23,7 @@ float DistributionTerm(float roughness, float ndoth)
 {
 	float r2 = roughness * roughness;
 	float d = (ndoth * r2 - ndoth) * ndoth + 1.0;
-	return r2 / (d * d * MATH_PI);
+	return r2 / (d * d * 3.141592);
 }
 
 vec3 FresnelTerm(vec3 specularColor, float vdoth)
@@ -35,10 +35,10 @@ vec3 FresnelTerm(vec3 specularColor, float vdoth)
 void main() {
 
 	vec3 viewDir = view[3].xyz;
-
-	vec4 albedoMetallic = texture( albedoMetallicTexture, p);
-	vec4 normalRoughness = texture( normalRoughnessTexture, p);
-	vec3 emissive = texture(emissiveTexture, p).xyz;
+	vec2 tc = (p + 1.) * .5;
+	vec4 albedoMetallic = texture( albedoMetallicTexture, tc);
+	vec4 normalRoughness = texture( normalRoughnessTexture, tc);
+	vec3 emissive = texture(emissiveTexture, tc).xyz;
 
 	vec3 normal = normalRoughness.xyz;
 	vec3 diffuseColor = mix(albedoMetallic.xyz, vec3(0.), albedoMetallic.w);
@@ -49,9 +49,10 @@ void main() {
 	float roughnessE = normalRoughness.w * normalRoughness.w;
 	float roughnessL = max(.01, roughnessE);
 	float ndotl = max(0.05, dot(normal, lightDir));
-	colorEmission.xyz = specularColor * lightColor * ndotl
-	+ emissive;
+	colorEmission.xyz = diffuseColor * lightColor * ndotl
+	+ emissive + refl/1999. + specularColor * 0.001;
 	vec3 specular = vec3(0.);
 	float ndotv = max(0., dot(normal, viewDir) );
 	float specularFactor = pow(ndotv, roughnessE );
+
 }

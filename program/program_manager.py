@@ -35,7 +35,7 @@ class FBOManager:
         if DEBUG: print(self.in_use_fbos)
 
 
-    def getFBO(self, win_sizes=[], components=None, dtypes=None, depth_requirements=None):
+    def getFBO(self, win_sizes=[], components=None, dtypes=None, depth_requirements=None, num_textures = None):
         if dtypes is not None and len(dtypes) != len(win_sizes):
             print('FBOManager::getFBO lists win_sizes and dtypes are not of the same size')
             return None
@@ -44,7 +44,7 @@ class FBOManager:
             return None
         if DEBUG: print("getFBOs:: in current FBOs :", self.current_fbos)
         if DEBUG: print("getFBOs:: in current in_use:", self.in_use_fbos)
-        hashmaps = self.getHashmaps(win_sizes, components, dtypes, depth_requirements)
+        hashmaps = self.getHashmaps(win_sizes, components, dtypes, depth_requirements, num_textures)
         #returned_fbos = [None for i in range(len(hashmaps))]
         returned_fbos = self.checkForExistingFBOs(hashmaps)
         for i in range(len(win_sizes)):
@@ -60,18 +60,18 @@ class FBOManager:
                 component = components[i]
             else:
                 component = self._default_component
-            new_texture = self.ctx.texture(size=win_size, components=component, dtype=dtype)
 
+            new_textures =  [self.ctx.texture(size=win_size, components=component, dtype=dtype) 
+                for j in range(num_textures[i])]
             if depth_requirements is not None:
                 depth = depth_requirements[i]
             else:
                 depth = False
             if depth:
                 depth_texture = self.ctx.depth_renderbuffer(size=win_size)
-                new_fbo = self.ctx.framebuffer(color_attachments=new_texture, depth_attachment=depth_texture)
+                new_fbo = self.ctx.framebuffer(color_attachments=new_textures, depth_attachment=depth_texture)
             else:
-                new_fbo = self.ctx.framebuffer(color_attachments=new_texture)
-
+                new_fbo = self.ctx.framebuffer(color_attachments=new_textures)
             returned_fbos[i] = new_fbo
             if not current_hashmap in self.current_fbos.keys():
                 self.current_fbos[current_hashmap] = []
@@ -100,7 +100,7 @@ class FBOManager:
         return returned_fbos
 
 
-    def getHashmaps(self, win_sizes, components=None, dtypes=None, depths=None):
+    def getHashmaps(self, win_sizes, components=None, dtypes=None, depths=None, num_textures=None):
         hashmaps = list()
         for i, win_size in enumerate(win_sizes):
             if components is not None:
@@ -115,17 +115,22 @@ class FBOManager:
                 depth = 1
             else:
                 depth = 0
-            hashmap = self.propertiesToHashmap(win_size, component, dtype, depth)
+            if num_textures is not None:
+                num_texture = num_textures[i]
+            else:
+                num_texture = 1
+            hashmap = self.propertiesToHashmap(win_size, component, dtype, depth, num_texture)
             hashmaps.append(hashmap)
         return hashmaps
 
 
-    def propertiesToHashmap(self, win_size, component, dtype, depth):
+    def propertiesToHashmap(self, win_size, component, dtype, depth, num_texture):
         hashmap = str(win_size[0]+win_size[1]*10000)
         hashmap += str(component)
         dtype_to_int = [ord(c) for c in dtype]
         hashmap += str(sum(dtype_to_int))
         hashmap += str(depth)
+        hashmap += str(num_texture)
         hashmap = int(hashmap)
         return hashmap
 

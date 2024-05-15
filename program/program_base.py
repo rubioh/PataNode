@@ -32,6 +32,7 @@ class ProgramBase:
     
         # Fbos specification 
         self.fbos_win_size, self.fbos_components, self.fbos_dtypes, self.fbos_depth_requirement = [], [], [], []
+        self.fbos_num_textures = []
         self._required_fbos = 1
         self.fbos = None
 
@@ -206,8 +207,8 @@ class ProgramBase:
     ##############
     def getFBOSpecifications(self):
         if len(self.fbos_depth_requirement):
-            return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, self.fbos_depth_requirement)
-        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, None)
+            return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, self.fbos_depth_requirement, self.fbos_num_textures)
+        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, None, self.fbos_num_textures)
 
     def connectFbos(self, fbos=None):
         assert len(fbos) == self.required_fbos

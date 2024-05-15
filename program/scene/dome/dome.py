@@ -20,7 +20,7 @@ class Dome(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
 
         self.title = "Dome"
-        self.scene = MeshScene("./assets/mesh/tex.glb", ctx)
+        self.scene = MeshScene("./assets/mesh/mushtex.glb", ctx)
         self.renderer = Renderer(ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager)
         self.renderer.add_scene(self.scene)
         self.renderer.add_sun(glm.vec3(1., 0., 0.), glm.vec3(1.))
@@ -30,15 +30,17 @@ class Dome(ProgramBase):
         self.initParams()
 
     def initFBOSpecifications(self):
-        self.required_fbos = 1
+        self.required_fbos = 2
         fbos_specification = [
-            [self.win_size, 4, 'f4', True]
+            [self.win_size, 4, 'f4', True, 3],
+            [self.win_size, 4, 'f4', False, 1]
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
             self.fbos_depth_requirement.append(specification[3])
+            self.fbos_num_textures.append(specification[4])
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
@@ -53,7 +55,7 @@ class Dome(ProgramBase):
        # self.camera = glm.rotate(self.camera, .2, glm.vec3(1., 0., 0.))
         self.projection = glm.perspective(glm.radians(45.), 16./9., 0.1, 1000.)
         self.model = glm.mat4()
-        self.model = glm.scale(self.model, glm.vec3( .1, .1,.1) )
+        self.model = glm.scale(self.model, glm.vec3( .02, .02,.02) )
         self.vitesse = .4
         self.offset = 0
         self.intensity = 5
@@ -121,7 +123,8 @@ class Dome(ProgramBase):
         self.fbos[0].clear()
         self.vao.render()
         self.renderer.renderGBUFFER(self.model, self.camera, self.projection, self.fbos[0])
-        return self.fbos[0].color_attachments[0]
+        self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
+        return self.fbos[1].color_attachments[0]
 
     def norender(self):
         return self.fbos[0].color_attachments[0]

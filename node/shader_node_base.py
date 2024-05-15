@@ -138,12 +138,12 @@ class ShaderNode(Node):
     def restoreFBODependencies(self):
         self.program.fbos = None
 
-    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None, depth=None):
+    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None, depth=None, num_textures = 1):
         if self.program.fbos is not None:
             # fbos already connected
             return True
         fbos = self.scene.fbo_manager.getFBO(
-                win_sizes, components, dtypes, depth
+                win_sizes, components, dtypes, depth, num_textures
         )
         try:
             self.program.connectFbos(fbos)
@@ -201,8 +201,8 @@ class ShaderNode(Node):
     def evalImplementation(self):
         if DEBUG: print("Eval Implementation:", self)
         # Find and Connect required fbos
-        win_sizes, components, dtypes, depth_requirements = self.program.getFBOSpecifications() 
-        success = self.findAndConnectFbos(win_sizes, components, dtypes, depth_requirements)
+        win_sizes, components, dtypes, depth_requirements, num_texture = self.program.getFBOSpecifications() 
+        success = self.findAndConnectFbos(win_sizes, components, dtypes, depth_requirements, num_texture)
         if not success:
             return False
         # Eval Input Node

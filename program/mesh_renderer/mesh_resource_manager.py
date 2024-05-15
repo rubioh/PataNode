@@ -78,7 +78,7 @@ class MeshResourceManager():
 		return program
 
 class GPUTexture:
-	def __init__(self, resolution, data, ctx, in_components = 3, in_dtype = "f4"):
+	def __init__(self, resolution, data, ctx, in_components = 3, in_dtype = "f1"):
 		self.resolution = resolution
 		self.ctx = ctx
 		self.gpu_texture = self.ctx.texture(
@@ -96,6 +96,6 @@ class TextureResourceManager():
 	def get_resource(self, index):
 		return self.resources[index]
 
-	def create_texture(self, resolution, data, ctx, in_components = 3, in_dtype = "f4"):
+	def create_texture(self, resolution, data, ctx, in_components = 3, in_dtype = "f1"):
 		self.resources.append(GPUTexture(resolution, data, self.ctx, in_components, in_dtype))
 		return len(self.resources) - 1
