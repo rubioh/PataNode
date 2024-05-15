@@ -13,7 +13,11 @@ uniform float trigger;
 uniform float deep;
 uniform float face;
 uniform float go_rot;
+uniform float side_col;
 uniform vec3 color;
+uniform float N_sq;
+uniform float zoom_factor;
+uniform float show_bulb;
 
 const int MAX_MARCHING_STEPS = 	100;
 const float MIN_DIST = 1.0;
@@ -74,9 +78,11 @@ float sdSphere( vec3 p, float r)
   return length(p)-r;
 }
 
-vec3 opRepLim( in vec3 p, in float c, in vec3 l)
+vec3 opRepLim( in vec3 p, in float c, in float N)
 {
+    vec3 l = vec3(N);
     vec3 q = p-c*clamp(floor(p/c+.5),-l,l);
+    q.x = p.x;
     return q;
 }
 
@@ -84,7 +90,7 @@ vec3 opTx(vec3 p){
    
     mat3 rot = deep<3? rotate(iTime/8): rotate(iTime/4.);
     p = rot*p;
-    return p;
+    return p * zoom_factor;
 }
 
 vec4 SDF (vec3 p)
@@ -105,18 +111,31 @@ vec4 SDF (vec3 p)
 
 
     vec3 p2 = ((idx.x == face/2) ? 
-                    opRepLim(rotX*p, 1.+energy_fast, vec3(1.)) : 
+                    opRepLim(rotX*p, 1.+energy_fast, N_sq) : 
                         ((idx.z == face) ? 
-                            opRepLim(rotZ*p, 1.+energy_fast, vec3(1.)) : 
+                            opRepLim(rotZ*p, 1.+energy_fast, N_sq) : 
                             (idx.y == face/3) ?
-                                opRepLim(rotY*p, 1.+energy_fast, vec3(1.)) : 
-                                opRepLim(p, 1.+energy_fast, vec3(1.))));
-
-    float displacement = sin(p.z*5.-iTime/2.+2.)*sin(p.x*5.-iTime/4+1.)*sin(p.y*5.-iTime+0.)*.1*(energy_mid+deep/2.);
-    float dt = (p==p2) ? sdSphere(p/1.5, .4)+displacement : sdBox(p2, b*(1.+deep*energy_fast/10.));
-    vec3 col = (p==p2) ? vec3(1., .58, .29) : color*.95 ;
-    d = min(d, dt);
-    return vec4(d, col);
+                                opRepLim(rotY*p, 1.+energy_fast, N_sq) : 
+                                opRepLim(p, 1.+energy_fast, N_sq)));
+    vec3 square_color = color;
+    if (side_col == 1.){
+        square_color = ((idx.x == face/2) ? 
+                        color: 
+                            ((idx.z == face) ? 
+                                color : 
+                                ((idx.y == face/3) ?
+                                    color : 
+                                    color - .75)));
+    }
+    d = (p==p2) ? d : sdBox(p2, b*(1.+deep*energy_fast/10.));
+    if (show_bulb == 1.){
+        float displacement = sin(p.z*5.-iTime/2.+2.)*sin(p.x*5.-iTime/4+1.)*sin(p.y*5.-iTime+0.)*.1*(energy_mid+deep/2.);
+        float dt = (p==p2) ? sdSphere(p/1.5, .4)+displacement+1000 : sdBox(p2, b*(1.+deep*energy_fast/10.));
+        vec3 col = (p==p2) ? vec3(1., .58, .29) : square_color*.95 ;
+        d = min(d, dt);
+        return vec4(d, col);
+    }
+    else return vec4(d, square_color);
 }
 
 
@@ -188,5 +207,5 @@ void main()
     }
     //col = vec3(pattern_border(uv*2.));
     // Output to screen
-    fragColor = vec4(col, 1.0);
+    fragColor = vec4(clamp(col, vec3(0.), vec3(1.)), 1.0);
     }

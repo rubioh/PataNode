@@ -519,7 +519,7 @@ vec4 castRay( in vec3 ro, in vec3 rd )
                  res = vec4(t,h.yzw); 
                  break;
             }
-            t += h.x;
+            t += h.x*.5;
         }
     }
 

@@ -85,7 +85,7 @@ class RainbowRoad(ProgramBase):
         self.energy_mid = 0
         self.energy = 0
 
-    def update_params(self, fa):
+    def updateParams(self, fa):
         if fa is None:
             return
         self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * fa["full"][3]
@@ -130,9 +130,6 @@ class RainbowRoad(ProgramBase):
             / 2.0
         ) / 4
 
-    def get_uniform(self, fa):
-        if fa is None:
-            return
         self.iTime = fa["time"] / 2 + self.time
         self.energy_fast = fa["decaying_kick"] + 1.0
         self.energy_fast2 = fa["low"][3] / 2.0
@@ -150,16 +147,19 @@ class RainbowRoad(ProgramBase):
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
     def render(self, af):
-        self.update_params(af)
-        self.get_uniform(af)
+        self.updateParams(af)
         self.bindUniform(af)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
 
+    def norender(self, af):
+        return self.fbos[0].color_attachments[0]
+
+
 @register_node(OP_CODE_RR)
 class RRNode(ShaderNode, Scene):
-    op_title = "rainbow_road"
+    op_title = "Rainbow road"
     op_code = OP_CODE_RR
     content_label = ""
     content_label_objname = "shader_rr"

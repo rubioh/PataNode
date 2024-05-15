@@ -320,7 +320,7 @@ void main()
 	float time = .0f; //iTime;
 	int iqheart = 0;
 	if ( mod( floor(iTime / 1200.), 5.) == 2.  )
-			iqheart = 1;
+			iqheart = 0;
 	// camera	
 	vec3 ro = vec3(.0f, .0f, -4.0f);
 	vec3 ta = vec3( -0.5, -0.4, 0.5 );

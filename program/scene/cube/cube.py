@@ -49,7 +49,11 @@ class Cube(ProgramBase):
                 'color' : 'color_final',
                 'go_rot' : 'go_rot',
                 'face' : 'face',
-                'deep' : 'deep_tic_final'
+                'deep' : 'deep_tic_final',
+                'side_col' : 'side_col',
+                'N_sq' : 'N_sq',
+                'zoom_factor' : 'zoom_factor',
+                'show_bulb' : 'show_bulb'
                 }
         super().initUniformsBinding(binding, program_name='')
         super().addProtectedUniforms([])
@@ -69,6 +73,10 @@ class Cube(ProgramBase):
         self.emid = 0
         self.color_final = self.color
         self.deep_tic_final = 0
+        self.side_col = 1
+        self.N_sq = 1
+        self.zoom_factor = 1.
+        self.show_bulb = 1
 
     def updateParams(self, fa=None):
         if fa is None:
