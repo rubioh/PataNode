@@ -209,12 +209,9 @@ class ProgramBase:
         dr = None
         if len(self.fbos_depth_requirement):
             dr = self.fbos_depth_requirement
-        nt = None
-        if len(self.fbos_num_textures):
-            nt = [1 for i in range(len(self.fbos_win_size))]
-            self.fbos_num_textures = nt
-
-        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, dr, nt)
+        if len(self.fbos_num_textures) == 0.:
+            self.fbos_num_textures = [1 for i in range(len(self.fbos_win_size))]
+        return (self.fbos_win_size, self.fbos_components, self.fbos_dtypes, dr, self.fbos_num_textures)
 
     def connectFbos(self, fbos=None):
         assert len(fbos) == self.required_fbos

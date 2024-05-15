@@ -34,7 +34,6 @@ class FBOManager:
                 self.in_use_fbos[hashmap][i] = 0
         if DEBUG: print(self.in_use_fbos)
 
-
     def getFBO(self, win_sizes=[], components=None, dtypes=None, depth_requirements=None, num_textures = None):
         if dtypes is not None and len(dtypes) != len(win_sizes):
             print('FBOManager::getFBO lists win_sizes and dtypes are not of the same size')
@@ -60,12 +59,8 @@ class FBOManager:
                 component = components[i]
             else:
                 component = self._default_component
-
-            if num_textures:
-                new_textures =  [self.ctx.texture(size=win_size, components=component, dtype=dtype) 
+            new_textures =  [self.ctx.texture(size=win_size, components=component, dtype=dtype) 
                     for j in range(num_textures[i])]
-            else:
-                new_textures =  self.ctx.texture(size=win_size, components=component, dtype=dtype)
             if depth_requirements is not None:
                 depth = depth_requirements[i]
             else:
