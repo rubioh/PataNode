@@ -61,8 +61,11 @@ class FBOManager:
             else:
                 component = self._default_component
 
-            new_textures =  [self.ctx.texture(size=win_size, components=component, dtype=dtype) 
-                for j in range(num_textures[i])]
+            if num_textures:
+                new_textures =  [self.ctx.texture(size=win_size, components=component, dtype=dtype) 
+                    for j in range(num_textures[i])]
+            else:
+                new_textures =  self.ctx.texture(size=win_size, components=component, dtype=dtype)
             if depth_requirements is not None:
                 depth = depth_requirements[i]
             else:

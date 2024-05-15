@@ -138,7 +138,7 @@ class ShaderNode(Node):
     def restoreFBODependencies(self):
         self.program.fbos = None
 
-    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None, depth=None, num_textures = 1):
+    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None, depth=None, num_textures = None):
         if self.program.fbos is not None:
             # fbos already connected
             return True

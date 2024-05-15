@@ -20,7 +20,7 @@ class Dome(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
 
         self.title = "Dome"
-        self.scene = MeshScene("./assets/mesh/mushtex.glb", ctx)
+        self.scene = MeshScene("./assets/mesh/dome.glb", ctx)
         self.renderer = Renderer(ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager)
         self.renderer.add_scene(self.scene)
         self.renderer.add_sun(glm.vec3(1., 0., 0.), glm.vec3(1.))
@@ -55,7 +55,7 @@ class Dome(ProgramBase):
        # self.camera = glm.rotate(self.camera, .2, glm.vec3(1., 0., 0.))
         self.projection = glm.perspective(glm.radians(45.), 16./9., 0.1, 1000.)
         self.model = glm.mat4()
-        self.model = glm.scale(self.model, glm.vec3( .02, .02,.02) )
+        self.model = glm.scale(self.model, glm.vec3( 1., 1., 1.) )
         self.vitesse = .4
         self.offset = 0
         self.intensity = 5
