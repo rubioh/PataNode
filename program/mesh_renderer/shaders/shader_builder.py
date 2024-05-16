@@ -131,7 +131,6 @@ def build_vertex_shader(mesh_layout):
 	else:
 		shader += "tangent = vec3(1., 0., 0.);\n"
 	shader += "}"
-	print(shader)
 	return shader
 
 def build_fragment_shader(material):
@@ -177,7 +176,6 @@ def build_fragment_shader(material):
 
 	result += "albedoMetallic.x += tcs.x * 0.000001;\n"
 	result += "}"
-	print(result)
 	return result
 
 def build_shaders(mesh_layout, material):

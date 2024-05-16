@@ -18,20 +18,21 @@ class NeonParty(ProgramBase):
 
         self.title = "Neon Party"
         self.win_size = win_size
+        self.hwin_size = (int(self.win_size[0] / 2), int(self.win_size[1] / 2))
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
         self.initParams()
 
     def initParams(self):
-        self.bwin_size = self.win_size
-      #  self.bwin_size = (int(self.win_size[0] / 2), int(self.win_size[1] / 2))
-        self.iResolution = self.bwin_size
+        self.iResolution = self.hwin_size
         self.current_texture = 0
         self.was_on_chill = False
         self.shape = 0
         self.animate = 0
         self.iTime = 0.
+        self.textures = [None, None]
+        self.frame = 0
         self.low1 = 0
         self.ro = 0
         self.on_chill = 0
@@ -54,8 +55,9 @@ class NeonParty(ProgramBase):
         self.beat_count = 0
 
     def initFBOSpecifications(self):
-        self.required_fbos = 1
+        self.required_fbos = 2
         fbos_specification = [
+            [self.hwin_size, 4, 'f4'],
             [self.win_size, 4, 'f4']
         ]
         for specification in fbos_specification:
@@ -91,20 +93,34 @@ class NeonParty(ProgramBase):
         frag_path = join(dirname(__file__), "NeonParty.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
+        vert_path = SQUARE_VERT_PATH
+        frag_path = join(dirname(__file__), "reconstruct.glsl")
+        self.loadProgramToCtx(vert_path, frag_path, False, name='reconstruct_')
+
     def render(self, af=None, stride = 0):
         self.fbos[0].color_attachments[0].filter = (moderngl.NEAREST, moderngl.NEAREST)
         self.stride = stride
-        print(stride)
         self.lichen_texture.use(0)
         self.updateParams(af)
         self.bindUniform(af)
         self.fbos[0].use()
         self.vao.render()
-        return self.fbos[0].color_attachments[0]
+        self.textures[self.frame] = self.fbos[0].color_attachments[0]
+        self.reconstruct_program["iChannel0"] = 0
+        self.reconstruct_program["iChannel1"] = 0
+        self.reconstruct_program["iResolution"] = self.win_size
+        if self.textures[0]:
+            self.textures[0].use(0)
+        if self.textures[1]:
+            self.textures[1].use(1)
+        self.fbos[1].use()
+        self.reconstruct_vao.render()
+        return self.fbos[1].color_attachments[0]
 
     def updateParams(self, af):
         if not af:
             return
+        self.frame = (self.frame + 1) % 2
         if af["on_kick"]:
             self.beat_count = self.beat_count + 1
         if af["on_chill"] and not self.drop:
@@ -127,7 +143,7 @@ class NeonParty(ProgramBase):
         else:
             self.shape = 1
         self.iTime = af["time"] * 1.0
-        self.stride = float(self.current_texture)
+        self.stride = float(self.frame)
         self.beat_count = float(self.beat_count)
         self.low1 = af["low"][1]
         self.low2 = af["low"][0]
@@ -152,10 +168,10 @@ class NeonPartyNode(ShaderNode, Scene):
         self.program = NeonParty(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
-    def render(self, audio_features=None, stride = 0):
+    def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
         else:
-            output_texture = self.program.render(audio_features, stride)
+            output_texture = self.program.render(audio_features)
         self.lastrender = output_texture
         return output_texture
