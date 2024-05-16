@@ -47,12 +47,12 @@ class SpiralParticules(ProgramBase):
     def initProgram(self, reload=False):
         vert_path = join(dirname(__file__), "part/draw.vert")
         frag_path = join(dirname(__file__), "part/draw.frag")
-        vao_binding = [(self.vbo1, "4f4 4f4", "in_position", "prev_pos")]
+        vao_binding = [(self.vbo1, "4f4", "in_position")]
         self.loadProgramToCtx(vert_path, frag_path, reload, 'draw_', vao_binding=vao_binding)
 
         vert_path = join(dirname(__file__), "part/draw.vert")
         frag_path = join(dirname(__file__), "part/alpha.frag")
-        vao_binding = [(self.vbo1, "4f4 4f4", "in_position", "prev_pos")]
+        vao_binding = [(self.vbo1, "4f4", "in_position")]
         self.loadProgramToCtx(vert_path, frag_path, reload, 'alpha_', vao_binding=vao_binding)
 
         vert_path = join(dirname(__file__), "part/transform.vert")
