@@ -88,9 +88,9 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
     def initQTimer(self):
         self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.app.start_shader_jobs)
-        #self.timer.timeout.connect(self.update)
-        #self.timer.start(int(1/60*1000))
+        #self.timer.timeout.connect(self.app.start_shader_jobs)
+        self.timer.timeout.connect(self.update)
+        self.timer.start(int(1/60*1000))
 
     def set_default_viewport(self):
         self._viewport = (0, 0, self._buffer_width, self._buffer_height)
