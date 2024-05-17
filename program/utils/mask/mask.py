@@ -61,8 +61,11 @@ class Mask(ProgramBase):
     def render(self, textures, af=None):
         self.bindUniform(af)
         self.updateParams(af)
-        textures[0].use(0)
-        textures[1].use(1)
+        if textures[0] != None:
+            textures[0].use(0)
+
+        if textures[1] != None:
+            textures[1].use(1)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
