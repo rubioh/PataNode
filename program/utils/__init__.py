@@ -10,3 +10,4 @@ import program.utils.reconstruct.reconstruct
 import program.utils.medianfilter.medianfilter
 import program.utils.downscale.downscale
 import program.utils.upscale_nearest.upscale_nearest
+import program.utils.random.random
