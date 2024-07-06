@@ -82,7 +82,7 @@ class RandomNode(ShaderNode, Utils):
     content_label_objname = "shader_random"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1, 2, 3, 4, 5], outputs=[6])
+        super().__init__(scene, inputs=[1, 1, 1, 1, 1], outputs=[3])
         self.program = Random(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
