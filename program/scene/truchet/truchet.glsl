@@ -17,9 +17,9 @@ uniform float K;
 uniform float smooth_low;
 uniform float accum_rot;
 
-const int MAX_MARCHING_STEPS = 30;
+const int MAX_MARCHING_STEPS = 85;
 const float MIN_DIST = 0.0;
-const float MAX_DIST = 20.0;
+const float MAX_DIST = 25.0;
 const float PRECISION = 0.003;
 
 #define PI 3.14159265359
@@ -242,7 +242,7 @@ vec4 rayMarch(vec3 ro, vec3 rd, float start, float end, inout float id) {
   for (int i = 0; i < MAX_MARCHING_STEPS; i++) {
     vec3 p = ro + (depth+dit) * rd;
     vec4 d = SDF(p, tmp_id);
-    depth += max(abs(d.x)*.4, sign(d.x)*precision_*2.);
+    depth += max(abs(d.x)*.4, sign(d.x)*precision_*2.)*.4;
     if (abs(d.x) < precision_ || depth > end){
         col = d.yzw;
         if (d.x < precision_) id = tmp_id;

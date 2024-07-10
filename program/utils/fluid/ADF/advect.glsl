@@ -24,7 +24,14 @@ void main(){
     else vel *= input_vel_intensity_passthrough;
 
     vec4 state = texture(FieldState, uv);
+   
+    vec2 tmp = uv+dt*state.xy/R*advect_amount;
+    
     vec4 color = texture(FieldState, uv+dt*state.xy/R*advect_amount);
+    if (tmp.x<0 || tmp.x>1)
+        vel *= 0.;
+    if (tmp.y<0 || tmp.y>1)
+        vel *= 0.;
 
     color.xy += vel;
 

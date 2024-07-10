@@ -1,0 +1,7 @@
+arch:
+    width: 1.
+    radius: 1.
+    height: .5
+trapez:
+    x: 0
+    y: 0

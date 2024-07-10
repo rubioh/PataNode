@@ -35,7 +35,7 @@ class PataShade(PataNode):
         super().__init__(audio_engine=self.audio_engine)
 
         # Thread Pool
-        self.threadpool = QThreadPool()
+        self.threadpool = QThreadPool(maxThreadCount=5)#number thread in Pool
 
         self.initAudioTimer()
         self.initLightTimer()
