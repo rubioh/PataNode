@@ -47,10 +47,10 @@ void main()
     uv *= 7. * res;
     int num_layer = int(numLayer);
     float wave = max(0., sin(waveOffset + length(uv) * 1. * waveFrequency - iTime * 5. * waveSpeed));
-    
+
     vec3 col = palette( length(uv) / .2 + iTime, 
     vec3(0.5,0.5,0.5),vec3(0.5,0.5,0.5),vec3(1.0,1.0,1.0),vec3(0.0,0.33,0.67));
-    
+
     vec3 col2 = 2.*palette( length(uv) / 4. + iTime, 
     vec3(0.5,0.1,0.5),vec3(0.1,0.5,0.5),vec3(1.0,.3,1.0),vec3(0.0,0.33,0.67));
     
@@ -77,7 +77,7 @@ void main()
             c1 *= (1.-wave);
         }
         c+=c1;
-        uv *= 2.;
+        uv *= 1.5;
     }
 
     vec3 o = c * col2 + c* col + (c) * col3 * wave * 2.;

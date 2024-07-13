@@ -5,7 +5,8 @@ uniform float iTime;
 uniform vec2 iResolution;
 uniform float width;
 uniform float radius;
-uniform float height;
+uniform float y_offset;
+uniform float x_offset;
 
 float opSmoothUnion( float d1, float d2, float k )
 {
@@ -63,7 +64,7 @@ void main()
 {
     vec2 R = iResolution.xy;
     vec2 uv = (gl_FragCoord.xy*2.-R)/R.y;
-    uv.y += height;
+    uv += vec2(x_offset, y_offset);
     float arc = arch(uv).x;
     vec2 dir = getDir(uv);
 

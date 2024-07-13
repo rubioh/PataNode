@@ -66,10 +66,14 @@ void main()
 
     vec2 L = Laplacian(center, iChannel0) + .000001*cos(iTime+iResolution.x);
 
+    float len = smoothstep(.4, .1, length((gl_FragCoord.xy*2.-iResolution.xy)/iResolution.y));
+    float f1 = mix(0.026, f, len);
+    float k1 = mix(0.051, k, len);
+
     float a = center.x;
     float b = center.y;
-    float da = (L.x*Da - a*b*b + f*(1.-a))*dt;
-    float db = (L.y*Db + a*b*b - (k+f)*b)*dt;
+    float da = (L.x*Da - a*b*b + f1*(1.-a))*dt;
+    float db = (L.y*Db + a*b*b - (k1+f1)*b)*dt;
 
     float na = a +da;
     float nb = b +db;

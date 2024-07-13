@@ -47,7 +47,8 @@ class MaskArche(ProgramBase):
             'iChannel0': 'iChannel0',
             'width': 'width',
             'radius': 'radius',
-            'height': 'height'
+            'y_offset': 'y_offset',
+            'x_offset': 'x_offset'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0'])
@@ -60,7 +61,8 @@ class MaskArche(ProgramBase):
             arch_conf = yaml.safe_load(stream)["arch"]
             self.width = arch_conf["width"]
             self.radius = arch_conf["radius"]
-            self.height = arch_conf["height"]
+            self.y_offset = arch_conf["y_offset"]
+            self.x_offset = arch_conf["x_offset"]
 
     def getParameters(self):
         return self.adaptableParametersDict

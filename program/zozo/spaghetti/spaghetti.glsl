@@ -4,7 +4,8 @@ layout (location=0) out vec4 fragColor;
 uniform vec2 iResolution;
 uniform float width;
 uniform float radius;
-uniform float height;
+uniform float y_offset;
+uniform float x_offset;
 uniform float iTime;
 
 float opSmoothUnion( float d1, float d2, float k )
@@ -59,13 +60,14 @@ void main()
     vec2 R = iResolution.xy;
     vec2 uv = (gl_FragCoord.xy*2.-R)/R.y;
 
-    uv.y += height;
+    uv.y += y_offset;
+    uv.x += x_offset;
     float arc = arch(uv);
     arc = smoothstep(0.01, 0., arc)*smoothstep(1.25, .3, -arc);
 
     
     float armRot = 1.6;
-    float armCount = 6.;
+    float armCount = 10.;
     float time = iTime*.2;
     float pi = 3.14159;
     float tao = 2.*pi;

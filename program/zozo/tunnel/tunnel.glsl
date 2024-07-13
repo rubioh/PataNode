@@ -4,8 +4,9 @@ layout (location=0) out vec4 fragColor;
 uniform vec2 iResolution;
 uniform float width;
 uniform float radius;
-uniform float height;
+uniform float y_offset;
 uniform float iTime;
+uniform float x_offset;
 
 #define time iTime*.1
 #define pi 3.14159
@@ -111,7 +112,9 @@ void main()
     vec2 R = iResolution.xy;
     vec2 uv = (gl_FragCoord.xy*2.-R)/R.y;
 
-    uv.y += height;
+    uv.y += y_offset;
+    uv.x += x_offset;
+
     float arc = arch(uv);
     float tmparc = arc;
     arc = smoothstep(0.01, 0., arc)*smoothstep(1.25, .3, -arc);

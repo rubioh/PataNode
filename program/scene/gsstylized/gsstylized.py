@@ -42,9 +42,10 @@ class GSStylized(ProgramBase):
         frag_path = join(dirname(__file__), "ReacDifShader/ReacDif.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="reacdif_")
         # Init PROGRAM
-        vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "InitShader/frag.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name="init_")
+        if not reload:
+            vert_path = SQUARE_VERT_PATH
+            frag_path = join(dirname(__file__), "InitShader/frag.glsl")
+            self.loadProgramToCtx(vert_path, frag_path, reload, name="init_")
         # Program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "gsstylized.glsl")
@@ -69,7 +70,8 @@ class GSStylized(ProgramBase):
             'K' : 'K',
             'energy': 'smooth_fast',
             'mode_flick': 'mode_flick',
-            'dkick' : 'dkick'
+            'dkick' : 'dkick',
+            'iTime' : 'time'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0', 'iChannel1'])
@@ -108,7 +110,7 @@ class GSStylized(ProgramBase):
     def initParams(self):
         self.iChannel0 = 0
         self.iChannel1 = 1
-        self.bwin_size = (800, 450)
+        self.bwin_size = (1280, 720)
         self.iFrame = 0
         self.fk = np.array([0.041, 0.061])
         self.Da = 0.21
@@ -154,20 +156,24 @@ class GSStylized(ProgramBase):
         self.f_current = self.render_preset[0]
         self.k_current = self.render_preset[1]
 
+        self.idx_preset_tmp = 0
+        self.time = 0
     def updateParams(self, af):
+        self.time += .001
         if self.fbos[0] is not None and self.loaded is False:
             self.load_data()
             self.init_texture4()
             self.loaded = True
         if af is None:
             return
+        af["on_kick"] = 0
         self.dkick = (1.0 - af["decaying_kick"]) ** 1.0 / 4.0
         if self.on_chill == 1 and af["mini_chill"] == 0:
             self.on_chill = 0
             self.change = 4
             self.change_triangle = 8
             self.initialize = True
-            self.get_init_texture()
+            #self.get_init_texture()
 
         if af["on_chill"]:
             self.K += 0.01 * self.sens
@@ -183,7 +189,8 @@ class GSStylized(ProgramBase):
 
         self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * af["full"][0]
         self.n_iter = int(np.clip((self.smooth_fast * 10.0), 1, 17))
-
+        self.change = 0
+        self.change_init = 0
         if af["on_kick"]:
             self.on_kick = 1
             self.change += 1
@@ -197,7 +204,7 @@ class GSStylized(ProgramBase):
                 self.change = 0
             if self.change_init >= 32:
                 self.change_init %= 32
-                self.get_init_texture()
+                #self.get_init_texture()
                 self.radius_triangle = 1
                 self.init_mode += 1
                 self.init_mode %= 4
@@ -217,6 +224,9 @@ class GSStylized(ProgramBase):
         else:
             self.render_preset = self.preset[self.preset_idx]
 
+
+        self.idx_preset_tmp += .0025
+        self.render_preset = self.preset[int(self.idx_preset_tmp)%len(self.preset)]
         diff = self.render_preset - self.fk
         self.fk = self.fk + diff * 3e-2
 
@@ -233,7 +243,7 @@ class GSStylized(ProgramBase):
         self.updateParams(af)
         self.bindUniform(af)
 
-        for i in range(self.n_iter):
+        for i in range(4):
             self.fbos[0], self.fbos[1] = self.fbos[1], self.fbos[0]
             self.fbos[1].color_attachments[0].use(0)
             self.fbos[0].clear()

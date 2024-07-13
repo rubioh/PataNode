@@ -1,7 +1,9 @@
 arch:
-    width: 1.
+    width: 1.15
     radius: 1.
-    height: .5
+    y_offset: .69
+    x_offset: -.4
+    zoom: 1.
 trapez:
     x: 0
     y: 0

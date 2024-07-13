@@ -5,21 +5,18 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode, Scene
+from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
-
 import yaml
 
 
-OP_CODE_SPAGHETTI = name_to_opcode('spaghetti')
+OP_CODE_OFFSET = name_to_opcode('offset')
 
-@register_program(OP_CODE_SPAGHETTI)
-class Spaghetti(ProgramBase):
-
+@register_program(OP_CODE_OFFSET)
+class Offset(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
-        self.title = "Spaghetti"
+        self.title = "offset"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -29,7 +26,7 @@ class Spaghetti(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4']
+            [self.win_size, 4, 'f4'],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -38,46 +35,47 @@ class Spaghetti(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "spaghetti.glsl")
+        frag_path = join(dirname(__file__), "offset.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
+
+    def initParams(self):
+        self.iChannel0 = 1
+        with open("resources/zozo_conf.yaml") as stream:
+            arch_conf = yaml.safe_load(stream)["arch"]
+            self.y_offset = float(arch_conf["y_offset"])
+            self.x_offset = float(arch_conf["x_offset"])
+            self.zoom = arch_conf["zoom"]
+        self.x_offset_fine = 0.
+        self.y_offset_fine = 0.
 
     def initUniformsBinding(self):
         binding = {
             'iResolution': 'win_size',
-            'width': 'width',
-            'radius': 'radius',
-            'y_offset': 'y_offset',
             'x_offset': 'x_offset',
-            'iTime': 'time'
+            'y_offset': 'y_offset',
+            'x_offset_fine': 'x_offset_fine',
+            'y_offset_fine': 'y_offset_fine',
+            'zoom': 'zoom',
+            'iChannel0' : 'iChannel0',
         }
         super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms([])
-    
-    def initParams(self):
-        self.vitesse = .4
-        self.time = 0
-        with open("resources/zozo_conf.yaml") as stream:
-            arch_conf = yaml.safe_load(stream)["arch"]
-            self.width = arch_conf["width"]
-            self.radius = arch_conf["radius"]
-            self.y_offset = arch_conf["y_offset"]
-            self.x_offset = arch_conf["x_offset"]
+        self.addProtectedUniforms(['iChannel0', 'x_offset', 'y_offset'])
 
-    def getParameters(self):
-        return self.adaptableParametersDict
-
-    def updateParams(self, af=None):
+    def updateParams(self, af):
         if af is None:
             return
-        self.time = .1 * af["time"]
 
     def bindUniform(self, af):
         super().bindUniform(af)
         self.programs_uniforms.bindUniformToProgram(af, program_name='')
 
-    def render(self, af=None):
+    def render(self, textures, af=None):
         self.bindUniform(af)
-        self.updateParams(af)
+        self.updateParams(af),
+        textures[0].repeat_x = False
+        textures[0].repeat_y = False
+        textures[0].border_color = (0.0, 0.0, 0.0, 0.0)
+        textures[0].use(1)
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -85,21 +83,23 @@ class Spaghetti(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
-@register_node(OP_CODE_SPAGHETTI)
-class SpaghettiNode(ShaderNode, Scene):
-    op_title = "Spaghetti"
-    op_code = OP_CODE_SPAGHETTI
+
+@register_node(OP_CODE_OFFSET)
+class OffsetNode(ShaderNode, Utils):
+    op_title = "Offset"
+    op_code = OP_CODE_OFFSET
     content_label = ""
-    content_label_objname = "shader_spaghetti"
+    content_label_objname = "shader_offset"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Spaghetti(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1], outputs=[3])
+        self.program = Offset(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
-
     def render(self, audio_features=None):
-        if self.program.already_called:
+        input_nodes = self.getShaderInputs()
+        if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
-        output_texture = self.program.render(audio_features)
+        texture = input_nodes[0].render(audio_features)
+        output_texture = self.program.render([texture], audio_features)
         return output_texture

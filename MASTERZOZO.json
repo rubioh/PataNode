@@ -1,0 +1,578 @@
+{
+    "id": 2957187238128,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 2957245394928,
+            "title": "Screen",
+            "pos_x": 337.0,
+            "pos_y": -40.0,
+            "inputs": [
+                {
+                    "id": 2957245395936,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2957245344240,
+            "title": "Random",
+            "pos_x": 90.0,
+            "pos_y": -46.0,
+            "inputs": [
+                {
+                    "id": 2957245586256,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2957245581072,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2957245389552,
+                    "index": 2,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2957245394640,
+                    "index": 3,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2957335962896,
+                    "index": 4,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2957335966352,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 641,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2957245345248,
+            "title": "Graph Ctn : \n\nzozoxagons",
+            "pos_x": -598.0,
+            "pos_y": -214.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2957245868240,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {}
+        },
+        {
+            "id": 2957245346784,
+            "title": "Graph Ctn : \n\npsyspinzozo",
+            "pos_x": -596.0,
+            "pos_y": -83.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2957335966736,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {}
+        },
+        {
+            "id": 2957362557392,
+            "title": "Graph Ctn : \n\nlightning",
+            "pos_x": -608.0,
+            "pos_y": 22.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2957362612704,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {}
+        },
+        {
+            "id": 2957362903520,
+            "title": "Graph Ctn : \n\nmotherboard",
+            "pos_x": -626.0,
+            "pos_y": 142.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2957362612896,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {}
+        },
+        {
+            "id": 2957362622928,
+            "title": "Eye",
+            "pos_x": -631.0,
+            "pos_y": 255.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2957362623360,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2957362547312,
+            "title": "MaskArche",
+            "pos_x": -85.0,
+            "pos_y": 179.0,
+            "inputs": [
+                {
+                    "id": 2957362560560,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2957336070336,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 943,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "width": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "radius": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "width": {
+                        "type": null,
+                        "param_name": "width"
+                    },
+                    "radius": {
+                        "type": null,
+                        "param_name": "radius"
+                    },
+                    "y_offset": {
+                        "type": null,
+                        "param_name": "y_offset"
+                    },
+                    "x_offset": {
+                        "type": null,
+                        "param_name": "x_offset"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2957362546928,
+            "title": "Offset",
+            "pos_x": -261.0,
+            "pos_y": 397.0,
+            "inputs": [
+                {
+                    "id": 2957362559840,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2957362560848,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 647,
+            "adaptable_parameters": {
+                "program": {
+                    "x_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x_offset_fine": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset_fine": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "zoom": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "x_offset": {
+                        "type": null,
+                        "param_name": "x_offset"
+                    },
+                    "y_offset": {
+                        "type": null,
+                        "param_name": "y_offset"
+                    },
+                    "x_offset_fine": {
+                        "type": null,
+                        "param_name": "x_offset_fine"
+                    },
+                    "y_offset_fine": {
+                        "type": null,
+                        "param_name": "y_offset_fine"
+                    },
+                    "zoom": {
+                        "type": null,
+                        "param_name": "zoom"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 2957353413152,
+            "edge_type": 2,
+            "start": 2957245868240,
+            "end": 2957245586256
+        },
+        {
+            "id": 2957353414640,
+            "edge_type": 2,
+            "start": 2957335966736,
+            "end": 2957245581072
+        },
+        {
+            "id": 2957362558064,
+            "edge_type": 2,
+            "start": 2957362612704,
+            "end": 2957245389552
+        },
+        {
+            "id": 2957362610736,
+            "edge_type": 2,
+            "start": 2957362612896,
+            "end": 2957245394640
+        },
+        {
+            "id": 2957336081520,
+            "edge_type": 2,
+            "start": 2957362623360,
+            "end": 2957362559840
+        },
+        {
+            "id": 2957362559120,
+            "edge_type": 2,
+            "start": 2957362560848,
+            "end": 2957362560560
+        },
+        {
+            "id": 2957336081232,
+            "edge_type": 2,
+            "start": 2957336070336,
+            "end": 2957335962896
+        },
+        {
+            "id": 2957362547360,
+            "edge_type": 2,
+            "start": 2957335966352,
+            "end": 2957245395936
+        }
+    ]
+}

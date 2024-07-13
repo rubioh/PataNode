@@ -328,7 +328,7 @@ void main()
 	mat3 ca = setCamera( ro, ta, 0.0 );
 
 	vec2 p = (-iResolution.xy + 2.0*gl_FragCoord.xy)/iResolution.y;
-
+	p.y += .3;
 	if (iqheart == 1) {
 		float rr = 2.;
 		//p.y-=iTime * 2.;

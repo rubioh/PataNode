@@ -98,9 +98,9 @@ vec3 calcnormal2(vec2 p, float d){
 float ring(){
 
     vec2 p = (gl_FragCoord.xy-.5*iResolution.xy)/iResolution.y;
-
-    float mask = 1.-smoothstep(dkick, dkick+.01, length(p));
-    mask *= (smoothstep(dkick-.02, dkick-.01, length(p)));
+    float dkick2 = .4+dkick*.0001 +.3*sin(iTime);
+    float dc = .2;
+    float mask = 1.-(smoothstep(0., dc, abs(length(p)-dkick2)));
 
     return mask;
 }
@@ -113,7 +113,7 @@ vec3 getPal3(vec2 uv){
     vec3 normal = calcnormal2(uv, d);
 
     vec3 col = vec3(.0,.5,.7)*(tex.y*4.);
-    col += tex.y*ring()*2.*vec3(.7, .4, .5);
+    col += tex.y*ring()*2.*vec3(1., .7, .5);
 
     vec3 ld = vec3(0.);
     vec3 rd = vec3(uv, -1);

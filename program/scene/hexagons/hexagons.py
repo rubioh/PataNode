@@ -72,7 +72,7 @@ class Hexagons(ProgramBase):
         if af is None:
             return
         self.time = af["time"] / 30.
-        self.waveOffset = self.waveOffset + af["low"][0];
+        #self.waveOffset = self.waveOffset + af["low"][0];
 
 
     def bindUniform(self, af):

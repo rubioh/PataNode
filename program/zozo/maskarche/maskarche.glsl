@@ -5,7 +5,8 @@ uniform sampler2D iChannel0;
 uniform vec2 iResolution;
 uniform float width;
 uniform float radius;
-uniform float height;
+uniform float y_offset;
+uniform float x_offset;
 
 float opSmoothUnion( float d1, float d2, float k )
 {
@@ -56,7 +57,7 @@ void main()
 
     vec4 tex = texture(iChannel0, gl_FragCoord.xy/R.xy);
 
-    uv.y += height;
+    uv += vec2(x_offset, y_offset);
     float arc = arch(uv);
     arc = smoothstep(0.01, 0., arc)*smoothstep(1.25, .3, -arc);
     fragColor = tex*arc;

@@ -1,0 +1,410 @@
+{
+    "id": 2304372723440,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 2304430895856,
+            "title": "Screen",
+            "pos_x": -68.0,
+            "pos_y": -44.0,
+            "inputs": [
+                {
+                    "id": 2304430819040,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2304430830032,
+            "title": "Offset",
+            "pos_x": -460.0,
+            "pos_y": 6.0,
+            "inputs": [
+                {
+                    "id": 2304430826144,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2304430894944,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 647,
+            "adaptable_parameters": {
+                "program": {
+                    "x_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x_offset_fine": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset_fine": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "zoom": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "x_offset": {
+                        "type": null,
+                        "param_name": "x_offset"
+                    },
+                    "y_offset": {
+                        "type": null,
+                        "param_name": "y_offset"
+                    },
+                    "x_offset_fine": {
+                        "type": null,
+                        "param_name": "x_offset_fine"
+                    },
+                    "y_offset_fine": {
+                        "type": null,
+                        "param_name": "y_offset_fine"
+                    },
+                    "zoom": {
+                        "type": null,
+                        "param_name": "zoom"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2304431492800,
+            "title": "MaskArche",
+            "pos_x": -224.0,
+            "pos_y": -52.0,
+            "inputs": [
+                {
+                    "id": 2304431436048,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2304430886544,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 943,
+            "adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "width": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "radius": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "width": {
+                        "type": null,
+                        "param_name": "width"
+                    },
+                    "radius": {
+                        "type": null,
+                        "param_name": "radius"
+                    },
+                    "y_offset": {
+                        "type": null,
+                        "param_name": "y_offset"
+                    },
+                    "x_offset": {
+                        "type": null,
+                        "param_name": "x_offset"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2304430826864,
+            "title": "Hexagons",
+            "pos_x": -624.0,
+            "pos_y": -192.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2304431008960,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 829,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rotationSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data / 3.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "offsetSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveFrequency": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data * 1.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "numLayer": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "4",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveOffset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "res": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "1.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thickness": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "1.5",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "rotationSpeed": {
+                        "type": null,
+                        "param_name": "rotationSpeed"
+                    },
+                    "offsetSpeed": {
+                        "type": null,
+                        "param_name": "offsetSpeed"
+                    },
+                    "waveFrequency": {
+                        "type": null,
+                        "param_name": "waveFrequency"
+                    },
+                    "waveSpeed": {
+                        "type": null,
+                        "param_name": "waveSpeed"
+                    },
+                    "numLayer": {
+                        "type": null,
+                        "param_name": "numLayer"
+                    },
+                    "waveOffset": {
+                        "type": null,
+                        "param_name": "waveOffset"
+                    },
+                    "res": {
+                        "type": null,
+                        "param_name": "res"
+                    },
+                    "thickness": {
+                        "type": null,
+                        "param_name": "thickness"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 2304431035920,
+            "edge_type": 2,
+            "start": 2304430894944,
+            "end": 2304431436048
+        },
+        {
+            "id": 2304430887360,
+            "edge_type": 2,
+            "start": 2304430886544,
+            "end": 2304430819040
+        },
+        {
+            "id": 2304596466800,
+            "edge_type": 2,
+            "start": 2304431008960,
+            "end": 2304430826144
+        }
+    ]
+}

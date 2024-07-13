@@ -11,15 +11,15 @@ from node.node_conf import register_node
 import yaml
 
 
-OP_CODE_SPAGHETTI = name_to_opcode('spaghetti')
+OP_CODE_MOTHERBOARD = name_to_opcode('motherboard')
 
-@register_program(OP_CODE_SPAGHETTI)
-class Spaghetti(ProgramBase):
+@register_program(OP_CODE_MOTHERBOARD)
+class Motherboard(ProgramBase):
 
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
 
-        self.title = "Spaghetti"
+        self.title = "Motherboard"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -38,7 +38,7 @@ class Spaghetti(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "spaghetti.glsl")
+        frag_path = join(dirname(__file__), "motherboard.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initUniformsBinding(self):
@@ -48,13 +48,15 @@ class Spaghetti(ProgramBase):
             'radius': 'radius',
             'y_offset': 'y_offset',
             'x_offset': 'x_offset',
+            'nrj': 'nrj',
             'iTime': 'time'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms([])
     
     def initParams(self):
-        self.vitesse = .4
+        self.vitesse = 0
+        self.nrj = 0
         self.time = 0
         with open("resources/zozo_conf.yaml") as stream:
             arch_conf = yaml.safe_load(stream)["arch"]
@@ -63,6 +65,7 @@ class Spaghetti(ProgramBase):
             self.y_offset = arch_conf["y_offset"]
             self.x_offset = arch_conf["x_offset"]
 
+
     def getParameters(self):
         return self.adaptableParametersDict
 
@@ -70,6 +73,7 @@ class Spaghetti(ProgramBase):
         if af is None:
             return
         self.time = .1 * af["time"]
+        self.nrj = af["smooth_low"]
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -85,16 +89,16 @@ class Spaghetti(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
-@register_node(OP_CODE_SPAGHETTI)
-class SpaghettiNode(ShaderNode, Scene):
-    op_title = "Spaghetti"
-    op_code = OP_CODE_SPAGHETTI
+@register_node(OP_CODE_MOTHERBOARD)
+class MotherboardNode(ShaderNode, Scene):
+    op_title = "Motherboard"
+    op_code = OP_CODE_MOTHERBOARD
     content_label = ""
-    content_label_objname = "shader_spaghetti"
+    content_label_objname = "shader_motherboard"
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Spaghetti(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Motherboard(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
 

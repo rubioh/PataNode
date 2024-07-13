@@ -145,7 +145,7 @@ class PataNode(NodeEditorWindow):
         self.gl_widget.hide()
 
     def showShaderWindow(self):
-        self.gl_widget.show()
+        self.gl_widget.showFullScreen()
 
     def hideAudioLogWindow(self):
         self.audio_log_widget.setVisible(False)
