@@ -21,6 +21,7 @@ class QDMInspector(QWidget):
         grid = QVBoxLayout()
         grid.insertStretch(-1, -1)
         self.grid = grid
+        grid.addWidget(QCheckBox())
         self.setLayout(grid)
 
     def addLayout(

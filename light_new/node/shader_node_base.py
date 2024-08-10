@@ -404,3 +404,6 @@ class Particles:
 
 class Gate:
     node_type_reference = "Gate"
+
+class Map:
+    node_type_reference = "Map"
