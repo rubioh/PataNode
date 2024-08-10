@@ -16,12 +16,13 @@ from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 
 from gui.subwindow import PataNodeSubWindow
+from gui.mappingwindow import PataNodeMappingWindow
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.shader_widget import ShaderWidget
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.audio_widget import AudioLogWidget
-
+from node.shader_node_base import Map
 from node.node_conf import SHADER_NODES, AUDIO_NODES
 from node.graph_container_node import GraphContainerNode
 
@@ -54,6 +55,7 @@ class PataNode(NodeEditorWindow):
             print("Registered nodes:")
             pp(SHADER_NODES)
 
+        self.mapDisplayed = False
         self.mdiArea = QMdiArea()
         self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
         self.mdiArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -82,8 +84,13 @@ class PataNode(NodeEditorWindow):
         self.readSettings()
 
         self.setWindowTitle("PataNode")
-
+        self.initMapWindow()
         self.current_program = None
+
+    def initMapWindow(self):
+        self.mapsubwnd = PataNodeMappingWindow(self)
+        self.map_scene = self.mapsubwnd.scene
+        self.mapsubwnd.hide()
 
     def initShaderWidget(self):
         self.gl_widget = ShaderWidget(self, self.audio_engine)
@@ -132,6 +139,7 @@ class PataNode(NodeEditorWindow):
     def createActions(self):
         super().createActions()
 
+
         self.actClose = QAction(
             "Cl&ose",
             self,
@@ -170,6 +178,15 @@ class PataNode(NodeEditorWindow):
             statusTip="Move the focus to the previous window",
             triggered=self.mdiArea.activatePreviousSubWindow,
         )
+
+        self.actMap = QAction(
+            '&Map', 
+            self, 
+            shortcut='Ctrl+M', 
+            statusTip="Show mapping window", 
+            triggered=self.openMapWindow,
+            )
+
 
         self.actSeparator = QAction(self)
         self.actSeparator.setSeparator(True)
@@ -216,6 +233,13 @@ class PataNode(NodeEditorWindow):
         if activeSubWindow:
             return activeSubWindow.widget()
         return None
+
+    def openMapWindow(self):
+        if self.mapDisplayed:
+            self.mapsubwnd.hide()
+        else:
+            self.mapsubwnd.showMaximized()
+        self.mapDisplayed = not self.mapDisplayed
 
     def onFileNew(self):
         try:
@@ -282,6 +306,9 @@ class PataNode(NodeEditorWindow):
 
         self.helpMenu = self.menuBar().addMenu("&Help")
         self.helpMenu.addAction(self.actAbout)
+
+        self.mapMenu = self.menuBar().addMenu("&Map")
+        self.mapMenu.addAction(self.actMap)
 
         self.editMenu.aboutToShow.connect(self.updateEditMenu)
 

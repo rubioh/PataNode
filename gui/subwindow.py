@@ -11,7 +11,7 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 
 # patanode package
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.shader_node_base import ShaderNode
+from node.shader_node_base import ShaderNode, Map
 from node.graph_container_node import GraphContainerNode
 
 from program.output.screen.screen import ScreenNode
@@ -31,6 +31,8 @@ class PataNodeSubWindow(NodeEditorWidget):
         # self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.setTitle()
+
+        self.map_scene = app.map_scene
 
         self.setOpenGLSharedObject()
 
@@ -126,6 +128,8 @@ class PataNodeSubWindow(NodeEditorWidget):
         if isinstance(item, QDMGraphicsNode):
             node = item.node
             self.updateInspector(node)
+        if isinstance(item.node, Map):
+            self.map_scene.reload_from_node(item.node)
 
     def updateInspector(self, node):
         self.app.updateInspector(node)
