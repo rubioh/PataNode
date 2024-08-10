@@ -29,7 +29,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         # self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.setTitle()
-
+        self.map_scene = app.map_scene
 
         self.setOpenGLSharedObject()
 
@@ -61,7 +61,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            self.screen_node.render(audio_features)
+            self.screen_node.render(audio_features, self.map_scene.polyproxies)
 
     def getLastMainColors(self):
         if self.screen_node is not None:

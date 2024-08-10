@@ -11,6 +11,10 @@ from node.node_conf import register_node
 
 OP_CODE_SCREEN = 0
 
+def read_file(path):
+    f = open(path, "r")
+    return f.read()
+
 @register_program(OP_CODE_SCREEN)
 class Screen(ProgramBase):
 
@@ -23,9 +27,15 @@ class Screen(ProgramBase):
         self.initParams()
 
     def initProgram(self, reload=False):
-        vert_path = SQUARE_VERT_PATH
+        vert_path = join(dirname(__file__), "screen_vtx.glsl")
         frag_path = join(dirname(__file__), "screen.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload)
+        code_version = "#version "
+        code_version += (
+            str(3) + str(3) + str("0 core\n")
+        )
+        self.program = self.ctx.program(
+            vertex_shader=read_file(vert_path), fragment_shader=read_file(frag_path)
+        )
 
     def initParams(self):
         pass
@@ -39,7 +49,32 @@ class Screen(ProgramBase):
         self.program['iResolution'] = (w,h)
         self.program["tex"] = 0
 
-    def render(self, textures, af=None):
+    def render_map(self, textures, af, polymap):
+        for poly in polymap:
+            vertex_pos = []
+            vertex_tcs = []
+            for p in poly.pointlist:
+                vertex_pos.append( (p.x()) / 1280. )
+                vertex_pos.append( (p.y()) / 720. )
+                vertex_tcs.append(p.tx)
+                vertex_tcs.append(p.ty)
+            vertex_pos = np.array(vertex_pos, 'f4')
+            vertex_tcs = np.array(vertex_tcs, 'f4')
+            vbo_p = self.ctx.buffer(vertex_pos)
+            vbo_t = self.ctx.buffer(vertex_tcs)
+            self.vao = self.ctx.vertex_array(self.program,
+                [(vbo_p, "2f", "in_position"),
+                (vbo_t, "2f", "in_tcs")])
+            self.updateParams(af)
+            self.bindUniform(af)
+            textures[0].use(0)
+            self.ctx.screen.use()
+            self.vao.render()
+
+    def render(self, textures, af=None, polymap = None):
+        if polymap != None:
+            self.render_map(textures, af, polymap)
+            return True
         self.updateParams(af)
         self.bindUniform(af)
         textures[0].use(0)
@@ -90,7 +125,7 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self, audio_features=None):
+    def render(self, audio_features=None, polymap = None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.program.already_called = False
@@ -102,5 +137,5 @@ class ScreenNode(ShaderNode, Output):
         texture = input_nodes[0].render(audio_features)
         if self.plreturn is not None:
             self.buffer_col = self.plreturn.render(texture)
-        self.program.render([texture], audio_features)
+        self.program.render([texture], audio_features, polymap)
         return True

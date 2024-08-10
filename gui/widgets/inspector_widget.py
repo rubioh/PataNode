@@ -20,6 +20,7 @@ class QDMInspector(QWidget):
         grid = QVBoxLayout()
         grid.insertStretch(-1,-1)
         self.grid = grid
+        grid.addWidget(QCheckBox())
         self.setLayout(grid)
 
     def addLayout(self, obj_connect=None): # TODO Redraw Layout at each onSelected -> Node
