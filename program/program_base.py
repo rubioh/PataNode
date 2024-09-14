@@ -249,13 +249,13 @@ class ProgramBase:
                 name = "eval_function",
                 uniform_name=uniform_name,
                 program_name=program_name,
-                value = "input_data",
+                value = "x",
                 minimum = .25,
                 maximum = 4.,
                 type="f4",
                 widget_type = "TextEdit")
 
-    def getAdaptableEvaluationForUniform(self, program_name, uniform_name, input_data):
+    def getAdaptableEvaluationForUniform(self, program_name, uniform_name, x):
         evaluation = self.adaptable_parameters_dict[program_name][uniform_name]["eval_function"]["value"]
         try:
             modified_data = eval(evaluation)
@@ -263,7 +263,7 @@ class ProgramBase:
         except:
             if DEBUG_EVAL: print('eval_function %s'%evaluation, "is not correct.", self.__class__.__name__, "for uniform %s"%uniform_name)
             if DEBUG_EVAL: print('giving raw input in uniforms %s'%uniform_name)
-            modified_data = input_data
+            modified_data = x
         return modified_data
 
     def getAdaptableParameters(self):
@@ -312,6 +312,9 @@ class ProgramBase:
 
     def addProtectedUniforms(self, uniforms_name):
         self.programs_uniforms.addProtectedUniforms(uniforms_name)
+
+    def isCalled(self):
+        self.already_called = True
 
     def bindUniform(self, af):
         self.already_called = True

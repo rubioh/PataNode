@@ -21,7 +21,7 @@ class QDMDragListbox(QTreeWidget):
         self.setDragEnabled(True)
 
         self.addShaderNodes()
-        self.addAudioNodes()
+        #self.addAudioNodes()
         self.addContainerNodes()
 
 

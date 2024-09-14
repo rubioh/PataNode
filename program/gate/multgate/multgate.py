@@ -9,13 +9,13 @@ from node.shader_node_base import ShaderNode, Gate
 from node.node_conf import register_node
 
 
-OP_CODE_SQUAREGATE = name_to_opcode('squaregate')
+OP_CODE_MULTGATE = name_to_opcode('multgate')
 
-@register_program(OP_CODE_SQUAREGATE)
-class SquareGate(ProgramBase):
+@register_program(OP_CODE_MULTGATE)
+class MultGate(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-        self.title = "SquareGate"
+        self.title = "MultGate"
 
         self.initProgram()
         self.initFBOSpecifications()
@@ -34,31 +34,22 @@ class SquareGate(ProgramBase):
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
-        frag_path = join(dirname(__file__), "squaregate.glsl")
+        frag_path = join(dirname(__file__), "multgate.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
         self.iChannel0 = 0
         self.iChannel1 = 1
-        self.time = 0
-        self.square_size = 0
-        self.energy = 0
-        self.N_SQUARE = 30
-        self.border_size = 1
-        self.which = 0
+        self.energy = 1
+        self.drywet = 0
 
     def initUniformsBinding(self):
         binding = {
             'iResolution' : 'win_size',
-            'iTime' : 'time',
             'iChannel0' : 'iChannel0',
             'iChannel1' : 'iChannel1',
-            'square_size' : 'square_size',
             'energy' : 'energy',
-            'N_SQUARE' : 'N_SQUARE',
-            'border_size' : 'border_size',
-            'which' : "which"
-
+            'drywet': 'drywet'
         }
         super().initUniformsBinding(binding, program_name='')
         self.addProtectedUniforms(['iChannel0', 'iChannel1'])
@@ -66,9 +57,6 @@ class SquareGate(ProgramBase):
     def updateParams(self, af):
         if af is None or self.already_called:
             return
-        self.time += (af['smooth_low']*.05+.01)*.25
-        self.square_size = af['low'][1]*.7 * .5
-        self.energy = af['smooth_low']*3. + .5
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -87,16 +75,16 @@ class SquareGate(ProgramBase):
         return self.fbos[0].color_attachments[0]
 
 
-@register_node(OP_CODE_SQUAREGATE)
-class SquareGateNode(ShaderNode, Gate):
-    op_title = "SquareGate"
-    op_code = OP_CODE_SQUAREGATE
+@register_node(OP_CODE_MULTGATE)
+class MultGateNode(ShaderNode, Gate):
+    op_title = "MultGate"
+    op_code = OP_CODE_MULTGATE
     content_label = ""
-    content_label_objname = "shader_squaregate"
+    content_label_objname = "shader_multgate"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1,1], outputs=[3])
-        self.program = SquareGate(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1,2], outputs=[3])
+        self.program = MultGate(ctx=self.scene.ctx, win_size=(1920,1080))
         self.eval()
 
     def render(self, audio_features=None):

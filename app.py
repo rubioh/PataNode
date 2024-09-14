@@ -35,7 +35,7 @@ class PataShade(PataNode):
         super().__init__(audio_engine=self.audio_engine)
 
         # Thread Pool
-        self.threadpool = QThreadPool(maxThreadCount=5)#number thread in Pool
+        self.threadpool = QThreadPool(maxThreadCount=5) # number thread in Pool
 
         self.initAudioTimer()
         self.initLightTimer()
@@ -104,7 +104,7 @@ class PataShade(PataNode):
             last_snare_count = af["snare_count"]
             self._last_audio_features = af
         except:
-            print("Error only in initialization else YA DU CACA")
+            pass
 
     # LIGHT THREAD
     def start_light_jobs(self):

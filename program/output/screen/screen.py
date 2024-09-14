@@ -84,6 +84,7 @@ class ScreenNode(ShaderNode, Output):
             self.grNode.setToolTip("Input is NaN")
             self.markDirty()
             return False
+
         success_render = self.program.render([input_texture])
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
@@ -93,7 +94,7 @@ class ScreenNode(ShaderNode, Output):
     def render(self, audio_features=None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
-                node.program.already_called = False
+                node.already_called = False
             if isinstance(node, PredominantColorNode):
                 self.plreturn = node
         input_nodes = self.getShaderInputs()

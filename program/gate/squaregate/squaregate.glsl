@@ -9,6 +9,7 @@ uniform float square_size;
 uniform float energy;
 uniform float N_SQUARE;
 uniform float border_size;
+uniform float which;
 
 float hash(float t){
     return fract(sin(t)*17558.246);
@@ -45,8 +46,9 @@ void main()
 
     vec4 col = vec4(0.);
     vec2 S = square(uv);
-
-    col = mix(texture(iChannel0, UV), texture(iChannel1, UV)*clamp(energy, .0, 1.), S.x);
+    
+    if (which == 0) col = mix(texture(iChannel0, UV), texture(iChannel1, UV)*clamp(energy, .0, 1.), S.x);
+    else col = mix(texture(iChannel1, UV), texture(iChannel0, UV)*clamp(energy, .0, 1.), S.x);
     col = mix(col, vec4(1.), 1.-S.y);
 
     fragColor = col;

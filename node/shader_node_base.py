@@ -1,4 +1,5 @@
 from os.path import dirname, basename, isfile, join
+import time
 import copy
 import os
 import inspect
@@ -88,6 +89,12 @@ class ShaderNode(Node):
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
 
+        # Evaluation Logics for loop in Graph
+        self._evaluate = False
+        self._in_evaluation = False
+        self.previous_evaluation_time = time.time()
+
+
     @property
     def container(self):
         return self._container
@@ -104,6 +111,30 @@ class ShaderNode(Node):
     @win_size.setter
     def win_size(self, value):
         self._win_size = value
+    
+    @property
+    def already_called(self):
+        return self.program.already_called
+
+    @already_called.setter
+    def already_called(self, value: bool):
+        self.program.already_called = value
+    
+    @property
+    def in_evaluation(self):
+        return self._in_evaluation
+
+    @in_evaluation.setter
+    def in_evaluation(self, value: bool):
+        self._in_evaluation = value
+
+    @property
+    def evaluate(self):
+        return self._evaluate
+
+    @evaluate.setter
+    def evaluate(self, value: bool):
+        self._evaluate = value
 
     def changeWindowSize(self, win_size):
         self.win_size = win_size
@@ -165,8 +196,19 @@ class ShaderNode(Node):
         else:
             textures = []
             for input_node in input_nodes:
-                texture = input_node.eval()
-                textures.append(texture)
+                if DEBUG: print(f"\t Node: {self} evaluate Input Node {input_node}")
+                if input_node.evaluate:
+                    texture = input_node.program.norender()
+                    if DEBUG: print(
+                        f"\t\t ALREADY EVALUATE Input Node: {input_node} with texture {texture}"
+                    )
+                    textures.append(input_node.program.norender())
+                else:
+                    texture = input_node.eval()
+                    if DEBUG: print(
+                        f"\t\t EVALUATE Input Node: {input_node} with texture {texture}"
+                    )
+                    textures.append(texture)
             if len(textures) != len(self.inputs):
                 self.grNode.setToolTip("Input is not connected")
                 self.markInvalid()
@@ -177,8 +219,6 @@ class ShaderNode(Node):
         sockets = self.inputs
         ins = []
         for i, sockets in enumerate(sockets):
-            if sockets.socket_type == 0: # socket_type 0 means audio_input
-                continue
             ins += super().getInputs(i)
         return ins
 
@@ -205,6 +245,7 @@ class ShaderNode(Node):
         success = self.findAndConnectFbos(win_sizes, components, dtypes, depth_requirements, num_texture)
         if not success:
             return False
+
         # Eval Input Node
         inputs = []
         for ins in self.inputs:
@@ -233,6 +274,7 @@ class ShaderNode(Node):
         if not self.isDirty() and not self.isInvalid():
             if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
             return self.value
+        self.setInputNodeToInEvaluation()
         try:
             if DEBUG: print('Eval Try', self)
             success = self.evalImplementation()
@@ -245,6 +287,20 @@ class ShaderNode(Node):
             self.markInvalid()
             self.grNode.setToolTip(str(e))
             dumpException(e)
+
+    def setInputNodeToInEvaluation(self):
+        self.in_evaluation = True
+        self.evaluate = False
+        t = time.time()
+        if t-self.previous_evaluation_time>2:
+            self.previous_evaluation_time = t
+            input_nodes = self.getShaderInputs()
+            for node in input_nodes:
+                node.setInputNodeToInEvaluation()
+            if DEBUG: print(f"{self} in evaluation:", self.in_evaluation)
+        else:
+            self.evaluate = True
+
 
     def onInputChanged(self, socket=None):
         if DEBUG: print("%s::__onInputChanged" % self.__class__.__name__)
@@ -327,3 +383,4 @@ class Effects(): node_type_reference = "Effects"
 class Colors(): node_type_reference = "Colors"
 class Particles(): node_type_reference = "Particles"
 class Gate(): node_type_reference = "Gate"
+class Physarum(): node_type_reference = "Physarum"

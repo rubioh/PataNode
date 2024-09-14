@@ -5,7 +5,7 @@ from os.path import dirname, basename, isfile, join
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
 from program.program_base import ProgramBase
 
-from node.shader_node_base import ShaderNode, Utils
+from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
 
 OP_CODE_BLOOM = name_to_opcode('bloom')
@@ -138,7 +138,7 @@ class Bloom(ProgramBase):
 
 
 @register_node(OP_CODE_BLOOM)
-class BloomNode(ShaderNode, Utils):
+class BloomNode(ShaderNode, Colors):
     op_title = "Bloom"
     op_code = OP_CODE_BLOOM
     content_label = ""

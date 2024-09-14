@@ -20,23 +20,25 @@ vec4 dither(ivec2 uv){
     
     int x = int(mod(float(uv.x), 4));
     int y = int(mod(float(uv.y), 4));
-    /*
+
     float bayer;
-    if (x == 0) bayer = dither0[y]*1./64.;
-    else if (x == 1) bayer = dither1[y]*1./64.;
-    else if (x == 2) bayer = dither2[y]*1./64.;
-    else if (x == 3) bayer = dither3[y]*1./64.;
-    else if (x == 4) bayer = dither4[y]*1./64.;
-    else if (x == 5) bayer = dither5[y]*1./64.;
-    else if (x == 6) bayer = dither6[y]*1./64.;
-    else if (x == 7) bayer = dither7[y]*1./64.;
-    */
-
-    float bayer = dither44[x][y];
-
+    if (true){
+        if (x == 0) bayer = dither0[y]*1./64.;
+        else if (x == 1) bayer = dither1[y]*1./64.;
+        else if (x == 2) bayer = dither2[y]*1./64.;
+        else if (x == 3) bayer = dither3[y]*1./64.;
+        else if (x == 4) bayer = dither4[y]*1./64.;
+        else if (x == 5) bayer = dither5[y]*1./64.;
+        else if (x == 6) bayer = dither6[y]*1./64.;
+        else if (x == 7) bayer = dither7[y]*1./64.;
+    }
+    else{
+        bayer = dither44[x][y];
+    }
     vec4 col = texelFetch(iChannel0, uv, 0);
     
-    col = floor((col + bayer)*2.)/2.-.5;
+    float N = 2.;
+    col = floor((col + bayer)*N)/N-(N-1)/N;
     col = clamp(col, vec4(0.), vec4(1.));
 
     return col;
