@@ -5,15 +5,19 @@ import copy
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
+
 def name_to_opcode(name):
     l = [ord(char) for char in name]
     return hash(name)
 
-OP_CODE_INPUTAF = name_to_opcode('input_af')
 
-class InputAudioFeatures():
+OP_CODE_INPUTAF = name_to_opcode("input_af")
+
+
+class InputAudioFeatures:
     def __init__(self):
-        self.title = 'Audio Features'
+        self.title = "Audio Features"
+
 
 @register_node(OP_CODE_INPUTAF)
 class InputAudioNode(AudioNode):
@@ -28,6 +32,6 @@ class InputAudioNode(AudioNode):
         self.eval()
 
     def render(self, audio_features):
-        # ???!
+        # ???!
         audio_features["custom_parameters"] = {}
         return audio_features

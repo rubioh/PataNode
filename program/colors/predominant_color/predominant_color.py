@@ -2,19 +2,25 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
 
 
-OP_CODE_PREDOMINANTCOLOR = name_to_opcode('predominantcolor')
+OP_CODE_PREDOMINANTCOLOR = name_to_opcode("predominantcolor")
+
 
 @register_program(OP_CODE_PREDOMINANTCOLOR)
 class PredominantColor(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(480, 270)):
-        win_size = (480,270) # PROTEGE ON PEUT PAS MODIFIER
+        win_size = (480, 270)  # PROTEGE ON PEUT PAS MODIFIER
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Predominant Color"
 
@@ -25,9 +31,9 @@ class PredominantColor(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = self.N_pass
-        Ks = [2**(i+1) for i in range(self.N_pass)]
+        Ks = [2 ** (i + 1) for i in range(self.N_pass)]
         fbos_specification = [
-            [(self.win_size[0]//K, self.win_size[1]//K), 4, 'f4'] for K in Ks
+            [(self.win_size[0] // K, self.win_size[1] // K), 4, "f4"] for K in Ks
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -62,21 +68,20 @@ class PredominantColor(ProgramBase):
         return col, out_col
 
     def initUniformsBinding(self):
-        binding = {
-        }
-        super().initUniformsBinding(binding, program_name='hist_')
-        self.addProtectedUniforms(['iChannel0'])
+        binding = {}
+        super().initUniformsBinding(binding, program_name="hist_")
+        self.addProtectedUniforms(["iChannel0"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='hist_')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="hist_")
 
     def render(self, texture, af=None):
         self.bindUniform(af)
-        
+
         if texture is None:
             return
-        self.hist_program['iChannel0'] = self.iChannel0
+        self.hist_program["iChannel0"] = self.iChannel0
         texture.use(1)
         colors_to_skip = [[0] * 3, [0] * 3, [0] * 3]
         self.buf_col = np.zeros((3, 3))
@@ -98,7 +103,7 @@ class PredominantColor(ProgramBase):
             col, out_col = self.getBufferColor(buf, j)
             colors_to_skip[j] = out_col
         return self.buf_col
-    
+
     def norender(self):
         return self.buf_col
 
@@ -122,4 +127,3 @@ class PredominantColorNode(ShaderNode, Colors):
             return self.program.norender()
         buffer_col = self.program.render(texture)
         return buffer_col
-

@@ -3,14 +3,19 @@ import numpy as np
 import cv2
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_PARTSYSTEM = name_to_opcode('PartSystem')
+OP_CODE_PARTSYSTEM = name_to_opcode("PartSystem")
 
 
 class PartSystem(ProgramBase):
@@ -26,54 +31,50 @@ class PartSystem(ProgramBase):
     def initFBOSpecifications(self):
         rfbos = 4
         self.required_fbos = rfbos
-        fbos_specification = [[self.win_size, 4, 'f4'] for i in range(rfbos)]
-        fbos_specification += [
-            [(self.N_part, 1), 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"] for i in range(rfbos)]
+        fbos_specification += [[(self.N_part, 1), 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-
     def initProgram(self, reload=False):
         ### DRAW THINGS
         vert_path = join(dirname(__file__), "draw/draw.vert")
         frag_path = join(dirname(__file__), "draw/draw.frag")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='draw_') 
-    
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="draw_")
+
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "draw/final.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='final_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="final_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "draw/trail.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='trail_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="trail_")
 
         ### Transform
         vert_path = join(dirname(__file__), "transform/transform.vert")
         frag_path = None
         varyings = ["out_pos", "out_col"]
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='transform_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="transform_")
 
         ### Colision
         vert_path = join(dirname(__file__), "transform/solve_collision.vert")
         frag_path = None
         varyings = ["out_pos", "out_col"]
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='collision_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="collision_")
 
         vert_path = join(dirname(__file__), "transform/copy.vert")
         frag_path = None
         varyings = ["out_pos"]
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='copy_') 
-    
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="copy_")
+
         self.final_program.program["TrailImg"] = 3
         self.final_program.program["iChannel0"] = 1
         self.final_program.program["iResolution"] = self.win_size
         self.trail_program.program["TrailImg"] = 3
         self.trail_program.program["PartImg"] = 2
         self.trail_program.program["iResolution"] = self.win_size
-
 
         # Copy program
 
@@ -267,8 +268,6 @@ class PartSystem(ProgramBase):
         self.render_vao(self.final_vao)
 
 
-
-
 def particle(ID):
     x = np.random.rand(1) * 2 - 1
     y = np.random.rand(1) * 2 - 1
@@ -309,4 +308,3 @@ def target(N_paritcules):
     res[:, :, 0] = x
     res[:, :, 1] = y
     return res.astype("f4").tobytes()
-

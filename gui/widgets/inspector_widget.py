@@ -6,8 +6,9 @@ from PyQt5.QtCore import *
 from PyQt5.QtWidgets import *
 
 from audio.audio_conf import list_audio_features, dict_audio_features
-#from nodeeditor.utils import dumpException
-#from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+
+# from nodeeditor.utils import dumpException
+# from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
 
 class QDMInspector(QWidget):
@@ -18,14 +19,16 @@ class QDMInspector(QWidget):
 
     def initUI(self):
         grid = QVBoxLayout()
-        grid.insertStretch(-1,-1)
+        grid.insertStretch(-1, -1)
         self.grid = grid
         self.setLayout(grid)
 
-    def addLayout(self, obj_connect=None): # TODO Redraw Layout at each onSelected -> Node
+    def addLayout(
+        self, obj_connect=None
+    ):  # TODO Redraw Layout at each onSelected -> Node
         for name, properties in obj_connect.items():
             self.grid.addWidget(self.createWidget(properties))
-        self.grid.insertStretch(-1,1)
+        self.grid.insertStretch(-1, 1)
 
     def createWidget(self, properties):
         if properties["widget"] == "Slider":
@@ -35,13 +38,13 @@ class QDMInspector(QWidget):
 
     def createCheckBox(self, properties):
         name = properties["name"].lower().capitalize()
-        name = name.replace('_', ' ')
+        name = name.replace("_", " ")
         groupBox = QGroupBox("")
 
         checkbox = QRadioButton(name)
         checkbox.setChecked(bool(properties["value"]))
-        connect = properties['connect']
-        fine_connect = lambda v : connect(int(checkbox.isChecked()))
+        connect = properties["connect"]
+        fine_connect = lambda v: connect(int(checkbox.isChecked()))
         checkbox.toggled.connect(fine_connect)
 
         vbox = QVBoxLayout()
@@ -51,12 +54,11 @@ class QDMInspector(QWidget):
         groupBox.setFlat(True)
         return groupBox
 
-
     def createSlider(self, properties):
         name = properties["name"].lower().capitalize()
-        name = name.replace('_', ' ')
+        name = name.replace("_", " ")
         groupBox = QGroupBox(name)
-        #groupBox.setForeground("#FFB500")
+        # groupBox.setForeground("#FFB500")
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
@@ -66,12 +68,14 @@ class QDMInspector(QWidget):
 
         value = properties["value"]
         minmax_range = properties["maximum"] - properties["minimum"]
-        value = (value - properties["minimum"])/minmax_range
-        slider.setValue(int(value*100))
+        value = (value - properties["minimum"]) / minmax_range
+        slider.setValue(int(value * 100))
         slider.setSingleStep(1)
-        
+
         connect = properties["connect"]
-        fine_connect = lambda v : connect(v/100.*minmax_range + properties["minimum"])
+        fine_connect = lambda v: connect(
+            v / 100.0 * minmax_range + properties["minimum"]
+        )
         slider.valueChanged.connect(fine_connect)
 
         vbox = QVBoxLayout()
@@ -82,56 +86,69 @@ class QDMInspector(QWidget):
         return groupBox
 
     def createUniformsToolbox(self, uniformsBinding):
-        groupBox = QGroupBox('Uniforms Binding')
+        groupBox = QGroupBox("Uniforms Binding")
         vbox = QVBoxLayout()
-        
+
         uniform_window = self.createUniformWindow(uniformsBinding)
         vbox.addWidget(uniform_window)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
-        self.grid.insertStretch(-1,-1)
+        self.grid.insertStretch(-1, -1)
 
     def createSetWinSizeToolbox(self, obj):
         callback = obj.changeWindowSize
         win_size_ref = obj.win_size
-        
+
         groupBox = QGroupBox("Resolution")
         vbox = QVBoxLayout()
-        
+
         def custom_callback(win_size, current_widget, callback):
             current_widget.setText(str(win_size))
             callback(win_size)
+
         def callback_factory(win_size, current_widget, callback):
-            return lambda : custom_callback(win_size, current_widget, callback)
+            return lambda: custom_callback(win_size, current_widget, callback)
 
         button_widget = QToolButton()
         button_widget.setText(str(win_size_ref))
         button_widget.setPopupMode(QToolButton.MenuButtonPopup)
         menu = QMenu()
-        win_sizes_list = [(1920, 1080), (1280, 720), (960, 540), (640, 360), (480, 270), (320, 180), (240, 135), (160, 90), (80, 45), (64, 36)] 
+        win_sizes_list = [
+            (1920, 1080),
+            (1280, 720),
+            (960, 540),
+            (640, 360),
+            (480, 270),
+            (320, 180),
+            (240, 135),
+            (160, 90),
+            (80, 45),
+            (64, 36),
+        ]
         for j, win_size in enumerate(win_sizes_list):
             action = menu.addAction(str(win_size))
-            action.triggered.connect(callback_factory(win_size, button_widget, callback))
+            action.triggered.connect(
+                callback_factory(win_size, button_widget, callback)
+            )
 
         button_widget.setMenu(menu)
         vbox.addWidget(button_widget)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
-        self.grid.insertStretch(-1,-1)
-
+        self.grid.insertStretch(-1, -1)
 
     def createUniformWindow(self, uniformsBinding):
         return UniformWidget(uniformsBinding)
 
     def createParametersToolbox(self, parameters_informations):
-        groupBox = QGroupBox('Transformation parameters')
+        groupBox = QGroupBox("Transformation parameters")
         vbox = QVBoxLayout()
         parameter_window = self.createParametersWindow(parameters_informations)
         vbox.addWidget(parameter_window)
-        vbox.sizeHint = lambda : QSize(900, 500)
+        vbox.sizeHint = lambda: QSize(900, 500)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
-        self.grid.insertStretch(-1,-1)
+        self.grid.insertStretch(-1, -1)
 
     def createParametersWindow(self, parameters_informations):
         return ParametersWidget(parameters_informations)
@@ -153,8 +170,6 @@ class QDMInspector(QWidget):
         self.createUniformsToolbox(uniforms_binding)
 
 
-
-
 class ParametersWidget(QTabWidget):
     def __init__(self, parameters_informations, parent=None):
         super().__init__(parent)
@@ -163,18 +178,20 @@ class ParametersWidget(QTabWidget):
         self.initUI()
 
     def initUI(self):
-        
+
         pal = QPalette()
-        pal.setColor(QPalette.Window, QColor(40,40,40))
-        
+        pal.setColor(QPalette.Window, QColor(40, 40, 40))
+
         self.setAutoFillBackground(True)
         self.setPalette(pal)
-        self.setGeometry(800,800, 250 + 50*self.n_programs, 1000)
+        self.setGeometry(800, 800, 250 + 50 * self.n_programs, 1000)
         stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
-        stylesheet = open(stylesheet, 'r').read()
+        stylesheet = open(stylesheet, "r").read()
 
-        stylesheet_tab = os.path.join(os.path.dirname(__file__), "qss/qtabwidget-styl.qss")
-        stylesheet_tab = open(stylesheet_tab, 'r').read()
+        stylesheet_tab = os.path.join(
+            os.path.dirname(__file__), "qss/qtabwidget-styl.qss"
+        )
+        stylesheet_tab = open(stylesheet_tab, "r").read()
 
         self.setStyleSheet(stylesheet + stylesheet_tab)
 
@@ -183,27 +200,29 @@ class ParametersWidget(QTabWidget):
         for program_name in self.parameters_informations:
             self._all_buttons[program_name] = list()
             self._all_line_edit_widgets[program_name] = list()
-            displayed_name = program_name.replace('_', ' ').capitalize()
+            displayed_name = program_name.replace("_", " ").capitalize()
             program_widget = self.createWidget(program_name)
             self.addTab(program_widget, displayed_name)
 
     def createWidget(self, program_name):
         list_widget = QListWidget()
         parameters = self.parameters_informations[program_name]
-        
+
         for idx, uniform_name in enumerate(parameters.keys()):
             item = QListWidgetItem()
-            
+
             parameter_widget = QWidget()
             parameter_layout = QHBoxLayout()
-            
-            line_edit_widget = self.getLineEdit(parameters[uniform_name], program_name, uniform_name)
+
+            line_edit_widget = self.getLineEdit(
+                parameters[uniform_name], program_name, uniform_name
+            )
             button_widget = QPushButton(uniform_name)
             self._all_buttons[program_name].append(button_widget)
             self._all_line_edit_widgets[program_name].append(line_edit_widget)
 
             button_widget.clicked.connect(partial(self.hide_unhide, idx, program_name))
-            
+
             parameter_layout.addWidget(button_widget)
             parameter_layout.addWidget(line_edit_widget)
             parameter_layout.setSizeConstraint(parameter_layout.SetFixedSize)
@@ -228,15 +247,17 @@ class ParametersWidget(QTabWidget):
         textfield.setText(parameter["eval_function"]["value"])
 
         callback = parameter["eval_function"]["connect"]
+
         def custom_callback():
             text = textfield.text()
             callback(text)
+
         def get_callback():
-            return lambda : custom_callback()
+            return lambda: custom_callback()
+
         textfield.returnPressed.connect(get_callback())
         textfield.hide()
         return textfield
-
 
 
 class UniformWidget(QTabWidget):
@@ -247,23 +268,25 @@ class UniformWidget(QTabWidget):
         self.initUI()
 
     def initUI(self):
-        
+
         pal = QPalette()
-        pal.setColor(QPalette.Window, QColor(40,40,40))
-        
+        pal.setColor(QPalette.Window, QColor(40, 40, 40))
+
         self.setAutoFillBackground(True)
         self.setPalette(pal)
-        self.setGeometry(800,800, 250 + 50*self.n_programs, 1500)
+        self.setGeometry(800, 800, 250 + 50 * self.n_programs, 1500)
         stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
-        stylesheet = open(stylesheet, 'r').read()
+        stylesheet = open(stylesheet, "r").read()
 
-        stylesheet_tab = os.path.join(os.path.dirname(__file__), "qss/qtabwidget-styl.qss")
-        stylesheet_tab = open(stylesheet_tab, 'r').read()
+        stylesheet_tab = os.path.join(
+            os.path.dirname(__file__), "qss/qtabwidget-styl.qss"
+        )
+        stylesheet_tab = open(stylesheet_tab, "r").read()
 
         self.setStyleSheet(stylesheet + stylesheet_tab)
 
         for program_name in self.uniforms_informations:
-            displayed_name = program_name.replace('_', ' ').capitalize() + 'Program'
+            displayed_name = program_name.replace("_", " ").capitalize() + "Program"
             program_widget = self.createWidget(program_name)
             self.addTab(program_widget, displayed_name)
 
@@ -274,16 +297,16 @@ class UniformWidget(QTabWidget):
 
         for uniform in uniforms:
             item = QListWidgetItem()
-            
+
             uniform_widget = QWidget()
             uniform_layout = QHBoxLayout()
-            
-            text_widget = QLabel('   '+uniform)
+
+            text_widget = QLabel("   " + uniform)
             uniform_layout.addWidget(text_widget)
-            
+
             combo_widget = self.getToolButtonWidget(uniform, program_name)
             uniform_layout.addWidget(combo_widget)
-            
+
             uniform_widget.setLayout(uniform_layout)
 
             item.setSizeHint(uniform_widget.sizeHint())
@@ -296,17 +319,25 @@ class UniformWidget(QTabWidget):
         if self.uniforms_informations[program_name][uniform_name]["type"] is None:
             current_param = "default"
         else:
-            current_param = self.uniforms_informations.uniforms[program_name][uniform_name]["param_name"]
+            current_param = self.uniforms_informations.uniforms[program_name][
+                uniform_name
+            ]["param_name"]
         button_widget = QToolButton()
         button_widget.setText(current_param)
         button_widget.setPopupMode(QToolButton.MenuButtonPopup)
 
         callback = self.uniforms_informations.callback
-        def custom_callback(program_name, uniform_name, feature_name, type, current_widget):
+
+        def custom_callback(
+            program_name, uniform_name, feature_name, type, current_widget
+        ):
             current_widget.setText(feature_name)
             callback(program_name, uniform_name, feature_name, type)
+
         def callback_factory(feature_name, type, current_widget):
-            return lambda : custom_callback(program_name, uniform_name, feature_name, type, current_widget)
+            return lambda: custom_callback(
+                program_name, uniform_name, feature_name, type, current_widget
+            )
 
         menu = QMenu()
         action = menu.addAction(current_param)
@@ -316,7 +347,9 @@ class UniformWidget(QTabWidget):
             sub_menu = menu.addMenu(audio_feature_type)
             for j, feature in enumerate(features_list):
                 action = sub_menu.addAction(feature)
-                action.triggered.connect(callback_factory(feature, "audio_features", button_widget))
+                action.triggered.connect(
+                    callback_factory(feature, "audio_features", button_widget)
+                )
 
         button_widget.setMenu(menu)
 

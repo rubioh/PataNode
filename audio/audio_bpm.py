@@ -52,7 +52,7 @@ class BPM_estimator:
             "on_tempo16": 0.125 * 0.5,
             "on_tempo32": 0.125 * 0.25,
         }
-        self.time = 0.
+        self.time = 0.0
 
     def update_bpm(self, on_kick):
         # if we are on a kick do things
@@ -63,7 +63,7 @@ class BPM_estimator:
                 abs(bpm - self.shortterm_bpm) < self.MAX_RANGE
                 and bpm > self.bpm_min
                 and bpm < self.bpm_max
-            ):  
+            ):
                 # Calculate update's parameters Adagrad (with momentum) like procedure
                 gradient = self.shortterm_bpm - bpm  # Estimated bpm's gradient
                 self.gradient_bpm = (

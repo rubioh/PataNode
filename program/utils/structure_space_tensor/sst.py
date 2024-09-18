@@ -2,15 +2,19 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_SST = name_to_opcode('structured space tensor')
-
+OP_CODE_SST = name_to_opcode("structured space tensor")
 
 
 class SST(ProgramBase):
@@ -30,72 +34,63 @@ class SST(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 3
-        fbos_specification = [[self.win_size, 4, 'f4'] for i in range(3)]
+        fbos_specification = [[self.win_size, 4, "f4"] for i in range(3)]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
-    
+
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "SST/rgb2lab.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='rgb2lab_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="rgb2lab_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "SST/sst.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='sst_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="sst_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "SST/vblur.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='vblur_')
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="vblur_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "SST/hblur.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='hblur_')
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="hblur_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "SST.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='')
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
         self.sigmaC = 3.0
         self.iChannel0 = 0
 
     def initUniformsBinding(self):
+        binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
+        super().initUniformsBinding(binding, program_name="rgb2lab_")
+        binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
+        super().initUniformsBinding(binding, program_name="sst_")
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iResolution' : 'win_size'
+            "sigmaC": "sigmaC",
+            "iChannel0": "iChannel0",
         }
-        super().initUniformsBinding(binding, program_name='rgb2lab_')
+        super().initUniformsBinding(binding, program_name="vblur_")
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iResolution' : 'win_size'
+            "sigmaC": "sigmaC",
+            "iChannel0": "iChannel0",
         }
-        super().initUniformsBinding(binding, program_name='sst_')
-        binding = {
-            'sigmaC' : 'sigmaC',
-            'iChannel0' : 'iChannel0',
-        }
-        super().initUniformsBinding(binding, program_name='vblur_')
-        binding = {
-            'sigmaC' : 'sigmaC',
-            'iChannel0' : 'iChannel0',
-        }
-        super().initUniformsBinding(binding, program_name='hblur_')
-        binding = {
-            'iChannel0' : 'iChannel0',
-            'iResolution' : 'win_size'
-        }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="hblur_")
+        binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='rgb2lab_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='sst_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='vblur_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='hblur_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="rgb2lab_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="sst_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="vblur_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="hblur_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -133,6 +128,7 @@ class SST(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_SST)
 class SSTNode(ShaderNode, Utils):
     op_title = "SST"
@@ -142,7 +138,7 @@ class SSTNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = SST(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = SST(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

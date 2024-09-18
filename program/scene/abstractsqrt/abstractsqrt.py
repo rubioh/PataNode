@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_ABSQRT = name_to_opcode('abstract_sqrt')
+OP_CODE_ABSQRT = name_to_opcode("abstract_sqrt")
+
 
 @register_program(OP_CODE_ABSQRT)
 class AbstractSQRT(ProgramBase):
@@ -25,9 +31,7 @@ class AbstractSQRT(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -55,21 +59,21 @@ class AbstractSQRT(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-                'iResolution' : 'win_size',
-                'iTime': 'time',
-                'count_beat': 'count_beat',
-                'thresh' : 'thresh',
-                'energy_fast' : 'nrj_fast',
-                't_h' : 't_h',
-                't_rot' : 't_rot'
-                }
-        super().initUniformsBinding(binding, program_name='')
+            "iResolution": "win_size",
+            "iTime": "time",
+            "count_beat": "count_beat",
+            "thresh": "thresh",
+            "energy_fast": "nrj_fast",
+            "t_h": "t_h",
+            "t_rot": "t_rot",
+        }
+        super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
 
     def updateParams(self, af):
         if af is None:
             return
-        self.nrj_fast = af["smooth_low"] * 2. + .2
+        self.nrj_fast = af["smooth_low"] * 2.0 + 0.2
         if af["full"][1] < 0.8:
             self.accel += 0.002
         else:
@@ -101,7 +105,7 @@ class AbstractSQRT(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -123,7 +127,7 @@ class AbastractSQRTNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = AbstractSQRT(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = AbstractSQRT(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

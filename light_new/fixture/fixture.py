@@ -28,8 +28,7 @@ class Fixture(abc.ABC, Generic[FixtureConfigVar]):
         self.config = config
         self.init_params()
 
-    def update(self) -> None:
-        ...
+    def update(self) -> None: ...
 
     def get_channel_values(self) -> np.ndarray:
         buffer_length = len(self.CHANNELS)

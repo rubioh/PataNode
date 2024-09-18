@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_BUMPMAPPING = name_to_opcode('bumpmapping')
+OP_CODE_BUMPMAPPING = name_to_opcode("bumpmapping")
+
 
 @register_program(OP_CODE_BUMPMAPPING)
 class BumpMapping(ProgramBase):
@@ -25,7 +31,7 @@ class BumpMapping(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -46,12 +52,9 @@ class BumpMapping(ProgramBase):
         self.mode = 0
 
     def initUniformsBinding(self):
-        binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0'
-        }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        binding = {"iResolution": "win_size", "iChannel0": "iChannel0"}
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, af):
         if af is None:
@@ -77,7 +80,7 @@ class BumpMapping(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -100,7 +103,7 @@ class BumpMappingNode(ShaderNode, Effects):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = BumpMapping(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = BumpMapping(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
@@ -110,4 +113,3 @@ class BumpMappingNode(ShaderNode, Effects):
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture
-

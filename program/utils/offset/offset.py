@@ -2,7 +2,12 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
@@ -10,7 +15,8 @@ from node.node_conf import register_node
 import yaml
 
 
-OP_CODE_OFFSET = name_to_opcode('offset')
+OP_CODE_OFFSET = name_to_opcode("offset")
+
 
 @register_program(OP_CODE_OFFSET)
 class Offset(ProgramBase):
@@ -26,7 +32,7 @@ class Offset(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -45,21 +51,21 @@ class Offset(ProgramBase):
             self.y_offset = float(arch_conf["y_offset"])
             self.x_offset = float(arch_conf["x_offset"])
             self.zoom = arch_conf["zoom"]
-        self.x_offset_fine = 0.
-        self.y_offset_fine = 0.
+        self.x_offset_fine = 0.0
+        self.y_offset_fine = 0.0
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution': 'win_size',
-            'x_offset': 'x_offset',
-            'y_offset': 'y_offset',
-            'x_offset_fine': 'x_offset_fine',
-            'y_offset_fine': 'y_offset_fine',
-            'zoom': 'zoom',
-            'iChannel0' : 'iChannel0',
+            "iResolution": "win_size",
+            "x_offset": "x_offset",
+            "y_offset": "y_offset",
+            "x_offset_fine": "x_offset_fine",
+            "y_offset_fine": "y_offset_fine",
+            "zoom": "zoom",
+            "iChannel0": "iChannel0",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'x_offset', 'y_offset'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "x_offset", "y_offset"])
 
     def updateParams(self, af):
         if af is None:
@@ -67,7 +73,7 @@ class Offset(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -93,7 +99,7 @@ class OffsetNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = Offset(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Offset(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

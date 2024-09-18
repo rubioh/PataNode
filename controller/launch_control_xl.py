@@ -137,7 +137,8 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
         )
 
     def set_led(self, index_key: str, color: LEDColor) -> None:
-        if not self.usable: return
+        if not self.usable:
+            return
         index = self.LED_INDICES[index_key]
         self.set_led_raw(
             self.template, index, color.value | LEDFlag.CLEAR | LEDFlag.COPY

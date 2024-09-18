@@ -1,9 +1,17 @@
 from light_new.fixture import (
-        Fixture, Lyre, LightString, 
-        Z1020, Par2Brod, LightCubeLZR,
-        CameoThunderWash, Dynamo250,
-        GhostXS70, Kub400RGB, Kub250RGB,
-        XtremLed, AmericanMegaPar
+    Fixture,
+    Lyre,
+    LightString,
+    Z1020,
+    Par2Brod,
+    LightCubeLZR,
+    CameoThunderWash,
+    Dynamo250,
+    GhostXS70,
+    Kub400RGB,
+    Kub250RGB,
+    XtremLed,
+    AmericanMegaPar,
 )
 from light_new.cracra import Cracra
 
@@ -51,9 +59,11 @@ class MasterEffect:
         gradient = [LEDColor.GREEN_LO, LEDColor.GREEN_MI, LEDColor.GREEN_HI]
         ctrl.set_led(
             "K15",
-            LEDColor.AMBER_HI
-            if strobe <= 4 / 255
-            else gradient[int(strobe * 0.9999 * len(gradient))],
+            (
+                LEDColor.AMBER_HI
+                if strobe <= 4 / 255
+                else gradient[int(strobe * 0.9999 * len(gradient))]
+            ),
         )
         ctrl.set_led("K23", LEDColor.YELLOW_MI)
         ctrl.set_led("B7", LEDColor.RED_HI if self.blackout else LEDColor.GREEN_HI)
@@ -293,9 +303,11 @@ class PatternManager:
                 if i in bank:
                     self.ctrl.set_led(
                         f"B{i}",
-                        LEDColor.GREEN_LO
-                        if i != self.current_slot
-                        else LEDColor.GREEN_HI,
+                        (
+                            LEDColor.GREEN_LO
+                            if i != self.current_slot
+                            else LEDColor.GREEN_HI
+                        ),
                     )
                 else:
                     self.ctrl.set_led(f"B{i}", LEDColor.BLACK)
@@ -325,10 +337,10 @@ class PatternManager:
                 par.append(f)
             elif isinstance(f, LightCubeLZR):
                 colors = colors**8
-                colors = colors/np.max(colors)
+                colors = colors / np.max(colors)
                 f.color = colors
-                f.attrib["laser"] = .99
-                f.attrib["auto_rotation"] = .51
+                f.attrib["laser"] = 0.99
+                f.attrib["auto_rotation"] = 0.51
         self.master_effect.update(self.ctrl, cracras, smoke)
         color = self.current_pattern.render(light_strings, af, self.ctrl)
         self.brod_par_effect.update(self.ctrl, par, color)

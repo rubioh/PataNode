@@ -2,13 +2,19 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
-OP_CODE_CURLNOISE = name_to_opcode('curlnoise')
+OP_CODE_CURLNOISE = name_to_opcode("curlnoise")
+
 
 class CurlNoise(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
@@ -23,9 +29,9 @@ class CurlNoise(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 3
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
-            [self.win_size, 4, 'f4'],
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
+            [self.win_size, 4, "f4"],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -33,34 +39,31 @@ class CurlNoise(ProgramBase):
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        # program
+        # program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "curlnoise.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
-        # ink_program
+        # ink_program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Ink/ink.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='ink_')
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="ink_")
 
     def initUniformsBinding(self):
         binding = {
-            'UVState' : 'UVState',
-            'a' : 'advection_level',
-            'dt' : 'dt',
-            'iResolution' : 'win_size',
-            'scale' : 'scale_final',
-            'iFrame' : 'iFrame',
-            'iTime' : 'time_final',
-            'energy' : 'energy'
+            "UVState": "UVState",
+            "a": "advection_level",
+            "dt": "dt",
+            "iResolution": "win_size",
+            "scale": "scale_final",
+            "iFrame": "iFrame",
+            "iTime": "time_final",
+            "energy": "energy",
         }
-        super().initUniformsBinding(binding, program_name='ink_')
-        binding = {
-            'UVState' : 'UVState2',
-            'iChannel0' : 'iChannel0'
-        }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'UVState', 'iFrame'])
+        super().initUniformsBinding(binding, program_name="ink_")
+        binding = {"UVState": "UVState2", "iChannel0": "iChannel0"}
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "UVState", "iFrame"])
 
     def initParams(self):
         self.UVState = 1
@@ -83,21 +86,20 @@ class CurlNoise(ProgramBase):
         self.energy = 0
         self.time = 0
 
-
     def updateParams(self, af):
         if af is None:
             return
-        self.on_kick = af['on_kick']
-        self.time = af['time']
+        self.on_kick = af["on_kick"]
+        self.time = af["time"]
         self.iFrame += 1
-        self.energy = af['smooth_full']*.5 + af['smooth_low']*.5
-        self.time_final = self.time * .1
-        self.scale_final = self.scale ** 3
+        self.energy = af["smooth_full"] * 0.5 + af["smooth_low"] * 0.5
+        self.time_final = self.time * 0.1
+        self.scale_final = self.scale**3
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='ink_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="ink_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -128,7 +130,7 @@ class CurlNoiseNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = CurlNoise(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = CurlNoise(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_HGLITCH = name_to_opcode('hglitch')
+OP_CODE_HGLITCH = name_to_opcode("hglitch")
+
 
 @register_program(OP_CODE_HGLITCH)
 class HGlitch(ProgramBase):
@@ -25,7 +31,7 @@ class HGlitch(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -41,18 +47,18 @@ class HGlitch(ProgramBase):
         self.iChannel0 = 1
         self.energy = 0
         self.t = 0
-        self.hscale = 8.
+        self.hscale = 8.0
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iResolution': 'win_size',
-            'energy': 'energy',
-            't': 't',
-            'hscale': 'hscale'
+            "iChannel0": "iChannel0",
+            "iResolution": "win_size",
+            "energy": "energy",
+            "t": "t",
+            "hscale": "hscale",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, af):
         if af is None:
@@ -62,7 +68,7 @@ class HGlitch(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -85,7 +91,7 @@ class HGlitchNode(ShaderNode, Effects):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = HGlitch(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = HGlitch(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

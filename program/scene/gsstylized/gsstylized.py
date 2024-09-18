@@ -3,14 +3,20 @@ import numpy as np
 import PIL
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 from nodeeditor.utils import dumpException
 
-OP_CODE_GSSTYLIZED = name_to_opcode('gsstylized')
+OP_CODE_GSSTYLIZED = name_to_opcode("gsstylized")
+
 
 @register_program(OP_CODE_GSSTYLIZED)
 class GSStylized(ProgramBase):
@@ -26,10 +32,10 @@ class GSStylized(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 4
         fbos_specification = [
-            [self.bwin_size, 4, 'f4'],
-            [self.bwin_size, 4, 'f4'],
-            [self.win_size, 4, 'f4'],
-            [self.bwin_size, 4, 'f4'],
+            [self.bwin_size, 4, "f4"],
+            [self.bwin_size, 4, "f4"],
+            [self.win_size, 4, "f4"],
+            [self.bwin_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -37,44 +43,43 @@ class GSStylized(ProgramBase):
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        # ReacDif PROGRAM
+        # ReacDif PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "ReacDifShader/ReacDif.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="reacdif_")
-        # Init PROGRAM
+        # Init PROGRAM
         if not reload:
             vert_path = SQUARE_VERT_PATH
             frag_path = join(dirname(__file__), "InitShader/frag.glsl")
             self.loadProgramToCtx(vert_path, frag_path, reload, name="init_")
-        # Program
+        # Program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "gsstylized.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
-    
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'bwin_size',
-            'iChannel0' : 'iChannel0',
-            'f' : 'f_current',
-            'k' : 'k_current',
-            'Db' : 'Db',
-            'Da' : 'Da',
-            'on_kick' : 'on_kick',
-            'radius_triangle' : 'radius_triangle'
+            "iResolution": "bwin_size",
+            "iChannel0": "iChannel0",
+            "f": "f_current",
+            "k": "k_current",
+            "Db": "Db",
+            "Da": "Da",
+            "on_kick": "on_kick",
+            "radius_triangle": "radius_triangle",
         }
-        super().initUniformsBinding(binding, program_name='reacdif_')
+        super().initUniformsBinding(binding, program_name="reacdif_")
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel1',
-            'K' : 'K',
-            'energy': 'smooth_fast',
-            'mode_flick': 'mode_flick',
-            'dkick' : 'dkick',
-            'iTime' : 'time'
+            "iResolution": "win_size",
+            "iChannel0": "iChannel1",
+            "K": "K",
+            "energy": "smooth_fast",
+            "mode_flick": "mode_flick",
+            "dkick": "dkick",
+            "iTime": "time",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "iChannel1"])
 
     def load_data(self):
         img = PIL.Image.open("./data/patat_hd.png")
@@ -158,8 +163,9 @@ class GSStylized(ProgramBase):
 
         self.idx_preset_tmp = 0
         self.time = 0
+
     def updateParams(self, af):
-        self.time += .001
+        self.time += 0.001
         if self.fbos[0] is not None and self.loaded is False:
             self.load_data()
             self.init_texture4()
@@ -173,7 +179,7 @@ class GSStylized(ProgramBase):
             self.change = 4
             self.change_triangle = 8
             self.initialize = True
-            #self.get_init_texture()
+            # self.get_init_texture()
 
         if af["on_chill"]:
             self.K += 0.01 * self.sens
@@ -199,12 +205,12 @@ class GSStylized(ProgramBase):
             self.go_flick += 1
             if self.change > 4:
                 self.preset_idx = np.random.randint(0, len(self.preset))
-                if (self.preset_idx == 2):
+                if self.preset_idx == 2:
                     self.preset_idx += 1
                 self.change = 0
             if self.change_init >= 32:
                 self.change_init %= 32
-                #self.get_init_texture()
+                # self.get_init_texture()
                 self.radius_triangle = 1
                 self.init_mode += 1
                 self.init_mode %= 4
@@ -224,20 +230,18 @@ class GSStylized(ProgramBase):
         else:
             self.render_preset = self.preset[self.preset_idx]
 
-
-        self.idx_preset_tmp += .0025
-        self.render_preset = self.preset[int(self.idx_preset_tmp)%len(self.preset)]
+        self.idx_preset_tmp += 0.0025
+        self.render_preset = self.preset[int(self.idx_preset_tmp) % len(self.preset)]
         diff = self.render_preset - self.fk
         self.fk = self.fk + diff * 3e-2
 
         self.f_current = self.render_preset[0]
         self.k_current = self.render_preset[1]
 
-
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='reacdif_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="reacdif_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -268,7 +272,7 @@ class GSStylizedNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = GSStylized(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = GSStylized(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

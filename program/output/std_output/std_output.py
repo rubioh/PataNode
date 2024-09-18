@@ -2,13 +2,18 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
 
 OP_CODE_STDOUTPUT = 1
+
 
 @register_program(OP_CODE_STDOUTPUT)
 class StdOutput(ProgramBase):
@@ -30,7 +35,7 @@ class StdOutput(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -51,6 +56,7 @@ class StdOutput(ProgramBase):
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
+
 
 @register_node(OP_CODE_STDOUTPUT)
 class StdOutputNode(ShaderNode, Output):

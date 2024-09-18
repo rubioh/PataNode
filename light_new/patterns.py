@@ -299,8 +299,7 @@ def bubble_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels):
     return pixels * amplitude.reshape(-1, 1)
 
 
-def master_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels):
-    ...
+def master_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels): ...
 
 
 def breathe(string: LightString, af, ctrl, pos_s, pos_e):
@@ -323,8 +322,7 @@ class Pattern(abc.ABC):
         ctrl: LaunchControlMidiReceiver,
         pos_s,
         pos_e,
-    ) -> np.ndarray:
-        ...
+    ) -> np.ndarray: ...
 
     def get_normalized_pos(self, strips: list[LightString]):
         self.strips = strips

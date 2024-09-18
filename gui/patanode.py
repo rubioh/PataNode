@@ -2,7 +2,14 @@ import os
 import time
 
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import (
+    QMdiArea,
+    QWidget,
+    QDockWidget,
+    QAction,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtCore import Qt, QSignalMapper
 
 from nodeeditor.utils import loadStylesheets
@@ -20,7 +27,6 @@ from node.node_conf import SHADER_NODES, AUDIO_NODES
 from node.graph_container_node import GraphContainerNode
 
 
-
 DEBUG = False
 
 
@@ -31,13 +37,17 @@ class PataNode(NodeEditorWindow):
         super().__init__()
 
     def initUI(self):
-        self.name_company = 'PataShade'
-        self.name_product = 'PataNode'
+        self.setWindowIcon(QIcon("gui/image/PataNode.png"))
 
-        self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss/nodeeditor.qss")
+        self.name_company = "PataShade"
+        self.name_product = "PataNode"
+
+        self.stylesheet_filename = os.path.join(
+            os.path.dirname(__file__), "qss/nodeeditor.qss"
+        )
         loadStylesheets(
             os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
-            self.stylesheet_filename
+            self.stylesheet_filename,
         )
 
         self.empty_icon = QIcon(".")
@@ -45,7 +55,6 @@ class PataNode(NodeEditorWindow):
         if DEBUG:
             print("Registered nodes:")
             pp(SHADER_NODES)
-
 
         self.mdiArea = QMdiArea()
         self.mdiArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAsNeeded)
@@ -60,8 +69,7 @@ class PataNode(NodeEditorWindow):
         self.windowMapper = QSignalMapper(self)
         self.windowMapper.mapped[QWidget].connect(self.setActiveSubWindow)
 
-
-        # Shader Widget and mgl context Initialization
+        # Shader Widget and mgl context Initialization
         self.initShaderWidget()
         self.initAudioLogDock()
         self.createNodesDock()
@@ -93,12 +101,11 @@ class PataNode(NodeEditorWindow):
         self.audioDock.setWidget(self.audio_log_widget)
         self.audioDock.visibilityChanged.connect(self.onHideAudioDock)
         self.audioDock.setFloating(False)
-        self.audio_log_widget.resize(1000,200)
+        self.audio_log_widget.resize(1000, 200)
         self.addDockWidget(Qt.TopDockWidgetArea, self.audioDock)
         self.resizeDocks((self.audioDock,), (200,), Qt.Vertical)
         # Hide the audio features on starting the app
         self.audioDock.setVisible(False)
-
 
     def render(self, audio_features=None):
         # TODO logic for choosing the rendering program
@@ -107,7 +114,10 @@ class PataNode(NodeEditorWindow):
         if self.current_program is not None:
             self.current_program.render(audio_features)
             self.last_main_colors = self.current_program.getLastMainColors()
-        if DEBUG: print('PataNode::render  No NodeEditorWidget detected, please set a new node scene')
+        if DEBUG:
+            print(
+                "PataNode::render  No NodeEditorWidget detected, please set a new node scene"
+            )
 
     def closeEvent(self, event):
         self.mdiArea.closeAllSubWindows()
@@ -118,28 +128,77 @@ class PataNode(NodeEditorWindow):
             event.accept()
             # hacky fix for PyQt 5.14.x
             import sys
-            sys.exit(0)
 
+            sys.exit(0)
 
     def createActions(self):
         super().createActions()
 
-        self.actClose = QAction("Cl&ose", self, statusTip="Close the active window", triggered=self.mdiArea.closeActiveSubWindow)
-        self.actCloseAll = QAction("Close &All", self, statusTip="Close all the windows", triggered=self.mdiArea.closeAllSubWindows)
-        self.actTile = QAction("&Tile", self, statusTip="Tile the windows", triggered=self.mdiArea.tileSubWindows)
-        self.actCascade = QAction("&Cascade", self, statusTip="Cascade the windows", triggered=self.mdiArea.cascadeSubWindows)
-        self.actNext = QAction("Ne&xt", self, shortcut=QKeySequence.NextChild, statusTip="Move the focus to the next window", triggered=self.mdiArea.activateNextSubWindow)
-        self.actPrevious = QAction("Pre&vious", self, shortcut=QKeySequence.PreviousChild, statusTip="Move the focus to the previous window", triggered=self.mdiArea.activatePreviousSubWindow)
+        self.actClose = QAction(
+            "Cl&ose",
+            self,
+            statusTip="Close the active window",
+            triggered=self.mdiArea.closeActiveSubWindow,
+        )
+        self.actCloseAll = QAction(
+            "Close &All",
+            self,
+            statusTip="Close all the windows",
+            triggered=self.mdiArea.closeAllSubWindows,
+        )
+        self.actTile = QAction(
+            "&Tile",
+            self,
+            statusTip="Tile the windows",
+            triggered=self.mdiArea.tileSubWindows,
+        )
+        self.actCascade = QAction(
+            "&Cascade",
+            self,
+            statusTip="Cascade the windows",
+            triggered=self.mdiArea.cascadeSubWindows,
+        )
+        self.actNext = QAction(
+            "Ne&xt",
+            self,
+            shortcut=QKeySequence.NextChild,
+            statusTip="Move the focus to the next window",
+            triggered=self.mdiArea.activateNextSubWindow,
+        )
+        self.actPrevious = QAction(
+            "Pre&vious",
+            self,
+            shortcut=QKeySequence.PreviousChild,
+            statusTip="Move the focus to the previous window",
+            triggered=self.mdiArea.activatePreviousSubWindow,
+        )
 
         self.actSeparator = QAction(self)
         self.actSeparator.setSeparator(True)
 
-        self.actAbout = QAction("&About", self, statusTip="Show the application's About box", triggered=self.about)
+        self.actAbout = QAction(
+            "&About",
+            self,
+            statusTip="Show the application's About box",
+            triggered=self.about,
+        )
 
-        self.actHideShaderWindow = QAction("&Hide Shader Screen", self, statusTip="Hide the screen mgl framebuffer", triggered=self.hideShaderWindow, shortcut='Ctrl+H')
-        self.actShowShaderWindow = QAction("&Display Shader Screen", self, statusTip="Display the screen mgl framebuffer", triggered=self.showShaderWindow, shortcut='Ctrl+D')
-        #self.actHideAudioLogWindow = QAction("&Hide Audio Log Screen", self, statusTip="Hide the audio features logger", triggered=self.hideShaderWindow, shortcut='Ctrl+Alt+H')
-        #self.actShowAudioLogWindow = QAction("&Display Audio Log Screen", self, statusTip="Display the audio features logger", triggered=self.showShaderWindow, shortcut='Ctrl+Alt+D')
+        self.actHideShaderWindow = QAction(
+            "&Hide Shader Screen",
+            self,
+            statusTip="Hide the screen mgl framebuffer",
+            triggered=self.hideShaderWindow,
+            shortcut="Ctrl+H",
+        )
+        self.actShowShaderWindow = QAction(
+            "&Display Shader Screen",
+            self,
+            statusTip="Display the screen mgl framebuffer",
+            triggered=self.showShaderWindow,
+            shortcut="Ctrl+D",
+        )
+        # self.actHideAudioLogWindow = QAction("&Hide Audio Log Screen", self, statusTip="Hide the audio features logger", triggered=self.hideShaderWindow, shortcut='Ctrl+Alt+H')
+        # self.actShowAudioLogWindow = QAction("&Display Audio Log Screen", self, statusTip="Display the audio features logger", triggered=self.showShaderWindow, shortcut='Ctrl+Alt+D')
 
     def hideShaderWindow(self):
         self.gl_widget.hide()
@@ -154,7 +213,7 @@ class PataNode(NodeEditorWindow):
         self.audio_log_widget.setVisible(True)
 
     def getCurrentNodeEditorWidget(self):
-        """ we're returning NodeEditorWidget here... """
+        """we're returning NodeEditorWidget here..."""
         activeSubWindow = self.mdiArea.activeSubWindow()
         if activeSubWindow:
             return activeSubWindow.widget()
@@ -165,11 +224,16 @@ class PataNode(NodeEditorWindow):
             subwnd = self.createMdiChild()
             subwnd.widget().fileNew()
             subwnd.show()
-        except Exception as e: dumpException(e)
-
+        except Exception as e:
+            dumpException(e)
 
     def onFileOpen(self, graph=False):
-        fnames, filter = QFileDialog.getOpenFileNames(self, 'Open graph from file', self.getFileDialogDirectory(), self.getFileDialogFilter())
+        fnames, filter = QFileDialog.getOpenFileNames(
+            self,
+            "Open graph from file",
+            self.getFileDialogDirectory(),
+            self.getFileDialogFilter(),
+        )
 
         try:
             for fname in fnames:
@@ -179,26 +243,26 @@ class PataNode(NodeEditorWindow):
                         self.mdiArea.setActiveSubWindow(existing)
                     else:
                         # we need to create new subWindow and open the file
-                        if graph: nodeeditor = GraphContainerSubWindow(self)
-                        else : nodeeditor = PataNodeSubWindow(self)
+                        if graph:
+                            nodeeditor = GraphContainerSubWindow(self)
+                        else:
+                            nodeeditor = PataNodeSubWindow(self)
                         if nodeeditor.fileLoad(fname):
                             self.statusBar().showMessage("File %s loaded" % fname, 5000)
                             nodeeditor.setTitle()
                             subwnd = self.createMdiChild(nodeeditor)
                             subwnd.show()
-                            if graph: nodeeditor.initGraphScene()
+                            if graph:
+                                nodeeditor.initGraphScene()
                         else:
                             nodeeditor.close()
-        except Exception as e: dumpException(e)
+        except Exception as e:
+            dumpException(e)
         if graph:
             return nodeeditor, subwnd
 
-
     def about(self):
-        QMessageBox.about(self, "About PataNode NodeEditor Example",
-                "The <b>PataNode NodeEditor</b> example demonstrates how to write multiple "
-                "document interface applications using PyQt5 and NodeEditor. For more information visit: "
-                "<a href='https://www.blenderfreak.com/'>www.BlenderFreak.com</a>")
+        QMessageBox.about(self, "About PataNode", "Un logiciel de bg pour les bg")
 
     def createMenus(self):
         super().createMenus()
@@ -214,11 +278,10 @@ class PataNode(NodeEditorWindow):
 
         self.editMenu.aboutToShow.connect(self.updateEditMenu)
 
-
     def updateMenus(self):
         # print("update Menus")
         active = self.getCurrentNodeEditorWidget()
-        hasMdiChild = (active is not None)
+        hasMdiChild = active is not None
 
         self.actSave.setEnabled(hasMdiChild)
         self.actSaveAs.setEnabled(hasMdiChild)
@@ -236,7 +299,7 @@ class PataNode(NodeEditorWindow):
         try:
             # print("update Edit Menu")
             active = self.getCurrentNodeEditorWidget()
-            hasMdiChild = (active is not None)
+            hasMdiChild = active is not None
 
             self.actPaste.setEnabled(hasMdiChild)
 
@@ -246,9 +309,8 @@ class PataNode(NodeEditorWindow):
 
             self.actUndo.setEnabled(hasMdiChild and active.canUndo())
             self.actRedo.setEnabled(hasMdiChild and active.canRedo())
-        except Exception as e: dumpException(e)
-
-
+        except Exception as e:
+            dumpException(e)
 
     def updateWindowMenu(self):
         self.windowMenu.clear()
@@ -271,8 +333,8 @@ class PataNode(NodeEditorWindow):
         self.windowMenu.addSeparator()
         self.windowMenu.addAction(self.actHideShaderWindow)
         self.windowMenu.addAction(self.actShowShaderWindow)
-        #self.windowMenu.addAction(self.actHideAudioLogWindow)
-        #self.windowMenu.addAction(self.actShowAudioLogWindow)
+        # self.windowMenu.addAction(self.actHideAudioLogWindow)
+        # self.windowMenu.addAction(self.actShowAudioLogWindow)
 
         windows = self.mdiArea.subWindowList()
         self.actSeparator.setVisible(len(windows) != 0)
@@ -282,7 +344,7 @@ class PataNode(NodeEditorWindow):
 
             text = "%d %s" % (i + 1, child.getUserFriendlyFilename())
             if i < 9:
-                text = '&' + text
+                text = "&" + text
 
             action = self.windowMenu.addAction(text)
             action.setCheckable(True)
@@ -325,7 +387,9 @@ class PataNode(NodeEditorWindow):
         self.statusBar().showMessage("Ready")
 
     def createMdiChild(self, child_widget=None):
-        nodeeditor = child_widget if child_widget is not None else PataNodeSubWindow(self)
+        nodeeditor = (
+            child_widget if child_widget is not None else PataNodeSubWindow(self)
+        )
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
         # nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
@@ -343,15 +407,19 @@ class PataNode(NodeEditorWindow):
         else:
             event.ignore()
 
-
     def findMdiChild(self, filename):
         for window in self.mdiArea.subWindowList():
             if window.widget().filename == filename:
                 return window
         return None
 
-
     def setActiveSubWindow(self, window):
         if window:
             self.mdiArea.setActiveSubWindow(window)
 
+    def getFileDialogFilter(self):
+        return "Graph (*.json *.pn);;All files (*)"
+
+    def getFileDialogDirectory(self):
+        """Returns starting directory for ``QFileDialog`` file open/save"""
+        return "saved"

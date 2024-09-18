@@ -2,18 +2,24 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
-OP_CODE_RR = name_to_opcode('rainbow_rewqeqoad')
+OP_CODE_RR = name_to_opcode("rainbow_rewqeqoad")
+
 
 @register_program(OP_CODE_RR)
 class RainbowRoad(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
-        
+
         super().__init__(ctx, major_version, minor_version, win_size)
         self.winsize = win_size
         self.title = "rainbow_road"
@@ -24,9 +30,7 @@ class RainbowRoad(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -39,20 +43,20 @@ class RainbowRoad(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'iTime',
-                'iResolution' : 'win_size',
-                'energy':'energy',
-                'energy_fast':'energy_fast',
-                'energy_fast2':'energy_fast2',
-                'energy_mid':'energy_mid',
-                'energy_slow':'energy_slow',
-                'turfu':'turfu',
-                'tic_tile':'tic_tile',
-                'mode':'mode',
-                'c1':'c1',
-                'trigger':'trigger'
-                }
-        super().initUniformsBinding(binding, program_name='')
+            "iTime": "iTime",
+            "iResolution": "win_size",
+            "energy": "energy",
+            "energy_fast": "energy_fast",
+            "energy_fast2": "energy_fast2",
+            "energy_mid": "energy_mid",
+            "energy_slow": "energy_slow",
+            "turfu": "turfu",
+            "tic_tile": "tic_tile",
+            "mode": "mode",
+            "c1": "c1",
+            "trigger": "trigger",
+        }
+        super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
 
     def initParams(self):
@@ -137,14 +141,14 @@ class RainbowRoad(ProgramBase):
         self.energy_mid = max(fa["full"][3] - fa["full"][2] * 0.95, 0.0)
         self.energy = fa["full"][0] * 0.3
         self.mode = self.mode
-        self.trigger= self.trigger
+        self.trigger = self.trigger
         self.turfu = self.turfu
         self.tic_tile = self.tic_tile
         self.c1 = self.c1
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af):
         self.updateParams(af)
@@ -166,7 +170,7 @@ class RRNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = RainbowRoad(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = RainbowRoad(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

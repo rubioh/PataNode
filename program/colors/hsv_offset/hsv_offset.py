@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
 
 
-OP_CODE_HSVOFFSET = name_to_opcode('hsvhsvhsvoffset')
+OP_CODE_HSVOFFSET = name_to_opcode("hsvhsvhsvoffset")
+
 
 @register_program(OP_CODE_HSVOFFSET)
 class HSVOffset(ProgramBase):
@@ -25,7 +31,7 @@ class HSVOffset(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -45,14 +51,14 @@ class HSVOffset(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0',
-            'hue_offset' : 'hue_offset',
-            'saturation_offset' : 'saturation_offset',
-            'value_offset' : 'value_offset'
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "hue_offset": "hue_offset",
+            "saturation_offset": "saturation_offset",
+            "value_offset": "value_offset",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, af):
         if af is None:
@@ -60,7 +66,7 @@ class HSVOffset(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -83,7 +89,7 @@ class HSVNode(ShaderNode, Colors):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = HSVOffset(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = HSVOffset(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
@@ -95,4 +101,3 @@ class HSVNode(ShaderNode, Colors):
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture
-

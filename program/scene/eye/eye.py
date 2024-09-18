@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_EYE = name_to_opcode('eye')
+OP_CODE_EYE = name_to_opcode("eye")
+
 
 @register_program(OP_CODE_EYE)
 class Eye(ProgramBase):
@@ -26,9 +32,7 @@ class Eye(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -40,32 +44,30 @@ class Eye(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
-        self.vitesse = .4
+        self.vitesse = 0.4
         self.offset = 0
         self.intensity = 5
         self.smooth_fast = 0
         self.time = 0
         self.tf = 0
-        self.eslow = .4
-        self.emid = .2
+        self.eslow = 0.4
+        self.emid = 0.2
 
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.smooth_fast_final = self.smooth_fast / 2.0
+        self.scale_final = 16 + 8 * np.cos(time.time() * 0.1)
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'time',
-                'energy_fast': 'smooth_fast_final',
-                'energy_slow': 'eslow',
-                'energy_mid': 'emid',
-                'tf' : "tf",
-                'intensity' : "intensity",
-                'scale' : "scale_final"
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "time",
+            "energy_fast": "smooth_fast_final",
+            "energy_slow": "eslow",
+            "energy_mid": "emid",
+            "tf": "tf",
+            "intensity": "intensity",
+            "scale": "scale_final",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
         self.vitesse = np.clip(self.vitesse, 0, 2)
@@ -88,16 +90,15 @@ class Eye(ProgramBase):
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
         self.tf += 0.01
-        self.eslow = af["full"][1] * .75
-        self.emid = af["low"][2] / 2.
-        
+        self.eslow = af["full"][1] * 0.75
+        self.emid = af["low"][2] / 2.0
 
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.smooth_fast_final = self.smooth_fast / 2.0
+        self.scale_final = 16 + 8 * np.cos(time.time() * 0.1)
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -119,7 +120,7 @@ class EyeNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Eye(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Eye(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

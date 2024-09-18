@@ -9,7 +9,8 @@ from qtpy.QtCore import Qt, QRectF, QPointF
 
 class QDMCutLine(QGraphicsItem):
     """Class representing Cutting Line used for cutting multiple `Edges` with one stroke"""
-    def __init__(self, parent:QWidget=None):
+
+    def __init__(self, parent: QWidget = None):
         """
         :param parent: parent widget
         :type parent: ``QWidget``
@@ -41,8 +42,8 @@ class QDMCutLine(QGraphicsItem):
             for pt in self.line_points[1:]:
                 path.lineTo(pt)
         else:
-            path = QPainterPath(QPointF(0,0))
-            path.lineTo(QPointF(1,1))
+            path = QPainterPath(QPointF(0, 0))
+            path.lineTo(QPointF(1, 1))
 
         return path
 

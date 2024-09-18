@@ -8,10 +8,10 @@ tc = ") in vec2 in_tc;\n"
 color = ") in vec3 in_color;\n"
 tangent = ") in vec3 in_tangent;\n"
 
-#matrix = "uniform mat4 model_transform; \n\
-#			uniform mat4 model;\n\
-#			uniform mat4 view;\n\
-#			uniform mat4 projection;\n"
+# matrix = "uniform mat4 model_transform; \n\
+# 			uniform mat4 model;\n\
+# 			uniform mat4 view;\n\
+# 			uniform mat4 projection;\n"
 
 matrix = "uniform mat4 model;\n\
 		  uniform mat4 mvp;\n"
@@ -65,10 +65,12 @@ layout(location = 2) out vec4 emissive;\n"
 fragment_main = "void main(void) {\n\
 \n"
 
-color_texture =	"vec3 tx_albedo = texture(baseColorTexture, tcs).xyz * color * in_albedo.xyz;\n"
+color_texture = (
+    "vec3 tx_albedo = texture(baseColorTexture, tcs).xyz * color * in_albedo.xyz;\n"
+)
 color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
-#todo metallic
+# todo metallic
 metallic_rougness_texture = "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
 	float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
 
@@ -87,96 +89,98 @@ fragment_end = "	albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
 
 
 def build_vertex_shader(mesh_layout):
-	shader = ""
-	shader += layout + str(0) + position
-	layout_index = 1
-	if mesh_layout["vertex_normal"]:
-		shader += layout + str(layout_index) + normal
-		layout_index = layout_index + 1
-	if mesh_layout["vertex_tcs"]:
-		shader += layout + str(layout_index) + tc
-		layout_index = layout_index + 1
-	if mesh_layout["vertex_color"]:
-		shader += layout + str(layout_index) + color
-		layout_index = layout_index + 1
-	if mesh_layout["vertex_tangent"]:
-		shader += layout + str(layout_index) + tangent
-		layout_index = layout_index + 1
+    shader = ""
+    shader += layout + str(0) + position
+    layout_index = 1
+    if mesh_layout["vertex_normal"]:
+        shader += layout + str(layout_index) + normal
+        layout_index = layout_index + 1
+    if mesh_layout["vertex_tcs"]:
+        shader += layout + str(layout_index) + tc
+        layout_index = layout_index + 1
+    if mesh_layout["vertex_color"]:
+        shader += layout + str(layout_index) + color
+        layout_index = layout_index + 1
+    if mesh_layout["vertex_tangent"]:
+        shader += layout + str(layout_index) + tangent
+        layout_index = layout_index + 1
 
-	shader += matrix
-	shader += out
-	if mesh_layout["vertex_tangent"]:
-		shader += out_tbn
+    shader += matrix
+    shader += out
+    if mesh_layout["vertex_tangent"]:
+        shader += out_tbn
 
-	shader += main
-	if mesh_layout["vertex_normal"]:
-		shader += normal_inter
-	else:
-		shader += "normal = vec3(1., 0., 0.);\n"
+    shader += main
+    if mesh_layout["vertex_normal"]:
+        shader += normal_inter
+    else:
+        shader += "normal = vec3(1., 0., 0.);\n"
 
-	if mesh_layout["vertex_tangent"]:
-		shader += tbn_compute
-	if mesh_layout["vertex_tcs"]:
-		shader += tcs_inter
-	else:
-		shader += "tcs = vec2(1.);\n"
+    if mesh_layout["vertex_tangent"]:
+        shader += tbn_compute
+    if mesh_layout["vertex_tcs"]:
+        shader += tcs_inter
+    else:
+        shader += "tcs = vec2(1.);\n"
 
-	if mesh_layout["vertex_color"]:
-		shader += col_inter
-	else:
-		shader += "color = vec3(1.);\n"
+    if mesh_layout["vertex_color"]:
+        shader += col_inter
+    else:
+        shader += "color = vec3(1.);\n"
 
-	if mesh_layout["vertex_tangent"]:
-		shader += tangent_inter
-	else:
-		shader += "tangent = vec3(1., 0., 0.);\n"
-	shader += "}"
-	return shader
+    if mesh_layout["vertex_tangent"]:
+        shader += tangent_inter
+    else:
+        shader += "tangent = vec3(1., 0., 0.);\n"
+    shader += "}"
+    return shader
+
 
 def build_fragment_shader(material):
-	result = ""
-	if "baseColorTexture" in material.textures:
-		result += baseColorTexture
-	if "metallicRoughnessTexture" in material.textures:
-		result += metallicRoughnessTexture
-	if "normalTexture" in material.textures:
-		result += normalTexture
-	
-#	if not "metallicRoughnessTexture" in material.textures:
-#		result += uniform_roughness + uniform_metallic
+    result = ""
+    if "baseColorTexture" in material.textures:
+        result += baseColorTexture
+    if "metallicRoughnessTexture" in material.textures:
+        result += metallicRoughnessTexture
+    if "normalTexture" in material.textures:
+        result += normalTexture
 
-	result += uniform_albedo
-	result += uniform_roughness
-	result += uniform_metallic
-	result += uniform_emissive
-	result += uniform_fragment_in
+    # 	if not "metallicRoughnessTexture" in material.textures:
+    # 		result += uniform_roughness + uniform_metallic
 
-	if "normalTexture" in material.textures:
-		result += in_tbn
+    result += uniform_albedo
+    result += uniform_roughness
+    result += uniform_metallic
+    result += uniform_emissive
+    result += uniform_fragment_in
 
-	result += fragment_out
-	result += fragment_main
+    if "normalTexture" in material.textures:
+        result += in_tbn
 
-	if "baseColorTexture" in material.textures:
-		result += color_texture
-	else:
-		result += color_no_texture
+    result += fragment_out
+    result += fragment_main
 
-	if "metallicRoughnessTexture" in material.textures:
-		result += metallic_rougness_texture
-	else:
-		result += metallic_roughness_no_texture
+    if "baseColorTexture" in material.textures:
+        result += color_texture
+    else:
+        result += color_no_texture
 
-	if "normalTexture" in material.textures:
-		result += normal_texture
-	else:
-		result += normal_no_texture
+    if "metallicRoughnessTexture" in material.textures:
+        result += metallic_rougness_texture
+    else:
+        result += metallic_roughness_no_texture
 
-	result += fragment_end
+    if "normalTexture" in material.textures:
+        result += normal_texture
+    else:
+        result += normal_no_texture
 
-	result += "albedoMetallic.x += tcs.x * 0.000001;\n"
-	result += "}"
-	return result
+    result += fragment_end
+
+    result += "albedoMetallic.x += tcs.x * 0.000001;\n"
+    result += "}"
+    return result
+
 
 def build_shaders(mesh_layout, material):
-	return (build_vertex_shader(mesh_layout), build_fragment_shader(material))
+    return (build_vertex_shader(mesh_layout), build_fragment_shader(material))

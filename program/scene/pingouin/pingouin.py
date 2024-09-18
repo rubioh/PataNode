@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_PINGOUIN = name_to_opcode('Pingouin')
+OP_CODE_PINGOUIN = name_to_opcode("Pingouin")
+
 
 @register_program(OP_CODE_PINGOUIN)
 class Pingouin(ProgramBase):
@@ -25,9 +31,7 @@ class Pingouin(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -39,32 +43,32 @@ class Pingouin(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
-        self.iTime = 0.
+        self.iTime = 0.0
         self.wait = 0
         self.iResolution = self.win_size
-        self.energy = 0.
-        self.smooth_fast = 0.
-        self.energy_fast = 0.
-        self.energy_mid = 0.
-        self.energy_slow = 0.
-        self.energy_low = 0.
-        self.decaying_kick = 0.
-        self.move_x = 0.
-        self.move_z = 0.
-        self.sens_x = 0.
-        self.on_tempo = 0.
-        self.on_tempo2 = 0.
-        self.on_tempo4 = 0.
-        self.mode = 0.
-        self.angle_t = 0.
-        self.y_t = 0.
-        self.trigger = 0.
-        self.rot_final = 0.
-        self.on_chill = 0.
+        self.energy = 0.0
+        self.smooth_fast = 0.0
+        self.energy_fast = 0.0
+        self.energy_mid = 0.0
+        self.energy_slow = 0.0
+        self.energy_low = 0.0
+        self.decaying_kick = 0.0
+        self.move_x = 0.0
+        self.move_z = 0.0
+        self.sens_x = 0.0
+        self.on_tempo = 0.0
+        self.on_tempo2 = 0.0
+        self.on_tempo4 = 0.0
+        self.mode = 0.0
+        self.angle_t = 0.0
+        self.y_t = 0.0
+        self.trigger = 0.0
+        self.rot_final = 0.0
+        self.on_chill = 0.0
         self.sens_x = -1.0
         self.sens_z = 1.0
         self.go_z = 1
-        self.count  = 0
+        self.count = 0
         self.decaying_kick_slow = 0
         self.color = np.array([0.6, 0.6, 0.8])
         self.l = np.zeros(3)
@@ -72,30 +76,28 @@ class Pingouin(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'iTime',
-                'iResolution': 'iResolution',
-                'energy_fast': 'energy_fast',
-                'energy_slow': 'energy_slow',
-                'decaying_kick': 'decaying_kick',
-                'move_x': 'move_x',
-                'move_z': 'move_z',
-                'on_tempo': 'on_tempo',
-                'on_tempo2': 'on_tempo2',
-                'on_tempo4': 'on_tempo4',
-                'l': 'l',
-                'mode': 'mode',
-                'color': 'color',
-                'angle_t': 'angle_t',
-                'y_t': 'y_t',
-                'trigger': 'trigger',
-                'rot_final': 'rot_final',
-                'min_dist': 'min_dist',
-                'on_chill': 'on_chill'
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "iTime",
+            "iResolution": "iResolution",
+            "energy_fast": "energy_fast",
+            "energy_slow": "energy_slow",
+            "decaying_kick": "decaying_kick",
+            "move_x": "move_x",
+            "move_z": "move_z",
+            "on_tempo": "on_tempo",
+            "on_tempo2": "on_tempo2",
+            "on_tempo4": "on_tempo4",
+            "l": "l",
+            "mode": "mode",
+            "color": "color",
+            "angle_t": "angle_t",
+            "y_t": "y_t",
+            "trigger": "trigger",
+            "rot_final": "rot_final",
+            "min_dist": "min_dist",
+            "on_chill": "on_chill",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def updateParams(self, fa):
         if not fa:
@@ -184,7 +186,7 @@ class Pingouin(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -196,6 +198,7 @@ class Pingouin(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_PINGOUIN)
 class PingouinNode(ShaderNode, Scene):
     op_title = "Pingouin"
@@ -205,7 +208,7 @@ class PingouinNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Pingouin(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Pingouin(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

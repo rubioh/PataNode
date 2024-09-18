@@ -76,6 +76,12 @@ void main()
     vec2 uv = ( 2.*gl_FragCoord.xy - iResolution.xy ) / iResolution.y;
 
     uv *= 1.8;
+    //uv *= .7;
+
+    float angle = iTime*.1 + energy_mid; 
+    angle = 0.;
+    mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
+    uv *= rot;
     // Time varying pixel color
     vec2 center = vec2(0., 0.);
     float radius = .05+energy_fast/2.;
@@ -97,6 +103,7 @@ void main()
     // Output to screen
     //col *= 0.;
     //fragColor = vec4(col.rgg,1.0);
+    //
     fragColor = vec4(col,1.0);
 }
 

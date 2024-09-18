@@ -29,11 +29,12 @@ def loadStylesheet(filename: str):
     :param filename: Filename of qss stylesheet
     :type filename: str
     """
-    print('STYLE loading:', filename)
+    print("STYLE loading:", filename)
     file = QFile(filename)
     file.open(QFile.ReadOnly | QFile.Text)
     stylesheet = file.readAll()
-    QApplication.instance().setStyleSheet(str(stylesheet, encoding='utf-8'))
+    QApplication.instance().setStyleSheet(str(stylesheet, encoding="utf-8"))
+
 
 def loadStylesheets(*args):
     """
@@ -42,10 +43,10 @@ def loadStylesheets(*args):
     :param args: variable number of filenames of qss stylesheets
     :type args: str, str,...
     """
-    res = ''
+    res = ""
     for arg in args:
         file = QFile(arg)
         file.open(QFile.ReadOnly | QFile.Text)
         stylesheet = file.readAll()
-        res += "\n" + str(stylesheet, encoding='utf-8')
+        res += "\n" + str(stylesheet, encoding="utf-8")
     QApplication.instance().setStyleSheet(res)

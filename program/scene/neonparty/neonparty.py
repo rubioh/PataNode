@@ -3,13 +3,19 @@ import numpy as np
 from PIL import Image
 from os.path import dirname, basename, isfile, join
 import moderngl
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
-OP_CODE_NEONPARTY = name_to_opcode('NeonParty')
+OP_CODE_NEONPARTY = name_to_opcode("NeonParty")
+
 
 @register_program(OP_CODE_NEONPARTY)
 class NeonParty(ProgramBase):
@@ -30,7 +36,7 @@ class NeonParty(ProgramBase):
         self.was_on_chill = False
         self.shape = 0
         self.animate = 0
-        self.iTime = 0.
+        self.iTime = 0.0
         self.textures = [None, None]
         self.frame = 0
         self.low1 = 0
@@ -56,10 +62,7 @@ class NeonParty(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 2
-        fbos_specification = [
-            [self.hwin_size, 4, 'f4'],
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.hwin_size, 4, "f4"], [self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -67,26 +70,24 @@ class NeonParty(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'iTime',
-                'iResolution': 'iResolution',
-                'stride':'stride',
-                'beat_count':'beat_count',
-                'low1':'low1',
-                'low2':'low2',
-                'drop':'drop',
-                'animate':'animate',
-                'shape':'shape',
-                'on_chill':'on_chill',
-                'ro':'ro'
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "iTime",
+            "iResolution": "iResolution",
+            "stride": "stride",
+            "beat_count": "beat_count",
+            "low1": "low1",
+            "low2": "low2",
+            "drop": "drop",
+            "animate": "animate",
+            "shape": "shape",
+            "on_chill": "on_chill",
+            "ro": "ro",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
@@ -95,9 +96,9 @@ class NeonParty(ProgramBase):
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "reconstruct.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, False, name='reconstruct_')
+        self.loadProgramToCtx(vert_path, frag_path, False, name="reconstruct_")
 
-    def render(self, af=None, stride = 0):
+    def render(self, af=None, stride=0):
         self.fbos[0].color_attachments[0].filter = (moderngl.NEAREST, moderngl.NEAREST)
         self.stride = stride
         self.lichen_texture.use(0)
@@ -156,6 +157,7 @@ class NeonParty(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_NEONPARTY)
 class NeonPartyNode(ShaderNode, Scene):
     op_title = "Neon Party"
@@ -165,7 +167,7 @@ class NeonPartyNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[1])
-        self.program = NeonParty(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = NeonParty(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

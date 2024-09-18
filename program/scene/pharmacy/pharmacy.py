@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_PHARMACY = name_to_opcode('Pharmacy')
+OP_CODE_PHARMACY = name_to_opcode("Pharmacy")
+
 
 @register_program(OP_CODE_PHARMACY)
 class Pharmacy(ProgramBase):
@@ -24,9 +30,7 @@ class Pharmacy(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -39,23 +43,21 @@ class Pharmacy(ProgramBase):
 
     def initParams(self):
         self.tick = 0
-        self.iTime = 0.
+        self.iTime = 0.0
         self.iResolution = self.win_size
-        self.decaying_kick= 0.
-        self.onTempo = 0.
+        self.decaying_kick = 0.0
+        self.onTempo = 0.0
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'iTime',
-                'iResolution': 'iResolution',
-                'tick': 'tick',
-                'decaying_kick' : 'decaying_kick',
-                'onTempo': 'onTempo'
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "iTime",
+            "iResolution": "iResolution",
+            "tick": "tick",
+            "decaying_kick": "decaying_kick",
+            "onTempo": "onTempo",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def updateParams(self, af):
         if af == None:
@@ -67,7 +69,7 @@ class Pharmacy(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -75,6 +77,7 @@ class Pharmacy(ProgramBase):
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
+
 
 @register_node(OP_CODE_PHARMACY)
 class PharmacyNode(ShaderNode, Scene):
@@ -85,7 +88,7 @@ class PharmacyNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Pharmacy(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Pharmacy(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

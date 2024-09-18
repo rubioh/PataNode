@@ -4,15 +4,20 @@ import numpy as np
 import moderngl as mgl
 from pyrr import Matrix44
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Particles
 from node.node_conf import register_node
 
 
+OP_CODE_SPIRALPARTICULES = name_to_opcode("spiralparticules")
 
-OP_CODE_SPIRALPARTICULES = name_to_opcode('spiralparticules')
 
 @register_program(OP_CODE_SPIRALPARTICULES)
 class SpiralParticules(ProgramBase):
@@ -28,10 +33,10 @@ class SpiralParticules(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 4
         fbos_specification = [
-            [self.win_size, 4, 'f4', True],
-            [self.win_size, 4, 'f4', True],
-            [self.win_size, 4, 'f4', False],
-            [self.win_size, 4, 'f4', False],
+            [self.win_size, 4, "f4", True],
+            [self.win_size, 4, "f4", True],
+            [self.win_size, 4, "f4", False],
+            [self.win_size, 4, "f4", False],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -48,31 +53,36 @@ class SpiralParticules(ProgramBase):
         vert_path = join(dirname(__file__), "part/draw.vert")
         frag_path = join(dirname(__file__), "part/draw.frag")
         vao_binding = [(self.vbo1, "4f4", "in_position")]
-        self.loadProgramToCtx(vert_path, frag_path, reload, 'draw_', vao_binding=vao_binding)
+        self.loadProgramToCtx(
+            vert_path, frag_path, reload, "draw_", vao_binding=vao_binding
+        )
 
         vert_path = join(dirname(__file__), "part/draw.vert")
         frag_path = join(dirname(__file__), "part/alpha.frag")
         vao_binding = [(self.vbo1, "4f4", "in_position")]
-        self.loadProgramToCtx(vert_path, frag_path, reload, 'alpha_', vao_binding=vao_binding)
+        self.loadProgramToCtx(
+            vert_path, frag_path, reload, "alpha_", vao_binding=vao_binding
+        )
 
         vert_path = join(dirname(__file__), "part/transform.vert")
         frag_path = None
         varyings = ["out_pos", "out_prev"]
         vao_binding = [(self.vbo1, "4f4 4f4", "in_pos", "prev_pos")]
         self.loadProgramToCtx(
-                    vert_path, frag_path, 
-                    reload, 
-                    'transform_', 
-                    vao_binding=vao_binding,          
-                    varyings=varyings
-                )
+            vert_path,
+            frag_path,
+            reload,
+            "transform_",
+            vao_binding=vao_binding,
+            varyings=varyings,
+        )
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "spiralparticules.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, '')
+        self.loadProgramToCtx(vert_path, frag_path, reload, "")
 
     def initParams(self):
         self.N_part = 15000
-        self.N_part_final = self.N_part//2
+        self.N_part_final = self.N_part // 2
 
         # MVP
         self.aspect_ratio = self.win_size[0] / self.win_size[1]
@@ -94,7 +104,7 @@ class SpiralParticules(ProgramBase):
         self.go_mnext = 1
         self.mod_fract = 1
         self.go_mf = 1
-        self.dt = .1
+        self.dt = 0.1
 
         self.angle = -3.14159 / 2
         self.sens_angle = 1
@@ -109,7 +119,7 @@ class SpiralParticules(ProgramBase):
         self.base = np.array([-3.14159 / 2, 0.0, 0.0])
         self.vel = np.array([1.0, 1.0, 1.0])
         self.target = np.array([-3.14159 / 2, 0.0, 0.0])
-        
+
         self.decay_kick = 0
         self.nrj_slow = 0
         self.nrj_fast = 0
@@ -182,51 +192,53 @@ class SpiralParticules(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            "modelview" : "modelview",
-            "projection" : "projection",
-            "iTime" : "timeaf",
-            "modNext" : "mnext",
-            "angle3" : "base"
+            "modelview": "modelview",
+            "projection": "projection",
+            "iTime": "timeaf",
+            "modNext": "mnext",
+            "angle3": "base",
         }
         super().initUniformsBinding(binding, program_name="draw_")
         binding = {
-            "modelview" : "modelview",
-            "projection" : "projection",
-            "iTime" : "timeaf",
-            "modNext" : "mnext",
-            "angle3" : "base"
+            "modelview": "modelview",
+            "projection": "projection",
+            "iTime": "timeaf",
+            "modNext": "mnext",
+            "angle3": "base",
         }
         super().initUniformsBinding(binding, program_name="alpha_")
         binding = {
-            "dt" : "dt",
-            "iTime" : "timeaf",
-            "iFrame" : "iFrame",
-            "N_part" : "N_part_final",
-            "energy_slow" : "nrj_slow",
-            "energy_fast" : "nrj_fast",
-            "next" : "next",
-            "decay_kick" : "decay_kick",
-            "modNext" : "mnext",
-            "mod_fract" : "mod_fract",
-            "mode_chill" : "mode_chill"
+            "dt": "dt",
+            "iTime": "timeaf",
+            "iFrame": "iFrame",
+            "N_part": "N_part_final",
+            "energy_slow": "nrj_slow",
+            "energy_fast": "nrj_fast",
+            "next": "next",
+            "decay_kick": "decay_kick",
+            "modNext": "mnext",
+            "mod_fract": "mod_fract",
+            "mode_chill": "mode_chill",
         }
         super().initUniformsBinding(binding, program_name="transform_")
         binding = {
-            "iChannel0" : "iChannel0",
-            "Prev" : "Prev",
-            "Alpha" : "Alpha",
-            "decaying_kick" : "decay_kick",
-            "mode_chill" : "mode_chill"
+            "iChannel0": "iChannel0",
+            "Prev": "Prev",
+            "Alpha": "Alpha",
+            "decaying_kick": "decay_kick",
+            "mode_chill": "mode_chill",
         }
         super().initUniformsBinding(binding, program_name="")
-        self.addProtectedUniforms(['iChannel0', 'Prev', 'Alpha', 'modelview', 'projection'])
+        self.addProtectedUniforms(
+            ["iChannel0", "Prev", "Alpha", "modelview", "projection"]
+        )
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='alpha_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='draw_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='transform_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="alpha_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="draw_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="transform_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af):
         self.updateParams(af)
@@ -262,6 +274,7 @@ class SpiralParticules(ProgramBase):
     def norender(self):
         return self.fbos[2].color_attachments[0]
 
+
 @register_node(OP_CODE_SPIRALPARTICULES)
 class SpiralParticulesNode(ShaderNode, Particles):
     op_title = "Spiral Particules"
@@ -279,4 +292,3 @@ class SpiralParticulesNode(ShaderNode, Particles):
             return self.program.norender()
         output_texture = self.program.render(audio_features)
         return output_texture
-

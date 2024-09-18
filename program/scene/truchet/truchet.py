@@ -2,7 +2,12 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
@@ -11,7 +16,8 @@ import moderngl as mgl
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
 
 
-OP_CODE_TRUCHET = name_to_opcode('truchet')
+OP_CODE_TRUCHET = name_to_opcode("truchet")
+
 
 @register_program(OP_CODE_TRUCHET)
 class Truchet(ProgramBase):
@@ -27,10 +33,10 @@ class Truchet(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 4
         fbos_specification = [
-            [(80,80), 4, 'f4'],
-            [(80,80), 4, 'f4'],
-            [(1980,1980), 4, 'f4'],
-            [self.win_size, 4, 'f4']
+            [(80, 80), 4, "f4"],
+            [(80, 80), 4, "f4"],
+            [(1980, 1980), 4, "f4"],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -75,41 +81,41 @@ class Truchet(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-                'iFrame': 'iFrame',
-                'TruchetSampler' : 'TruchetSampler',
-                'iResolution': 'bwin_size'
-                }
-        super().initUniformsBinding(binding, program_name='connex_')
-        binding = {
-                'iResolution': 'twin_size',
-                'iChannel0' : 'iChannel0',
+            "iFrame": "iFrame",
+            "TruchetSampler": "TruchetSampler",
+            "iResolution": "bwin_size",
         }
-        super().initUniformsBinding(binding, program_name='draw_')
+        super().initUniformsBinding(binding, program_name="connex_")
         binding = {
-                'iTime': 'iTime',
-                'iResolution': 'win_size',
-                'iChannel1' : 'iChannel1',
-                'energy_fast' : 'smooth_fast',
-                'energy_slow' : 'nrj_slow',
-                'angle_rot' : 'angle_rot',
-                'deep' : 'deep',
-                'K' : 'K_final',
-                'smooth_low': 'smooth_low_final',
-                'accum_rot' : 'accum_rot',
-                'iTime' : 'time'
+            "iResolution": "twin_size",
+            "iChannel0": "iChannel0",
         }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                ['TruchetSampler', 'iChannel0', 'iChannel1']
-        )
+        super().initUniformsBinding(binding, program_name="draw_")
+        binding = {
+            "iTime": "iTime",
+            "iResolution": "win_size",
+            "iChannel1": "iChannel1",
+            "energy_fast": "smooth_fast",
+            "energy_slow": "nrj_slow",
+            "angle_rot": "angle_rot",
+            "deep": "deep",
+            "K": "K_final",
+            "smooth_low": "smooth_low_final",
+            "accum_rot": "accum_rot",
+            "iTime": "time",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms(["TruchetSampler", "iChannel0", "iChannel1"])
 
     def updateParams(self, fa):
         if fa is None:
             return
-        self.smooth_low_final = fa["smooth_low"] ** 2.0 * 3.0 + fa["on_chill"] * 2.0 + 0.1
-        self.time = fa['time']
-        self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * fa["low"][3] * .5
-        self.nrj_slow = fa["full"][1] * .5
+        self.smooth_low_final = (
+            fa["smooth_low"] ** 2.0 * 3.0 + fa["on_chill"] * 2.0 + 0.1
+        )
+        self.time = fa["time"]
+        self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * fa["low"][3] * 0.5
+        self.nrj_slow = fa["full"][1] * 0.5
 
         tmp = rgb_to_hsv(self.color)
         tmp[0] += 0.002
@@ -143,9 +149,9 @@ class Truchet(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='connex_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='draw_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="connex_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="draw_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af):
         self.bindUniform(af)
@@ -178,7 +184,7 @@ class TruchetNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Truchet(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Truchet(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

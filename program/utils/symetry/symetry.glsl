@@ -43,6 +43,7 @@ void main()
     if (st.y<0) st.y = (1-mod(st.y, 1.));
 
     vec3 col = texture(iChannel0, st).rgb;
+    //col = mix(col, 1.-col, smoothstep(.2, .4, length(col)));
     fragColor = vec4(col,1.0);
 
 }

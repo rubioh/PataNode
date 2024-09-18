@@ -3,22 +3,27 @@ import numpy as np
 import cv2
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_DOG = name_to_opcode('DoGDoG')
+OP_CODE_DOG = name_to_opcode("DoGDoG")
 
 
 class DoG(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         """
-            Difference of Gaussians (DoG) 
-            band pass filters
-            required a textures and its SST to performs the DoG
+        Difference of Gaussians (DoG)
+        band pass filters
+        required a textures and its SST to performs the DoG
         """
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "DoG"
@@ -39,29 +44,27 @@ class DoG(ProgramBase):
         hatch = np.flip(hatch, 0).copy(order="C")
         self.hatch = self.ctx.texture(hatch.shape[:2][::-1], hatch.shape[2], hatch)
 
-
     def initFBOSpecifications(self):
         rfbos = 3
         self.required_fbos = rfbos
-        fbos_specification = [[self.win_size, 4, 'f4'] for i in range(rfbos)]
+        fbos_specification = [[self.win_size, 4, "f4"] for i in range(rfbos)]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-    
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Blur/vblur.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='vblur_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="vblur_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Blur/hblur.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='hblur_') 
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="hblur_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "DoG.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name='')
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def initParams(self):
         self.initTexture()
@@ -150,45 +153,44 @@ class DoG(ProgramBase):
                 for k, v in getattr(self, m).items():
                     setattr(self, k, v)
 
-
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'tau' : 'tau',
-            'eps': 'epsilon',
-            'phi': 'phi',
-            'mode': 'mode',
-            'BaseTex': 'BaseTex', # 87
-            'Hatch': 'Hatch', # 90
-            'DoG': 'DoG', # 88
+            "iResolution": "win_size",
+            "tau": "tau",
+            "eps": "epsilon",
+            "phi": "phi",
+            "mode": "mode",
+            "BaseTex": "BaseTex",  # 87
+            "Hatch": "Hatch",  # 90
+            "DoG": "DoG",  # 88
         }
-        super().initUniformsBinding(binding, program_name='')
+        super().initUniformsBinding(binding, program_name="")
         binding = {
-            'iResolution' : 'win_size',
-            'sigmaE' : 'sigmaE',
-            'iChannel0' : 'iChannel0',
-            'k' : 'k',
-            'SST' : 'SST' # 86
+            "iResolution": "win_size",
+            "sigmaE": "sigmaE",
+            "iChannel0": "iChannel0",
+            "k": "k",
+            "SST": "SST",  # 86
         }
-        super().initUniformsBinding(binding, program_name='vblur_')
+        super().initUniformsBinding(binding, program_name="vblur_")
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0',
-            'sigma' : 'sigma',
-            'k' : 'k',
-            'SST' : 'SST' # 86
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "sigma": "sigma",
+            "k": "k",
+            "SST": "SST",  # 86
         }
-        super().initUniformsBinding(binding, program_name='hblur_')
-        self.addProtectedUniforms(['iChannel0', 'SST', 'BaseTex', 'Hatch', 'DoG'])
+        super().initUniformsBinding(binding, program_name="hblur_")
+        self.addProtectedUniforms(["iChannel0", "SST", "BaseTex", "Hatch", "DoG"])
 
     def updateParams(self, af=None):
         pass
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='vblur_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='hblur_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="vblur_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="hblur_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -227,8 +229,8 @@ class DoGNode(ShaderNode, Effects):
     content_label_objname = "shader_dog"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1,2], outputs=[3])
-        self.program = DoG(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1, 2], outputs=[3])
+        self.program = DoG(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

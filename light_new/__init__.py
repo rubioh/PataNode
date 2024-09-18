@@ -58,8 +58,7 @@ class FixturesConfig(BaseModel):
     fixtures: list[FixtureConfig]
 
 
-class InvalidConfigurationError(Exception):
-    ...
+class InvalidConfigurationError(Exception): ...
 
 
 class LightEngine:
@@ -124,7 +123,7 @@ class LightEngine:
             return AmericanMegaPar(conf)
 
     def exit(self):
-        buffer = [0]*512
+        buffer = [0] * 512
         self.outputs.write(buffer)
         self.pattern_manager.exit()
 
@@ -157,14 +156,22 @@ class LightEngine:
 if __name__ == "__main__":
     engine = LightEngine()
     import numpy as np
+
     while True:
-        c = [np.cos(time.time())*.5+.5, .5+.5*np.cos(time.time()+2.), .5+.5*np.cos(time.time() + 4.)]
-        engine.tick(colors=c, audio_features={
-                'hat_count': 0,
-                'snare_count': 0,
-                'kick_count': 0,
-                'smooth_low':.001,
-                'on_tempo':0
-                })
+        c = [
+            np.cos(time.time()) * 0.5 + 0.5,
+            0.5 + 0.5 * np.cos(time.time() + 2.0),
+            0.5 + 0.5 * np.cos(time.time() + 4.0),
+        ]
+        engine.tick(
+            colors=c,
+            audio_features={
+                "hat_count": 0,
+                "snare_count": 0,
+                "kick_count": 0,
+                "smooth_low": 0.001,
+                "on_tempo": 0,
+            },
+        )
         time.sleep(1 / 60)
     exit(0)

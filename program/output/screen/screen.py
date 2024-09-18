@@ -2,14 +2,21 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+)
 from program.program_base import ProgramBase
 from program.colors.predominant_color.predominant_color import PredominantColorNode
 
 from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
 
+import time
+
 OP_CODE_SCREEN = 0
+
 
 @register_program(OP_CODE_SCREEN)
 class Screen(ProgramBase):
@@ -35,8 +42,8 @@ class Screen(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        _,_,w,h = self.ctx.screen.viewport
-        self.program['iResolution'] = (w,h)
+        _, _, w, h = self.ctx.screen.viewport
+        self.program["iResolution"] = (w, h)
         self.program["tex"] = 0
 
     def render(self, textures, af=None):
@@ -46,6 +53,7 @@ class Screen(ProgramBase):
         self.ctx.screen.use()
         self.vao.render()
         return True
+
 
 @register_node(OP_CODE_SCREEN)
 class ScreenNode(ShaderNode, Output):
@@ -67,7 +75,7 @@ class ScreenNode(ShaderNode, Output):
         self.scene.fbo_manager.restoreFBOUsability()
         for node in self.scene.nodes:
             node.markDirty()
-            if (node != self):
+            if node != self:
                 node.restoreFBODependencies()
         self.eval()
 
@@ -84,6 +92,7 @@ class ScreenNode(ShaderNode, Output):
             self.grNode.setToolTip("Input is NaN")
             self.markDirty()
             return False
+
         success_render = self.program.render([input_texture])
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
@@ -93,7 +102,7 @@ class ScreenNode(ShaderNode, Output):
     def render(self, audio_features=None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
-                node.program.already_called = False
+                node.already_called = False
             if isinstance(node, PredominantColorNode):
                 self.plreturn = node
         input_nodes = self.getShaderInputs()

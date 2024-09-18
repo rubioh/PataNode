@@ -14,9 +14,10 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
-#from node.node_conf import register_node
+# from node.node_conf import register_node
 
 DEBUG = False
+
 
 class GraphContainerGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
@@ -36,18 +37,18 @@ class GraphContainerGraphicsNode(QDMGraphicsNode):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
         offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
+        if self.node.isDirty():
+            offset = 0.0
+        if self.node.isInvalid():
+            offset = 48.0
 
         painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
         )
 
-    def openDialog(self, msg): 
+    def openDialog(self, msg):
         if isinstance(msg, list):
-            msgs = ''
+            msgs = ""
             for m in msg:
                 msgs += m
         else:
@@ -63,7 +64,7 @@ class GraphContainerNodeContent(QDMNodeContentWidget):
         lbl.setObjectName(self.node.content_label_objname)
 
 
-#@register_node("GRAPHCONTAINER")
+# @register_node("GRAPHCONTAINER")
 class GraphContainerNode(Node):
     icon = ""
     op_code = 666
@@ -75,14 +76,14 @@ class GraphContainerNode(Node):
     NodeContent_class = GraphContainerNodeContent
 
     def __init__(self, scene, inputs=[], outputs=[3]):
-        #inputs = [0] + inputs
+        # inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
         self.app = None
-        self.value = None # Using to store output texture reference
+        self.value = None  # Using to store output texture reference
         self.program = None
         self.graph = None
         self.subwnd = None
-        # Current OpenGL ctx
+        # Current OpenGL ctx
         self.ctx = scene.ctx
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
@@ -111,7 +112,6 @@ class GraphContainerNode(Node):
         input_sockets = [1 for i in range(len(self.graph.input_nodes))]
         output_sockets = [3 for i in range(len(self.outputs))]
         self.initSockets(input_sockets, output_sockets, reset=True)
-            
 
     def restoreFBODependencies(self):
         for node in self.graph.output_nodes:
@@ -122,19 +122,24 @@ class GraphContainerNode(Node):
         if self.graph is None:
             self.grNode.setToolTip("GCNode::eval No Graph Associated")
             self.markInvalid()
-            if DEBUG: print("GCNode::eval No Graph Associated to this graph container node")
+            if DEBUG:
+                print("GCNode::eval No Graph Associated to this graph container node")
             return False
         output_nodes = self.graph.output_nodes
         if len(output_nodes) == 0:
             self.grNode.setToolTip("No Std Output found")
             self.markInvalid()
-            if DEBUG: print("GCNode::eval No Std Output found to this graph container node")
+            if DEBUG:
+                print("GCNode::eval No Std Output found to this graph container node")
             return False
-        if DEBUG: print("Start evaluation nodes from the Graph")
+        if DEBUG:
+            print("Start evaluation nodes from the Graph")
         for node in self.graph.output_nodes:
-            if DEBUG : print("GCNode::eval Evaluate the node : ", node)
+            if DEBUG:
+                print("GCNode::eval Evaluate the node : ", node)
             success = node.eval()
-            if DEBUG: print("Evaluation of node", node, "is ", success)
+            if DEBUG:
+                print("Evaluation of node", node, "is ", success)
             if not success:
                 self.grNode.setToolTip("Graph evaluation failed")
                 self.markInvalid()
@@ -146,13 +151,15 @@ class GraphContainerNode(Node):
 
     def getShaderInputs(self):
         sockets = self.inputs
-        if DEBUG: print("GCNodes::getShaderInputs():  Container Sockets are", sockets)
+        if DEBUG:
+            print("GCNodes::getShaderInputs():  Container Sockets are", sockets)
         ins = []
         for i, sockets in enumerate(sockets):
-            if sockets.socket_type == 0: # socket_type 0 means audio_input
+            if sockets.socket_type == 0:  # socket_type 0 means audio_input
                 continue
             ins += super().getInputs(i)
-        if DEBUG: print("GCNodes::getShaderInputs():  Container Inputs are", ins)
+        if DEBUG:
+            print("GCNodes::getShaderInputs():  Container Inputs are", ins)
         return ins
 
     def render(self, audio_features=None):
@@ -166,5 +173,3 @@ class GraphContainerNode(Node):
     def deserialize(self, data, hashmap={}, restore_id=True):
         res = super().deserialize(data, hashmap, restore_id)
         return res
-
-

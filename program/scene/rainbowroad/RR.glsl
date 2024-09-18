@@ -192,7 +192,7 @@ vec3 archCOL(vec3 p ) {
  
 float mapStarField(vec3 p, out vec2 id) {
 
-    vec3 rep = vec3(20.);
+    vec3 rep = vec3(5.);
     float scale = 1.;
     p.yz = rotate2d(3.14 / -2.) * p.yz;
     float t = iTime * 15.;
