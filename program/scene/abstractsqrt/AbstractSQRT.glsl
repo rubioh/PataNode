@@ -52,8 +52,11 @@ vec3 hsv2rgb(vec3 c){
 }
 
 vec4 make_square_cell(vec2 coord, vec2 index){
+    
 
     vec2 centered_coord = coord-.5;
+    //float angle = iTime*.4;
+    //centered_coord *= mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     float length_ = max(abs(centered_coord.x), abs(centered_coord.y));
     float radius = energy_fast*.7;
     float square1 = max(abs(centered_coord).x, abs(centered_coord).y);

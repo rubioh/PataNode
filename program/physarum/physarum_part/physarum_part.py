@@ -70,7 +70,7 @@ class PhysarumPart(ProgramBase):
 
     def initParams(self):
         #self.N_part = 150000*16
-        self.N_part = 1000000
+        self.N_part = 250000
         self.part_size = 1
 
         self.iFrame = -1

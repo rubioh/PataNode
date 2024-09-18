@@ -9,6 +9,7 @@ from program.colors.predominant_color.predominant_color import PredominantColorN
 from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
 
+import time
 OP_CODE_SCREEN = 0
 
 @register_program(OP_CODE_SCREEN)

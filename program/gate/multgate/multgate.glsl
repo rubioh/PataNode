@@ -20,6 +20,7 @@ void main()
 
     vec4 col = tex1*tex2+energy*.00001;
     col = mix(tex1, col, drywet);
+    col = col*.00001 + tex1 + tex2;
 
     fragColor = col;
 }
