@@ -1,9 +1,8 @@
-from os.path import dirname, basename, isfile, join
 import time
 import copy
 import os
-import inspect
 import traceback
+import sys
 
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QRectF
@@ -82,7 +81,7 @@ class ShaderNode(Node):
 
         self.value = None  # Using to store output texture reference
         self.program = None
-        self._container = None  # GraphContainer reference
+        self._container = None # GraphContainer reference
         self._win_size = (1920, 1080)
         # Current OpenGL ctx
         self.ctx = scene.ctx
@@ -364,9 +363,22 @@ class ShaderNode(Node):
         return self.program.getGLSLCodePath()
 
     def openGLSLInTerminal(self, glsl_path):
-        os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
+        platform = sys.platform
+
+        if platform.startswith("darwin"):
+            term_program = os.environ.get("TERM_PROGRAM") or "Apple_Terminal"
+
+            if term_program == "iTerm.app":
+                os.system("osascript -e 'tell app \"iTerm2\" to create window with default profile command \"vim %s\"'" % glsl_path)
+            else:
+                os.system("osascript -e 'tell app \"Terminal\" to activate' -e 'tell app \"Terminal\" to do script \"vim %s\"'" % glsl_path)
+        elif platform.startswith("linux"):
+            os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
+        else:
+            print("error: unsupported platform: %s" % platform)
+
         if DEBUG:
-            print("Open in Vim the file %s" % glsl_path)
+            print("Opening in Vim with file %s" % glsl_path)
 
     def transform_audio_features(self, audio_features):
         pass
