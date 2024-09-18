@@ -9,7 +9,8 @@ from qtpy.QtWidgets import QWidget, QLabel, QVBoxLayout, QTextEdit
 class QDMNodeContentWidget(QWidget, Serializable):
     """Base class for representation of the Node's graphics content. This class also provides layout
     for other widgets inside of a :py:class:`~nodeeditor.node_node.Node`"""
-    def __init__(self, node:'Node', parent:QWidget=None):
+
+    def __init__(self, node: "Node", parent: QWidget = None):
         """
         :param node: reference to the :py:class:`~nodeeditor.node_node.Node`
         :type node: :py:class:`~nodeeditor.node_node.Node`
@@ -26,17 +27,16 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.initUI()
 
     def initUI(self):
-        """Sets up layouts and widgets to be rendered in :py:class:`~nodeeditor.node_graphics_node.QDMGraphicsNode` class.
-        """
+        """Sets up layouts and widgets to be rendered in :py:class:`~nodeeditor.node_graphics_node.QDMGraphicsNode` class."""
         self.layout = QVBoxLayout()
-        self.layout.setContentsMargins(0,0,0,0)
+        self.layout.setContentsMargins(0, 0, 0, 0)
         self.setLayout(self.layout)
 
         self.wdg_label = QLabel("Some Title")
         self.layout.addWidget(self.wdg_label)
         self.layout.addWidget(QDMTextEdit("foo"))
 
-    def setEditingFlag(self, value:bool):
+    def setEditingFlag(self, value: bool):
         """
         .. note::
 
@@ -53,22 +53,25 @@ class QDMNodeContentWidget(QWidget, Serializable):
         self.node.scene.getView().editingFlag = value
 
     def serialize(self) -> OrderedDict:
-        return OrderedDict([
-        ])
+        return OrderedDict([])
 
-    def deserialize(self, data:dict, hashmap:dict={}, restore_id:bool=True) -> bool:
+    def deserialize(
+        self, data: dict, hashmap: dict = {}, restore_id: bool = True
+    ) -> bool:
         return True
+
 
 class QDMTextEdit(QTextEdit):
     """
-        .. note::
+    .. note::
 
-            This class is an example of a ``QTextEdit`` modification that handles the `Delete` key event with an overridden
-            Qt's ``keyPressEvent`` (when not using ``QActions`` in menu or toolbar)
+        This class is an example of a ``QTextEdit`` modification that handles the `Delete` key event with an overridden
+        Qt's ``keyPressEvent`` (when not using ``QActions`` in menu or toolbar)
 
-        Overridden ``QTextEdit`` which sends a notification about being edited to its parent's container :py:class:`QDMNodeContentWidget`
+    Overridden ``QTextEdit`` which sends a notification about being edited to its parent's container :py:class:`QDMNodeContentWidget`
     """
-    def focusInEvent(self, event:'QFocusEvent'):
+
+    def focusInEvent(self, event: "QFocusEvent"):
         """Example of an overridden focusInEvent to mark the start of editing
 
         :param event: Qt's focus event
@@ -77,7 +80,7 @@ class QDMTextEdit(QTextEdit):
         self.parentWidget().setEditingFlag(True)
         super().focusInEvent(event)
 
-    def focusOutEvent(self, event:'QFocusEvent'):
+    def focusOutEvent(self, event: "QFocusEvent"):
         """Example of an overridden focusOutEvent to mark the end of editing
 
         :param event: Qt's focus event

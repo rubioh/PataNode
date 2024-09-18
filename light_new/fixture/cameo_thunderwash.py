@@ -21,4 +21,12 @@ class CameoThunderWash(RGB, Fixture):
         "white": 6,
         "sound": 7,
     }
-    CHANNELS_DEFAULTS = {"dimmer": .1, "strobe":.0, "red":.5, "green":.0, "blue":.0, "white":.0, "sound":0.}
+    CHANNELS_DEFAULTS = {
+        "dimmer": 0.1,
+        "strobe": 0.0,
+        "red": 0.5,
+        "green": 0.0,
+        "blue": 0.0,
+        "white": 0.0,
+        "sound": 0.0,
+    }

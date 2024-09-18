@@ -2,13 +2,19 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
-OP_CODE_SYMETRY = name_to_opcode('symetry')
+OP_CODE_SYMETRY = name_to_opcode("symetry")
+
 
 @register_program(OP_CODE_SYMETRY)
 class Symetry(ProgramBase):
@@ -24,7 +30,7 @@ class Symetry(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -38,14 +44,14 @@ class Symetry(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-        'iChannel0' : 'iChannel0',
-        'smooth_low' : 'smlow',
-        'mode' : 'symetry_mode',
-        't' : 't_final',
-        't_angle' : 't_angle_final'
+            "iChannel0": "iChannel0",
+            "smooth_low": "smlow",
+            "mode": "symetry_mode",
+            "t": "t_final",
+            "t_angle": "t_angle_final",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def initParams(self):
         self.chill = False
@@ -57,12 +63,12 @@ class Symetry(ProgramBase):
         self.smlow = 1
         self.rotation_amplification = 1
         self.energy_amplification = 1
-        #self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
-        #self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
+        # self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
+        # self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
         self.automatic_mode = 1
         self.symetry_mode = 1
-        #self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
-        #self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
+        # self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
+        # self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
 
     def updateParams(self, af=None):
         if af is None:
@@ -70,23 +76,25 @@ class Symetry(ProgramBase):
         self.t += af["smooth_full"]
         if af["on_chill"] and not self.chill:
             self.chill = True
-        
+
         if self.automatic_mode:
             if self.chill and not af["on_chill"]:
                 self.symetry_mode ^= 1
                 self.chill = False
 
         if af["on_chill"] == 0.0:
-            self.t_angle += af["full"][0] * 0.01 * (2.5 * self.rotation_amplification + 0.5) - 0.03
+            self.t_angle += (
+                af["full"][0] * 0.01 * (2.5 * self.rotation_amplification + 0.5) - 0.03
+            )
 
-        self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + .5)
+        self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + 0.5)
 
-        self.t_final = self.t * 5.
-        self.t_angle_final = self.t_angle * 5.
+        self.t_final = self.t * 5.0
+        self.t_angle_final = self.t_angle * 5.0
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -109,7 +117,7 @@ class SymetryNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = Symetry(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Symetry(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

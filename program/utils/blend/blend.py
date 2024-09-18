@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_BLEND = name_to_opcode('blend')
+OP_CODE_BLEND = name_to_opcode("blend")
+
 
 @register_program(OP_CODE_BLEND)
 class Blend(ProgramBase):
@@ -25,7 +31,7 @@ class Blend(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -38,8 +44,8 @@ class Blend(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-        self.baseBlend = .5
-        self.bias = 0.
+        self.baseBlend = 0.5
+        self.bias = 0.0
         self.iChannel0 = 1
         self.iChannel1 = 2
         self.baseFactor1 = 0
@@ -49,19 +55,19 @@ class Blend(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iChannel1' : 'iChannel1',
-            'iResolution': 'win_size',
-            'baseBlend': 'baseBlend',
-            'bias': 'bias',
-            'offset1': 'offset1',
-            'offset2': 'offset2',
-            'baseFactor2': 'baseFactor2',
-            'baseFactor1': 'baseFactor1'
+            "iChannel0": "iChannel0",
+            "iChannel1": "iChannel1",
+            "iResolution": "win_size",
+            "baseBlend": "baseBlend",
+            "bias": "bias",
+            "offset1": "offset1",
+            "offset2": "offset2",
+            "baseFactor2": "baseFactor2",
+            "baseFactor1": "baseFactor1",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
-        self.addProtectedUniforms(['iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
+        self.addProtectedUniforms(["iChannel1"])
 
     def updateParams(self, af):
         if af is None:
@@ -70,7 +76,7 @@ class Blend(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -84,6 +90,7 @@ class Blend(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_BLEND)
 class BlendNode(ShaderNode, Utils):
     op_title = "Blend"
@@ -93,7 +100,7 @@ class BlendNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1, 2], outputs=[3])
-        self.program = Blend(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Blend(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

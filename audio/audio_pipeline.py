@@ -51,7 +51,6 @@ class AudioEngine:
             print(devices)
             print("hint: `export PATASHADE_INPUT_DEVICE=<index>`")
             exit(1)
-        
 
         self.log_buffer_size = 250
         # Tracker, estimator and ML models
@@ -68,7 +67,7 @@ class AudioEngine:
         self.mini_chill = 0
 
         self.tic = 0
-        
+
         self.features = {}
         self.initFeatures()
 
@@ -150,7 +149,9 @@ class AudioEngine:
         self.features["_on_kick"] = _on_kick
         self.features["fft"] = np.abs(self.fft)  # First get dft
         self.features["mini_chill"] = self.mini_chill
-        self.add_to_features(self.ET(np.abs(self.fft), self.features, audio=self.buffer))  # Energy things
+        self.add_to_features(
+            self.ET(np.abs(self.fft), self.features, audio=self.buffer)
+        )  # Energy things
         self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
         self.add_to_features(
             self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
@@ -167,5 +168,5 @@ class AudioEngine:
         else:
             self.logger.update_info(self.buffer[self.previous_length :], self.features)
         self.previous_length = self.buffer.shape[0]
-        
+
         return self.features

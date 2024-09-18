@@ -3,6 +3,7 @@ import numpy as np
 
 melbank = librosa.filters.mel(sr=16000, n_fft=1024)
 
+
 class AudioEventTracker:
     def __init__(self):
         self.current_state = dict()
@@ -56,18 +57,18 @@ class AudioEventTracker:
 
     def get_on_kick_vl(self, bpm):
         af = self.current_state
-        dft = af['fft']
-        mel = melbank@dft
+        dft = af["fft"]
+        mel = melbank @ dft
         mel = librosa.core.power_to_db(mel)
         dft[10:] = 0
         self.all_mel[1:] = self.all_mel[:-1]
         self.all_mel[-1] = dft
-    
+
         lag = 1
         onset_env = self.all_mel[lag:] - self.all_mel[:-lag]
         onset_env = np.maximum(0.0, onset_env)
         onset_env = np.mean(onset_env, 1)
-        self.event_features['onset_env'] = onset_env[-1]
+        self.event_features["onset_env"] = onset_env[-1]
 
     def get_on_hat(self):
         if (

@@ -45,8 +45,7 @@ class Pattern(abc.ABC):
         color: np.ndarray,
         pos_s,
         pos_e,
-    ) -> np.ndarray:
-        ...
+    ) -> np.ndarray: ...
 
     def map(self, uid, *args):
         self.mapped[uid] = True

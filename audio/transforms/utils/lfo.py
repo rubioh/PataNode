@@ -5,15 +5,18 @@ import copy
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
+
 def name_to_opcode(name):
     l = [ord(char) for char in name]
     return sum(l)
 
-OP_CODE_LFO = name_to_opcode('lfo')
 
-class LFO():
+OP_CODE_LFO = name_to_opcode("lfo")
+
+
+class LFO:
     def __init__(self):
-        self.title = 'LFO'
+        self.title = "LFO"
 
     def initParams(self):
         self.transform = {
@@ -21,8 +24,8 @@ class LFO():
                 "f0": 1,
                 "phi": 0,
                 "t": time.time(),
-                "amplitude": .5,
-                "offset": .5
+                "amplitude": 0.5,
+                "offset": 0.5,
             }
         }
 
@@ -34,12 +37,13 @@ class LFO():
             t = settings["t"]
             amplitude = settings["amplitude"]
             offset = settings["offset"]
-            lfo_transform = np.cos(f0*t+phi)*amplitude + offset
+            lfo_transform = np.cos(f0 * t + phi) * amplitude + offset
             af["custom_parameters"][param_name] = lfo_transform
         return af
 
     def render(self, af):
         return self.updateAudioFeatures(self, af)
+
 
 @register_node(OP_CODE_LFO)
 class LFONode(AudioNode):

@@ -2,7 +2,12 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 import glm
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
@@ -11,7 +16,8 @@ from node.node_conf import register_node
 from program.mesh_renderer.scene import MeshScene
 from program.mesh_renderer.renderer import Renderer
 
-OP_CODE_DOME = name_to_opcode('dome')
+OP_CODE_DOME = name_to_opcode("dome")
+
 
 @register_program(OP_CODE_DOME)
 class Dome(ProgramBase):
@@ -21,9 +27,11 @@ class Dome(ProgramBase):
 
         self.title = "Dome"
         self.scene = MeshScene("./assets/mesh/dome.glb", ctx)
-        self.renderer = Renderer(ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager)
+        self.renderer = Renderer(
+            ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
+        )
         self.renderer.add_scene(self.scene)
-        self.renderer.add_sun(glm.vec3(1., 0., 0.), glm.vec3(1.))
+        self.renderer.add_sun(glm.vec3(1.0, 0.0, 0.0), glm.vec3(1.0))
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
@@ -32,8 +40,8 @@ class Dome(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 2
         fbos_specification = [
-            [self.win_size, 4, 'f4', True, 3],
-            [self.win_size, 4, 'f4', False, 1]
+            [self.win_size, 4, "f4", True, 3],
+            [self.win_size, 4, "f4", False, 1],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -50,41 +58,39 @@ class Dome(ProgramBase):
     def initParams(self):
         self.time = 0
         self.camera = glm.mat4()
-        self.camera = glm.translate(self.camera, glm.vec3(0., 0., -2.1))
-       # self.camera = glm.translate(self.camera, glm.vec3(0., 10., -2.1)) 
-       # self.camera = glm.rotate(self.camera, .2, glm.vec3(1., 0., 0.))
-        self.projection = glm.perspective(glm.radians(45.), 16./9., 0.1, 1000.)
+        self.camera = glm.translate(self.camera, glm.vec3(0.0, 0.0, -2.1))
+        # self.camera = glm.translate(self.camera, glm.vec3(0., 10., -2.1))
+        # self.camera = glm.rotate(self.camera, .2, glm.vec3(1., 0., 0.))
+        self.projection = glm.perspective(glm.radians(45.0), 16.0 / 9.0, 0.1, 1000.0)
         self.model = glm.mat4()
-        self.model = glm.scale(self.model, glm.vec3( 1., 1., 1.) )
-        self.vitesse = .4
+        self.model = glm.scale(self.model, glm.vec3(1.0, 1.0, 1.0))
+        self.vitesse = 0.4
         self.offset = 0
         self.intensity = 5
         self.smooth_fast = 0
         self.time = 0
         self.tf = 0
-        self.eslow = .4
-        self.emid = .2
+        self.eslow = 0.4
+        self.emid = 0.2
 
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.smooth_fast_final = self.smooth_fast / 2.0
+        self.scale_final = 16 + 8 * np.cos(time.time() * 0.1)
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'time',
-                'energy_fast': 'smooth_fast_final',
-                'energy_slow': 'eslow',
-                'energy_mid': 'emid',
-                'tf' : "tf",
-                'intensity' : "intensity",
-                'scale' : "scale_final"
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "time",
+            "energy_fast": "smooth_fast_final",
+            "energy_slow": "eslow",
+            "energy_mid": "emid",
+            "tf": "tf",
+            "intensity": "intensity",
+            "scale": "scale_final",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
-        self.model = glm.rotate(self.model, .01, glm.vec3(.0, 1., 0.))
+        self.model = glm.rotate(self.model, 0.01, glm.vec3(0.0, 1.0, 0.0))
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
@@ -105,16 +111,15 @@ class Dome(ProgramBase):
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
         self.tf += 0.01
-        self.eslow = af["full"][1] * .75
-        self.emid = af["low"][2] / 2.
-        
+        self.eslow = af["full"][1] * 0.75
+        self.emid = af["low"][2] / 2.0
 
-        self.smooth_fast_final = self.smooth_fast / 2.
-        self.scale_final = 16 + 8 * np.cos(time.time() * .1)
+        self.smooth_fast_final = self.smooth_fast / 2.0
+        self.scale_final = 16 + 8 * np.cos(time.time() * 0.1)
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -122,7 +127,9 @@ class Dome(ProgramBase):
         self.fbos[0].use()
         self.fbos[0].clear()
         self.vao.render()
-        self.renderer.renderGBUFFER(self.model, self.camera, self.projection, self.fbos[0])
+        self.renderer.renderGBUFFER(
+            self.model, self.camera, self.projection, self.fbos[0]
+        )
         self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
         return self.fbos[1].color_attachments[0]
 
@@ -139,7 +146,7 @@ class DomeNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Dome(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Dome(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
 
 
-OP_CODE_HSVBLENDING = name_to_opcode('hsvhsvhsvblending')
+OP_CODE_HSVBLENDING = name_to_opcode("hsvhsvhsvblending")
+
 
 @register_program(OP_CODE_HSVBLENDING)
 class HSVBlending(ProgramBase):
@@ -25,7 +31,7 @@ class HSVBlending(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -47,25 +53,25 @@ class HSVBlending(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'iTime' : 'iTime',
-            'iChannel0' : 'iChannel0',
-            'GradientMap' : 'GradientMap',
-            'hue_offset' : 'hue_offset',
-            'saturation_offset' : 'saturation_offset',
-            'value_offset' : 'value_offset'
+            "iResolution": "win_size",
+            "iTime": "iTime",
+            "iChannel0": "iChannel0",
+            "GradientMap": "GradientMap",
+            "hue_offset": "hue_offset",
+            "saturation_offset": "saturation_offset",
+            "value_offset": "value_offset",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'GradientMap'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "GradientMap"])
 
     def updateParams(self, af):
         if af is None:
             return
-        self.iTime = af['time']
+        self.iTime = af["time"]
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -88,8 +94,8 @@ class HSVNode(ShaderNode, Colors):
     content_label_objname = "shader_hsv_blending"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1,2], outputs=[3])
-        self.program = HSVBlending(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1, 2], outputs=[3])
+        self.program = HSVBlending(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
@@ -104,4 +110,3 @@ class HSVNode(ShaderNode, Colors):
             return self.program.norender()
         output_texture = self.program.render([texture, vel], audio_features)
         return output_texture
-

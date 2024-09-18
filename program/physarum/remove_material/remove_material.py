@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Physarum
 from node.node_conf import register_node
 
 
-OP_CODE_REMOVE_MATERIAL = name_to_opcode('remove_material')
+OP_CODE_REMOVE_MATERIAL = name_to_opcode("remove_material")
+
 
 @register_program(OP_CODE_REMOVE_MATERIAL)
 class RemoveMaterial(ProgramBase):
@@ -25,7 +31,7 @@ class RemoveMaterial(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -41,17 +47,17 @@ class RemoveMaterial(ProgramBase):
         self.BaseTexture = 1
         self.SubTexture = 2
 
-        self.substract_amount = 1.
+        self.substract_amount = 1.0
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'BaseTexture' : 'BaseTexture',
-            'SubTexture' : 'SubTexture',
-            'substract_amount': 'substract_amount',
+            "iResolution": "win_size",
+            "BaseTexture": "BaseTexture",
+            "SubTexture": "SubTexture",
+            "substract_amount": "substract_amount",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['BaseTexture',  'SubTexture'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["BaseTexture", "SubTexture"])
 
     def updateParams(self, af):
         if af is None:
@@ -60,7 +66,7 @@ class RemoveMaterial(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -84,7 +90,7 @@ class RemoveMaterialNode(ShaderNode, Physarum):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[2, 1], outputs=[3])
-        self.program = RemoveMaterial(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = RemoveMaterial(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

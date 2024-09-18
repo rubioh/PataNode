@@ -2,7 +2,12 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
@@ -11,7 +16,8 @@ from node.node_conf import register_node
 import yaml
 
 
-OP_CODE_DIRECTIONALARCHE = name_to_opcode('directionalarche')
+OP_CODE_DIRECTIONALARCHE = name_to_opcode("directionalarche")
+
 
 @register_program(OP_CODE_DIRECTIONALARCHE)
 class DirectionalArche(ProgramBase):
@@ -28,9 +34,7 @@ class DirectionalArche(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -43,18 +47,18 @@ class DirectionalArche(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iTime' : 'time',
-            'iResolution': 'win_size',
-            'width': 'width',
-            'radius': 'radius',
-            'y_offset': 'y_offset',
-            'x_offset': 'x_offset'
+            "iTime": "time",
+            "iResolution": "win_size",
+            "width": "width",
+            "radius": "radius",
+            "y_offset": "y_offset",
+            "x_offset": "x_offset",
         }
-        super().initUniformsBinding(binding, program_name='')
+        super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
-    
+
     def initParams(self):
-        self.vitesse = .4
+        self.vitesse = 0.4
         self.time = 0
         with open("resources/zozo_conf.yaml") as stream:
             arch_conf = yaml.safe_load(stream)["arch"]
@@ -67,11 +71,11 @@ class DirectionalArche(ProgramBase):
         return self.adaptableParametersDict
 
     def updateParams(self, af=None):
-        self.time += .01*self.vitesse
+        self.time += 0.01 * self.vitesse
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -83,6 +87,7 @@ class DirectionalArche(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_DIRECTIONALARCHE)
 class DirectionalArcheNode(ShaderNode, Scene):
     op_title = "DirectionalArche"
@@ -92,9 +97,8 @@ class DirectionalArcheNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = DirectionalArche(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = DirectionalArche(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
-
 
     def render(self, audio_features=None):
         if self.program.already_called:

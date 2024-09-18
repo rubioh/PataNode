@@ -4,14 +4,20 @@ import numpy as np
 import moderngl as mgl
 from pyrr import Matrix44
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Physarum
 from node.node_conf import register_node
 
 
-OP_CODE_PHYSARUMPART = name_to_opcode('physa1')
+OP_CODE_PHYSARUMPART = name_to_opcode("physa1")
+
 
 @register_program(OP_CODE_PHYSARUMPART)
 class PhysarumPart(ProgramBase):
@@ -27,7 +33,7 @@ class PhysarumPart(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4', True],
+            [self.win_size, 4, "f4", True],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -45,11 +51,7 @@ class PhysarumPart(ProgramBase):
         frag_path = join(dirname(__file__), "particules/draw.frag")
         vao_binding = [(self.vbo1, "4f4", "in_infos")]
         self.loadProgramToCtx(
-            vert_path, 
-            frag_path, 
-            reload, 
-            'draw_', 
-            vao_binding=vao_binding
+            vert_path, frag_path, reload, "draw_", vao_binding=vao_binding
         )
 
         vert_path = join(dirname(__file__), "particules/transform.vert")
@@ -57,11 +59,12 @@ class PhysarumPart(ProgramBase):
         varyings = ["out_infos"]
         vao_binding = [(self.vbo1, "4f4", "in_infos")]
         self.loadProgramToCtx(
-            vert_path, frag_path, 
-            reload, 
-            'transform_', 
-            vao_binding=vao_binding,          
-            varyings=varyings
+            vert_path,
+            frag_path,
+            reload,
+            "transform_",
+            vao_binding=vao_binding,
+            varyings=varyings,
         )
 
         vert_path = SQUARE_VERT_PATH
@@ -69,30 +72,29 @@ class PhysarumPart(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-        #self.N_part = 150000*16
-        self.N_part = 250000
+        # self.N_part = 150000*16
+        self.N_part = 1000000
         self.part_size = 1
 
         self.iFrame = -1
 
-        self.sensor_direction = 1.2 #22.5/180*np.pi # theta
-        self.update_direction = .5 # 22.5/180*np.pi # phi
-        self.trail_thresh = 2500 #TODO
-        self.velocity_rate = 2.
+        self.sensor_direction = 1.2  # 22.5/180*np.pi # theta
+        self.update_direction = 0.5  # 22.5/180*np.pi # phi
+        self.trail_thresh = 2500  # TODO
+        self.velocity_rate = 2.0
         self.sensor_length = 10
 
         self.to_center_amount = 0
 
         self.Trail = 0
         self.SeedTex = 1
-        
-        W = (self.win_size[0]*2, self.win_size[1]*2)
-        self.seed_texture = self.ctx.texture(size=W, components=4, dtype='f4')
+
+        W = (self.win_size[0] * 2, self.win_size[1] * 2)
+        self.seed_texture = self.ctx.texture(size=W, components=4, dtype="f4")
         random = np.float32(np.random.rand(*W, 4))
         self.seed_texture.write(random)
         print(self.win_size)
         print(self.velocity_rate)
-
 
     def updateParams(self, af):
         self.iFrame += 1
@@ -101,11 +103,10 @@ class PhysarumPart(ProgramBase):
         return
 
     def initUniformsBinding(self):
-        binding = {
-        }
+        binding = {}
         super().initUniformsBinding(binding, program_name="draw_")
         binding = {
-            "iFrame" : "iFrame",
+            "iFrame": "iFrame",
             "part_size": "part_size",
             "iResolution": "win_size",
             "sensor_direction": "sensor_direction",
@@ -115,16 +116,15 @@ class PhysarumPart(ProgramBase):
             "sensor_length": "sensor_length",
             "to_center_amount": "to_center_amount",
             "Trail": "Trail",
-            "SeedTex": "SeedTex"
+            "SeedTex": "SeedTex",
         }
         super().initUniformsBinding(binding, program_name="transform_")
-        self.addProtectedUniforms(['iChannel0', 'Trail', "SeedTex"])
+        self.addProtectedUniforms(["iChannel0", "Trail", "SeedTex"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='draw_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='transform_')
-
+        self.programs_uniforms.bindUniformToProgram(af, program_name="draw_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="transform_")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -146,6 +146,7 @@ class PhysarumPart(ProgramBase):
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
+
 
 @register_node(OP_CODE_PHYSARUMPART)
 class PhysarumPartNode(ShaderNode, Physarum):
@@ -172,4 +173,3 @@ class PhysarumPartNode(ShaderNode, Physarum):
             texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture
-

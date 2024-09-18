@@ -6,12 +6,17 @@ from qtpy.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsItem
 from qtpy.QtGui import QColor, QPen, QPainterPath
 from qtpy.QtCore import Qt, QRectF, QPointF
 
-from nodeeditor.node_graphics_edge_path import GraphicsEdgePathBezier, GraphicsEdgePathDirect, GraphicsEdgePathSquare
+from nodeeditor.node_graphics_edge_path import (
+    GraphicsEdgePathBezier,
+    GraphicsEdgePathDirect,
+    GraphicsEdgePathSquare,
+)
 
 
 class QDMGraphicsEdge(QGraphicsPathItem):
     """Base class for Graphics Edge"""
-    def __init__(self, edge:'Edge', parent:QWidget=None):
+
+    def __init__(self, edge: "Edge", parent: QWidget = None):
         """
         :param edge: reference to :class:`~nodeeditor.node_edge.Edge`
         :type edge: :class:`~nodeeditor.node_edge.Edge`
@@ -70,7 +75,12 @@ class QDMGraphicsEdge(QGraphicsPathItem):
 
     def determineEdgePathClass(self):
         """Decide which GraphicsEdgePath class should be used to calculate path according to edge.edge_type value"""
-        from nodeeditor.node_edge import EDGE_TYPE_BEZIER, EDGE_TYPE_DIRECT, EDGE_TYPE_SQUARE
+        from nodeeditor.node_edge import (
+            EDGE_TYPE_BEZIER,
+            EDGE_TYPE_DIRECT,
+            EDGE_TYPE_SQUARE,
+        )
+
         if self.edge.edge_type == EDGE_TYPE_BEZIER:
             return GraphicsEdgePathBezier
         if self.edge.edge_type == EDGE_TYPE_DIRECT:
@@ -96,14 +106,17 @@ class QDMGraphicsEdge(QGraphicsPathItem):
         """Change color according to connected sockets. Returns ``True`` if color can be determined"""
         socket_type_start = self.edge.start_socket.socket_type
         socket_type_end = self.edge.end_socket.socket_type
-        if socket_type_start != socket_type_end: return False
-        self.changeColor(self.edge.start_socket.grSocket.getSocketColor(socket_type_start))
+        if socket_type_start != socket_type_end:
+            return False
+        self.changeColor(
+            self.edge.start_socket.grSocket.getSocketColor(socket_type_start)
+        )
 
     def onSelected(self):
         """Our event handling when the edge was selected"""
         self.edge.scene.grScene.itemSelected.emit()
 
-    def doSelect(self, new_state:bool=True):
+    def doSelect(self, new_state: bool = True):
         """Safe version of selecting the `Graphics Node`. Takes care about the selection state flag used internally
 
         :param new_state: ``True`` to select, ``False`` to deselect
@@ -111,7 +124,8 @@ class QDMGraphicsEdge(QGraphicsPathItem):
         """
         self.setSelected(new_state)
         self._last_selected_state = new_state
-        if new_state: self.onSelected()
+        if new_state:
+            self.onSelected()
 
     def mouseReleaseEvent(self, event):
         """Overridden Qt's method to handle selecting and deselecting this `Graphics Edge`"""
@@ -121,18 +135,18 @@ class QDMGraphicsEdge(QGraphicsPathItem):
             self._last_selected_state = self.isSelected()
             self.onSelected()
 
-    def hoverEnterEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+    def hoverEnterEvent(self, event: "QGraphicsSceneHoverEvent") -> None:
         """Handle hover effect"""
         self.hovered = True
         self.update()
 
-    def hoverLeaveEvent(self, event: 'QGraphicsSceneHoverEvent') -> None:
+    def hoverLeaveEvent(self, event: "QGraphicsSceneHoverEvent") -> None:
         """Handle hover effect"""
         self.hovered = False
         self.update()
 
-    def setSource(self, x:float, y:float):
-        """ Set source point
+    def setSource(self, x: float, y: float):
+        """Set source point
 
         :param x: x position
         :type x: ``float``
@@ -141,8 +155,8 @@ class QDMGraphicsEdge(QGraphicsPathItem):
         """
         self.posSource = [x, y]
 
-    def setDestination(self, x:float, y:float):
-        """ Set destination point
+    def setDestination(self, x: float, y: float):
+        """Set destination point
 
         :param x: x position
         :type x: ``float``
@@ -165,7 +179,7 @@ class QDMGraphicsEdge(QGraphicsPathItem):
 
     def paint(self, painter, QStyleOptionGraphicsItem, widget=None):
         """Qt's overridden method to paint this Graphics Edge. Path calculated
-            in :func:`~nodeeditor.node_graphics_edge.QDMGraphicsEdge.calcPath` method"""
+        in :func:`~nodeeditor.node_graphics_edge.QDMGraphicsEdge.calcPath` method"""
         self.setPath(self.calcPath())
 
         painter.setBrush(Qt.NoBrush)
@@ -181,7 +195,7 @@ class QDMGraphicsEdge(QGraphicsPathItem):
 
         painter.drawPath(self.path())
 
-    def intersectsWith(self, p1:QPointF, p2:QPointF) -> bool:
+    def intersectsWith(self, p1: QPointF, p2: QPointF) -> bool:
         """Does this Graphics Edge intersect with the line between point A and point B ?
 
         :param p1: point A
@@ -205,4 +219,3 @@ class QDMGraphicsEdge(QGraphicsPathItem):
         :rtype: ``QPainterPath``
         """
         return self.pathCalculator.calcPath()
-

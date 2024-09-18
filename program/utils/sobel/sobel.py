@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_SOBEL = name_to_opcode('sobel')
+OP_CODE_SOBEL = name_to_opcode("sobel")
+
 
 @register_program(OP_CODE_SOBEL)
 class Sobel(ProgramBase):
@@ -25,7 +31,7 @@ class Sobel(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -44,13 +50,13 @@ class Sobel(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iResolution': 'win_size',
-            'nrj': 'nrj',
-            'dry_wet': 'dry_wet'
+            "iChannel0": "iChannel0",
+            "iResolution": "win_size",
+            "nrj": "nrj",
+            "dry_wet": "dry_wet",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, af):
         if af is None:
@@ -60,7 +66,7 @@ class Sobel(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -83,7 +89,7 @@ class SobelNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = Sobel(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Sobel(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

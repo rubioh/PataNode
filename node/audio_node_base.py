@@ -18,6 +18,7 @@ from program.program_conf import GLSLImplementationError, UnuseUniformError
 
 DEBUG = False
 
+
 class AudioGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
         super().initSizes()
@@ -36,18 +37,18 @@ class AudioGraphicsNode(QDMGraphicsNode):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
         offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
+        if self.node.isDirty():
+            offset = 0.0
+        if self.node.isInvalid():
+            offset = 48.0
 
         painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
         )
 
-    def openDialog(self, msg): 
+    def openDialog(self, msg):
         if isinstance(msg, list):
-            msgs = ''
+            msgs = ""
             for m in msg:
                 msgs += m
         else:
@@ -73,12 +74,12 @@ class AudioNode(Node):
     GraphicsNode_class = AudioGraphicsNode
     NodeContent_class = AudioContent
 
-    def __init__(self, scene, inputs=[2,2], outputs=[1]):
+    def __init__(self, scene, inputs=[2, 2], outputs=[1]):
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
-        self.value = None # Using to store output texture reference
+        self.value = None  # Using to store output texture reference
         self.program = None
-        # Current OpenGL ctx
+        # Current OpenGL ctx
         self.ctx = scene.ctx
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
@@ -105,10 +106,13 @@ class AudioNode(Node):
         self.grNode.setToolTip("")
         return True
 
-
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
-            if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+            if DEBUG:
+                print(
+                    " _> returning cached %s value:" % self.__class__.__name__,
+                    self.value,
+                )
             return self.value
         try:
             success = self.evalImplementation()
@@ -119,13 +123,14 @@ class AudioNode(Node):
             dumpException(e)
 
     def onInputChanged(self, socket=None):
-        if DEBUG: print("%s::__onInputChanged" % self.__class__.__name__)
+        if DEBUG:
+            print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
         self.eval()
 
     def serialize(self):
         res = super().serialize()
-        res['op_code'] = self.__class__.op_code
+        res["op_code"] = self.__class__.op_code
 
         return res
 

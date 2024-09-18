@@ -15,12 +15,11 @@ from nodeeditor.utils import dumpException
 DEBUG = True
 
 
-
 class AudioLogWidget(QWidget):
     def __init__(self, audio_engine=None, parent=None):
         super().__init__(parent)
 
-        self.title = 'Audio Features Logger'
+        self.title = "Audio Features Logger"
 
         self.audio_engine = audio_engine
         self.log_buffer_size = self.audio_engine.log_buffer_size
@@ -29,7 +28,7 @@ class AudioLogWidget(QWidget):
 
         self.graphs = {}
 
-        self.time = [0]*self.log_buffer_size
+        self.time = [0] * self.log_buffer_size
         self.data1 = [0]
 
         self.initUI()
@@ -39,28 +38,28 @@ class AudioLogWidget(QWidget):
     @property
     def fps_timer(self):
         return self._fps_timer
+
     @fps_timer.setter
     def fps_timer(self, value):
         self._fps_timer = value
 
-        
     def setData(self):
-        if len(self.data1) != self.audio_engine.logger.log_buffer_size+1:
+        if len(self.data1) != self.audio_engine.logger.log_buffer_size + 1:
             del self.data1
             self.data1 = self.audio_engine.logger.information["smooth_low"]
-            self.time = [i/self.fps_timer for i in range(len(self.data1))]
+            self.time = [i / self.fps_timer for i in range(len(self.data1))]
 
-        #update graph
+        # update graph
         for name, graph in self.graphs.items():
             data = self.audio_engine.logger.information[name]
             graph.clear()
-            time = np.arange(0, len(data))/self.fps_timer
+            time = np.arange(0, len(data)) / self.fps_timer
             graph.plot(time, data, pen=self.pen)
 
     def setHidden(self, value):
         if not value:
             self.show()
-            self.timer.start(int(1/self.fps_timer*1000))
+            self.timer.start(int(1 / self.fps_timer * 1000))
             return
         self.hide()
         self.timer.stop()
@@ -73,32 +72,32 @@ class AudioLogWidget(QWidget):
         self.setPalette(p)
 
         # Main Layout
-        self.mainLayout= QHBoxLayout(self)
+        self.mainLayout = QHBoxLayout(self)
 
         # List Box widget
         self.list_box = AudioFeaturesDragListBox(self.audio_engine.logger.information)
         self.mainLayout.addWidget(self.list_box)
-        
+
         # Create graphics widget
         self.initGraphLayout()
         self.mainLayout.addWidget(self.graphLayout)
         self.initTimer()
-        self.resize(self.height(),200)
+        self.resize(self.height(), 200)
 
     def initGraphLayout(self):
         self.graphLayout = GraphicsLayoutWidget()
-        self.addGraph('smooth_low')
+        self.addGraph("smooth_low")
 
     def addGraph(self, name):
         if name not in self.graphs.keys():
             graph = self.graphLayout.addPlot()
             self.graphLayout.nextRow()
-            self.graphLayout.setBackground((40,40,40,220))
-            self.pen = mkPen(color=(255,40,40), width=2)
-            #graph.setBackground((30,30,30,220)) 
+            self.graphLayout.setBackground((40, 40, 40, 220))
+            self.pen = mkPen(color=(255, 40, 40), width=2)
+            # graph.setBackground((30,30,30,220))
             graph.setTitle(name.capitalize().replace("_", " "), color="w", size="10pt")
-            graph.showGrid(x=True, y=True)                      
-            graph.addLegend()           
+            graph.showGrid(x=True, y=True)
+            graph.addLegend()
             self.graphs[name] = graph
 
     def mousePressEvent(self, event):
@@ -117,8 +116,8 @@ class AudioLogWidget(QWidget):
         gpos = graph.pos()
         gwidth = graph.width()
         gheight = graph.height()
-        if pos.x()>gpos.x() and pos.x()<gpos.x()+graph.width():
-            if pos.y()>gpos.y() and pos.y()<gpos.y()+graph.height():
+        if pos.x() > gpos.x() and pos.x() < gpos.x() + graph.width():
+            if pos.y() > gpos.y() and pos.y() < gpos.y() + graph.height():
                 return True
         return False
 
@@ -130,20 +129,20 @@ class AudioLogWidget(QWidget):
         try:
             self.graphLayout.removeItem(graph)
         except:
-            print('Failed to remove item', graph)
-        #self.graphLayout.removeWidget(graph)
+            print("Failed to remove item", graph)
+        # self.graphLayout.removeWidget(graph)
 
     def initTimer(self):
         self.timer = QTimer()
         self.timer.timeout.connect(self.setData)
-        self.timer.start(int(1/self.fps_timer*1000))
+        self.timer.start(int(1 / self.fps_timer * 1000))
 
     def dragEnterEvent(self, e):
         e.accept()
 
     def dropEvent(self, event):
-        if event.mimeData().hasFormat('application/x-item'):
-            eventData = event.mimeData().data('application/x-item')
+        if event.mimeData().hasFormat("application/x-item"):
+            eventData = event.mimeData().data("application/x-item")
             dataStream = QDataStream(eventData, QIODevice.ReadOnly)
             text = dataStream.readQString()
             event.setDropAction(Qt.MoveAction)
@@ -164,12 +163,11 @@ class AudioFeaturesDragListBox(QListWidget):
         self.setDragEnabled(True)
         self.setResizeMode(True)
         self.setFixedWidth(120)
-        
+
         stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
-        stylesheet = open(stylesheet, 'r').read()
+        stylesheet = open(stylesheet, "r").read()
         self.setStyleSheet(stylesheet)
         self.addMyItems()
-
 
     def addMyItems(self):
         keys = list(self.keys)
@@ -181,14 +179,14 @@ class AudioFeaturesDragListBox(QListWidget):
         item = QListWidgetItem(name, self)
         item.setText(name)
         item.setForeground(QColor("#FFFFFF"))
-        item.setSizeHint(QSize(16,16))
+        item.setSizeHint(QSize(16, 16))
         item.setFlags(Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled)
         item.setData(Qt.UserRole, name)
 
     def startDrag(self, *args, **kwargs):
         try:
             item = self.currentItem()
-            
+
             item_data = item.data(Qt.UserRole)
             itemData = QByteArray()
             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
@@ -204,17 +202,16 @@ class AudioFeaturesDragListBox(QListWidget):
             dumpException(e)
 
 
-if __name__ == '__main__':
-        app = QApplication(sys.argv)
-        ae = AudioEngine()
-        ae.start_recording()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    ae = AudioEngine()
+    ae.start_recording()
 
-        timer = QTimer()
-        timer.timeout.connect(ae.__call__)
-        timer.start(int(1/60*1000))
+    timer = QTimer()
+    timer.timeout.connect(ae.__call__)
+    timer.start(int(1 / 60 * 1000))
 
+    ex = AudioLogWidget(ae)
+    ex.show()
 
-        ex = AudioLogWidget(ae)
-        ex.show()
-        
-        sys.exit(app.exec())
+    sys.exit(app.exec())

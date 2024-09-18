@@ -17,8 +17,8 @@ from nodeeditor.utils import dumpException
 from program.program_conf import GLSLImplementationError, UnuseUniformError
 
 
-
 DEBUG = True
+
 
 class ShaderGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
@@ -38,18 +38,18 @@ class ShaderGraphicsNode(QDMGraphicsNode):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
         offset = 24.0
-        if self.node.isDirty(): offset = 0.0
-        if self.node.isInvalid(): offset = 48.0
+        if self.node.isDirty():
+            offset = 0.0
+        if self.node.isInvalid():
+            offset = 48.0
 
         painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0),
-            self.icons,
-            QRectF(offset, 0, 24.0, 24.0)
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
         )
 
-    def openDialog(self, msg): 
+    def openDialog(self, msg):
         if isinstance(msg, list):
-            msgs = ''
+            msgs = ""
             for m in msg:
                 msgs += m
         else:
@@ -75,15 +75,15 @@ class ShaderNode(Node):
     GraphicsNode_class = ShaderGraphicsNode
     NodeContent_class = ShaderContent
 
-    def __init__(self, scene, inputs=[2,2], outputs=[1]):
-        #inputs = [0] + inputs
+    def __init__(self, scene, inputs=[2, 2], outputs=[1]):
+        # inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
-        self.value = None # Using to store output texture reference
+        self.value = None  # Using to store output texture reference
         self.program = None
-        self._container = None # GraphContainer reference 
+        self._container = None  # GraphContainer reference
         self._win_size = (1920, 1080)
-        # Current OpenGL ctx
+        # Current OpenGL ctx
         self.ctx = scene.ctx
         # it's really important to mark all nodes Dirty by default
         self.markDirty()
@@ -94,7 +94,13 @@ class ShaderNode(Node):
 
     @container.setter
     def container(self, value):
-        if DEBUG: print("ShaderNode::container.setter bind container ", value, "to ShaderNode", self.__class__.__name__)
+        if DEBUG:
+            print(
+                "ShaderNode::container.setter bind container ",
+                value,
+                "to ShaderNode",
+                self.__class__.__name__,
+            )
         self._container = value
 
     @property
@@ -124,7 +130,7 @@ class ShaderNode(Node):
         if self.program is not None:
             return self.program.getAdaptableParameters()
         return None
-    
+
     def getUniformsBinding(self):
         if self.program is not None:
             return self.program.getUniformsBinding()
@@ -138,24 +144,30 @@ class ShaderNode(Node):
     def restoreFBODependencies(self):
         self.program.fbos = None
 
-    def findAndConnectFbos(self, win_sizes, components=None, dtypes=None, depth=None, num_textures = None):
+    def findAndConnectFbos(
+        self, win_sizes, components=None, dtypes=None, depth=None, num_textures=None
+    ):
         if self.program.fbos is not None:
             # fbos already connected
             return True
         fbos = self.scene.fbo_manager.getFBO(
-                win_sizes, components, dtypes, depth, num_textures
+            win_sizes, components, dtypes, depth, num_textures
         )
         try:
             self.program.connectFbos(fbos)
         except AssertionError:
-            print("Created fbos doesn't match the number of required fbos for %s"%self.program.__class__.__name__)
+            print(
+                "Created fbos doesn't match the number of required fbos for %s"
+                % self.program.__class__.__name__
+            )
             self.grNode.setToolTip("No fbo's found")
             self.markInvalid()
             return False
         return True
 
     def evalInputNodes(self):
-        if DEBUG: print("Eval Inputs:", self)
+        if DEBUG:
+            print("Eval Inputs:", self)
         # TODO Several Textures test
         input_nodes = self.getShaderInputs()
         if not input_nodes:
@@ -177,7 +189,7 @@ class ShaderNode(Node):
         sockets = self.inputs
         ins = []
         for i, sockets in enumerate(sockets):
-            if sockets.socket_type == 0: # socket_type 0 means audio_input
+            if sockets.socket_type == 0:  # socket_type 0 means audio_input
                 continue
             ins += super().getInputs(i)
         return ins
@@ -185,8 +197,15 @@ class ShaderNode(Node):
     def evalRendering(self, textures=None):
         try:
             output_texture = self.program.render(textures)
-            if DEBUG: print("ShaderNode::evalRendering output_texture is ", output_texture,
-                    "from ShaderNode", self, "of class", self.__class__.__name__)
+            if DEBUG:
+                print(
+                    "ShaderNode::evalRendering output_texture is ",
+                    output_texture,
+                    "from ShaderNode",
+                    self,
+                    "of class",
+                    self.__class__.__name__,
+                )
             self.value = output_texture
             return True
         except Exception as e:
@@ -199,16 +218,21 @@ class ShaderNode(Node):
         return True
 
     def evalImplementation(self):
-        if DEBUG: print("Eval Implementation:", self)
-        # Find and Connect required fbos
-        win_sizes, components, dtypes, depth_requirements, num_texture = self.program.getFBOSpecifications() 
-        success = self.findAndConnectFbos(win_sizes, components, dtypes, depth_requirements, num_texture)
+        if DEBUG:
+            print("Eval Implementation:", self)
+        # Find and Connect required fbos
+        win_sizes, components, dtypes, depth_requirements, num_texture = (
+            self.program.getFBOSpecifications()
+        )
+        success = self.findAndConnectFbos(
+            win_sizes, components, dtypes, depth_requirements, num_texture
+        )
         if not success:
             return False
         # Eval Input Node
         inputs = []
         for ins in self.inputs:
-            if ins.socket_type == 0: # socket_type 0 means audio_input
+            if ins.socket_type == 0:  # socket_type 0 means audio_input
                 continue
             inputs.append(ins)
         if inputs:
@@ -227,14 +251,19 @@ class ShaderNode(Node):
             return True
         return False
 
-
     def eval(self):
-        if DEBUG: print("Eval:", self)
+        if DEBUG:
+            print("Eval:", self)
         if not self.isDirty() and not self.isInvalid():
-            if DEBUG: print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+            if DEBUG:
+                print(
+                    " _> returning cached %s value:" % self.__class__.__name__,
+                    self.value,
+                )
             return self.value
         try:
-            if DEBUG: print('Eval Try', self)
+            if DEBUG:
+                print("Eval Try", self)
             success = self.evalImplementation()
             return self.value
         except ValueError as e:
@@ -247,12 +276,14 @@ class ShaderNode(Node):
             dumpException(e)
 
     def onInputChanged(self, socket=None):
-        if DEBUG: print("%s::__onInputChanged" % self.__class__.__name__)
+        if DEBUG:
+            print("%s::__onInputChanged" % self.__class__.__name__)
         self.markDirty()
         self.eval()
 
     def reloadGLSLCode(self):
-        if DEBUG: print("Program before reloading is: ", self.program.program)
+        if DEBUG:
+            print("Program before reloading is: ", self.program.program)
         try:
             self.program.reloadProgramSafely()
             self.markDirty()
@@ -268,14 +299,16 @@ class ShaderNode(Node):
             self.grNode.setToolTip("Unuse Uniform Error")
             self.grNode.openDialog(traceback.format_exception(e))
             self.program.reloadPreviousProgramVersion()
-        if DEBUG: print("Program after reloading is: ", self.program.program)
+        if DEBUG:
+            print("Program after reloading is: ", self.program.program)
 
     def getGLSLCodePath(self):
         return self.program.getGLSLCodePath()
 
     def openGLSLInTerminal(self, glsl_path):
         os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
-        if DEBUG: print("Open in Vim the file %s"%glsl_path)
+        if DEBUG:
+            print("Open in Vim the file %s" % glsl_path)
 
     def transform_audio_features(self, audio_features):
         pass
@@ -285,45 +318,68 @@ class ShaderNode(Node):
 
     def serialize(self):
         res = super().serialize()
-        res['op_code'] = self.__class__.op_code
+        res["op_code"] = self.__class__.op_code
 
         adapt_params = copy.deepcopy(self.getAdaptableParameters())
         for program in adapt_params.keys():
             program_params = adapt_params[program]
             for uniform in program_params.keys():
-                del program_params[uniform]['eval_function']['connect']
-        res['adaptable_parameters'] = adapt_params
+                del program_params[uniform]["eval_function"]["connect"]
+        res["adaptable_parameters"] = adapt_params
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
-        res['uniforms_binding'] = uniforms_binding
-        res['win_size'] = self.win_size
+        res["uniforms_binding"] = uniforms_binding
+        res["win_size"] = self.win_size
         return res
 
     def deserialize(self, data, hashmap={}, restore_id=True, restore_window_size=True):
         res = super().deserialize(data, hashmap, restore_id)
-        adapt_params = data['adaptable_parameters']
+        adapt_params = data["adaptable_parameters"]
         node_params = self.getAdaptableParameters()
         for program in adapt_params.keys():
             program_params = adapt_params[program]
             for uniform in program_params.keys():
-                eval_func = program_params[uniform]['eval_function']['value']
-                node_params[program][uniform]['eval_function']['value'] = eval_func
-        uniforms_binding = data['uniforms_binding']
+                eval_func = program_params[uniform]["eval_function"]["value"]
+                node_params[program][uniform]["eval_function"]["value"] = eval_func
+        uniforms_binding = data["uniforms_binding"]
         self.program.restoreUniformsBinding(uniforms_binding)
-        if DEBUG: print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
-        if restore_window_size and 'win_size' in data.keys():
-            self.changeWindowSize(data['win_size'])
+        if DEBUG:
+            print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
+        if restore_window_size and "win_size" in data.keys():
+            self.changeWindowSize(data["win_size"])
         return res
 
 
+class Utils:
+    node_type_reference = "Utils"
 
 
+class Scene:
+    node_type_reference = "Scenes"
 
-class Utils(): node_type_reference = "Utils"
-class Scene(): node_type_reference = "Scenes"
-class Output(): node_type_reference = "Outputs"
-class Input(): node_type_reference = "Input"
-class Texture(): node_type_reference = "Textures"
-class Effects(): node_type_reference = "Effects"
-class Colors(): node_type_reference = "Colors"
-class Particles(): node_type_reference = "Particles"
-class Gate(): node_type_reference = "Gate"
+
+class Output:
+    node_type_reference = "Outputs"
+
+
+class Input:
+    node_type_reference = "Input"
+
+
+class Texture:
+    node_type_reference = "Textures"
+
+
+class Effects:
+    node_type_reference = "Effects"
+
+
+class Colors:
+    node_type_reference = "Colors"
+
+
+class Particles:
+    node_type_reference = "Particles"
+
+
+class Gate:
+    node_type_reference = "Gate"

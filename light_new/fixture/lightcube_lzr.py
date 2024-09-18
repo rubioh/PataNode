@@ -24,4 +24,14 @@ class LightCubeLZR(RGB, Fixture):
         "rotation": 8,
         "auto_rotation": 9,
     }
-    CHANNELS_DEFAULTS = {"dimmer": .5, "strobe":.0, "red":.5, "green":.5, "blue":.5, "white":.0, "laser":0., "rotation": .5, "auto_rotation":.0}
+    CHANNELS_DEFAULTS = {
+        "dimmer": 0.5,
+        "strobe": 0.0,
+        "red": 0.5,
+        "green": 0.5,
+        "blue": 0.5,
+        "white": 0.0,
+        "laser": 0.0,
+        "rotation": 0.5,
+        "auto_rotation": 0.0,
+    }

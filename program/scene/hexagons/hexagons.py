@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_HEXAGONS = name_to_opcode('Hexagons')
+OP_CODE_HEXAGONS = name_to_opcode("Hexagons")
+
 
 @register_program(OP_CODE_HEXAGONS)
 class Hexagons(ProgramBase):
@@ -26,9 +32,7 @@ class Hexagons(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -41,43 +45,40 @@ class Hexagons(ProgramBase):
 
     def initParams(self):
         self.time = 0
-        self.rotation = 0.
-        self.rotationSpeed = 1.;
-        self.offsetSpeed = 1.;
-        self.waveFrequency = 1.;
-        self.waveSpeed = 1.;
-        self.numLayer = 2.;
-        self.waveOffset = 0.;
-        self.res = 1.;
-        self.thickness = 0.;
+        self.rotation = 0.0
+        self.rotationSpeed = 1.0
+        self.offsetSpeed = 1.0
+        self.waveFrequency = 1.0
+        self.waveSpeed = 1.0
+        self.numLayer = 2.0
+        self.waveOffset = 0.0
+        self.res = 1.0
+        self.thickness = 0.0
 
     def initUniformsBinding(self):
         binding = {
-                'iTime': 'time',
-                'rotationSpeed': 'rotationSpeed',
-                'offsetSpeed': 'offsetSpeed',
-                'waveFrequency': 'waveFrequency',
-                'waveSpeed': 'waveSpeed',
-                'numLayer': 'numLayer',
-                'waveOffset': 'waveOffset',
-                'res': 'res',
-                'thickness': 'thickness'
-                }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+            "iTime": "time",
+            "rotationSpeed": "rotationSpeed",
+            "offsetSpeed": "offsetSpeed",
+            "waveFrequency": "waveFrequency",
+            "waveSpeed": "waveSpeed",
+            "numLayer": "numLayer",
+            "waveOffset": "waveOffset",
+            "res": "res",
+            "thickness": "thickness",
+        }
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
         if af is None:
             return
-        self.time = af["time"] / 30.
-        #self.waveOffset = self.waveOffset + af["low"][0];
-
+        self.time = af["time"] / 30.0
+        # self.waveOffset = self.waveOffset + af["low"][0];
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -99,7 +100,7 @@ class HexagonsNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Hexagons(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Hexagons(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 from nodeeditor.utils import dumpException
 
-OP_CODE_SDFBM = name_to_opcode('SDF_BM')
+OP_CODE_SDFBM = name_to_opcode("SDF_BM")
+
 
 @register_program(OP_CODE_SDFBM)
 class SDF_BM(ProgramBase):
@@ -17,7 +23,7 @@ class SDF_BM(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
 
         self.title = "Eye"
-        
+
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
@@ -25,17 +31,14 @@ class SDF_BM(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 2
-        fbos_specification = [
-            [self.win_size, 4, 'f4'],
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"], [self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        # INFO PROGRAM
+        # INFO PROGRAM
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Info/info.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="info_")
@@ -46,28 +49,28 @@ class SDF_BM(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'tm' : 'tma',
-            'tz' : 'tza',
-            'tp' : 'tp_final',
-            'tptt' : 'tptt',
-            'mode_sym' : 'mode_sym',
-            'go_ptt' : 'go_ptt',
-            'go_arms' : 'go_arms',
-            'mode_ptt' : 'mode_ptt',
-            'iResolution' : 'win_size',
+            "tm": "tma",
+            "tz": "tza",
+            "tp": "tp_final",
+            "tptt": "tptt",
+            "mode_sym": "mode_sym",
+            "go_ptt": "go_ptt",
+            "go_arms": "go_arms",
+            "mode_ptt": "mode_ptt",
+            "iResolution": "win_size",
         }
-        super().initUniformsBinding(binding, program_name='info_')
+        super().initUniformsBinding(binding, program_name="info_")
         binding = {
-            'iResolution' : 'win_size',
-            'mode_ptt' : 'go_ptt',  # self.mode_ptt
-            'iChannel0' : 'iChannel0',
-            'go_idx' : 'go_bloom',
-            'goBloom_arms' : 'goBloom_arms',
-            'tc' : 'tc',
-            'go_idx2' : 'go_bloom2'
+            "iResolution": "win_size",
+            "mode_ptt": "go_ptt",  # self.mode_ptt
+            "iChannel0": "iChannel0",
+            "go_idx": "go_bloom",
+            "goBloom_arms": "goBloom_arms",
+            "tc": "tc",
+            "go_idx2": "go_bloom2",
         }
-        super().initUniformsBinding(binding, program_name='normal_')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="normal_")
+        self.addProtectedUniforms(["iChannel0"])
 
     def initParams(self):
         self.tm = 150
@@ -99,11 +102,11 @@ class SDF_BM(ProgramBase):
 
     def updateParams(self, af):
         if af is None:
-            self.tm = time.time()%1000
-            self.tz = time.time()%1000
-            self.tp = time.time()%1000
-            self.tc = time.time()%1000
-            self.tptt = time.time()%1000
+            self.tm = time.time() % 1000
+            self.tz = time.time() % 1000
+            self.tp = time.time() % 1000
+            self.tc = time.time() % 1000
+            self.tptt = time.time() % 1000
             return
         self.tm += 0.01
         self.tz += af["smooth_low"] * 0.1 + 1 / 60 * 0.2
@@ -192,9 +195,8 @@ class SDF_BM(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='info_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='normal_')
-        
+        self.programs_uniforms.bindUniformToProgram(af, program_name="info_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="normal_")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -213,7 +215,8 @@ class SDF_BM(ProgramBase):
     def norender(self):
         return self.fbos[1].color_attachments[0]
 
-        #self.apply_utils(self.manager.utils["Bloom2"])
+        # self.apply_utils(self.manager.utils["Bloom2"])
+
 
 @register_node(OP_CODE_SDFBM)
 class SDF_BMNode(ShaderNode, Scene):
@@ -224,7 +227,7 @@ class SDF_BMNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = SDF_BM(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = SDF_BM(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

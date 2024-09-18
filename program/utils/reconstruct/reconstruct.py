@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_RECONSTRUCT = name_to_opcode('Reconstruct')
+OP_CODE_RECONSTRUCT = name_to_opcode("Reconstruct")
+
 
 @register_program(OP_CODE_RECONSTRUCT)
 class Reconstruct(ProgramBase):
@@ -25,7 +31,7 @@ class Reconstruct(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -46,13 +52,13 @@ class Reconstruct(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iChannel1' : 'iChannel1',
-            'iResolution': 'win_size'
+            "iChannel0": "iChannel0",
+            "iChannel1": "iChannel1",
+            "iResolution": "win_size",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
-        self.addProtectedUniforms(['iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
+        self.addProtectedUniforms(["iChannel1"])
 
     def updateParams(self, af):
         self.iChannel0 = 1
@@ -61,12 +67,12 @@ class Reconstruct(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.updateParams(af)
         if self.texture1 == None or self.texture2 == None:
-        	return self.fbos[0].color_attachments[0]
+            return self.fbos[0].color_attachments[0]
         self.bindUniform(af)
         self.texture1.use(1)
         self.texture2.use(2)
@@ -77,6 +83,7 @@ class Reconstruct(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_RECONSTRUCT)
 class ReconstructNode(ShaderNode, Utils):
     op_title = "Reconstruct"
@@ -86,7 +93,7 @@ class ReconstructNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[2])
-        self.program = Reconstruct(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Reconstruct(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

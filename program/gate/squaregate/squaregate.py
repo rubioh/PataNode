@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Gate
 from node.node_conf import register_node
 
 
-OP_CODE_SQUAREGATE = name_to_opcode('squaregate')
+OP_CODE_SQUAREGATE = name_to_opcode("squaregate")
+
 
 @register_program(OP_CODE_SQUAREGATE)
 class SquareGate(ProgramBase):
@@ -25,7 +31,7 @@ class SquareGate(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -49,30 +55,29 @@ class SquareGate(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'iTime' : 'time',
-            'iChannel0' : 'iChannel0',
-            'iChannel1' : 'iChannel1',
-            'square_size' : 'square_size',
-            'energy' : 'energy',
-            'N_SQUARE' : 'N_SQUARE',
-            'border_size' : 'border_size',
-            'which' : "which"
-
+            "iResolution": "win_size",
+            "iTime": "time",
+            "iChannel0": "iChannel0",
+            "iChannel1": "iChannel1",
+            "square_size": "square_size",
+            "energy": "energy",
+            "N_SQUARE": "N_SQUARE",
+            "border_size": "border_size",
+            "which": "which",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "iChannel1"])
 
     def updateParams(self, af):
         if af is None or self.already_called:
             return
-        self.time += (af['smooth_low']*.05+.01)*.25
-        self.square_size = af['low'][1]*.7 * .5
-        self.energy = af['smooth_low']*3. + .5
+        self.time += (af["smooth_low"] * 0.05 + 0.01) * 0.25
+        self.square_size = af["low"][1] * 0.7 * 0.5
+        self.energy = af["smooth_low"] * 3.0 + 0.5
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -95,8 +100,8 @@ class SquareGateNode(ShaderNode, Gate):
     content_label_objname = "shader_squaregate"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1,1], outputs=[3])
-        self.program = SquareGate(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1, 1], outputs=[3])
+        self.program = SquareGate(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
@@ -110,4 +115,3 @@ class SquareGateNode(ShaderNode, Gate):
         texture2 = input_nodes[1].render(audio_features)
         output_texture = self.program.render([texture1, texture2], audio_features)
         return output_texture
-

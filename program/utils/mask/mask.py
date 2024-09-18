@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
 
 
-OP_CODE_MASK= name_to_opcode('Mask')
+OP_CODE_MASK = name_to_opcode("Mask")
+
 
 @register_program(OP_CODE_MASK)
 class Mask(ProgramBase):
@@ -25,7 +31,7 @@ class Mask(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -43,20 +49,21 @@ class Mask(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'iChannel1' : 'iChannel1',
-            'iResolution': 'win_size',
+            "iChannel0": "iChannel0",
+            "iChannel1": "iChannel1",
+            "iResolution": "win_size",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
-        self.addProtectedUniforms(['iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
+        self.addProtectedUniforms(["iChannel1"])
 
     def updateParams(self, af):
         if af is None:
             return
+
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
@@ -73,6 +80,7 @@ class Mask(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_MASK)
 class BlendNode(ShaderNode, Utils):
     op_title = "Mask"
@@ -82,7 +90,7 @@ class BlendNode(ShaderNode, Utils):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1, 2], outputs=[3])
-        self.program = Mask(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Mask(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

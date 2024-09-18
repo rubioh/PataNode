@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
 
 
-OP_CODE_PATATRACK3D = name_to_opcode('patatrack3D!')
+OP_CODE_PATATRACK3D = name_to_opcode("patatrack3D!")
+
 
 @register_program(OP_CODE_PATATRACK3D)
 class Patatrack3D(ProgramBase):
@@ -27,9 +33,9 @@ class Patatrack3D(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 3
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
-            [self.win_size, 4, 'f4'],
-            [self.win_size, 4, 'f4']
+            [self.win_size, 4, "f4"],
+            [self.win_size, 4, "f4"],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -39,46 +45,46 @@ class Patatrack3D(ProgramBase):
     def initProgram(self, reload=False):
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "sdf/sdf.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, 'sdf_')
+        self.loadProgramToCtx(vert_path, frag_path, reload, "sdf_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "palette/palette.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, 'palette_')
+        self.loadProgramToCtx(vert_path, frag_path, reload, "palette_")
 
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "patatrack3d.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, '')
+        self.loadProgramToCtx(vert_path, frag_path, reload, "")
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'mini_chill' : 'mini_chill',
-            'energy' : 'nrj',
-            'mode' : 'mode',
-            'mode_sym' : 'mode_sym',
-            'tz' : 'tz' ,
-            'tr' : 'tr' ,
-            'tf' : 'tf' ,
-            'th' : 'th' ,
+            "iResolution": "win_size",
+            "mini_chill": "mini_chill",
+            "energy": "nrj",
+            "mode": "mode",
+            "mode_sym": "mode_sym",
+            "tz": "tz",
+            "tr": "tr",
+            "tf": "tf",
+            "th": "th",
         }
-        super().initUniformsBinding(binding, program_name='sdf_')
+        super().initUniformsBinding(binding, program_name="sdf_")
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0',
-            'th' : 'th',
-            'ts' : 'ts',
-            'mode_ptt' : 'mode_ptt',
-            'energy' : 'nrj',
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "th": "th",
+            "ts": "ts",
+            "mode_ptt": "mode_ptt",
+            "energy": "nrj",
         }
-        super().initUniformsBinding(binding, program_name='palette_')
+        super().initUniformsBinding(binding, program_name="palette_")
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0',
-            'energy' : 'nrj',
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "energy": "nrj",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
-    
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
+
     def initParams(self):
         self.iChannel0 = 0
         self.smooth_pitch = 0
@@ -106,8 +112,8 @@ class Patatrack3D(ProgramBase):
     def updateParams(self, af=None):
         if af is None:
             return
-        self.time = af['time']
-        self.nrj = af['smooth_low'] ** .5
+        self.time = af["time"]
+        self.nrj = af["smooth_low"] ** 0.5
         if af["on_kick"]:
             self.prev_tz ^= 1
         self.tz = (self.prev_tz + af["decaying_kick"] ** 2.0) * 3.14159
@@ -138,9 +144,9 @@ class Patatrack3D(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='sdf_')
-        self.programs_uniforms.bindUniformToProgram(af, program_name='palette_')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="sdf_")
+        self.programs_uniforms.bindUniformToProgram(af, program_name="palette_")
 
     def render(self, af=None):
         self.updateParams(af)
@@ -148,7 +154,7 @@ class Patatrack3D(ProgramBase):
 
         self.fbos[0].use()
         self.sdf_vao.render()
-        
+
         self.fbos[0].color_attachments[0].use(0)
         self.fbos[1].use()
         self.palette_vao.render()
@@ -161,6 +167,7 @@ class Patatrack3D(ProgramBase):
     def norender(self):
         return self.fbos[2].color_attachments[0]
 
+
 @register_node(OP_CODE_PATATRACK3D)
 class Patatrack3DNode(ShaderNode, Scene):
     op_title = "Patatrack3D"
@@ -170,9 +177,8 @@ class Patatrack3DNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Patatrack3D(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Patatrack3D(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
-
 
     def render(self, audio_features=None):
         if self.program.already_called:

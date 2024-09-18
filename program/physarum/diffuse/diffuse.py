@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Physarum
 from node.node_conf import register_node
 
 
-OP_CODE_DIFFUSE = name_to_opcode('diffuse')
+OP_CODE_DIFFUSE = name_to_opcode("diffuse")
+
 
 @register_program(OP_CODE_DIFFUSE)
 class Diffuse(ProgramBase):
@@ -25,7 +31,7 @@ class Diffuse(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -40,18 +46,18 @@ class Diffuse(ProgramBase):
     def initParams(self):
         self.BaseTexture = 1
 
-        self.decay_rate = .95
-        self.diffuse_amount = .5
+        self.decay_rate = 0.95
+        self.diffuse_amount = 0.5
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'BaseTexture' : 'BaseTexture',
-            'decay_rate': 'decay_rate',
-            'diffuse_amount': 'diffuse_amount',
+            "iResolution": "win_size",
+            "BaseTexture": "BaseTexture",
+            "decay_rate": "decay_rate",
+            "diffuse_amount": "diffuse_amount",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['AddTexture',  'BaseTexture'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["AddTexture", "BaseTexture"])
 
     def updateParams(self, af):
         if af is None:
@@ -60,7 +66,7 @@ class Diffuse(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -83,7 +89,7 @@ class DiffuseNode(ShaderNode, Physarum):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = Diffuse(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Diffuse(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

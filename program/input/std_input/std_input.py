@@ -2,7 +2,11 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Input
@@ -13,6 +17,7 @@ DEBUG = True
 
 
 OP_CODE_STDINPUT = 2
+
 
 @register_program(OP_CODE_STDINPUT)
 class StdInput(ProgramBase):
@@ -34,7 +39,7 @@ class StdInput(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -56,6 +61,7 @@ class StdInput(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_STDINPUT)
 class StdInputNode(ShaderNode, Input):
     op_title = "Std Input"
@@ -76,7 +82,8 @@ class StdInputNode(ShaderNode, Input):
         self.eval()
 
     def evalInputNodes(self):
-        if DEBUG: print("StdInputNode::evalInputNodes Eval Inputs:", self)
+        if DEBUG:
+            print("StdInputNode::evalInputNodes Eval Inputs:", self)
         # TODO Several Textures test
         input_nodes = self.getShaderInputs()
         if not input_nodes:
@@ -95,9 +102,10 @@ class StdInputNode(ShaderNode, Input):
             return textures
 
     def evalImplementation(self):
-        if DEBUG: print("StdInputNode::evalImplementation Eval Implementation:", self)
-        # Find and Connect required fbos
-        win_sizes, components, dtypes = self.program.getFBOSpecifications() 
+        if DEBUG:
+            print("StdInputNode::evalImplementation Eval Implementation:", self)
+        # Find and Connect required fbos
+        win_sizes, components, dtypes = self.program.getFBOSpecifications()
         success = self.findAndConnectFbos(win_sizes, components, dtypes)
         print("FBOS INPUT OK")
         if not success:
@@ -119,10 +127,12 @@ class StdInputNode(ShaderNode, Input):
         return False
 
     def getShaderInputs(self):
-        if DEBUG: print("StdInputNode::getShaderInputs  current container is", self.container)
+        if DEBUG:
+            print("StdInputNode::getShaderInputs  current container is", self.container)
         if self.container is not None:
             ins = self.container.getShaderInputs()
-            if DEBUG: print("StdInputNode::getShaderInputs  Inputs are", ins)
+            if DEBUG:
+                print("StdInputNode::getShaderInputs  Inputs are", ins)
             return ins
         else:
             self.grNode.setToolTip("No Input connected")

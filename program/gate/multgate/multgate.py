@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Gate
 from node.node_conf import register_node
 
 
-OP_CODE_MULTGATE = name_to_opcode('multgate')
+OP_CODE_MULTGATE = name_to_opcode("multgate")
+
 
 @register_program(OP_CODE_MULTGATE)
 class MultGate(ProgramBase):
@@ -25,7 +31,7 @@ class MultGate(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -45,14 +51,14 @@ class MultGate(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'iChannel0' : 'iChannel0',
-            'iChannel1' : 'iChannel1',
-            'energy' : 'energy',
-            'drywet': 'drywet'
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "iChannel1": "iChannel1",
+            "energy": "energy",
+            "drywet": "drywet",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0', 'iChannel1'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0", "iChannel1"])
 
     def updateParams(self, af):
         if af is None or self.already_called:
@@ -60,7 +66,7 @@ class MultGate(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -83,8 +89,8 @@ class MultGateNode(ShaderNode, Gate):
     content_label_objname = "shader_multgate"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1,2], outputs=[3])
-        self.program = MultGate(ctx=self.scene.ctx, win_size=(1920,1080))
+        super().__init__(scene, inputs=[1, 2], outputs=[3])
+        self.program = MultGate(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
@@ -98,4 +104,3 @@ class MultGateNode(ShaderNode, Gate):
         texture2 = input_nodes[1].render(audio_features)
         output_texture = self.program.render([texture1, texture2], audio_features)
         return output_texture
-

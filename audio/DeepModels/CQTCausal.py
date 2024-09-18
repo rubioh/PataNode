@@ -293,7 +293,9 @@ def create_cqt_kernels(
     if np.max(freqs) > fs / 2 and topbin_check == True:
         raise ValueError(
             "The top bin {}Hz has exceeded the Nyquist frequency, \
-                          please reduce the n_bins".format(np.max(freqs))
+                          please reduce the n_bins".format(
+                np.max(freqs)
+            )
         )
 
     alpha = 2.0 ** (1.0 / bins_per_octave) - 1.0
@@ -608,7 +610,9 @@ class CQTCausal(nn.Module):
         if fmax_t > sr / 2:
             raise ValueError(
                 "The top bin {}Hz has exceeded the Nyquist frequency, \
-                              please reduce the n_bins".format(fmax_t)
+                              please reduce the n_bins".format(
+                    fmax_t
+                )
             )
 
         if (
@@ -631,7 +635,9 @@ class CQTCausal(nn.Module):
             if verbose == True:
                 print(
                     "Early downsampling filter created, \
-                            time used = {:.4f} seconds".format(time() - start)
+                            time used = {:.4f} seconds".format(
+                        time() - start
+                    )
                 )
         else:
             self.downsample_factor = 1.0

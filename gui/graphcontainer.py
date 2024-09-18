@@ -2,7 +2,14 @@ import os
 import time
 
 from PyQt5.QtGui import QIcon, QKeySequence
-from PyQt5.QtWidgets import QMdiArea, QWidget, QDockWidget, QAction, QMessageBox, QFileDialog
+from PyQt5.QtWidgets import (
+    QMdiArea,
+    QWidget,
+    QDockWidget,
+    QAction,
+    QMessageBox,
+    QFileDialog,
+)
 from PyQt5.QtCore import Qt, QSignalMapper
 
 from nodeeditor.utils import loadStylesheets
@@ -40,7 +47,8 @@ class GraphContainerSubWindow(PataNodeSubWindow):
     def bindToContainer(self):
         for node in self.scene.nodes:
             node.container = self.graph_container_node
-            if DEBUG: print("GCSubWindow::bindToContainer Bind container to node", node)
+            if DEBUG:
+                print("GCSubWindow::bindToContainer Bind container to node", node)
 
     def searchOutputNodes(self):
         for node in self.scene.nodes:

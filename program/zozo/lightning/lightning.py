@@ -2,7 +2,12 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
@@ -11,7 +16,8 @@ from node.node_conf import register_node
 import yaml
 
 
-OP_CODE_LIGHTNING = name_to_opcode('lightning')
+OP_CODE_LIGHTNING = name_to_opcode("lightning")
+
 
 @register_program(OP_CODE_LIGHTNING)
 class Lightning(ProgramBase):
@@ -28,9 +34,7 @@ class Lightning(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, 'f4']
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -43,17 +47,17 @@ class Lightning(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution': 'win_size',
-            'width': 'width',
-            'radius': 'radius',
-            'y_offset': 'y_offset',
-            'x_offset': 'x_offset',
-            'nrj': 'nrj',
-            'iTime': 'time'
+            "iResolution": "win_size",
+            "width": "width",
+            "radius": "radius",
+            "y_offset": "y_offset",
+            "x_offset": "x_offset",
+            "nrj": "nrj",
+            "iTime": "time",
         }
-        super().initUniformsBinding(binding, program_name='')
+        super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
-    
+
     def initParams(self):
         self.vitesse = 0
         self.nrj = 0
@@ -65,19 +69,18 @@ class Lightning(ProgramBase):
             self.y_offset = arch_conf["y_offset"]
             self.x_offset = arch_conf["x_offset"]
 
-
     def getParameters(self):
         return self.adaptableParametersDict
 
     def updateParams(self, af=None):
         if af is None:
             return
-        self.time = .1 * af["time"]
+        self.time = 0.1 * af["time"]
         self.nrj = af["smooth_low"]
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
         self.bindUniform(af)
@@ -89,6 +92,7 @@ class Lightning(ProgramBase):
     def norender(self):
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_LIGHTNING)
 class LightningNode(ShaderNode, Scene):
     op_title = "Lightning"
@@ -98,9 +102,8 @@ class LightningNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Lightning(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = Lightning(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
-
 
     def render(self, audio_features=None):
         if self.program.already_called:

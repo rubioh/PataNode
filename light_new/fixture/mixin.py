@@ -73,8 +73,7 @@ class Lyre(PhysicalPositionFixture):
 
 class Color(abc.ABC, Fixture):
     @abc.abstractmethod
-    def update_color(self):
-        ...
+    def update_color(self): ...
 
     def update(self) -> None:
         self.update_color()

@@ -50,12 +50,10 @@ class LightOutput(abc.ABC, Generic[LightOutputConfig]):
 
     @property
     @abc.abstractmethod
-    def universes(self) -> int:
-        ...
+    def universes(self) -> int: ...
 
     @abc.abstractmethod
-    def write(self, buff: bytes) -> None:
-        ...
+    def write(self, buff: bytes) -> None: ...
 
 
 class ArtnetOutput(LightOutput[ArtnetOutputConfig]):

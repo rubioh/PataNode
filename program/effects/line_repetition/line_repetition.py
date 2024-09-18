@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_LREPET = name_to_opcode('lrepet')
+OP_CODE_LREPET = name_to_opcode("lrepet")
+
 
 @register_program(OP_CODE_LREPET)
 class LRepet(ProgramBase):
@@ -25,7 +31,7 @@ class LRepet(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -43,30 +49,45 @@ class LRepet(ProgramBase):
         self.size = 0
         self.mode_size = 1
         self.offset_x = 0
-        self.seed = np.random.rand()*2.*3.14159
+        self.seed = np.random.rand() * 2.0 * 3.14159
 
     def initUniformsBinding(self):
         binding = {
-            'iChannel0' : 'iChannel0',
-            'size' : 'size',
-            'start_uy' : 'start_uy',
-            'offset_x' : 'offset_x'
+            "iChannel0": "iChannel0",
+            "size": "size",
+            "start_uy": "start_uy",
+            "offset_x": "offset_x",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def updateParams(self, af=None):
         if af is None:
             return
-        
-        self.start_uy = self.win_size[1]//2 + np.sin(af['on_tempo32']*2.*3.14159 + af['smooth_low']*2. + self.seed)*self.win_size[1]//4
-        self.size = (af['low'][2] ** 4 * 3.  + af['smooth_low'] * 2.)* 100. * (.5+.5*np.cos(af['time']*.05 + self.seed))
 
-        self.offset_x = 100.*(af['smooth_low']**.5*5.)*np.sin(af['on_tempo2']*2.*3.14159 + self.seed)
+        self.start_uy = (
+            self.win_size[1] // 2
+            + np.sin(
+                af["on_tempo32"] * 2.0 * 3.14159 + af["smooth_low"] * 2.0 + self.seed
+            )
+            * self.win_size[1]
+            // 4
+        )
+        self.size = (
+            (af["low"][2] ** 4 * 3.0 + af["smooth_low"] * 2.0)
+            * 100.0
+            * (0.5 + 0.5 * np.cos(af["time"] * 0.05 + self.seed))
+        )
+
+        self.offset_x = (
+            100.0
+            * (af["smooth_low"] ** 0.5 * 5.0)
+            * np.sin(af["on_tempo2"] * 2.0 * 3.14159 + self.seed)
+        )
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -89,7 +110,7 @@ class LRepetNode(ShaderNode, Effects):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = LRepet(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = LRepet(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

@@ -4,28 +4,36 @@ from node.graph_container_node import GraphContainerNode
 
 LISTBOX_MIMETYPE = "application/x-item"
 
-SHADER_NODES = {
-}
+SHADER_NODES = {}
 
-AUDIO_NODES = {
-}
+AUDIO_NODES = {}
 
 GRAPH_CONTAINER_OPCODE = 666
 
-class ConfException(Exception): pass
-class InvalidNodeRegistration(ConfException): pass
-class OpCodeNotRegistered(ConfException): pass
+
+class ConfException(Exception):
+    pass
+
+
+class InvalidNodeRegistration(ConfException):
+    pass
+
+
+class OpCodeNotRegistered(ConfException):
+    pass
 
 
 def register_node_now(op_code, class_reference):
     if op_code in SHADER_NODES:
-        raise InvalidNodeRegistration("Duplicate node registration of '%s'. There is already %s" %(
-            op_code, SHADER_NODES[op_code]
-        ))
+        raise InvalidNodeRegistration(
+            "Duplicate node registration of '%s'. There is already %s"
+            % (op_code, SHADER_NODES[op_code])
+        )
     if op_code in AUDIO_NODES:
-        raise InvalidNodeRegistration("Duplicate node registration of '%s'. There is already %s" %(
-            op_code, AUDIO_NODES[op_code]
-        ))
+        raise InvalidNodeRegistration(
+            "Duplicate node registration of '%s'. There is already %s"
+            % (op_code, AUDIO_NODES[op_code])
+        )
     if ShaderNode in class_reference.__mro__:
         SHADER_NODES[op_code] = class_reference
     if AudioNode in class_reference.__mro__:
@@ -38,7 +46,9 @@ def register_node(op_code):
     def decorator(original_class):
         register_node_now(op_code, original_class)
         return original_class
+
     return decorator
+
 
 def get_class_from_opcode(op_code):
     if op_code in SHADER_NODES:
@@ -47,8 +57,8 @@ def get_class_from_opcode(op_code):
         return AUDIO_NODES[op_code]
     if op_code == GRAPH_CONTAINER_OPCODE:
         return GraphContainerNode
-    else: raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
-
+    else:
+        raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
 
 
 # import all nodes and register them
@@ -57,4 +67,4 @@ import program.output
 import program.utils
 import audio.transforms
 
-#print(SHADER_NODES)
+# print(SHADER_NODES)

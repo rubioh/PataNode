@@ -1,12 +1,32 @@
 from PyQt5.QtGui import QPixmap, QIcon, QDrag, QColor
-from PyQt5.QtCore import QSize, Qt, QByteArray, QDataStream, QMimeData, QIODevice, QPoint
-from PyQt5.QtWidgets import QListWidget, QAbstractItemView, QListWidgetItem, QTreeWidget, QTreeWidgetItem
+from PyQt5.QtCore import (
+    QSize,
+    Qt,
+    QByteArray,
+    QDataStream,
+    QMimeData,
+    QIODevice,
+    QPoint,
+)
+from PyQt5.QtWidgets import (
+    QListWidget,
+    QAbstractItemView,
+    QListWidgetItem,
+    QTreeWidget,
+    QTreeWidgetItem,
+)
 from PyQt5.Qt import *
 
 from nodeeditor.utils import dumpException
 
-from node.node_conf import AUDIO_NODES, SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.node_conf import (
+    AUDIO_NODES,
+    SHADER_NODES,
+    get_class_from_opcode,
+    LISTBOX_MIMETYPE,
+)
 from node.graph_container_node import GraphContainerNode
+
 
 class QDMDragListbox(QTreeWidget):
     def __init__(self, parent=None):
@@ -21,24 +41,27 @@ class QDMDragListbox(QTreeWidget):
         self.setDragEnabled(True)
 
         self.addShaderNodes()
-        #self.addAudioNodes()
+        # self.addAudioNodes()
         self.addContainerNodes()
-
 
     def addShaderNodes(self):
         keys = list(SHADER_NODES.keys())
         keys.sort()
-        
+
         shader_types = {}
         for key in keys:
             node = get_class_from_opcode(key)
             node_type_reference = node.node_type_reference
             if node_type_reference in shader_types.keys():
-                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
+                shader_types[node_type_reference].append(
+                    (node.op_title, node.icon, node.op_code)
+                )
             else:
                 shader_types[node_type_reference] = list()
-                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
-        
+                shader_types[node_type_reference].append(
+                    (node.op_title, node.icon, node.op_code)
+                )
+
         for shader_type in shader_types:
             shader_type_item = QTreeWidgetItem(self)
             shader_type_item.setText(0, shader_type)
@@ -74,9 +97,9 @@ class QDMDragListbox(QTreeWidget):
         container_type_item.sortChildren(1, Qt.AscendingOrder)
 
     def addMyItem(self, name, icon=None, op_code=0, parent=None):
-        item = QTreeWidgetItem(parent) # can be (icon, text, parent, <int>type)
+        item = QTreeWidgetItem(parent)  # can be (icon, text, parent, <int>type)
 
-        #qname.setTextColor()
+        # qname.setTextColor()
         item.setText(1, name)
         item.setForeground(1, QColor("#BAC18A"))
         pixmap = QPixmap(icon if icon is not None else ".")
@@ -87,7 +110,7 @@ class QDMDragListbox(QTreeWidget):
         # setup data
         item.setData(1, Qt.UserRole, pixmap)
         item.setData(1, Qt.UserRole + 1, op_code)
-        #item.setHidden()
+        # item.setHidden()
 
     def startDrag(self, *args, **kwargs):
         try:
@@ -97,7 +120,6 @@ class QDMDragListbox(QTreeWidget):
             op_code = item.data(1, Qt.UserRole + 1)
 
             pixmap = QPixmap(item.data(1, Qt.UserRole))
-
 
             itemData = QByteArray()
             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
@@ -115,4 +137,5 @@ class QDMDragListbox(QTreeWidget):
 
             drag.exec_(Qt.MoveAction)
 
-        except Exception as e: dumpException(e)
+        except Exception as e:
+            dumpException(e)

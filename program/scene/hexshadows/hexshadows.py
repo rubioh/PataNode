@@ -2,12 +2,19 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
-OP_CODE_HEXSHADOWS = name_to_opcode('hexshadows')
+
+OP_CODE_HEXSHADOWS = name_to_opcode("hexshadows")
+
 
 @register_program(OP_CODE_HEXSHADOWS)
 class HexShadows(ProgramBase):
@@ -29,37 +36,30 @@ class HexShadows(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
-
     def initUniformsBinding(self):
-        binding = {
-            'iTime' : 'iTime',
-            'iResolution' : 'iResolution'
-        }
-        super().initUniformsBinding(binding, program_name='')
-        super().addProtectedUniforms(
-                []
-        )
+        binding = {"iTime": "iTime", "iResolution": "iResolution"}
+        super().initUniformsBinding(binding, program_name="")
+        super().addProtectedUniforms([])
 
     def initParams(self):
-        self.iTime = 0.
+        self.iTime = 0.0
         self.iResolution = self.bwinsize
 
     def update_params(self, af):
         if not af:
             return
-        self.iTime = af['time']
-
+        self.iTime = af["time"]
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af):
         self.update_params(af)
@@ -67,6 +67,7 @@ class HexShadows(ProgramBase):
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
+
 
 @register_node(OP_CODE_HEXSHADOWS)
 class HexShadowsNode(ShaderNode, Scene):
@@ -77,7 +78,7 @@ class HexShadowsNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = HexShadows(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = HexShadows(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):

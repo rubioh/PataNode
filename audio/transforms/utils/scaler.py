@@ -5,15 +5,18 @@ import copy
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
+
 def name_to_opcode(name):
     l = [ord(char) for char in name]
     return sum(l)
 
-OP_CODE_SCALER = name_to_opcode('scaler')
 
-class Scaler():
+OP_CODE_SCALER = name_to_opcode("scaler")
+
+
+class Scaler:
     def __init__(self):
-        self.title = 'Scaler'
+        self.title = "Scaler"
 
     def initParams(self):
         self.transform = {
@@ -22,7 +25,7 @@ class Scaler():
                 "scale": 1,
                 "pow": 1,
                 "out_offset": 0,
-                "to_transform": "smooth_low"
+                "to_transform": "smooth_low",
             }
         }
 
@@ -34,12 +37,13 @@ class Scaler():
             pow_ = settings["pow"]
             scale = settings["scale"]
             to_transform = af[settings["smooth_low"]]
-            scaler_transform = ((to_transform+in_offset)*scale)**pow_ + out_offset
+            scaler_transform = ((to_transform + in_offset) * scale) ** pow_ + out_offset
             af["custom_parameters"][param_name] = scaler_transform
         return af
 
     def render(self, af):
         return self.updateAudioFeatures(self, af)
+
 
 @register_node(OP_CODE_SCALER)
 class ScalerNode(AudioNode):

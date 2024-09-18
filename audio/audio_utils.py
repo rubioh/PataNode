@@ -3,6 +3,7 @@ import librosa
 import numpy as np
 import scipy
 
+
 def next_power_of_2(N):
     return 2 ** (int(np.log2(N)) + 1)
 
@@ -42,40 +43,40 @@ class EnergyTracker:
             "very_low",
             "mid",
             "high",
-            #"50_100",
-            #"100_150",
-            #"150_200",
-            #"200_250",
-            #"250_300",
-            #"300_350",
+            # "50_100",
+            # "100_150",
+            # "150_200",
+            # "200_250",
+            # "250_300",
+            # "300_350",
         ]
         # Normalization parameters
         self.norm = {
             "full": 0.55,
             "low": 10.0,
-            "very_low" : 5.,
+            "very_low": 5.0,
             "high": 0.25,
             "mid": 1.1,
-            #"50_100": 1,
-            #"100_150": 1,
-            #"150_200": 1,
-            #"200_250": 1,
-            #"250_300": 1,
-            #"300_350": 1,
+            # "50_100": 1,
+            # "100_150": 1,
+            # "150_200": 1,
+            # "200_250": 1,
+            # "250_300": 1,
+            # "300_350": 1,
         }
         # Init bandpass tuple -> (lower frequency, higher frequency)
         self.bp = {
             "full": (0, self.sr // 2),
             "high": (4000, self.sr // 2),
-            "very_low" : (60, 200),
+            "very_low": (60, 200),
             "low": (0, 200),
             "mid": (300, 1000),
-            #"50_100" : (50,100),
-            #"100_150" : (100, 150),
-            #"150_200": (150,200),
-            #"200_250": (200,250),
-            #"250_300": (250,300),
-            #"300_350": (300,350),
+            # "50_100" : (50,100),
+            # "100_150" : (100, 150),
+            # "150_200": (150,200),
+            # "200_250": (200,250),
+            # "250_300": (250,300),
+            # "300_350": (300,350),
         }
 
         # Init values to 1 for all the features
@@ -94,19 +95,24 @@ class EnergyTracker:
             self.dsmooth[k] = 0
 
         # Smooth Low DFT things
-        self.dft = np.ones((513, 300))*1e-8
-        
-        freqs = np.array([i*8000/513 for i in range(513)])
-        a_weighting = np.clip(librosa.A_weighting(freqs)+10, .1, 20)
-        self.a_weighting_filters = np.log(a_weighting)-.1
-        self.b_weighting_filters = -librosa.B_weighting(np.array([i*8000/513 for i in range(513)]))
-        self.c_weighting_filters = -librosa.C_weighting(np.array([i*8000/513 for i in range(513)]))
-        self.d_weighting_filters = -librosa.D_weighting(np.array([i*8000/513 for i in range(513)]))
-        self.a_weighting = 0.
-        self.b_weighting = 0.
-        self.c_weighting = 0.
-        self.d_weighting = 0.
+        self.dft = np.ones((513, 300)) * 1e-8
 
+        freqs = np.array([i * 8000 / 513 for i in range(513)])
+        a_weighting = np.clip(librosa.A_weighting(freqs) + 10, 0.1, 20)
+        self.a_weighting_filters = np.log(a_weighting) - 0.1
+        self.b_weighting_filters = -librosa.B_weighting(
+            np.array([i * 8000 / 513 for i in range(513)])
+        )
+        self.c_weighting_filters = -librosa.C_weighting(
+            np.array([i * 8000 / 513 for i in range(513)])
+        )
+        self.d_weighting_filters = -librosa.D_weighting(
+            np.array([i * 8000 / 513 for i in range(513)])
+        )
+        self.a_weighting = 0.0
+        self.b_weighting = 0.0
+        self.c_weighting = 0.0
+        self.d_weighting = 0.0
 
     def update_energy(self, dft):
         for key, cutoffs in self.bp.items():
@@ -124,29 +130,28 @@ class EnergyTracker:
             self.fast[key] = 0.7 * self.slow[key] + 0.3 * instant_energy
 
     def update_a_weighting(self, dft):
-        return # TODO DETECT CE PUTAIN DE KICK JPP GENTLE GRIT MPEG BABY ROLLEN REMIX
-        current_a_weighting = (self.a_weighting_filters*dft).sum()
-        self.a_weighting = self.a_weighting * .5 + current_a_weighting * .5
-        current_b_weighting = (self.b_weighting_filters*dft).sum()
-        self.b_weighting = self.b_weighting * .5 + current_b_weighting * .5
-        current_c_weighting = (self.c_weighting_filters*dft).sum()
-        self.c_weighting = self.c_weighting * .5 + current_c_weighting * .5
-        current_d_weighting = (self.d_weighting_filters*dft).sum()
-        self.d_weighting = self.d_weighting * .5 + current_d_weighting * .5
+        return  # TODO DETECT CE PUTAIN DE KICK JPP GENTLE GRIT MPEG BABY ROLLEN REMIX
+        current_a_weighting = (self.a_weighting_filters * dft).sum()
+        self.a_weighting = self.a_weighting * 0.5 + current_a_weighting * 0.5
+        current_b_weighting = (self.b_weighting_filters * dft).sum()
+        self.b_weighting = self.b_weighting * 0.5 + current_b_weighting * 0.5
+        current_c_weighting = (self.c_weighting_filters * dft).sum()
+        self.c_weighting = self.c_weighting * 0.5 + current_c_weighting * 0.5
+        current_d_weighting = (self.d_weighting_filters * dft).sum()
+        self.d_weighting = self.d_weighting * 0.5 + current_d_weighting * 0.5
 
     def update_smooth(self):
         for key in self.keys:
             prev_d = self.dsmooth[key]
             tmp = np.clip(self.fast[key] - self.slow[key], 0, 100)
-            # SMOOTH FEATURE
+            # SMOOTH FEATURE
             self.smooth[key] = self.smooth[key] * 0.7 + 0.3 * tmp
             # DSMOOTH FEATURE
             self.dsmooth[key] = np.clip(tmp - self.smooth[key], 0, 10)
 
-
     def update_smooth_dft(self):
         self.smooth_low_all[:-1] = self.smooth_low_all[1:]
-        self.smooth_low_all[-1] = self.smooth['low']
+        self.smooth_low_all[-1] = self.smooth["low"]
         final = self.smooth_low_all - np.mean(self.smooth_low_all)
         self.smooth_dft = np.abs(scipy.fftpack.fft(final))
         arg = np.argmax(self.smooth_dft)
@@ -168,8 +173,8 @@ class EnergyTracker:
         res["b_weighting"] = self.b_weighting
         res["c_weighting"] = self.c_weighting
         res["d_weighting"] = self.d_weighting
-        #res['high_low'] = self.smooth['low'] * self.instantaneous['high']
-        #res["smooth_dft"] = self.smooth_dft[:self.n_fft//8]
+        # res['high_low'] = self.smooth['low'] * self.instantaneous['high']
+        # res["smooth_dft"] = self.smooth_dft[:self.n_fft//8]
         return res
 
     def update_boost(self):

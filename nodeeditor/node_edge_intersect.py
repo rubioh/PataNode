@@ -53,9 +53,11 @@ class EdgeIntersect:
 
         # check if the node is dropped on an existing edge
         edge = self.intersect(node_box)
-        if edge is None: return
+        if edge is None:
+            return
 
-        if self.isConnected(node): return
+        if self.isConnected(node):
+            return
 
         # determine the order of start and end
         if edge.start_socket.is_output:
@@ -68,17 +70,20 @@ class EdgeIntersect:
         # The new edges will have the same edge_type as the intersected edge
         edge_type = edge.edge_type
         edge.remove()
-        self.grView.grScene.scene.history.storeHistory('Delete existing edge', setModified=True)
+        self.grView.grScene.scene.history.storeHistory(
+            "Delete existing edge", setModified=True
+        )
 
         new_node_socket_in = node.inputs[0]
         Edge(self.grScene.scene, socket_start, new_node_socket_in, edge_type=edge_type)
         new_node_socket_out = node.outputs[0]
         Edge(self.grScene.scene, new_node_socket_out, socket_end, edge_type=edge_type)
 
-        self.grView.grScene.scene.history.storeHistory('Created new edges by dropping node', setModified=True)
+        self.grView.grScene.scene.history.storeHistory(
+            "Created new edges by dropping node", setModified=True
+        )
 
-
-    def hotZoneRect(self, node: 'Node') -> 'QRectF':
+    def hotZoneRect(self, node: "Node") -> "QRectF":
         """
         Returns A QRectF of creating a box around a node
 
@@ -94,7 +99,6 @@ class EdgeIntersect:
         h = node.grNode.height
         return QRectF(x, y, w, h)
 
-
     def update(self, scene_pos_x: float, scene_pos_y: float):
         """
         Updating during mouse move when grView is in this state
@@ -106,14 +110,17 @@ class EdgeIntersect:
         """
         rect = self.hotZoneRect(self.draggedNode)
         grItems = self.grScene.items(rect)
-        for grEdge in self.hoveredList: grEdge.hovered = False
+        for grEdge in self.hoveredList:
+            grEdge.hovered = False
         self.hoveredList = []
         for grItem in grItems:
-            if hasattr(grItem, 'edge') and not self.draggedNode.hasConnectedEdge(grItem.edge):
+            if hasattr(grItem, "edge") and not self.draggedNode.hasConnectedEdge(
+                grItem.edge
+            ):
                 self.hoveredList.append(grItem)
                 grItem.hovered = True
 
-    def intersect(self, node_box: 'QRectF') -> 'Edge':
+    def intersect(self, node_box: "QRectF") -> "Edge":
         """
         Checking for intersection of a rectangle (usually a `Node`) with edges in the scene
 
@@ -125,11 +132,13 @@ class EdgeIntersect:
         # returns the first edge that intersects with the dropped node, ignores the rest
         grItems = self.grScene.items(node_box)
         for grItem in grItems:
-            if hasattr(grItem, 'edge') and not self.draggedNode.hasConnectedEdge(grItem.edge):
+            if hasattr(grItem, "edge") and not self.draggedNode.hasConnectedEdge(
+                grItem.edge
+            ):
                 return grItem.edge
         return None
 
-    def isConnected(self, node: 'Node'):
+    def isConnected(self, node: "Node"):
         """
         Return ``True`` if node got any connections
 
@@ -138,7 +147,8 @@ class EdgeIntersect:
         :return:
         """
         # Nodes with only inputs or outputs are excluded
-        if node.inputs == [] or node.outputs == []: return True
+        if node.inputs == [] or node.outputs == []:
+            return True
 
         # Check if the node has edges connected
         return node.getInput() or node.getOutputs()

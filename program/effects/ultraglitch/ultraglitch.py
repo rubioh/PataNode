@@ -2,14 +2,20 @@ import time
 import numpy as np
 from os.path import dirname, basename, isfile, join
 
-from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data, register_program, name_to_opcode
+from program.program_conf import (
+    SQUARE_VERT_PATH,
+    get_square_vertex_data,
+    register_program,
+    name_to_opcode,
+)
 from program.program_base import ProgramBase
 
 from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
 
 
-OP_CODE_UGLITCH = name_to_opcode('ultraglitch')
+OP_CODE_UGLITCH = name_to_opcode("ultraglitch")
+
 
 @register_program(OP_CODE_UGLITCH)
 class UltraGlitch(ProgramBase):
@@ -25,7 +31,7 @@ class UltraGlitch(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [
-            [self.win_size, 4, 'f4'],
+            [self.win_size, 4, "f4"],
         ]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -48,20 +54,20 @@ class UltraGlitch(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
-            'iResolution' : 'win_size',
-            'iTime' : 'time',
-            'iChannel0' : 'iChannel0',
-            'on_chill' : 'go_strobe',
-            'change_seed' : 'seed',
-            'stop' : 'tstop'
+            "iResolution": "win_size",
+            "iTime": "time",
+            "iChannel0": "iChannel0",
+            "on_chill": "go_strobe",
+            "change_seed": "seed",
+            "stop": "tstop",
         }
-        super().initUniformsBinding(binding, program_name='')
-        self.addProtectedUniforms(['iChannel0'])
+        super().initUniformsBinding(binding, program_name="")
+        self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, af):
         if af is None:
             return
-        self.time = af['time']
+        self.time = af["time"]
         if af["on_kick"]:
             self.seed = np.random.randint(0, 1000)
             self.stop += 1
@@ -74,12 +80,12 @@ class UltraGlitch(ProgramBase):
             self.go_strobe = True
         else:
             self.go_strobe = False
-        self.tstop = self.stop>16
+        self.tstop = self.stop > 16
         self.tstop = 0
 
     def bindUniform(self, af):
         super().bindUniform(af)
-        self.programs_uniforms.bindUniformToProgram(af, program_name='')
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -102,7 +108,7 @@ class UGlitchNode(ShaderNode, Effects):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])
-        self.program = UltraGlitch(ctx=self.scene.ctx, win_size=(1920,1080))
+        self.program = UltraGlitch(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
 
     def render(self, audio_features=None):
