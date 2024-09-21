@@ -87,9 +87,6 @@ class PhysarumPart(ProgramBase):
 
         self.seed_texture.write(random)
 
-        print(self.win_size)
-        print(self.velocity_rate)
-
     def updateParams(self, af):
         self.iFrame += 1
 
