@@ -93,8 +93,6 @@ class PhysarumPart(ProgramBase):
         self.seed_texture = self.ctx.texture(size=W, components=4, dtype="f4")
         random = np.float32(np.random.rand(*W, 4))
         self.seed_texture.write(random)
-        print(self.win_size)
-        print(self.velocity_rate)
 
     def updateParams(self, af):
         self.iFrame += 1
