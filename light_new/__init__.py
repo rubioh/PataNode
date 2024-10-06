@@ -68,8 +68,12 @@ class InvalidConfigurationError(Exception): ...
 
 class LightEngine:
     def __init__(self):
+<<<<<<< HEAD
         DEFAULT_SCENO_PATH = "light_new/current_sceno.yml"
 
+=======
+        DEFAULT_SCENO_PATH = "light_new/sceno/current_sceno.yml"
+>>>>>>> feat: initial light commit
         try:
             self.sceno = yaml.load(open(DEFAULT_SCENO_PATH), Loader=yaml.CLoader)
         except FileNotFoundError:

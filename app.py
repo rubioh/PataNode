@@ -4,10 +4,10 @@ import copy
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject, QTimer
 
 from audio.audio_pipeline import AudioEngine
+
 from gui.patanode import PataNode
-from light.light import LightEngine
-#from light_new import LightEngine
-import time
+from light.core import LightEngine
+
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
