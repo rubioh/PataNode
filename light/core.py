@@ -9,6 +9,9 @@ import numpy as np
 from light.device import LightDevice
 import light.fixture
 from light.fixture.config import LIGHT_MODELS
+from light.shader_mapper import ShaderMapper
+
+print(LIGHT_MODELS)
 
 class LightEngine:
 
@@ -21,6 +24,7 @@ class LightEngine:
         self.lights = list()
 
         self.load_sceno(sceno_path)
+        self.init_shader_light_binding()
 
         self.wait = 0
         self.prev_ts = time.time()
@@ -36,11 +40,15 @@ class LightEngine:
         light = LIGHT_MODELS[light_name](infos)
         self.lights.append(light)
 
+    def init_shader_light_binding(self):
+        self.shader_mapper = ShaderMapper(self)
+        for light in self.lights:
+            self.shader_mapper.add_light(light)
+
     def __call__(self, color=(0, 0, 0), audio_features=None):
         af = audio_features
         output_buffer = np.zeros((512))
         for light in self.lights:
-            light.update([1.,0.,0.])
             light_buffer = light.get_dmx_buffer()
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
         self.light_device.write(output_buffer)

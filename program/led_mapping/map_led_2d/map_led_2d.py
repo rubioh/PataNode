@@ -11,7 +11,6 @@ from program.program_conf import (
     name_to_opcode,
 )
 from program.program_base import ProgramBase
-from program.led_mapping.map_led_2d.pixels_view import PixelsView
 
 from node.shader_node_base import ShaderNode, LED
 from node.node_conf import register_node
@@ -75,15 +74,8 @@ class MapLed2D(ProgramBase):
         self.buf_col = np.zeros((self.N_part_max, 3))
 
     def initPixels(self):
-        self.pixels = PixelsView(self.N_part_max)
-        self.pixels.addPixelsSubGroup(
-            8, [
-                [960, 540], [960, 540],
-                [960, 540], [960, 540],
-                [360, 540], [360, 550],
-                [360, 540], [360, 550]]
-        )
-        self.pixels.bind_position_in_vbo(self.vbo1)
+        self.shader_light_mapper = self.light_engine.shader_mapper
+        self.shader_light_mapper.bind_position_in_vbo(self.vbo1)
 
     def initUniformsBinding(self):
         binding = {
@@ -103,7 +95,7 @@ class MapLed2D(ProgramBase):
             mgl.POINTS, 
             self.N_part_max
         )
-        self.pixels.read_color(self.vbo2)
+        self.shader_light_mapper.read_color(self.vbo2)
         return self.buf_col
 
     def norender(self):

@@ -4,5 +4,5 @@ ClassicPar:
         dmx_address: 1
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[500, 1250]]
+        canvas_position: [[960, 540]]
         num_pixels: 1
