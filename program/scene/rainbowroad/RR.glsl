@@ -209,7 +209,7 @@ float mapStarField(vec3 p, out vec2 id) {
     id.x = fract(id.x *112.131);
     id.y = 1.;
    // id.x = .2;
-    return opExtrusion(pm  / 2., .05);
+    return opExtrusion(pm  / 2., .05)-100000;
 }
 
 float mapArch(vec3 p) {
@@ -289,11 +289,11 @@ vec2 map(vec3 p, out vec2 id) {
     if (resArch.x < res.x) {
         res = resArch;
     }
-    vec2 resStar = vec2(mapStarField(ps, id2), 4.);
-    if (resStar.x < res.x) {
-        res = resStar;
-        id = id2;
-    }
+    //vec2 resStar = vec2(mapStarField(ps, id2), 4.);
+    //if (resStar.x < res.x) {
+    //    res = resStar;
+    //    id = id2;
+    //}
     return res;
 }
 

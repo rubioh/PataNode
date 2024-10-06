@@ -1,3 +1,4 @@
+from program.effects.blink import blink
 from program.effects.DoG import dog
 from program.effects.bumpmapping import bumpmapping
 from program.effects.column_repetition import column_repetition
@@ -10,6 +11,7 @@ from program.effects.strings import strings
 from program.effects.ultraglitch import ultraglitch
 
 __all__ = [
+    "blink",
     "bumpmapping",
     "column_repetition",
     "dithering",

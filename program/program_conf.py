@@ -68,3 +68,4 @@ import program.particles # noqa: E402
 import program.zozo # noqa: E402
 import program.physarum # noqa: E402
 import program.map # noqa: F401, E402
+import program.led_mapping # noqa: F401
