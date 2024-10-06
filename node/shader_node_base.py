@@ -457,3 +457,6 @@ class Gate:
 
 class Physarum:
     node_type_reference = "Physarum"
+
+class LED:
+    node_type_reference = "LED"

@@ -8,3 +8,4 @@ import program.effects.bumpmapping.bumpmapping
 import program.effects.strings.strings
 import program.effects.dithering.dithering
 import program.effects.orientationaa.orientationaa
+import program.effects.blink.blink
