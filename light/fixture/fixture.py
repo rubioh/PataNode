@@ -40,7 +40,8 @@ class Fixture():
             self.canvas_position = shader_binding["canvas_position"]
             self.num_pixels = shader_binding["num_pixels"]
             assert self.num_pixels == len(self.canvas_position)
-        self.use_shader = False
+        else:
+            self.use_shader = False
 
     def get_dmx_buffer(self):
         dmx_buffer = [0]*len(self.CHANNELS)
@@ -49,4 +50,4 @@ class Fixture():
         return dmx_buffer
 
     def __str__(self):
-        return f"Name : {self.MODEL} \tUniverse : {self.config.address.universe}, Address : {self.config.address.dmx_start_channel} \n"
+        return f"Name : {self.MODEL} \tUniverse : {self.universe}, Address : {self.dmx_address} \n"

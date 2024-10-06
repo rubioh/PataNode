@@ -1,16 +1,16 @@
 {
-    "id": 140527711751504,
+    "id": 140313201132368,
     "scene_width": 64000,
     "scene_height": 64000,
     "nodes": [
         {
-            "id": 140527711752400,
+            "id": 140312560504400,
             "title": "Screen",
-            "pos_x": 205.0,
-            "pos_y": -27.0,
+            "pos_x": -184.0,
+            "pos_y": -223.0,
             "inputs": [
                 {
-                    "id": 140527711812752,
+                    "id": 140312560568336,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -49,14 +49,64 @@
             ]
         },
         {
-            "id": 140527711698704,
+            "id": 140312560555920,
+            "title": "Map Led 2D",
+            "pos_x": -401.0,
+            "pos_y": -77.0,
+            "inputs": [
+                {
+                    "id": 140312560408784,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140312560571920,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 967,
+            "adaptable_parameters": {
+                "get_pixel_col_program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "get_pixel_col_": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": 1
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140312560454480,
             "title": "Eye",
-            "pos_x": -509.0,
-            "pos_y": -114.0,
+            "pos_x": -613.0,
+            "pos_y": -300.0,
             "inputs": [],
             "outputs": [
                 {
-                    "id": 140527711693648,
+                    "id": 140312560472592,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -179,13 +229,13 @@
             ]
         },
         {
-            "id": 140080573637904,
+            "id": 140312560504016,
             "title": "Symetry",
-            "pos_x": -265.0,
-            "pos_y": -138.0,
+            "pos_x": -527.0,
+            "pos_y": -217.0,
             "inputs": [
                 {
-                    "id": 140080573795984,
+                    "id": 140312560467664,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -194,7 +244,7 @@
             ],
             "outputs": [
                 {
-                    "id": 140080573667728,
+                    "id": 140312560506384,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -291,76 +341,26 @@
                 1920,
                 1080
             ]
-        },
-        {
-            "id": 140591459221072,
-            "title": "Map Led 2D",
-            "pos_x": -57.0,
-            "pos_y": -89.0,
-            "inputs": [
-                {
-                    "id": 140591459070352,
-                    "index": 0,
-                    "multi_edges": false,
-                    "position": 2,
-                    "socket_type": 1
-                }
-            ],
-            "outputs": [
-                {
-                    "id": 140591459122896,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 1
-                }
-            ],
-            "content": {},
-            "op_code": 967,
-            "adaptable_parameters": {
-                "get_pixel_col_program": {
-                    "iChannel0": {
-                        "eval_function": {
-                            "name": "iChannel0",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": true
-                        }
-                    }
-                }
-            },
-            "uniforms_binding": {
-                "get_pixel_col_": {
-                    "iChannel0": {
-                        "type": null,
-                        "param_name": 1
-                    }
-                }
-            },
-            "win_size": [
-                1920,
-                1080
-            ]
         }
     ],
     "edges": [
         {
-            "id": 140080573810896,
+            "id": 140312560352336,
             "edge_type": 2,
-            "start": 140527711693648,
-            "end": 140080573795984
+            "start": 140312560472592,
+            "end": 140312560467664
         },
         {
-            "id": 140591459338640,
+            "id": 140312560516880,
             "edge_type": 2,
-            "start": 140080573667728,
-            "end": 140591459070352
+            "start": 140312560506384,
+            "end": 140312560408784
         },
         {
-            "id": 140591459339600,
+            "id": 140312560513168,
             "edge_type": 2,
-            "start": 140591459122896,
-            "end": 140527711812752
+            "start": 140312560571920,
+            "end": 140312560568336
         }
     ]
 }
