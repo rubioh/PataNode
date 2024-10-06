@@ -23,9 +23,10 @@ OP_CODE_MAPLED2D = name_to_opcode("map_led_2d")
 
 @register_program(OP_CODE_MAPLED2D)
 class MapLed2D(ProgramBase):
-    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(1920, 1080)):
+    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(1920, 1080), light_engine=None):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Map Led 2D"
+        self.light_engine = light_engine
     
         self.initParams()
         self.initVBOs()
@@ -116,9 +117,13 @@ class MapLed2DNode(ShaderNode, LED):
     content_label = ""
     content_label_objname = "shader_map_led_2d"
 
-    def __init__(self, scene):
+    def __init__(self, scene, light_engine):
         super().__init__(scene, inputs=[1], outputs=[1])
-        self.program = MapLed2D(ctx=self.scene.ctx, win_size=(480, 270))
+        self.program = MapLed2D(
+            ctx=self.scene.ctx, 
+            win_size=(480, 270), 
+            light_engine=light_engine
+        )
         self.eval()
 
     def render(self, audio_features=None):

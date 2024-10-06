@@ -32,8 +32,7 @@ DEBUG = False
 
 class PataNode(NodeEditorWindow):
 
-    def __init__(self, audio_engine=None):
-        self.audio_engine = audio_engine
+    def __init__(self):
         super().__init__()
 
     def initUI(self):

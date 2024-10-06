@@ -7,7 +7,7 @@ from program.program_manager import ProgramManager, FBOManager
 
 # from light_new import LightEngine
 from audio.audio_pipeline import AudioEngine
-from light.light import LightEngine
+from light.core import LightEngine
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 
 
@@ -34,7 +34,7 @@ class PataShade(PataNode):
     def __init__(self):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
-        super().__init__(audio_engine=self.audio_engine)
+        super().__init__()
 
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool

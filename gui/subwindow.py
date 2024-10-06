@@ -27,6 +27,7 @@ DEBUG_CONTEXT = False
 class PataNodeSubWindow(NodeEditorWidget):
     def __init__(self, app=None):
         self.app = app
+        self.light_engine = app.light_engine
         super().__init__()
         # self.setAttribute(Qt.WA_DeleteOnClose)
 
@@ -46,6 +47,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         self._close_event_listeners = []
 
         self.screen_node = None
+
 
     def searchScreenNodes(self):
         # TODO better logic if multiple screen or output nodes
@@ -166,7 +168,8 @@ class PataNodeSubWindow(NodeEditorWidget):
                 )
 
             try:
-                node = get_class_from_opcode(op_code)(self.scene)
+                node_class = get_class_from_opcode(op_code)
+                node = self.init_node(node_class)
                 if isinstance(node, GraphContainerNode):
                     node.setApp(self.app)
                 node.setPos(scene_position.x(), scene_position.y())
@@ -175,12 +178,18 @@ class PataNodeSubWindow(NodeEditorWidget):
                 )
             except Exception as e:
                 dumpException(e)
-
             event.setDropAction(Qt.MoveAction)
             event.accept()
         else:
             # print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
             event.ignore()
+
+    def init_node(self, node_class):
+        if node_class.__name__ == "MapLed2DNode":
+            node = node_class(self.scene, self.light_engine)
+        else:
+            node = node_class(self.scene)
+        return node
 
     def contextMenuEvent(self, event):
         try:
