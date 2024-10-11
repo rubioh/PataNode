@@ -59,9 +59,9 @@ class MapLed2D(ProgramBase):
             varyings=varyings
         )
 
-        #vert_path = SQUARE_VERT_PATH
-        #frag_path = join(dirname(__file__), "previs.glsl")
-        #self.loadProgramToCtx(vert_path, frag_path, reload, name="")
+        vert_path = SQUARE_VERT_PATH
+        frag_path = join(dirname(__file__), "view_led.glsl")
+        self.loadProgramToCtx(vert_path, frag_path, reload, name="view_led_")
 
     def initVBOs(self):
         self.vbo1 = self.ctx.buffer(reserve=self.N_part_max*8)
@@ -71,24 +71,47 @@ class MapLed2D(ProgramBase):
         self.N_part_max = 1000
         self.N_part = 0
         self.iChannel0 = 1
+        self.LightsBuffer = 12
+        self.input_texture = 3
         self.buf_col = np.zeros((self.N_part_max, 3))
 
     def initPixels(self):
         self.shader_light_mapper = self.light_engine.shader_mapper
         self.shader_light_mapper.bind_position_in_vbo(self.vbo1)
 
+        byte_array = self.shader_light_mapper.pixels_positions.tobytes()
+        self.pos_texture = self.ctx.texture(
+            (self.N_part_max, 1), 
+            components=2, 
+            data=byte_array, 
+            dtype="f4",
+        )
+
+
     def initUniformsBinding(self):
         binding = {
             "iChannel0": self.iChannel0
         }
         super().initUniformsBinding(binding, program_name="get_pixel_col_")
-        self.addProtectedUniforms(["iChannel0"])
+        binding = {
+            "iResolution": self.win_size,
+            "input_texture": self.input_texture,
+            "LightsBuffer": self.LightsBuffer
+        }
+        super().initUniformsBinding(binding, program_name="view_led_")
+        self.addProtectedUniforms(["iChannel0", "input_texture", "LightsBuffer"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
 
     def render(self, texture, af=None):
         self.bindUniform(af)
+        # PREVIS SHOW
+        #texture[0].use(3)
+        #self.pos_texture.use(12)
+        #self.fbos[0].use()
+        #self.view_led_vao.render()
+        # WRITE COLOR
         texture[0].use(1)
         self.get_pixel_col_vao.transform(
             self.vbo2, 
@@ -96,10 +119,10 @@ class MapLed2D(ProgramBase):
             self.N_part_max
         )
         self.shader_light_mapper.read_color(self.vbo2)
-        return self.buf_col
+        return self.fbos[0].color_attachments[0]
 
     def norender(self):
-        return self.buf_col
+        return self.fbos[0].color_attachments[0]
 
 
 @register_node(OP_CODE_MAPLED2D)
@@ -113,7 +136,6 @@ class MapLed2DNode(ShaderNode, LED):
         super().__init__(scene, inputs=[1], outputs=[1])
         self.program = MapLed2D(
             ctx=self.scene.ctx, 
-            win_size=(480, 270), 
             light_engine=light_engine
         )
         self.eval()
@@ -128,5 +150,6 @@ class MapLed2DNode(ShaderNode, LED):
             texture = input_nodes[0].render(audio_features)
         if texture is None:
             return self.program.norender()
-        buffer_col = self.program.render([texture], audio_features)
+        out_texture = self.program.render([texture], audio_features)
+        #return out_texture
         return texture

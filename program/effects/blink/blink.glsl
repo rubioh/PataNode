@@ -15,7 +15,7 @@ void main()
   
     vec3 col = texture(iChannel0, uv).rgb;
 
-    col *= NRJ_LOW;
+    col = mix(vec3(0.), col, min(1., NRJ_LOW));
 
     fragColor = vec4(vec3(col),1.0);
 }

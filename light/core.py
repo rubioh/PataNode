@@ -34,10 +34,11 @@ class LightEngine:
             path = "light/sceno/plante_a_son.yaml"   
         sceno = yaml.safe_load(open(path, "r"))
         for light_name, infos in sceno.items():
+            print(light_name)
             self.add_light(light_name, infos)
 
     def add_light(self, light_name: str, infos: dict):
-        light = LIGHT_MODELS[light_name](infos)
+        light = LIGHT_MODELS[infos["type"]](infos)
         self.lights.append(light)
 
     def init_shader_light_binding(self):
@@ -50,5 +51,10 @@ class LightEngine:
         output_buffer = np.zeros((512))
         for light in self.lights:
             light_buffer = light.get_dmx_buffer()
+            if self.wait > 1000:
+                print(light, light.color)
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
+        self.wait += 1
+        self.wait %= 1002
+        #print(light_buffer)
         self.light_device.write(output_buffer)

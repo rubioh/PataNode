@@ -28,7 +28,7 @@ class Fixture():
 
     def init_address(self, address_infos: dict):
         self.universe = address_infos["universe"]
-        self.dmx_address = address_infos["dmx_address"]
+        self.dmx_address = address_infos["dmx_address"]-1
 
     def init_position(self, position_infos: list):
         self.position = position_infos
@@ -50,4 +50,4 @@ class Fixture():
         return dmx_buffer
 
     def __str__(self):
-        return f"Name : {self.MODEL} \tUniverse : {self.universe}, Address : {self.dmx_address} \n"
+        return f"Name : {self.MODEL} \tUniverse : {self.universe}, Address : {self.dmx_address+1} \n"
