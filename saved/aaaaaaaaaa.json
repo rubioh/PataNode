@@ -49,190 +49,10 @@
             ]
         },
         {
-            "id": 140312560555920,
-            "title": "Map Led 2D",
-            "pos_x": -401.0,
-            "pos_y": -77.0,
-            "inputs": [
-                {
-                    "id": 140312560408784,
-                    "index": 0,
-                    "multi_edges": false,
-                    "position": 2,
-                    "socket_type": 1
-                }
-            ],
-            "outputs": [
-                {
-                    "id": 140312560571920,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 1
-                }
-            ],
-            "content": {},
-            "op_code": 967,
-            "adaptable_parameters": {
-                "get_pixel_col_program": {
-                    "iChannel0": {
-                        "eval_function": {
-                            "name": "iChannel0",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": true
-                        }
-                    }
-                }
-            },
-            "uniforms_binding": {
-                "get_pixel_col_": {
-                    "iChannel0": {
-                        "type": null,
-                        "param_name": 1
-                    }
-                }
-            },
-            "win_size": [
-                1920,
-                1080
-            ]
-        },
-        {
-            "id": 140312560454480,
-            "title": "Eye",
-            "pos_x": -613.0,
-            "pos_y": -300.0,
-            "inputs": [],
-            "outputs": [
-                {
-                    "id": 140312560472592,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 3
-                }
-            ],
-            "content": {},
-            "op_code": 323,
-            "adaptable_parameters": {
-                "program": {
-                    "iTime": {
-                        "eval_function": {
-                            "name": "iTime",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "energy_fast": {
-                        "eval_function": {
-                            "name": "energy_fast",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "energy_mid": {
-                        "eval_function": {
-                            "name": "energy_mid",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "energy_slow": {
-                        "eval_function": {
-                            "name": "energy_slow",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "bpm": {
-                        "eval_function": {
-                            "name": "bpm",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "intensity": {
-                        "eval_function": {
-                            "name": "intensity",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "tf": {
-                        "eval_function": {
-                            "name": "tf",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    },
-                    "scale": {
-                        "eval_function": {
-                            "name": "scale",
-                            "value": "x",
-                            "widget": "TextEdit",
-                            "protected": false
-                        }
-                    }
-                }
-            },
-            "uniforms_binding": {
-                "": {
-                    "iTime": {
-                        "type": null,
-                        "param_name": "time"
-                    },
-                    "iResolution": {
-                        "type": null,
-                        "param_name": null
-                    },
-                    "energy_fast": {
-                        "type": null,
-                        "param_name": "smooth_fast_final"
-                    },
-                    "energy_mid": {
-                        "type": null,
-                        "param_name": "emid"
-                    },
-                    "energy_slow": {
-                        "type": null,
-                        "param_name": "eslow"
-                    },
-                    "bpm": {
-                        "type": null,
-                        "param_name": null
-                    },
-                    "intensity": {
-                        "type": null,
-                        "param_name": "intensity"
-                    },
-                    "tf": {
-                        "type": null,
-                        "param_name": "tf"
-                    },
-                    "scale": {
-                        "type": null,
-                        "param_name": "scale_final"
-                    }
-                }
-            },
-            "win_size": [
-                1920,
-                1080
-            ]
-        },
-        {
             "id": 140312560504016,
             "title": "Symetry",
-            "pos_x": -527.0,
-            "pos_y": -217.0,
+            "pos_x": -525.0,
+            "pos_y": -155.0,
             "inputs": [
                 {
                     "id": 140312560467664,
@@ -341,26 +161,316 @@
                 1920,
                 1080
             ]
+        },
+        {
+            "id": 139785422760464,
+            "title": "Map Led 2D",
+            "pos_x": -258.0,
+            "pos_y": -8.0,
+            "inputs": [
+                {
+                    "id": 139786053685008,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 139785422484176,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 967,
+            "adaptable_parameters": {
+                "get_pixel_col_program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "get_pixel_col_": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": 1
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 139785422573136,
+            "title": "SDF_BM",
+            "pos_x": -592.0,
+            "pos_y": 25.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 139785422573584,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 459,
+            "adaptable_parameters": {
+                "info_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "iTime",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tm": {
+                        "eval_function": {
+                            "name": "tm",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tz": {
+                        "eval_function": {
+                            "name": "tz",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tp": {
+                        "eval_function": {
+                            "name": "tp",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tptt": {
+                        "eval_function": {
+                            "name": "tptt",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode_sym": {
+                        "eval_function": {
+                            "name": "mode_sym",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "mode_ptt",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "go_ptt": {
+                        "eval_function": {
+                            "name": "go_ptt",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "go_arms": {
+                        "eval_function": {
+                            "name": "go_arms",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "normal_program": {
+                    "tm": {
+                        "eval_function": {
+                            "name": "tm",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tc": {
+                        "eval_function": {
+                            "name": "tc",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    },
+                    "go_idx": {
+                        "eval_function": {
+                            "name": "go_idx",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "go_idx2": {
+                        "eval_function": {
+                            "name": "go_idx2",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "goBloom_arms": {
+                        "eval_function": {
+                            "name": "goBloom_arms",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "mode_ptt",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "info_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": "tma"
+                    },
+                    "tz": {
+                        "type": null,
+                        "param_name": "tza"
+                    },
+                    "tp": {
+                        "type": null,
+                        "param_name": "tp_final"
+                    },
+                    "tptt": {
+                        "type": null,
+                        "param_name": "tptt"
+                    },
+                    "mode_sym": {
+                        "type": null,
+                        "param_name": "mode_sym"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "mode_ptt"
+                    },
+                    "go_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    },
+                    "go_arms": {
+                        "type": null,
+                        "param_name": "go_arms"
+                    }
+                },
+                "normal_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "tc": {
+                        "type": null,
+                        "param_name": "tc"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "go_idx": {
+                        "type": null,
+                        "param_name": "go_bloom"
+                    },
+                    "go_idx2": {
+                        "type": null,
+                        "param_name": "go_bloom2"
+                    },
+                    "goBloom_arms": {
+                        "type": null,
+                        "param_name": "goBloom_arms"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
         }
     ],
     "edges": [
         {
-            "id": 140312560352336,
-            "edge_type": 2,
-            "start": 140312560472592,
-            "end": 140312560467664
+            "id": 140312560516880,
+            "edge_type": 1,
+            "start": 140312560506384,
+            "end": null
         },
         {
-            "id": 140312560516880,
+            "id": 139785422395728,
             "edge_type": 2,
             "start": 140312560506384,
-            "end": 140312560408784
+            "end": 139786053685008
         },
         {
-            "id": 140312560513168,
+            "id": 139785422886032,
             "edge_type": 2,
-            "start": 140312560571920,
+            "start": 139785422484176,
             "end": 140312560568336
+        },
+        {
+            "id": 139785423202576,
+            "edge_type": 2,
+            "start": 139785422573584,
+            "end": 140312560467664
         }
     ]
 }

@@ -4,24 +4,17 @@ from light.fixture.fixture import Fixture
 from light.fixture.mixin import RGB
 from light.fixture.config import register_light, name_to_opcode
 
-OP_CODE_CLASSICPAR = name_to_opcode("ClassicPar")
+OP_CODE_TRIANGLE = name_to_opcode("Triangle")
 
-@register_light(OP_CODE_CLASSICPAR)
-class ClassicPar(Fixture, RGB):
-    MODEL = "ClassicPar"
+@register_light(OP_CODE_TRIANGLE)
+class Triangle(Fixture, RGB):
+    MODEL = "Triangle"
     CHANNELS = {
         "red": 1,
         "green": 2,
-        "blue": 3,
-        "white": 4,
-        "amber": 5,
-        "uv": 6,
-        "dimmer": 7,
-        "strobe": 8,
+        "blue": 3
     }
     CHANNELS_DEFAULTS = {
-        "dimmer": 1,
-        "strobe": 1
     }
     def __init__(self, args):
         super().__init__(args)

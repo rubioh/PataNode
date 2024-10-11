@@ -1,0 +1,380 @@
+{
+    "id": 140045726423568,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 140045726642960,
+            "title": "Screen",
+            "pos_x": 466.0,
+            "pos_y": -30.0,
+            "inputs": [
+                {
+                    "id": 140045726582800,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "tex",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140045726590480,
+            "title": "WhiteScreen",
+            "pos_x": -536.0,
+            "pos_y": -175.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140045726631952,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1280,
+            "adaptable_parameters": {
+                "program": {}
+            },
+            "uniforms_binding": {
+                "": {}
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140045726563344,
+            "title": "HSV Offset",
+            "pos_x": -367.0,
+            "pos_y": -40.0,
+            "inputs": [
+                {
+                    "id": 140045726726288,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140045726586704,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1658,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "iTime",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    },
+                    "hue_offset": {
+                        "eval_function": {
+                            "name": "hue_offset",
+                            "value": "x*.002",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "saturation_offset": {
+                        "eval_function": {
+                            "name": "saturation_offset",
+                            "value": "1.-x**3*100.",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "value_offset": {
+                        "eval_function": {
+                            "name": "value_offset",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_offset": {
+                        "type": "audio_features",
+                        "param_name": "kick_count"
+                    },
+                    "saturation_offset": {
+                        "type": "audio_features",
+                        "param_name": "smooth_low"
+                    },
+                    "value_offset": {
+                        "type": null,
+                        "param_name": "value_offset"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140045726581968,
+            "title": "LedSymetry",
+            "pos_x": -105.0,
+            "pos_y": 17.0,
+            "inputs": [
+                {
+                    "id": 140045726719376,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140045726515344,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1201,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "iTime",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "mode",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_mask": {
+                        "eval_function": {
+                            "name": "mode_mask",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "blink_force": {
+                        "eval_function": {
+                            "name": "blink_force",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "kick_count": {
+                        "eval_function": {
+                            "name": "kick_count",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "no_sym_mode": {
+                        "eval_function": {
+                            "name": "no_sym_mode",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_tempo": {
+                        "eval_function": {
+                            "name": "on_tempo",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "real_kick_count": {
+                        "eval_function": {
+                            "name": "real_kick_count",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "black_mode": {
+                        "eval_function": {
+                            "name": "black_mode",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_strobe": {
+                        "eval_function": {
+                            "name": "go_strobe",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "black": {
+                        "eval_function": {
+                            "name": "black",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "noise_time": {
+                        "eval_function": {
+                            "name": "noise_time",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "led_symetry_mode"
+                    },
+                    "mode_mask": {
+                        "type": null,
+                        "param_name": "mode_mask"
+                    },
+                    "blink_force": {
+                        "type": null,
+                        "param_name": "blink_force"
+                    },
+                    "kick_count": {
+                        "type": null,
+                        "param_name": "kick_count"
+                    },
+                    "no_sym_mode": {
+                        "type": null,
+                        "param_name": "no_sym_mode"
+                    },
+                    "on_tempo": {
+                        "type": null,
+                        "param_name": "on_tempo"
+                    },
+                    "real_kick_count": {
+                        "type": null,
+                        "param_name": "real_kick_count"
+                    },
+                    "black_mode": {
+                        "type": null,
+                        "param_name": "black_mode"
+                    },
+                    "go_strobe": {
+                        "type": null,
+                        "param_name": "go_strobe"
+                    },
+                    "black": {
+                        "type": null,
+                        "param_name": "black"
+                    },
+                    "noise_time": {
+                        "type": null,
+                        "param_name": "noise_time"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 140045726500432,
+            "edge_type": 2,
+            "start": 140045726631952,
+            "end": 140045726726288
+        },
+        {
+            "id": 140044339826896,
+            "edge_type": 2,
+            "start": 140045726586704,
+            "end": 140045726719376
+        },
+        {
+            "id": 140435883710288,
+            "edge_type": 2,
+            "start": 140045726515344,
+            "end": 140045726582800
+        }
+    ]
+}

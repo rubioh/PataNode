@@ -63,4 +63,4 @@ class PixelsSubGroup():
     def set_colors(self, color_buffer: np.ndarray):
         colors = color_buffer[self.output_vbo_pos:self.output_vbo_pos+len(self)]
         colors = colors[0, :3]
-        self.light.update(colors[0])
+        self.light.update(colors)
