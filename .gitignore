@@ -8,6 +8,7 @@ __pycache__/
 *.sess
 *.pickle
 .vimsess
+\:w
 
 # C extensions
 *.so
