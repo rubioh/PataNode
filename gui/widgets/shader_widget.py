@@ -1,11 +1,6 @@
-from PyQt5 import QtOpenGL, QtCore, QtWidgets, QtGui
+from PyQt5 import QtOpenGL, QtCore, QtWidgets
 from program.program_manager import FBOManager
 import moderngl
-import numpy as np
-import time
-
-import PyQt5
-
 
 class ShaderWidget(QtOpenGL.QGLWidget):
     def __init__(
@@ -86,6 +81,9 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         # We want mouse position events
         self.setMouseTracking(True)
 
+        # Disable cursor
+        self.setCursor(QtCore.Qt.BlankCursor)
+
     def initFormat(self):
         self.fmt = QtOpenGL.QGLFormat()
         self.fmt.setVersion(self.gl_version[0], self.gl_version[1])
@@ -145,14 +143,14 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
     def set_default_viewport(self) -> None:
         """
-        Calculates the and sets the viewport based on window configuration.
+        Calculates and sets the viewport based on window configuration.
 
-        The viewport will based on the configured fixed aspect ratio if set.
-        If no fixed aspect ratio is set the viewport will be scaled
-        to the entire window size regardless of size.
+        The viewport is based on the configured fixed aspect ratio if set.
+        If no fixed aspect ratio is set, the viewport is scaled to the entire
+        window size regardless of size.
 
-        Will add black borders and center the viewport if the window
-        do not match the configured viewport (fixed only)
+        Will add black borders and center the viewport if the window does not
+        match the configured viewport (fixed only)
         """
         if self._fixed_aspect_ratio:
             expected_width = int(self._buffer_height * self._fixed_aspect_ratio)
