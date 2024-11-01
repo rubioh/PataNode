@@ -9,7 +9,7 @@ from program.program_manager import ProgramManager, FBOManager
 from audio.audio_pipeline import AudioEngine
 from light.core import LightEngine
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
-
+import keyboard
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -35,7 +35,7 @@ class PataShade(PataNode):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
         super().__init__()
-
+        keyboard.add_hotkey("enter", self.light_engine.force_strobe.activate_10)
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
