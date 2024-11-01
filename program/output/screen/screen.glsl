@@ -9,5 +9,5 @@ in vec2 tcs;
 void main()
 {
     vec2 uv = gl_FragCoord.xy/iResolution.xy;
-    fragColor = texture(tex, tcs+iResolution.x*0.0001);
+    fragColor = texture(tex, tcs+iResolution.x*0.000000001);
 }

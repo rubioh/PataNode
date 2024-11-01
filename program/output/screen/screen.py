@@ -8,6 +8,7 @@ from program.colors.predominant_color.predominant_color import PredominantColorN
 
 from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
+from earcut.earcut import earcut
 
 OP_CODE_SCREEN = 0
 
@@ -49,17 +50,28 @@ class Screen(ProgramBase):
         self.program['iResolution'] = (w,h)
         self.program["tex"] = 0
 
+    def triangulate_poly(self, poly):
+        pointlist = []
+        for point in poly.pointlist:
+            pointlist.append(point.x())
+            pointlist.append(point.y())
+        indices = earcut(pointlist)
+        return indices
+
     def render_map(self, textures, af, polymap):
         for poly in polymap:
             vertex_pos = []
             vertex_tcs = []
-            for p in poly.pointlist:
-                vertex_pos.append( (p.x()) / 1280. )
-                vertex_pos.append( (p.y()) / 720. )
+            indices = self.triangulate_poly(poly)
+            for i in indices:
+                p = poly.pointlist[i]
+                vertex_pos.append( (2. * p.x()) / 1280. )
+                vertex_pos.append( (2. * p.y()) / 720. )
                 vertex_tcs.append(p.tx)
                 vertex_tcs.append(p.ty)
             vertex_pos = np.array(vertex_pos, 'f4')
             vertex_tcs = np.array(vertex_tcs, 'f4')
+
             vbo_p = self.ctx.buffer(vertex_pos)
             vbo_t = self.ctx.buffer(vertex_tcs)
             self.vao = self.ctx.vertex_array(self.program,
