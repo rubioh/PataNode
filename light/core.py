@@ -10,8 +10,24 @@ from light.device import LightDevice
 import light.fixture
 from light.fixture.config import LIGHT_MODELS
 from light.shader_mapper import ShaderMapper
+import time
 
 print(LIGHT_MODELS)
+
+class TimedEvent:
+    def __init__(self):
+        self.duration = -1e10
+        self.start = 0
+    
+    def activate(self, duration_seconds):
+        self.start = time.time()
+        self.duration = duration_seconds
+
+    def activate_10(self):
+        self.activate(10)
+
+    def __call__(self):
+        return (time.time() > self.start) and (time.time() < self.start + self.duration)
 
 class LightEngine:
 
@@ -20,7 +36,7 @@ class LightEngine:
         self.DMX_CHANNELS_NUM = 512
 
         self.light_device = LightDevice()
-
+        self.force_strobe = TimedEvent()
         self.lights = list()
 
         self.load_sceno(sceno_path)
@@ -50,6 +66,13 @@ class LightEngine:
         af = audio_features
         output_buffer = np.zeros((512))
         for light in self.lights:
+            if self.force_strobe():
+                if "strobe" in light.attrib:
+                    light.attrib["strobe"] = 100
+            else:
+                if "strobe" in light.attrib:
+                    print("no_strobe")
+
             light_buffer = light.get_dmx_buffer()
             if self.wait > 1000:
                 print(light, light.color)
