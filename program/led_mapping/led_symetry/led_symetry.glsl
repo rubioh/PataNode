@@ -62,6 +62,38 @@ float get_no_sym_mask(vec2 uv){
         a += K*2.*3.14159+PI/8.;
         a = mod(a, 2*PI);
         mask = 1.-step(PI/4., a);
+
+        float c = .4;
+
+        K = mod(real_kick_count-1, 8.)/8.;
+        a = atan(uv.y, uv.x);
+        a += K*2.*3.14159+PI/8;
+        a = mod(a, 2*PI);
+        mask = max(mask, pow(c, 1.)*(1.-step(PI/4., a)));
+
+        K = mod(real_kick_count-2, 8.)/8.;
+        a = atan(uv.y, uv.x);
+        a += K*2.*3.14159+PI/8;
+        a = mod(a, 2*PI);
+        mask = max(mask, pow(c, 2.)*(1.-step(PI/4., a)));
+
+        K = mod(real_kick_count-3, 8.)/8.;
+        a = atan(uv.y, uv.x);
+        a += K*2.*3.14159+PI/8;
+        a = mod(a, 2*PI);
+        mask = max(mask, pow(c, 3.)*(1.-step(PI/4., a)));
+
+        K = mod(real_kick_count-4, 8.)/8.;
+        a = atan(uv.y, uv.x);
+        a += K*2.*3.14159+PI/8;
+        a = mod(a, 2*PI);
+        mask = max(mask, pow(c, 4.)*(1.-step(PI/4., a)));
+
+        K = mod(real_kick_count-5, 8.)/8.;
+        a = atan(uv.y, uv.x);
+        a += K*2.*3.14159+PI/8;
+        a = mod(a, 2*PI);
+        mask = max(mask, pow(c, 5.)*(1.-step(PI/4., a)));
     }
     if (no_sym_mode == 1){
         float K = on_tempo;
@@ -117,7 +149,7 @@ void main()
         mask = get_mask(uv);
         col = texture(iChannel0, uv).rgb;
     if (mode >= 2){
-        if (mode_2_sym <= 2){
+        if (mode_2_sym <= -1){
             uv.x = abs(uv.x-.5)+.5;
             if (mode_2_sym <= 1)
                 uv.y = abs(uv.y-.5)+.5;
@@ -139,7 +171,7 @@ void main()
     }
     if (go_strobe == 1){
         float s = cos(on_tempo*4*2.*3.14159)*.5+.5;
-        s = pow(s, 3.);
+        s = pow(s, 2.);
         st.x = abs(st.x)-.5;
         col += s*get_mask(st);
     }

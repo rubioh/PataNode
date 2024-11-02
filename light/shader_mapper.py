@@ -11,14 +11,14 @@ class ShaderMapper():
 
     def add_light(self, light: object):
         if light.use_shader:
-            self.addPixelsSubGroup(
+            self.add_pixels_subgroup(
                 light,
             )
         print("ShaderMapper Lights:", self.pixels_group)
 
-    def addPixelsSubGroup(
-            self, 
-            light: int, 
+    def add_pixels_subgroup(
+            self,
+            light: int,
         ):
         self.pixels_group.append(
             PixelsSubGroup(
@@ -33,6 +33,7 @@ class ShaderMapper():
         for group in self.pixels_group:
             pos = group.input_vbo_pos
             N = group.pixels_number
+            print(pos, N)
             self.pixels_positions[pos:pos+N] = group.pixels_pos
         vbo.write(
             self.pixels_positions.tobytes()
@@ -43,12 +44,11 @@ class ShaderMapper():
         colors = np.frombuffer(data, dtype=np.float32).reshape(-1, 4)
         for group in self.pixels_group:
             group.set_colors(colors)
-    
 
 class PixelsSubGroup():
-    def __init__(self, 
+    def __init__(self,
             light: object,
-            input_vbo_pos: int, 
+            input_vbo_pos: int,
             output_vbo_pos: int
         ):
         self.light = light
@@ -62,5 +62,6 @@ class PixelsSubGroup():
 
     def set_colors(self, color_buffer: np.ndarray):
         colors = color_buffer[self.output_vbo_pos:self.output_vbo_pos+len(self)]
-        colors = colors[0, :3]
+        if len(colors) == 1:
+            colors = colors[0, :3]
         self.light.update(colors)

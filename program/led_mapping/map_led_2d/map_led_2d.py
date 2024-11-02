@@ -26,7 +26,7 @@ class MapLed2D(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Map Led 2D"
         self.light_engine = light_engine
-    
+
         self.initParams()
         self.initVBOs()
         self.initProgram()
@@ -51,9 +51,9 @@ class MapLed2D(ProgramBase):
         varyings = ["out_col"]
         vao_binding = [(self.vbo1, "2f4", "in_pos")]
         self.loadProgramToCtx(
-            vert_path, 
-            frag_path, 
-            reload, 
+            vert_path,
+            frag_path,
+            reload,
             name="get_pixel_col_",
             vao_binding=vao_binding,
             varyings=varyings

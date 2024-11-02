@@ -1,4 +1,4 @@
-git+https://github.com/pata-tech/pyqt-node-editor@master
+#git+https://github.com/pata-tech/pyqt-node-editor@master
 pyglm
 moderngl
 pygame

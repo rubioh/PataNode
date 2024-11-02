@@ -39,7 +39,6 @@ class Fixture():
             self.use_shader = True
             self.canvas_position = shader_binding["canvas_position"]
             self.num_pixels = shader_binding["num_pixels"]
-            assert self.num_pixels == len(self.canvas_position)
         else:
             self.use_shader = False
 
