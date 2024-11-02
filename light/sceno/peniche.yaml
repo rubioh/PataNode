@@ -1,0 +1,9 @@
+Octo1:
+    type: "OCTOSTRIP"
+    address:
+        universe: 0
+        dmx_address: 1
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[1, 1], [1919, 1079]]
+        num_pixels: 64

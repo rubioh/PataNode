@@ -38,7 +38,7 @@ ClassicPar1:
     type: "ClassicPar"
     address:
         universe: 0
-        dmx_address: 15
+        dmx_address: 50
     position: [0,0,1]
     shader_binding:
         canvas_position: [[1360, 740]]

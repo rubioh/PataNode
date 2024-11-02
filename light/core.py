@@ -18,7 +18,6 @@ class TimedEvent:
     def __init__(self):
         self.duration = -1e10
         self.start = 0
-    
     def activate(self, duration_seconds):
         self.start = time.time()
         self.duration = duration_seconds
@@ -47,7 +46,7 @@ class LightEngine:
 
     def load_sceno(self, path: str):
         if path is None:
-            path = "light/sceno/plante_a_son.yaml"   
+            path = "light/sceno/peniche.yaml"
         sceno = yaml.safe_load(open(path, "r"))
         for light_name, infos in sceno.items():
             print(light_name)
@@ -71,11 +70,13 @@ class LightEngine:
                     light.attrib["strobe"] = 100
             else:
                 if "strobe" in light.attrib:
-                    print("no_strobe")
+                    #print("no_strobe")
+                    pass
 
             light_buffer = light.get_dmx_buffer()
             if self.wait > 1000:
-                print(light, light.color)
+                pass
+                print(light, light_buffer)
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
         self.wait += 1
         self.wait %= 1002

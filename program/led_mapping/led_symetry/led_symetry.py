@@ -93,17 +93,17 @@ class LedSymetry(ProgramBase):
             return
         self.kick_count = af["kick_count"] % 4
 
-        self.time_mask += .0007*.33
+        self.time_mask += .007*.33
         self.mode_mask = int(self.time_mask%2)
-        
+
         if af["mini_chill"] and self.wait_mode>10:
             self.led_symetry_mode += 1 
             self.float_no_sym_mode += 1
             self.wait_mode = 0
         self.led_symetry_mode %= 6
         self.wait_mode += 1/60
-    
-        self.blink += .0009*.31
+
+        self.blink += .009*.31
         self.blink %= 2
         blink = int(self.blink) + af["smooth_low"]
         self.blink_force = np.clip(blink, 0, 1)
@@ -131,8 +131,9 @@ class LedSymetry(ProgramBase):
         self.black_mode %= 2
         self.noise_time += .001
 
-        self.mode_2_sym += .000013
+        self.mode_2_sym += .0013
         self.mode_2_sym %= 4
+        self.mode_2_sym = 0
 
 
     def bindUniform(self, af):

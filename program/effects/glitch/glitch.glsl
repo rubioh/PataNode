@@ -74,17 +74,17 @@ void main()
 
     vec3 r = vec3(0.);
     r.rgb = mask(uvr)*texture(iChannel0, uvr/R).rgb;
-    r.gb *= 0.;
+    r.gb *= 0.3;
     r = hsv2rgb(rgb2hsv(r) + vec3(phi1,0.,0.));
 
     vec3 g = vec3(0.);
     g.rgb = mask(uvg)*texture(iChannel0, uvg/R).rgb;
-    g.rb *= 0.;
+    g.rb *= 0.3;
     g = hsv2rgb(rgb2hsv(g) + vec3(phi2,0.,0.));
 
     vec3 b = vec3(0.);
     b.rgb = mask(uvb)*texture(iChannel0, uvb/R).rgb;
-    b.rg *= 0.;
+    b.rg *= 0.3;
     b = hsv2rgb(rgb2hsv(b) + vec3(phi3,0.,0.));
 
     fragColor = vec4((r+g+b),1.0);
