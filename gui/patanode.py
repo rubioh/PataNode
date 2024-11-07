@@ -1,5 +1,4 @@
 import os
-import time
 
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
@@ -32,7 +31,8 @@ DEBUG = False
 
 class PataNode(NodeEditorWindow):
 
-    def __init__(self):
+    def __init__(self, audio_engine=None):
+        self.audio_engine = audio_engine
         super().__init__()
 
     def initUI(self):
@@ -237,28 +237,37 @@ class PataNode(NodeEditorWindow):
         try:
             for fname in fnames:
                 if fname:
-                    existing = self.findMdiChild(fname)
-                    if existing:
-                        self.mdiArea.setActiveSubWindow(existing)
-                    else:
-                        # we need to create new subWindow and open the file
-                        if graph:
-                            nodeeditor = GraphContainerSubWindow(self)
-                        else:
-                            nodeeditor = PataNodeSubWindow(self)
-                        if nodeeditor.fileLoad(fname):
-                            self.statusBar().showMessage("File %s loaded" % fname, 5000)
-                            nodeeditor.setTitle()
-                            subwnd = self.createMdiChild(nodeeditor)
-                            subwnd.show()
-                            if graph:
-                                nodeeditor.initGraphScene()
-                        else:
-                            nodeeditor.close()
+                    nodeeditor, subwnd = self.openFile(fname, graph)
         except Exception as e:
             dumpException(e)
+
         if graph:
             return nodeeditor, subwnd
+
+    def openFile(self, filename, graph=False):
+        existing = self.findMdiChild(filename)
+
+        if existing:
+            self.mdiArea.setActiveSubWindow(existing)
+        else:
+            # We need to create a new subWindow and open the file
+            if graph:
+                nodeeditor = GraphContainerSubWindow(self)
+            else:
+                nodeeditor = PataNodeSubWindow(self)
+
+            if nodeeditor.fileLoad(filename):
+                self.statusBar().showMessage("File %s loaded" % filename, 5000)
+                nodeeditor.setTitle()
+                subwnd = self.createMdiChild(nodeeditor)
+                subwnd.show()
+
+                if graph:
+                    nodeeditor.initGraphScene()
+            else:
+                nodeeditor.close()
+
+        return nodeeditor, subwnd
 
     def about(self):
         QMessageBox.about(self, "About PataNode", "Un logiciel de bg pour les bg")
