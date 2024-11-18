@@ -49,6 +49,7 @@ class ProgramBase:
         self.fragment_shader_glsl_paths = []
 
         self.adaptable_parameters_dict = {}
+        self.cpu_adaptable_parameters_dict = {}
         self.programs_uniforms = ProgramsUniforms(self)
 
         self.previous_programs = {}
@@ -133,6 +134,7 @@ class ProgramBase:
             )
         vert = open(vert_path, "r").read()
         frag = None
+        self.name = name
         if frag_path is not None:
             frag = open(frag_path, "r").read()
         if not reload:
@@ -163,6 +165,7 @@ class ProgramBase:
             setattr(self, name + "program", program)
             setattr(self, name + "vao", vao)
         self.adaptable_parameters_dict[name + "program"] = {}
+        self.cpu_adaptable_parameters_dict[name + "program"] = {}
         if frag is None:
             frag = ""
         if vert_path == SQUARE_VERT_PATH:
@@ -171,6 +174,7 @@ class ProgramBase:
         # self.initUniformsForProgram(frag+vert, name, reload)
         if reload:
             self.reloadUniformsBinding(None, name)
+
 
     def storePreviousProgramVersion(self, program, vao, name):
         # Program
@@ -308,6 +312,26 @@ class ProgramBase:
             "widget": widget_type,
         }
 
+    def setCpuAdaptableParameters(self, progam_name, name, value):
+        self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"][
+            "value"
+        ] = value
+    #    if self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"]:
+     #       self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"](value)
+
+    def add_text_edit_cpu_adaptable_parameter(self, name, value, callback = None):
+        uniform_parameters = self.cpu_adaptable_parameters_dict[self.name + "program"]
+        uniform_parameters[name] = { "eval_function":{ 
+            "name": name,
+            "value": value,
+            "connect": lambda v: self.setCpuAdaptableParameters(
+                self.name + "program", name, v
+            ),
+         #   "callback": callback,
+            "widget": "TextEdit",
+        }
+        }
+
     def initUniformsAdaptableParameters(self, program_name, uniform_name):
         self.initAdaptableParameters(
             name="eval_function",
@@ -340,7 +364,10 @@ class ProgramBase:
             modified_data = x
         return modified_data
 
-    def getAdaptableParameters(self):
+    def getCpuAdaptableParameters(self):
+        return self.cpu_adaptable_parameters_dict
+    
+    def getGpuAdaptableParameters(self):
         return self.adaptable_parameters_dict
 
     def setAdaptableParameters(self, program_name, uniform_name, params, value):

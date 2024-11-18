@@ -15,3 +15,4 @@ import program.scene.pharmacy.pharmacy
 import program.scene.pingouin.pingouin
 import program.scene.dome.dome
 import program.scene.hexagons.hexagons
+import program.scene.texture.texture

@@ -140,12 +140,22 @@ class QDMInspector(QWidget):
     def createUniformWindow(self, uniformsBinding):
         return UniformWidget(uniformsBinding)
 
-    def createParametersToolbox(self, parameters_informations):
-        groupBox = QGroupBox("Transformation parameters")
+    def createCpuParametersToolbox(self, parameters_informations):
+        groupBox = QGroupBox("Cpu Transformation parameters")
         vbox = QVBoxLayout()
         parameter_window = self.createParametersWindow(parameters_informations)
         vbox.addWidget(parameter_window)
-        vbox.sizeHint = lambda: QSize(900, 500)
+        vbox.sizeHint = lambda: QSize(450, 500)
+        groupBox.setLayout(vbox)
+        self.grid.addWidget(groupBox)
+        self.grid.insertStretch(-1, -1)
+
+    def createGpuParametersToolbox(self, parameters_informations):
+        groupBox = QGroupBox("Gpu Transformation parameters")
+        vbox = QVBoxLayout()
+        parameter_window = self.createParametersWindow(parameters_informations)
+        vbox.addWidget(parameter_window)
+        vbox.sizeHint = lambda: QSize(450, 500)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
         self.grid.insertStretch(-1, -1)
@@ -163,10 +173,12 @@ class QDMInspector(QWidget):
         self.clearLayout()
         if self.uniform_window is not None:
             self.uniform_window.deleteLater()
-        parameters_informations = obj.getAdaptableParameters()
+        gpu_parameters_informations = obj.getGpuAdaptableParameters()
+        cpu_parameters_informations = obj.getCpuAdaptableParameters()
         uniforms_binding = obj.getUniformsBinding()
         self.createSetWinSizeToolbox(obj)
-        self.createParametersToolbox(parameters_informations)
+        self.createGpuParametersToolbox(obj.getGpuAdaptableParameters())
+        self.createCpuParametersToolbox(obj.getCpuAdaptableParameters())
         self.createUniformsToolbox(uniforms_binding)
 
 
@@ -207,7 +219,6 @@ class ParametersWidget(QTabWidget):
     def createWidget(self, program_name):
         list_widget = QListWidget()
         parameters = self.parameters_informations[program_name]
-
         for idx, uniform_name in enumerate(parameters.keys()):
             item = QListWidgetItem()
 
