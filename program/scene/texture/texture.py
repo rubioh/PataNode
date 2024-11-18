@@ -26,11 +26,10 @@ class Texture(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
 
         self.title = "texture"
-
+        self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
-        self.initParams()
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
@@ -47,10 +46,11 @@ class Texture(ProgramBase):
 
     def initParams(self):
         self.path = "./assets/textures/lichen.jpg"
-        self.reload_texture()
+        self.reload_texture(self.path)
 
-    def reload_texture(self):
-        jpg_image = Image.open(self.path)
+    def reload_texture(self, v):
+        self.path = v
+        jpg_image = Image.open(v)
         bmp_image = jpg_image.convert("RGB")
         b = list(bmp_image.getdata())
         b2 = []
@@ -67,11 +67,15 @@ class Texture(ProgramBase):
     def initUniformsBinding(self):
         binding = {
         }
+        self.add_text_edit_cpu_adaptable_parameter("text_path", self.path, self.reload_texture)
         super().initUniformsBinding(binding, program_name="")
         super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
-        pass
+        v = self.getCpuAdaptableParameters()["program"]["text_path"]["eval_function"]["value"]
+        if self.path != v:
+            self.path = v
+            self.reload_texture(v)
 
     def norender(self):
         return self.fbos[0].color_attachments[0]

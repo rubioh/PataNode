@@ -2,6 +2,7 @@
 layout (location=0) out vec4 fragColor;
 
 uniform vec2 iResolution;
+
 uniform sampler2D iChannel0;
 void main()
 {

@@ -126,9 +126,14 @@ class ShaderNode(Node):
         self.markDirty()
         self.eval()
 
-    def getAdaptableParameters(self):
+    def getCpuAdaptableParameters(self):
         if self.program is not None:
-            return self.program.getAdaptableParameters()
+            return self.program.getCpuAdaptableParameters()
+        return None
+
+    def getGpuAdaptableParameters(self):
+        if self.program is not None:
+            return self.program.getGpuAdaptableParameters()
         return None
 
     def getUniformsBinding(self):
@@ -320,12 +325,20 @@ class ShaderNode(Node):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
 
-        adapt_params = copy.deepcopy(self.getAdaptableParameters())
-        for program in adapt_params.keys():
-            program_params = adapt_params[program]
+        cpu_adapt_params = copy.deepcopy(self.getCpuAdaptableParameters())
+        for program in cpu_adapt_params.keys():
+            program_params = cpu_adapt_params[program]
             for uniform in program_params.keys():
                 del program_params[uniform]["eval_function"]["connect"]
-        res["adaptable_parameters"] = adapt_params
+        res["cpu_adaptable_parameters"] = cpu_adapt_params
+
+        gpu_adapt_params = copy.deepcopy(self.getGpuAdaptableParameters())
+        for program in gpu_adapt_params.keys():
+            program_params = gpu_adapt_params[program]
+            for uniform in program_params.keys():
+                del program_params[uniform]["eval_function"]["connect"]
+        res["gpu_adaptable_parameters"] = gpu_adapt_params
+    
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
         res["uniforms_binding"] = uniforms_binding
         res["win_size"] = self.win_size
@@ -333,8 +346,16 @@ class ShaderNode(Node):
 
     def deserialize(self, data, hashmap={}, restore_id=True, restore_window_size=True):
         res = super().deserialize(data, hashmap, restore_id)
-        adapt_params = data["adaptable_parameters"]
-        node_params = self.getAdaptableParameters()
+        adapt_params = data["cpu_adaptable_parameters"]
+        node_params = self.getCpuAdaptableParameters()
+        for program in adapt_params.keys():
+            program_params = adapt_params[program]
+            for uniform in program_params.keys():
+                eval_func = program_params[uniform]["eval_function"]["value"]
+                node_params[program][uniform]["eval_function"]["value"] = eval_func
+
+        adapt_params = data["gpu_adaptable_parameters"]
+        node_params = self.getGpuAdaptableParameters()
         for program in adapt_params.keys():
             program_params = adapt_params[program]
             for uniform in program_params.keys():
