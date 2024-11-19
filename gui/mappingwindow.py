@@ -87,5 +87,5 @@ class PataNodeMappingWindow(QMainWindow):
         pass
 
     def contextMenuEvent(self, event):
-        pass
+        pass    
 
