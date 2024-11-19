@@ -19,10 +19,28 @@ class mapPoint(QPointF):
 class PolyProxy():
 
     def from_poly(self, polys):
-        pass
+        self.pointlist = []
+        if len(polys) < 4:
+            return
+        for i in range( len(polys) // 4):
+            self.pointlist.append(mapPoint(polys[i * 4] * self.hrx - self.hrx / 2.,
+                                           polys[i * 4 +1] * self.hry - self.hry / 2.,
+                                           polys[i * 4+2],
+                                           polys[i * 4+3]))
+        self.pointlist.append(mapPoint(polys[0] * self.hrx - self.hrx / 2.,
+                                        polys[1] * self.hry - self.hry / 2.,
+                                        polys[2],
+                                        polys[3]))
 
     def to_polys(self):
-        pass
+        ret = []
+        for p in self.pointlist:
+            ret.append((p.x() + self.hrx / 2.) / (self.hrx))
+            ret.append((p.y() + self.hry / 2.) / (self.hry))
+            ret.append(p.tx)
+            ret.append(p.ty)
+        ret.pop()
+        return ret
 
     def __init__(self):
         hrx = 1280 / 2
@@ -31,6 +49,8 @@ class PolyProxy():
         ye = hry
         xs = -hrx
         ys = -hry
+        self.hrx = hrx * 2.
+        self.hry = hry * 2.
 
         self.pointlist = [mapPoint(xs, ys, 0., 0.), mapPoint(xs, ye, 0., 1.), 
                 mapPoint(xe, ye, 1., 1.), mapPoint(xe, ys, 1., 0.), mapPoint(xs, ys, 0., 0.)]
@@ -56,15 +76,6 @@ class PolyGraphicScene(QGraphicsScene):
 
         self.scene = "scene"
 
-        # There is an issue when reconnecting edges -> mouseMove and trying to delete/remove them
-        # the edges stayed in the scene in Qt, however python side was deleted
-        # this caused a lot of troubles...
-        #
-        # I've spend months to find this sh*t!!
-        #
-        # https://bugreports.qt.io/browse/QTBUG-18021
-        # https://bugreports.qt.io/browse/QTBUG-50691
-        # Affected versions: 4.7.1, 4.7.2, 4.8.0, 5.5.1, 5.7.0 - LOL!
         self.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.poly_drag_idx = None
         # settings
@@ -74,9 +85,20 @@ class PolyGraphicScene(QGraphicsScene):
         self._pen.setWidthF(2.0)
         self._pen.setStyle(Qt.SolidLine)
         self.initAssets()
+        self.program = None
         self.setBackgroundBrush(self._color_background)
         self.selected_poly_idx = 0
-        self.polyproxies = [PolyProxy()]
+        self.polyproxies = [PolyProxy(), PolyProxy()]
+
+    def fromPolygons(self, polygons):
+        self.polyproxies = []
+        for p in polygons:
+            n = PolyProxy()
+            n.from_poly(p)
+            self.polyproxies.append(n)
+
+    def makePolygons(self):
+        return [p.to_polys() for p in self.polyproxies]
 
     def initAssets(self):
         """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
@@ -103,6 +125,8 @@ class PolyGraphicScene(QGraphicsScene):
         self.setSceneRect(-width // 2, -height // 2, width, height)
 
     def drawPolys(self, painter):
+        if self.program != None:
+            self.program.updatePolygons(self.makePolygons())
         pen = QPen(Qt.white)
 #        pen.setWidthF(2.0)
  #       pen.setStyle(Qt.SolidLine)
@@ -114,19 +138,20 @@ class PolyGraphicScene(QGraphicsScene):
         brush.setStyle(Qt.BDiagPattern)
         path = QPainterPath()
         path.addPolygon(QPolygonF(self.polyproxies[self.selected_poly_idx].pointlist))
-        painter.fillPath(path, brush);
+        painter.fillPath(path, brush)
 
         plframe = PolyProxy().pointlist
-        painter.setPen(Qt.yellow)
+        painter.setPen(Qt.black)
         for p1, p2 in zip(plframe[:-1], plframe[1:]):
             painter.drawLine(QLineF(p1, p2))
-
         
         for i, poly in enumerate(self.polyproxies):
             painter.setPen(Qt.white)
             j = 0
             pl = poly.pointlist
             for p1, p2 in zip(pl[:-1], pl[1:]):
+                if i == self.selected_poly_idx:
+                    painter.setPen(Qt.yellow)
                 if j == self.polyproxies[self.selected_poly_idx].selected_line_idx and i == self.selected_poly_idx:
                     painter.setPen(Qt.blue)
                 painter.drawLine(QLineF(p1, p2))
@@ -140,8 +165,9 @@ class PolyGraphicScene(QGraphicsScene):
                 painter.drawPoint(p)
 
     def reload_from_node(self, node):
-        print("Hey !")
-        pass
+        self.program = node.program
+        self.fromPolygons(node.program.polygons)
+        self.selected_poly_idx = 0
 
     def mousePressEvent(self, event: QMouseEvent):
         """Dispatch Qt's mouseRelease event to corresponding function below"""
@@ -196,6 +222,7 @@ class PolyGraphicScene(QGraphicsScene):
             self.selected_poly_idx = 0
 
         if event.key() == Qt.Key_P:
+            self.polyproxies.append(PolyProxy())
             self.polyproxies.append(PolyProxy())
 
         if event.key() == Qt.Key_N:
