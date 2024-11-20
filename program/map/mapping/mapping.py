@@ -1,16 +1,22 @@
 from os.path import dirname,join
 
+import numpy as np
+
 from program.program_conf import (
     SQUARE_VERT_PATH,
     register_program,
     name_to_opcode,
 )
 from program.program_base import ProgramBase
-
+from program.map.mapping.earcut import earcut
 from node.shader_node_base import ShaderNode, Map
 from node.node_conf import register_node
 
 OP_CODE_MAPPING = name_to_opcode("Mapping")
+
+def read_file(path):
+    f = open(path, "r")
+    return f.read()
 
 @register_program(OP_CODE_MAPPING)
 class Mapping(ProgramBase):
@@ -22,7 +28,7 @@ class Mapping(ProgramBase):
         self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
-        self.initUniformsBinding()
+        #self.initUniformsBinding()
         self.polygons = [[0., 0., 0., 0.,  
                             0., 1., 0., 1.,
                             1., 1., 1., 1.,
@@ -31,8 +37,10 @@ class Mapping(ProgramBase):
                             0., 1., 0., 1.,
                             1., 1., 1., 1.,
                             1., 0., 1., 0. ] ]
+        self.vaos = []
 
     def updatePolygons(self, new_polygons):
+        self.needsEarcut = True
         self.polygons = new_polygons
 
     def initFBOSpecifications(self):
@@ -44,12 +52,18 @@ class Mapping(ProgramBase):
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        vert_path = SQUARE_VERT_PATH
+        vert_path = join(dirname(__file__), "mapping_vertex.glsl")
         frag_path = join(dirname(__file__), "mapping.glsl")
-        self.loadProgramToCtx(vert_path, frag_path, reload, name="")
+        code_version = "#version "
+        code_version += (
+            str(3) + str(3) + str("0 core\n")
+        )
+        self.program = self.ctx.program(
+            vertex_shader=read_file(vert_path), fragment_shader=read_file(frag_path)
+        )
 
     def initParams(self):
-        pass
+        self.needsEarcut = True
 
     def initUniformsBinding(self):
         binding = {
@@ -57,8 +71,40 @@ class Mapping(ProgramBase):
         super().initUniformsBinding(binding, program_name="")
         super().addProtectedUniforms([])
 
+    def updateEarcut(self):
+        self.vaos = []
+        for i, p in enumerate(self.polygons):
+            n_p = []
+            vertex_pos = []
+            vertex_tcs = []
+
+            for j in range(len(p) // 4):
+                n_p.append(p[j * 4])
+                n_p.append(p[j * 4+ 1])
+                vertex_pos.append(p[j * 4])
+                vertex_pos.append(p[j * 4 + 1])
+                vertex_tcs.append(p[j * 4 + 2])
+                vertex_tcs.append(p[j * 4 + 3])
+            indices = earcut(n_p)
+            is_scisor = (i % 2) == 1
+            if not is_scisor:
+                gpu_vertex_buffer = np.array([],dtype='f4')
+                gpu_tcs_buffer = np.array([],dtype='f4')
+                for idx in indices:
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 0]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 1]) )
+                gpu_vertex_buffer = gpu_vertex_buffer.astype("f4")
+                gpu_tcs_buffer = gpu_tcs_buffer.astype("f4")
+                self.vaos.append( self.ctx.vertex_array(self.program,
+                    [(self.ctx.buffer(gpu_vertex_buffer), "2f", "in_position"),
+                    (self.ctx.buffer(gpu_tcs_buffer), "2f", "in_tcs")]) )
+
     def updateParams(self, af=None):
-        pass
+        if self.needsEarcut:
+            self.needsEarcut = False
+            self.updateEarcut()
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
@@ -69,7 +115,8 @@ class Mapping(ProgramBase):
         self.program["iChannel0"] = 0
         textures[0].use(0)
         self.fbos[0].use()
-        self.vao.render()
+        for vao in self.vaos:
+            vao.render()
         return self.fbos[0].color_attachments[0]
 
 @register_node(OP_CODE_MAPPING)

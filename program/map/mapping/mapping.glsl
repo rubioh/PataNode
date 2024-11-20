@@ -1,13 +1,13 @@
 #version 330 core
 layout (location=0) out vec4 fragColor;
 
-uniform vec2 iResolution;
-
 uniform sampler2D iChannel0;
+uniform vec2 iResolution;
+#define PI 3.141593
+in vec2 tcs;
+
 void main()
 {
-    // Normalized pixel coordinates (from 0 to 1)
-    vec2 uv = gl_FragCoord.xy / iResolution.xy;
-
-    fragColor = vec4(texture(iChannel0, uv).rgba);
+    vec2 uv = gl_FragCoord.xy/iResolution.xy;
+    fragColor = texture(iChannel0, tcs+iResolution.x);
 }
