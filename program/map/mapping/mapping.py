@@ -115,6 +115,7 @@ class Mapping(ProgramBase):
         self.program["iChannel0"] = 0
         textures[0].use(0)
         self.fbos[0].use()
+        self.fbos[0].clear()
         for vao in self.vaos:
             vao.render()
         return self.fbos[0].color_attachments[0]
