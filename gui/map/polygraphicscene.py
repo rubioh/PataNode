@@ -85,6 +85,7 @@ class PolyGraphicScene(QGraphicsScene):
         self._pen.setWidthF(2.0)
         self._pen.setStyle(Qt.SolidLine)
         self.initAssets()
+        self.dragged_poly_idx = None
         self.program = None
         self.setBackgroundBrush(self._color_background)
         self.selected_poly_idx = 0
@@ -179,6 +180,12 @@ class PolyGraphicScene(QGraphicsScene):
     def mouseMoveEvent(self, event):
         pl = self.getcurrentpoly().pointlist
         pd = self.getcurrentpoly().point_drag_idx
+        if self.poly_drag_idx != None:
+            for i, p in enumerate(pl):
+                pl[i] = mapPoint(p.x()+ (event.scenePos().x() - event.lastScenePos().x()), 
+                             p.y()+ (event.scenePos().y() - event.lastScenePos().y()),
+                              p.tx,
+                               p.ty)
         if pd != None:
             pl[pd] = mapPoint(event.scenePos().x(), event.scenePos().y(), pl[pd].tx, pl[pd].ty) 
             if pd == 0:
@@ -189,6 +196,7 @@ class PolyGraphicScene(QGraphicsScene):
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         self.getcurrentpoly().point_drag_idx = None
+        self.poly_drag_idx = None
 
     def dd(self, p1, p2):
         x = p2.x()-p1.x()
@@ -239,10 +247,10 @@ class PolyGraphicScene(QGraphicsScene):
 
     def leftclickevent(self, event):
         self.getcurrentpoly().selected_line_idx = None
-        self.poly_drag_idx = None
+   #     self.poly_drag_idx = None
         poly = QPolygonF(self.getcurrentpoly().pointlist)
         for i, point in enumerate(self.getcurrentpoly().pointlist):
-            if self.dd(point, event.scenePos()) < 5.:
+            if self.dd(point, event.scenePos()) < 10.:
                 self.getcurrentpoly().point_drag_idx = i
                 return
         i = 0
