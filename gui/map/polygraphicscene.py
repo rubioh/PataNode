@@ -260,7 +260,7 @@ class PolyGraphicScene(QGraphicsScene):
         newp = (p1 + p2) / 2 
         newp.tx = (p1.tx + p2.tx) / 2
         newp.ty = (p1.ty + p2.ty) / 2
-        self.getcurrentpoly().pointlist.insert(line_idx+1, newp)
+        self.getcurrentpoly().pointlist.insert(line_idx+1, mapPoint(newp.x(), newp.y(), newp.tx, newp.ty))
 
     def keyReleaseEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_F:
