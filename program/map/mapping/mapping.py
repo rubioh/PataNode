@@ -1,5 +1,6 @@
 from os.path import dirname,join
 
+import moderngl
 import numpy as np
 
 from program.program_conf import (
@@ -64,6 +65,7 @@ class Mapping(ProgramBase):
 
     def initParams(self):
         self.needsEarcut = True
+        self.wireframe = False
 
     def initUniformsBinding(self):
         binding = {
@@ -73,33 +75,30 @@ class Mapping(ProgramBase):
 
     def updateEarcut(self):
         self.vaos = []
-        for i, p in enumerate(self.polygons):
+        for i, p in enumerate(self.polygons[::2]):
             n_p = []
             vertex_pos = []
             vertex_tcs = []
-
             for j in range(len(p) // 4):
                 n_p.append(p[j * 4])
                 n_p.append(p[j * 4+ 1])
                 vertex_pos.append(p[j * 4])
                 vertex_pos.append(p[j * 4 + 1])
-                vertex_tcs.append(p[j * 4 + 2])
+                vertex_tcs.append(p[j * 4 + 2] )
                 vertex_tcs.append(p[j * 4 + 3])
             indices = earcut(n_p)
-            is_scisor = (i % 2) == 1
-            if not is_scisor:
-                gpu_vertex_buffer = np.array([],dtype='f4')
-                gpu_tcs_buffer = np.array([],dtype='f4')
-                for idx in indices:
-                    gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
-                    gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
-                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 0]) )
-                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 1]) )
-                gpu_vertex_buffer = gpu_vertex_buffer.astype("f4")
-                gpu_tcs_buffer = gpu_tcs_buffer.astype("f4")
-                self.vaos.append( self.ctx.vertex_array(self.program,
-                    [(self.ctx.buffer(gpu_vertex_buffer), "2f", "in_position"),
-                    (self.ctx.buffer(gpu_tcs_buffer), "2f", "in_tcs")]) )
+            gpu_vertex_buffer = np.array([],dtype='f4')
+            gpu_tcs_buffer = np.array([],dtype='f4')
+            for idx in indices:
+                gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
+                gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
+                gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 0]) )
+                gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 1]) )
+            gpu_vertex_buffer = gpu_vertex_buffer.astype("f4")
+            gpu_tcs_buffer = gpu_tcs_buffer.astype("f4")
+            self.vaos.append( self.ctx.vertex_array(self.program,
+                [(self.ctx.buffer(gpu_vertex_buffer), "2f", "in_position"),
+                (self.ctx.buffer(gpu_tcs_buffer), "2f", "in_tcs")]) )
 
     def updateParams(self, af=None):
         if self.needsEarcut:
@@ -118,6 +117,13 @@ class Mapping(ProgramBase):
         self.fbos[0].clear()
         for vao in self.vaos:
             vao.render()
+        if self.wireframe:
+            self.program["white"] = 1
+            shape = moderngl.LINE_STRIP
+            for vao in self.vaos:
+                vao.render(shape)
+        self.program["white"] = 0
+
         return self.fbos[0].color_attachments[0]
 
 @register_node(OP_CODE_MAPPING)

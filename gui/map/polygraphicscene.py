@@ -2,6 +2,7 @@
 """
 A module containing Graphic representation of :class:`~nodeeditor.node_scene.Scene`
 """
+import copy
 import math
 from qtpy.QtWidgets import QGraphicsScene, QWidget
 from qtpy.QtCore import Signal, QRect, QLine, Qt, QPointF, QLineF
@@ -11,11 +12,14 @@ from nodeeditor.utils import dumpException
 from nodeeditor.node_graphics_view import STATE_STRING, DEBUG_STATE
 
 class mapPoint(QPointF):
-    def __init__(self, x, y, tx, ty):
+    def __init__(self, x, y, tx, ty, edge = None):
         super().__init__(x, y)
         self.tx = tx
         self.ty = ty
+        self.edge = edge
 
+    def __deepcopy__(self, memo):
+        return mapPoint(self.x(), self.y(), self.tx, self.ty, self.edge)
 class PolyProxy():
 
     def from_poly(self, polys):
@@ -26,11 +30,11 @@ class PolyProxy():
             self.pointlist.append(mapPoint(polys[i * 4] * self.hrx - self.hrx / 2.,
                                            polys[i * 4 +1] * self.hry - self.hry / 2.,
                                            polys[i * 4+2],
-                                           polys[i * 4+3]))
+                                           polys[i * 4+3], i))
         self.pointlist.append(mapPoint(polys[0] * self.hrx - self.hrx / 2.,
                                         polys[1] * self.hry - self.hry / 2.,
                                         polys[2],
-                                        polys[3]))
+                                        polys[3], 4))
 
     def to_polys(self):
         ret = []
@@ -52,8 +56,9 @@ class PolyProxy():
         self.hrx = hrx * 2.
         self.hry = hry * 2.
 
-        self.pointlist = [mapPoint(xs, ys, 0., 0.), mapPoint(xs, ye, 0., 1.), 
-                mapPoint(xe, ye, 1., 1.), mapPoint(xe, ys, 1., 0.), mapPoint(xs, ys, 0., 0.)]
+        self.translation = QPointF(0., 0.)
+        self.pointlist = [mapPoint(xs, ys, 0., 0., 0), mapPoint(xs, ye, 0., 1., 1), 
+                mapPoint(xe, ye, 1., 1., 2), mapPoint(xe, ys, 1., 0., 3), mapPoint(xs, ys, 0., 0., 4)]
         self.point_drag_idx = None
         self.selected_point_idx = None
         self.selected_line_idx = None
@@ -75,7 +80,7 @@ class PolyGraphicScene(QGraphicsScene):
         super().__init__(None)
 
         self.scene = "scene"
-
+        self.rotate = False
         self.setItemIndexMethod(QGraphicsScene.NoIndex)
         self.poly_drag_idx = None
         # settings
@@ -99,7 +104,27 @@ class PolyGraphicScene(QGraphicsScene):
             self.polyproxies.append(n)
 
     def makePolygons(self):
-        return [p.to_polys() for p in self.polyproxies]
+        scisor_id = 0
+        polyproxies = copy.deepcopy(self.polyproxies)
+        for poly, scisor in zip(polyproxies[::2], polyproxies[1::2]):
+            current_scisor_idx = 0
+            next_line_idx = 1
+            current_line_idx = 0
+            while current_scisor_idx != 4:
+                while poly.pointlist[next_line_idx].edge == None:
+                    next_line_idx = next_line_idx + 1
+                p = poly.pointlist[current_line_idx]
+                poly.pointlist[current_line_idx] = mapPoint(p.x(), p.y(), 
+                                                            ((scisor.pointlist[current_scisor_idx].x() + scisor.hrx / 2.) / scisor.hrx),
+                                                            ((scisor.pointlist[current_scisor_idx].y() + scisor.hry / 2.) / scisor.hry))
+
+                for j in range(current_line_idx, next_line_idx):
+                    pass
+                current_scisor_idx = current_scisor_idx + 1
+                current_line_idx = next_line_idx
+                next_line_idx = current_line_idx + 1
+
+        return [p.to_polys() for p in polyproxies]
 
     def initAssets(self):
         """Initialize ``QObjects`` like ``QColor``, ``QPen`` and ``QBrush``"""
@@ -151,6 +176,8 @@ class PolyGraphicScene(QGraphicsScene):
             j = 0
             pl = poly.pointlist
             for p1, p2 in zip(pl[:-1], pl[1:]):
+                if i % 2 == 1:
+                    painter.setPen(Qt.red)
                 if i == self.selected_poly_idx:
                     painter.setPen(Qt.yellow)
                 if j == self.polyproxies[self.selected_poly_idx].selected_line_idx and i == self.selected_poly_idx:
@@ -177,22 +204,36 @@ class PolyGraphicScene(QGraphicsScene):
         else:
             super().mouseReleaseEvent(event)
 
+    def do_rotate(self, diffx, diffy):
+        diff = (diffy) / 300.
+        poly = self.getcurrentpoly()
+        pl = self.getcurrentpoly().pointlist
+        for i, p in enumerate(self.getcurrentpoly().pointlist):
+            n_p = (( (p.x() - poly.hrx/2. ) + poly.hrx / 2.) / poly.hrx, ( (p.y() - poly.hry/2. ) + poly.hry / 2.) / poly.hry)
+            x = n_p[0] * math.cos(diff) + n_p[1] * -math.sin(diff)
+            y = n_p[0] * math.sin(diff) + n_p[1] * math.cos(diff)
+            x = x * poly.hrx - poly.hrx / 2 + poly.hrx / 2.
+            y = y * poly.hry - poly.hry / 2 + poly.hry / 2.
+            pl[i] = mapPoint(x, y, p.tx, p.ty, p.edge)
+
     def mouseMoveEvent(self, event):
         pl = self.getcurrentpoly().pointlist
         pd = self.getcurrentpoly().point_drag_idx
+        if self.rotate:
+            self.do_rotate(event.scenePos().x() - event.lastScenePos().x(), event.scenePos().y() - event.lastScenePos().y())
         if self.poly_drag_idx != None:
             for i, p in enumerate(pl):
                 pl[i] = mapPoint(p.x()+ (event.scenePos().x() - event.lastScenePos().x()), 
                              p.y()+ (event.scenePos().y() - event.lastScenePos().y()),
                               p.tx,
-                               p.ty)
+                               p.ty, p.edge)
         if pd != None:
-            pl[pd] = mapPoint(event.scenePos().x(), event.scenePos().y(), pl[pd].tx, pl[pd].ty) 
+            pl[pd] = mapPoint(event.scenePos().x(), event.scenePos().y(), pl[pd].tx, pl[pd].ty, pl[pd].edge) 
             if pd == 0:
-                pl[len(pl) - 1] = mapPoint(pl[0].x(), pl[0].y(), pl[0].tx,pl[0].ty)
+                pl[len(pl) - 1] = mapPoint(pl[0].x(), pl[0].y(), pl[0].tx,pl[0].ty, pl[0].edge)
             if pd == len(pl) - 1:
                 u = len(pl) - 1
-                pl[0] = mapPoint(pl[u].x(), pl[u].y(), pl[u].tx,pl[u].ty)
+                pl[0] = mapPoint(pl[u].x(), pl[u].y(), pl[u].tx,pl[u].ty, pl[u].edge)
 
     def mouseReleaseEvent(self, event: QMouseEvent):
         self.getcurrentpoly().point_drag_idx = None
@@ -221,14 +262,29 @@ class PolyGraphicScene(QGraphicsScene):
         newp.ty = (p1.ty + p2.ty) / 2
         self.getcurrentpoly().pointlist.insert(line_idx+1, newp)
 
+    def keyReleaseEvent(self, event: QKeyEvent):
+        if event.key() == Qt.Key_F:
+            self.rotate = False
+
     def keyPressEvent(self, event: QKeyEvent):
         if event.key() == Qt.Key_S and self.getcurrentpoly().selected_line_idx != None:
             self.subdivide(self.getcurrentpoly().selected_line_idx)
             self.getcurrentpoly().selected_line_idx = None
         if event.key() == Qt.Key_R:
-            self.polyproxies = [PolyProxy()]
+            self.polyproxies = [PolyProxy(), PolyProxy()]
             self.selected_poly_idx = 0
 
+        if event.key() == Qt.Key_W:
+            if self.program:
+                self.program.wireframe = not self.program.wireframe
+
+        if event.key() == Qt.Key_H:
+            for i, p in enumerate(self.getcurrentpoly().pointlist):
+                pl = self.getcurrentpoly().pointlist[i] 
+                self.getcurrentpoly().pointlist[i] = mapPoint(pl.x() / 2., pl.y() / 2., pl.tx, pl.ty, pl.edge)
+
+        if event.key() == Qt.Key_F:
+            self.rotate = True
         if event.key() == Qt.Key_P:
             self.polyproxies.append(PolyProxy())
             self.polyproxies.append(PolyProxy())

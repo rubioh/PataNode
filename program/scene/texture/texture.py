@@ -51,6 +51,7 @@ class Texture(ProgramBase):
     def reload_texture(self, v):
         self.path = v
         jpg_image = Image.open(v)
+        jpg_image = jpg_image.resize((1024, 1024))
         bmp_image = jpg_image.convert("RGB")
         b = list(bmp_image.getdata())
         b2 = []
