@@ -101,7 +101,7 @@ class ScreenNode(ShaderNode, Output):
 
     def render(self, audio_features=None):
         for node in self.scene.nodes:
-            if isinstance(node, ShaderNode):
+            if isinstance(node, ShaderNode) and node != None:
                 node.already_called = False
             if isinstance(node, PredominantColorNode):
                 self.plreturn = node
