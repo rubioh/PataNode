@@ -1,6 +1,9 @@
 import abc
+
 import numpy as np
+
 from typing import NamedTuple, Protocol
+
 from light_new.fixture.fixture import FixtureConfigBase
 
 
@@ -45,14 +48,19 @@ class Lyre(PhysicalPositionFixture):
     def pan_tilt_to_dmx(self) -> None:
         if self.pan > self.PAN_LIM:
             self.pan = self.PAN_LIM
+
         if self.pan < -self.PAN_LIM:
             self.pan = -self.PAN_LIM
+
         pan = (self.pan + self.PAN_LIM) / (2.0 * self.PAN_LIM)
         self.attrib["pan"] = pan
+
         if self.tilt > self.TILT_LIM:
             self.tilt = self.TILT_LIM
+
         if self.tilt < -self.TILT_LIM:
             self.tilt = -self.TILT_LIM
+
         tilt = (self.tilt + self.TILT_LIM) / (2.0 * self.TILT_LIM)
         self.attrib["tilt"] = tilt
 
@@ -73,7 +81,8 @@ class Lyre(PhysicalPositionFixture):
 
 class Color(abc.ABC, Fixture):
     @abc.abstractmethod
-    def update_color(self): ...
+    def update_color(self):
+        ...
 
     def update(self) -> None:
         self.update_color()

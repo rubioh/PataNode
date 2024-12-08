@@ -1,8 +1,10 @@
-from bytechomp import Parser, serialize
-from bytechomp.datatypes import U16
 from typing import Dict, Callable, TypeVar, Generic, Tuple, Self
 
+from bytechomp import Parser, serialize
+from bytechomp.datatypes import U16
+
 from artnet.packet.header import ArtOp, ArtHeader, ArtHeaderProtVer, ArtParseError
+
 
 ARTNET_PORT = 6454
 ArtPayload = TypeVar("ArtPayload")
@@ -37,22 +39,22 @@ class ArtBase(Generic[ArtPayload]):
         return serialize(ArtHeaderProtVer())  # type: ignore
 
     @classmethod
-    def parse_protocol_version(
-        cls, packet: bytes
-    ) -> Tuple[ArtHeaderProtVer | None, bytes]:
+    def parse_protocol_version(cls, packet: bytes) -> Tuple[ArtHeaderProtVer | None, bytes]:
         prot_ver, payload = cls.__protocol_version_parser.parse(packet)
+
         if prot_ver is None:
-            raise ArtParseError(
-                f"packet is too short to parse protocol version: len={len(packet)}"
-            )
+            raise ArtParseError(f"packet is too short to parse protocol version: len={len(packet)}")
+
         return prot_ver, payload
 
     @classmethod
     def parse(cls, packet: bytes) -> Self:
         _, packet = cls.parse_protocol_version(packet)
         data, extra = cls._parser.parse(packet)
+
         if data is None:
             raise ArtParseError("packet is too short for the expected ArtNet payload")
+
         cls.validate(data, extra)
         return cls(data, extra)
 

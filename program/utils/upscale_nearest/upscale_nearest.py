@@ -1,18 +1,12 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
-
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Utils
-from node.node_conf import register_node
 import moderngl as mgl
+
+from os.path import dirname, join
+
+from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Utils
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_UPSCALENEAREST = name_to_opcode("upscale_nearest")
 
@@ -33,6 +27,7 @@ class UpscaleNearest(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -90,8 +85,10 @@ class UpscaleNearestNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture

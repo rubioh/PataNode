@@ -1,11 +1,13 @@
+from time import time
+
+import numpy as np
 import torch
 import torch.nn as nn
-from time import time
+
+from nnAudio.librosa_functions import *
 from scipy import signal
-import numpy as np
 from scipy.signal import get_window
 from scipy.fftpack import fft
-from nnAudio.librosa_functions import *
 from torch.nn.functional import conv1d
 
 
@@ -37,7 +39,6 @@ def downsampling_by_n(x, filterKernel, n):
     --------
     >>> x_down = downsampling_by_n(x, filterKernel)
     """
-
     padding = int((filterKernel.shape[-1] - 1) // 2)
     x = conv1d(x, filterKernel, stride=(n,), padding=(padding,))
     return x
@@ -63,7 +64,6 @@ def downsampling_by_2(x, filterKernel):
     --------
     >>> x_down = downsampling_by_2(x, filterKernel)
     """
-
     return downsampling_by_n(x, filterKernel, 2)
 
 
@@ -111,7 +111,7 @@ def get_cqt_complex2(
         x = padding(
             x
         )  # When center == True, we need padding at the beginning and ending
-    except:
+    except Exception:
         warnings.warn(
             f"\ninput size = {x.shape}\tkernel size = {cqt_kernels_real.shape[-1]}\n"
             "padding with reflection mode might not be the best choice, try using constant padding",
@@ -121,13 +121,13 @@ def get_cqt_complex2(
             x, (cqt_kernels_real.shape[-1] // 2, cqt_kernels_real.shape[-1] // 2)
         )
 
-    if wcos == None or wsin == None:
+    if wcos is None or wsin is None:
         CQT_real = conv1d(x, cqt_kernels_real, stride=hop_length)
         CQT_imag = -conv1d(x, cqt_kernels_imag, stride=hop_length)
-
     else:
         fourier_real = conv1d(x, wcos, stride=hop_length)
         fourier_imag = conv1d(x, wsin, stride=hop_length)
+
         # Multiplying input with the CQT kernel in freq domain
         CQT_real, CQT_imag = complex_mul(
             (cqt_kernels_real, cqt_kernels_imag), (fourier_real, fourier_imag)
@@ -140,7 +140,6 @@ def broadcast_dim(x):
     """
     Auto broadcast input so that it can fits into a Conv1d
     """
-
     if x.dim() == 2:
         x = x[:, None, :]
     elif x.dim() == 1:
@@ -152,6 +151,7 @@ def broadcast_dim(x):
         raise ValueError(
             "Only support input with shape = (batch, len) or shape = (len)"
         )
+
     return x
 
 
@@ -200,25 +200,24 @@ def get_early_downsample_params(sr, hop_length, fmax_t, Q, n_octaves, verbose):
     sr, hop_length, downsample_factor = early_downsample(
         sr, hop_length, n_octaves, sr // 2, filter_cutoff
     )
+
     if downsample_factor != 1:
-        if verbose == True:
+        if verbose:
             print("Can do early downsample, factor = ", downsample_factor)
+
         earlydownsample = True
-        # print("new sr = ", sr)
-        # print("new hop_length = ", hop_length)
+#       print("new sr = ", sr)
+#       print("new hop_length = ", hop_length)
         early_downsample_filter = create_lowpass_filter(
             band_center=1 / downsample_factor,
             kernelLength=256,
             transitionBandwidth=0.03,
         )
         early_downsample_filter = torch.tensor(early_downsample_filter)[None, None, :]
-
     else:
-        if verbose == True:
-            print(
-                "No early downsampling is required, downsample_factor = ",
-                downsample_factor,
-            )
+        if verbose:
+            print("No early downsampling is required, downsample_factor =", downsample_factor)
+
         early_downsample_filter = None
         earlydownsample = False
 
@@ -227,10 +226,8 @@ def get_early_downsample_params(sr, hop_length, fmax_t, Q, n_octaves, verbose):
 
 def early_downsample(sr, hop_length, n_octaves, nyquist, filter_cutoff):
     """Return new sampling rate and hop length after early dowansampling"""
-    downsample_count = early_downsample_count(
-        nyquist, filter_cutoff, hop_length, n_octaves
-    )
-    # print("downsample_count = ", downsample_count)
+    downsample_count = early_downsample_count(nyquist, filter_cutoff, hop_length, n_octaves)
+#   print("downsample_count =", downsample_count)
     downsample_factor = 2 ** (downsample_count)
 
     hop_length //= downsample_factor  # Getting new hop_length
@@ -242,14 +239,11 @@ def early_downsample(sr, hop_length, n_octaves, nyquist, filter_cutoff):
 
 def early_downsample_count(nyquist, filter_cutoff, hop_length, n_octaves):
     """Compute the number of early downsampling operations"""
-
-    downsample_count1 = max(
-        0, int(np.ceil(np.log2(0.85 * nyquist / filter_cutoff)) - 1) - 1
-    )
-    # print("downsample_count1 = ", downsample_count1)
+    downsample_count1 = max(0, int(np.ceil(np.log2(0.85 * nyquist / filter_cutoff)) - 1) - 1)
+#   print("downsample_count1 = ", downsample_count1)
     num_twos = nextpow2(hop_length)
     downsample_count2 = max(0, num_twos - n_octaves + 1)
-    # print("downsample_count2 = ",downsample_count2)
+#   print("downsample_count2 = ",downsample_count2)
 
     return min(downsample_count1, downsample_count2)
 
@@ -272,17 +266,15 @@ def create_cqt_kernels(
     """
 
     fftLen = 2 ** nextpow2(np.ceil(Q * fs / fmin))
-    # minWin = 2**nextpow2(np.ceil(Q * fs / fmax))
+#   minWin = 2**nextpow2(np.ceil(Q * fs / fmax))
 
-    if (fmax != None) and (n_bins == None):
+    if (fmax is not None) and (n_bins is None):
         n_bins = np.ceil(
             bins_per_octave * np.log2(fmax / fmin)
         )  # Calculate the number of bins
         freqs = fmin * 2.0 ** (np.r_[0:n_bins] / np.double(bins_per_octave))
-
-    elif (fmax == None) and (n_bins != None):
+    elif (fmax is None) and (n_bins is not None):
         freqs = fmin * 2.0 ** (np.r_[0:n_bins] / np.double(bins_per_octave))
-
     else:
         warnings.warn("If fmax is given, n_bins will be ignored", SyntaxWarning)
         n_bins = np.ceil(
@@ -290,7 +282,7 @@ def create_cqt_kernels(
         )  # Calculate the number of bins
         freqs = fmin * 2.0 ** (np.r_[0:n_bins] / np.double(bins_per_octave))
 
-    if np.max(freqs) > fs / 2 and topbin_check == True:
+    if np.max(freqs) > fs / 2 and topbin_check:
         raise ValueError(
             "The top bin {}Hz has exceeded the Nyquist frequency, \
                           please reduce the n_bins".format(
@@ -301,12 +293,12 @@ def create_cqt_kernels(
     alpha = 2.0 ** (1.0 / bins_per_octave) - 1.0
     lengths = np.ceil(Q * fs / (freqs + gamma / alpha))
 
-    # get max window length depending on gamma value
+    # Get max window length depending on gamma value
     max_len = int(max(lengths))
     fftLen = int(2 ** (np.ceil(np.log2(max_len))))
 
     tempKernel = np.zeros((int(n_bins), int(fftLen)), dtype=np.complex64)
-    specKernel = np.zeros((int(n_bins), int(fftLen)), dtype=np.complex64)
+#   specKernel = np.zeros((int(n_bins), int(fftLen)), dtype=np.complex64)
 
     for k in range(0, int(n_bins)):
         freq = freqs[k]
@@ -329,16 +321,18 @@ def create_cqt_kernels(
             tempKernel[k, start : start + int(l)] = sig / np.linalg.norm(sig, norm)
         else:
             tempKernel[k, start : start + int(l)] = sig
-        # specKernel[k, :] = fft(tempKernel[k])
 
-    # return specKernel[:,:fftLen//2+1], fftLen, torch.tensor(lenghts).float()
+#       specKernel[k, :] = fft(tempKernel[k])
+
+#   return specKernel[:,:fftLen//2+1], fftLen, torch.tensor(lenghts).float()
     return tempKernel, fftLen, torch.tensor(lengths).float(), freqs
 
 
 def get_window_dispatch(window, N, fftbins=True):
     if isinstance(window, str):
         return get_window(window, N, fftbins=fftbins)
-    elif isinstance(window, tuple):
+
+    if isinstance(window, tuple):
         if window[0] == "gaussian":
             assert window[1] >= 0
             sigma = np.floor(-N / 2 / np.sqrt(-2 * np.log(10 ** (-window[1] / 20))))
@@ -413,9 +407,9 @@ def create_fourier_kernels(
         This ``k`` is in the Discrete Fourier Transform equation $$
 
     """
-
     if freq_bins == None:
         freq_bins = n_fft // 2 + 1
+
     if win_length == None:
         win_length = n_fft
 
@@ -427,8 +421,8 @@ def create_fourier_kernels(
     bins2freq = []
     binslist = []
 
-    # num_cycles = start_freq*d/44000.
-    # scaling_ind = np.log(end_freq/start_freq)/k
+#   num_cycles = start_freq*d/44000.
+#   scaling_ind = np.log(end_freq/start_freq)/k
 
     # Choosing window shape
 
@@ -436,16 +430,17 @@ def create_fourier_kernels(
     window_mask = pad_center(window_mask, n_fft)
 
     if freq_scale == "linear":
-        if verbose == True:
+        if verbose:
             print(
                 f"sampling rate = {sr}. Please make sure the sampling rate is correct in order to"
                 f"get a valid freq range"
             )
+
         start_bin = start_freq * n_fft / sr
         scaling_ind = (end_freq - start_freq) * (n_fft / sr) / freq_bins
 
         for k in range(freq_bins):  # Only half of the bins contain useful info
-            # print("linear freq = {}".format((k*scaling_ind+start_bin)*sr/n_fft))
+#           print("linear freq = {}".format((k*scaling_ind+start_bin)*sr/n_fft))
             bins2freq.append((k * scaling_ind + start_bin) * sr / n_fft)
             binslist.append((k * scaling_ind + start_bin))
             wsin[k, 0, :] = np.sin(
@@ -454,18 +449,18 @@ def create_fourier_kernels(
             wcos[k, 0, :] = np.cos(
                 2 * np.pi * (k * scaling_ind + start_bin) * s / n_fft
             )
-
     elif freq_scale == "log":
-        if verbose == True:
+        if verbose:
             print(
                 f"sampling rate = {sr}. Please make sure the sampling rate is correct in order to"
                 f"get a valid freq range"
             )
+
         start_bin = start_freq * n_fft / sr
         scaling_ind = np.log(end_freq / start_freq) / freq_bins
 
         for k in range(freq_bins):  # Only half of the bins contain useful info
-            # print("log freq = {}".format(np.exp(k*scaling_ind)*start_bin*sr/n_fft))
+#           print("log freq = {}".format(np.exp(k*scaling_ind)*start_bin*sr/n_fft))
             bins2freq.append(np.exp(k * scaling_ind) * start_bin * sr / n_fft)
             binslist.append((np.exp(k * scaling_ind) * start_bin))
             wsin[k, 0, :] = np.sin(
@@ -474,18 +469,18 @@ def create_fourier_kernels(
             wcos[k, 0, :] = np.cos(
                 2 * np.pi * (np.exp(k * scaling_ind) * start_bin) * s / n_fft
             )
-
     elif freq_scale == "log2":
-        if verbose == True:
+        if verbose:
             print(
                 f"sampling rate = {sr}. Please make sure the sampling rate is correct in order to"
                 f"get a valid freq range"
             )
+
         start_bin = start_freq * n_fft / sr
         scaling_ind = np.log2(end_freq / start_freq) / freq_bins
 
         for k in range(freq_bins):  # Only half of the bins contain useful info
-            # print("log freq = {}".format(np.exp(k*scaling_ind)*start_bin*sr/n_fft))
+#           print("log freq = {}".format(np.exp(k*scaling_ind)*start_bin*sr/n_fft))
             bins2freq.append(2 ** (k * scaling_ind) * start_bin * sr / n_fft)
             binslist.append((2 ** (k * scaling_ind) * start_bin))
             wsin[k, 0, :] = np.sin(
@@ -494,7 +489,6 @@ def create_fourier_kernels(
             wcos[k, 0, :] = np.cos(
                 2 * np.pi * (2 ** (k * scaling_ind) * start_bin) * s / n_fft
             )
-
     elif freq_scale == "no":
         for k in range(freq_bins):  # Only half of the bins contain useful info
             bins2freq.append(k * sr / n_fft)
@@ -503,6 +497,7 @@ def create_fourier_kernels(
             wcos[k, 0, :] = np.cos(2 * np.pi * k * s / n_fft)
     else:
         print("Please select the correct frequency scale, 'linear' or 'log'")
+
     return (
         wsin.astype(np.float32),
         wcos.astype(np.float32),
@@ -567,8 +562,9 @@ class CQTCausal(nn.Module):
         Q = float(filter_scale) / (2 ** (1 / bins_per_octave) - 1)
 
         # Creating lowpass filter and make it a torch tensor
-        if verbose == True:
+        if verbose:
             print("Creating low pass filter ...", end="\r")
+
         start = time()
         lowpass_filter = torch.tensor(
             create_lowpass_filter(
@@ -579,7 +575,7 @@ class CQTCausal(nn.Module):
         # Broadcast the tensor to the shape that fits conv1d
         self.register_buffer("lowpass_filter", lowpass_filter[None, None, :])
 
-        if verbose == True:
+        if verbose:
             print(
                 "Low pass filter created, time used = {:.4f} seconds".format(
                     time() - start
@@ -590,12 +586,12 @@ class CQTCausal(nn.Module):
         # n_octaves determines how many resampling requires for the CQT
         n_filters = min(bins_per_octave, n_bins)
         self.n_octaves = int(np.ceil(float(n_bins) / bins_per_octave))
-        # print("n_octaves = ", self.n_octaves)
+#       print("n_octaves = ", self.n_octaves)
 
         # Calculate the lowest frequency bin for the top octave kernel
         self.fmin_t = fmin * 2 ** (self.n_octaves - 1)
         remainder = n_bins % bins_per_octave
-        # print("remainder = ", remainder)
+#       print("remainder = ", remainder)
 
         if remainder == 0:
             # Calculate the top bin frequency
@@ -607,6 +603,7 @@ class CQTCausal(nn.Module):
         self.fmin_t = fmax_t / 2 ** (
             1 - 1 / bins_per_octave
         )  # Adjusting the top minium bins
+
         if fmax_t > sr / 2:
             raise ValueError(
                 "The top bin {}Hz has exceeded the Nyquist frequency, \
@@ -615,11 +612,10 @@ class CQTCausal(nn.Module):
                 )
             )
 
-        if (
-            self.earlydownsample == True
-        ):  # Do early downsampling if this argument is True
-            if verbose == True:
+        if self.earlydownsample:  # Do early downsampling if this argument is True
+            if verbose:
                 print("Creating early downsampling filter ...", end="\r")
+
             start = time()
             (
                 sr,
@@ -632,7 +628,8 @@ class CQTCausal(nn.Module):
             )
 
             self.register_buffer("early_downsample_filter", early_downsample_filter)
-            if verbose == True:
+
+            if verbose:
                 print(
                     "Early downsampling filter created, \
                             time used = {:.4f} seconds".format(
@@ -643,11 +640,11 @@ class CQTCausal(nn.Module):
             self.downsample_factor = 1.0
 
         # Preparing CQT kernels
-        if verbose == True:
+        if verbose:
             print("Creating CQT kernels ...", end="\r")
 
         start = time()
-        # print("Q = {}, fmin_t = {}, n_filters = {}".format(Q, self.fmin_t, n_filters))
+#       print("Q = {}, fmin_t = {}, n_filters = {}".format(Q, self.fmin_t, n_filters))
         basis, self.n_fft, _, _ = create_cqt_kernels(
             Q,
             sr,
@@ -675,7 +672,7 @@ class CQTCausal(nn.Module):
         cqt_kernels_real = torch.tensor(fft_basis.real)
         cqt_kernels_imag = torch.tensor(fft_basis.imag)
 
-        if verbose == True:
+        if verbose:
             print(
                 "CQT kernels created, time used = {:.4f} seconds".format(time() - start)
             )
@@ -684,7 +681,7 @@ class CQTCausal(nn.Module):
         # Preparing kernels for Short-Time Fourier Transform (STFT)
         # We set the frequency range in the CQT filter instead of here.
 
-        if verbose == True:
+        if verbose:
             print("Creating STFT kernels ...", end="\r")
 
         start = time()
@@ -697,7 +694,7 @@ class CQTCausal(nn.Module):
         wsin = torch.tensor(wsin)
         wcos = torch.tensor(wcos)
 
-        if verbose == True:
+        if verbose:
             print(
                 "STFT kernels created, time used = {:.4f} seconds".format(
                     time() - start
@@ -714,19 +711,15 @@ class CQTCausal(nn.Module):
             self.register_buffer("wcos", wcos)
 
         if trainable_CQT:
-            cqt_kernels_real = nn.Parameter(
-                cqt_kernels_real, requires_grad=trainable_CQT
-            )
-            cqt_kernels_imag = nn.Parameter(
-                cqt_kernels_imag, requires_grad=trainable_CQT
-            )
+            cqt_kernels_real = nn.Parameter(cqt_kernels_real, requires_grad=trainable_CQT)
+            cqt_kernels_imag = nn.Parameter(cqt_kernels_imag, requires_grad=trainable_CQT)
             self.register_parameter("cqt_kernels_real", cqt_kernels_real)
             self.register_parameter("cqt_kernels_imag", cqt_kernels_imag)
         else:
             self.register_buffer("cqt_kernels_real", cqt_kernels_real)
             self.register_buffer("cqt_kernels_imag", cqt_kernels_imag)
 
-            # If center==True, the STFT window will be put in the middle, and paddings at the beginning
+        # If center==True, the STFT window will be put in the middle, and paddings at the beginning
         # and ending are required.
         if self.pad_mode == "constant":
             self.padding = nn.ConstantPad1d((self.n_fft, 0), 0)
@@ -747,12 +740,13 @@ class CQTCausal(nn.Module):
             It will be automatically broadcast to the right shape
         """
         output_format = output_format or self.output_format
-
         x = broadcast_dim(x)
+
         if self.earlydownsample == True:
             x = downsampling_by_n(
                 x, self.early_downsample_filter, self.downsample_factor
             )
+
         hop = self.hop_length
         S = int(x.shape[-1] / hop) + 1
         CQT = get_cqt_complex2(
@@ -767,11 +761,13 @@ class CQTCausal(nn.Module):
 
         x_down = x  # Preparing a new variable for downsampling
         k = 1
+
         for i in range(self.n_octaves - 1):
             if hop == 1:
                 hop = hop
             else:
                 hop = hop // 2
+
             x_down = downsampling_by_2(x_down, self.lowpass_filter)
             CQT1 = get_cqt_complex2(
                 x_down,
@@ -802,10 +798,10 @@ class CQTCausal(nn.Module):
             # Getting CQT Amplitude
             return torch.sqrt(CQT.pow(2).sum(-1))
 
-        elif output_format == "Complex":
+        if output_format == "Complex":
             return CQT
 
-        elif output_format == "Phase":
+        if output_format == "Phase":
             phase_real = torch.cos(torch.atan2(CQT[:, :, :, 1], CQT[:, :, :, 0]))
             phase_imag = torch.sin(torch.atan2(CQT[:, :, :, 1], CQT[:, :, :, 0]))
             return torch.stack((phase_real, phase_imag), -1)

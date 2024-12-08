@@ -1,17 +1,12 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_RR = name_to_opcode("rainbow_rewqeqoad")
 
@@ -19,10 +14,10 @@ OP_CODE_RR = name_to_opcode("rainbow_rewqeqoad")
 @register_program(OP_CODE_RR)
 class RainbowRoad(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
-
         super().__init__(ctx, major_version, minor_version, win_size)
         self.winsize = win_size
         self.title = "rainbow_road"
+
         self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
@@ -31,6 +26,7 @@ class RainbowRoad(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -92,6 +88,7 @@ class RainbowRoad(ProgramBase):
     def updateParams(self, fa):
         if fa is None:
             return
+
         self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * fa["full"][3]
         self.smooth_mid = self.smooth_mid * 0.2 + 0.8 * fa["full"][2]
         tmp = max(self.smooth_fast - self.smooth_mid * 0.95, 0.0) * 10.0
@@ -106,8 +103,10 @@ class RainbowRoad(ProgramBase):
             self.count_kick += 1
             self.tic_tile2 = 1
             self.tic_tile2 = self.tic_tile2 % 2
+
             if self.mode == 1:
                 self.r = np.random.randint(0, 100)
+
             if self.count_kick >= 16:
                 self.count_kick = 0
                 self.c1 ^= 1
@@ -178,4 +177,5 @@ class RRNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

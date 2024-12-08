@@ -1,17 +1,10 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_PSYSPIN = name_to_opcode("psyspin")
 
@@ -38,6 +31,7 @@ class PsySpin(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -51,7 +45,7 @@ class PsySpin(ProgramBase):
             "time_tunnel_depth": "time_tunnel_depth",
             "time_tunnel_rot": "time_tunnel_rot",
             "time_depth_mod": "time_depth_mod",
-            "tunnel_wave_amp": "tunnel_wave_amp",
+#           "tunnel_wave_amp": "tunnel_wave_amp",
             "tunnel_wave_freq": "tunnel_wave_freq",
             "time_col_rotation": "time_col_rotation",
             "tunnel_wave_amp": "tunnel_wave_amp",
@@ -100,7 +94,7 @@ class PsySpin(ProgramBase):
         self.time_col_rotation = (-af["time"] * tm * -5.0) * self.G
         self.tunnel_wave_freq = 1.0 * self.G
         self.wave_time_freq = 1.0 * self.G
-        onTempo = af["on_tempo"] * 3.14159
+#       onTempo = af["on_tempo"] * 3.14159
         self.kick = (
             min(max(af["full"][3] - 0.8 * af["full"][2], 0.05) * 0.8, 0.48) * self.G
         )
@@ -138,4 +132,5 @@ class PsySpinNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

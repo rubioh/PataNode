@@ -1,26 +1,18 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Output
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program
+
 
 OP_CODE_STDOUTPUT = 1
 
 
 @register_program(OP_CODE_STDOUTPUT)
 class StdOutput(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Std Output"
 
         self.initProgram()
@@ -37,6 +29,7 @@ class StdOutput(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -76,16 +69,21 @@ class StdOutputNode(ShaderNode, Output):
         for node in self.scene.nodes:
             if not isinstance(node, Output):
                 node.restoreFBODependencies()
+
             node.markDirty()
             node.program.fbos = None
+
         self.eval()
 
     def render(self, audio_features=None):
         for node in self.scene.nodes:
             node.program.already_called = False
+
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return False
+
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture

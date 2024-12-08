@@ -1,19 +1,21 @@
 import socket
 import time
+
 from dataclasses import dataclass, field
 from time import monotonic
 from typing import Self, Dict, Set, Callable
+
+from artnet.definitions import IPv4Address, PortAddr
 from artnet.packet import (
-    artnet_parse_packet,
+    ARTNET_PORT,
     ArtBase,
     ArtDmx,
+    ArtParseError,
     ArtPoll,
     ArtPollReply,
-    ArtParseError,
     ArtSync,
+    artnet_parse_packet,
 )
-from artnet.packet import ARTNET_PORT
-from artnet.definitions import IPv4Address, PortAddr
 
 
 @dataclass
@@ -34,7 +36,7 @@ class ArtNetNode:
         self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.__socket.bind((self.ip, ARTNET_PORT))
         self.__socket.settimeout(0.1)
-        # self.__socket.setblocking(False)
+#       self.__socket.setblocking(False)
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback) -> None:
@@ -54,10 +56,12 @@ class ArtNetNode:
                     print(f"pps: {self.__packets_since_last_pps}")
                     self.__packets_since_last_pps = 0
                     self.__last_pps_ts = monotonic()
+
             try:
                 packet, addr = self.__socket.recvfrom(4096)
                 art = artnet_parse_packet(packet)
                 self.__packets_since_last_pps += 1
+
                 if isinstance(art, ArtPoll):
                     # For now we send just a dumb packet to allow firewall traversals
                     reply = ArtPollReply.new(b"\0\0\0\0", 0, 0)  # TODO
@@ -66,12 +70,11 @@ class ArtNetNode:
                     if art.payload.sub_uni == 0 and art.payload.net == 0:
                         # XXX allow other portaddr
                         self.__sequence = art.payload.sequence
+
                         if self.__dmx_cb:
                             self.__dmx_cb(art.extra)
-
                 elif isinstance(art, ArtSync):
-                    ...
-                    # TODO: Wait for artsync to trigger callback
+                    ... # TODO: Wait for artsync to trigger callback
                 elif any(isinstance(art, ignore) for ignore in (ArtPollReply,)):
                     pass
                 else:
@@ -94,11 +97,13 @@ class ArtNetNode:
 
 
 if __name__ == "__main__":
-    import usb.core
-    import usb.util
+    import usb.core # type: ignore[import-untyped]
+    import usb.util # type: ignore[import-untyped]
 
     print("trying to open device with VID = 0x0000 & PID = 0x0001")
+
     dev = usb.core.find(idVendor=0x0000, idProduct=0x0001)
+
     if dev is None:
         raise ValueError("Device not found")
 
@@ -107,7 +112,7 @@ if __name__ == "__main__":
 
     outep = usb.util.find_descriptor(
         intf,
-        # match the first OUT endpoint
+        # Match the first OUT endpoint
         custom_match=lambda e: usb.util.endpoint_direction(e.bEndpointAddress)
         == usb.util.ENDPOINT_OUT,
     )
@@ -115,8 +120,10 @@ if __name__ == "__main__":
     assert outep is not None
 
     print("listening for artnet packets on 0.0.0.0")
+
     with ArtNetNode("0.0.0.0") as node:
         node.set_cb(outep.write)
+
         while True:
             node.tick()
             time.sleep(1 / 60)

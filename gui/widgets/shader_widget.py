@@ -1,6 +1,8 @@
-from PyQt5 import QtOpenGL, QtCore, QtWidgets
-from program.program_manager import FBOManager
 import moderngl
+
+from PyQt5 import QtCore, QtOpenGL, QtWidgets
+
+from program.program_manager import FBOManager
 
 class ShaderWidget(QtOpenGL.QGLWidget):
     def __init__(
@@ -24,11 +26,14 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self._fixed_aspect_ratio = 16 / 9
         self._vsync = True
         self._ctx = None
+
         # Internal states
         if self.fullscreen:
             self.resizable = False
+
         # Specify OpenGL context parameters
         self.initFormat()
+
         # Create the OpenGL widget
         super().__init__(self.fmt)
         self.title = self._title
@@ -73,6 +78,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.move(*center_window_position)
         self._buffer_width = self._width
         self._buffer_height = self._height
+
         # Needs to be set before show()
         self.resizeGL = self.resize
 
@@ -96,17 +102,15 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def initQTimer(self):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.app.start_shader_jobs)
-        # self.timer.timeout.connect(self.update)
-        # self.timer.start(int(1/60*1000))
+#       self.timer.timeout.connect(self.update)
+#       self.timer.start(int(1/60*1000))
 
-    def set_default_viewport(self):
-        self._viewport = (0, 0, self._buffer_width, self._buffer_height)
-        self._ctx.screen.viewport = self._viewport
+#   def set_default_viewport(self):
+#       self._viewport = (0, 0, self._buffer_width, self._buffer_height)
+#       self._ctx.screen.viewport = self._viewport
 
     def init_mgl_context(self):
-        self._ctx = moderngl.create_context(
-            self.gl_version[0] * 100 + self.gl_version[1]
-        )
+        self._ctx = moderngl.create_context(self.gl_version[0] * 100 + self.gl_version[1])
         self.screen = self._ctx.detect_framebuffer()
         self.init_fbo_manager()
 
@@ -118,9 +122,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.af = audio_features
         self.af["on_kick"] = 1 if self.last_kick_count != self.af["kick_count"] else 0
         self.af["on_hat"] = 1 if self.last_hat_count != self.af["hat_count"] else 0
-        self.af["on_snare"] = (
-            1 if self.last_snare_count != self.af["snare_count"] else 0
-        )
+        self.af["on_snare"] = 1 if self.last_snare_count != self.af["snare_count"] else 0
         self.last_kick_count = self.af["kick_count"]
         self.last_hat_count = self.af["hat_count"]
         self.last_snare_count = self.af["snare_count"]
@@ -131,13 +133,14 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.set_audio_features()
         self.app.render(self.af)
 
-    def resize(self, width: int, height: int) -> None:
+    def resize(self, width: int, height: int) -> None: # type: ignore[override] # FIXME?
         self._width = width * self.devicePixelRatio()
         self._height = height * self.devicePixelRatio()
-        self.width = self._width
-        self.height = self._height
+        self.width = self._width # type: ignore[assignment] # FIXME?
+        self.height = self._height # type: ignore[assignment] # FIXME?
         self._buffer_width = width
         self._buffer_height = height
+
         if self._ctx is not None:
             self.set_default_viewport()
 

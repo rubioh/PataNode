@@ -1,18 +1,13 @@
 import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
-from nodeeditor.utils import dumpException
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_SDFBM = name_to_opcode("SDF_BM")
 
@@ -21,7 +16,6 @@ OP_CODE_SDFBM = name_to_opcode("SDF_BM")
 class SDF_BM(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Eye"
 
         self.initProgram()
@@ -32,17 +26,19 @@ class SDF_BM(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 2
         fbos_specification = [[self.win_size, 4, "f4"], [self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        # INFO PROGRAM
+        # Info program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Info/info.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="info_")
-        # NORMAL PROGRAM
+
+        # Normal program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "Normal/normal.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="normal_")
@@ -108,6 +104,7 @@ class SDF_BM(ProgramBase):
             self.tc = time.time() % 1000
             self.tptt = time.time() % 1000
             return
+
         self.tm += 0.01
         self.tz += af["smooth_low"] * 0.1 + 1 / 60 * 0.2
         self.tp += af["smooth_low"] * 0.1 + 1 / 60 * 0.2
@@ -117,22 +114,29 @@ class SDF_BM(ProgramBase):
         if af["on_kick"]:
             self.cnt_beat += 1
             self.go_bloom += 1 * self.sens
+
             if self.mode2 == 0:
                 self.go_bloom2 = np.random.randint(-12, 12)
+
             if self.mode2 == 1:
                 self.go_bloom2 = self.go_bloom - 2
+
             if self.go_bloom >= 12:
                 self.sens = -1
+
             if self.go_bloom <= 0:
                 self.sens = 1
                 self.mode2 ^= 1
+
             if self.cnt_beat % 32 == 0:
                 if self.mode_ptt <= 0:
                     self.sens_ptt = 1
+
                 if self.mode_ptt >= 1:
                     self.sens_ptt = -1
-        # self.mode_ptt += .01*self.sens_ptt
-        # self.mode_ptt = np.clip(self.mode_ptt, 0, 1)
+
+#       self.mode_ptt += .01*self.sens_ptt
+#       self.mode_ptt = np.clip(self.mode_ptt, 0, 1)
 
         if af["mini_chill"] and self.wait_mc > 10:
             self.wait_mc = 0
@@ -140,11 +144,14 @@ class SDF_BM(ProgramBase):
 
         if self.cnt_beat % 64 == 0:
             self.mode_sym += 0.02 * af["smooth_low"] * self.sens_sym
+
         if self.mode_sym % 1 != 0:
             self.mode_sym += 0.02 * af["smooth_low"] * self.sens_sym
+
             if self.mode_sym >= 1:
                 self.mode_sym = 1
                 self.sens_sym = -1
+
             if self.mode_sym <= 0:
                 self.mode_sym = 0
                 self.sens_sym = 1
@@ -154,36 +161,47 @@ class SDF_BM(ProgramBase):
             self.wait_go_arms += 0.001
             self.go_bloom = -40
             self.go_ptt = np.clip(self.go_ptt, 0, 1)
+
         if self.go_ptt > 0:
             self.go_ptt += 0.01
             self.wait_go_arms += 0.002
+
             if self.cnt_go_arms < 32:
                 self.go_bloom = -40
+
             self.go_ptt = np.clip(self.go_ptt, 0, 1)
+
         if self.wait_go_arms >= 1:
             self.wait_go_arms = 1
+
             if af["on_kick"]:
                 self.go_arms ^= 1
                 self.cnt_go_arms += 1
+
         if self.cnt_go_arms >= 32:
             if af["on_kick"]:
                 self.mode_ptt = 1
                 self.go_bloom = np.random.randint(2, 5)
                 self.cnt_full_ptt += 1
+
         if self.cnt_full_ptt >= 32:
             self.go_ptt -= 0.02
             self.go_ptt = np.clip(self.go_ptt, 0, 1)
             self.go_arms = 0
             self.mode_ptt = 0
+
             if self.go_ptt == 0:
                 self.go_arms = 0
                 self.mode_ptt = 0
                 self.wait_go_arms = 0
                 self.cnt_go_arms = 0
                 self.cnt_full_ptt = 0
+
             self.wait_to_ptt = 0
+
         if self.go_ptt == 0 and af["on_kick"]:
             self.wait_to_ptt += 1
+
         self.wait_mc += 1
         self.goBloom_arms = af["smooth_low"] ** 0.25 + 0.1
         self.mode_sym = 1
@@ -233,4 +251,5 @@ class SDF_BMNode(ShaderNode, Scene):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         return self.program.render(audio_features)

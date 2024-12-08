@@ -1,17 +1,11 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Colors
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_PREDOMINANTCOLOR = name_to_opcode("predominantcolor")
@@ -35,6 +29,7 @@ class PredominantColor(ProgramBase):
         fbos_specification = [
             [(self.win_size[0] // K, self.win_size[1] // K), 4, "f4"] for K in Ks
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -47,8 +42,10 @@ class PredominantColor(ProgramBase):
 
     def initParams(self):
         self.N_pass = 7
+
         if self.win_size == (480, 270):
             self.N_pass = 7
+
         self.iChannel0 = 1
         self.buf_col = np.zeros(3)
         self.hist = np.zeros((3, 6, 4))
@@ -58,10 +55,12 @@ class PredominantColor(ProgramBase):
         self.hist[j] = self.hist[j] * 0.7 + 0.3 * col_tex
         max_a = 0
         idx = 0
+
         for i in range(self.hist.shape[0]):
             if self.hist[j][i, -1] > max_a:
                 max_a = self.hist[j][i, -1]
                 idx = i
+
         col = self.hist[j][idx, :3] * 0.3 + self.buf_col[j] * 0.7
         out_col = self.hist[j][idx, :3]
         self.buf_col = out_col
@@ -81,18 +80,21 @@ class PredominantColor(ProgramBase):
 
         if texture is None:
             return
+
         self.hist_program["iChannel0"] = self.iChannel0
         texture.use(1)
         colors_to_skip = [[0] * 3, [0] * 3, [0] * 3]
         self.buf_col = np.zeros((3, 3))
+
         for j in range(1):
             self.hist_program["to_skip_size"] = j
             self.hist_program["to_skip"] = colors_to_skip
             self.hist_program["pass_number"] = 0
             self.fbos[0].use()
             self.hist_vao.render()
+
             for i in range(0, self.N_pass - 1):
-                # self.fbo_hist[1 + i].clear()
+#               self.fbo_hist[1 + i].clear()
                 self.hist_program["pass_number"] = i + 1
                 self.fbos[i].color_attachments[0].use(1)
                 self.fbos[i + 1].use()
@@ -123,7 +125,9 @@ class PredominantColorNode(ShaderNode, Colors):
     def render(self, texture=None):
         if self.program.already_called:
             return self.program.norender()
+
         if texture is None:
             return self.program.norender()
+
         buffer_col = self.program.render(texture)
         return buffer_col

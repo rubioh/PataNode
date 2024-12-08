@@ -1,11 +1,12 @@
-import torch
-import torch.nn as nn
-from typing import Optional
-from functools import partial
 import nnAudio.features
 import numpy as np
+import torch
+import torch.nn as nn
 
-# from audio.DeepModels.CQTCausal import CQTCausal
+from typing import Optional
+from functools import partial
+
+#from audio.DeepModels.CQTCausal import CQTCausal
 
 
 class PESTO(nn.Module):
@@ -18,6 +19,7 @@ class PESTO(nn.Module):
                 self.device = "cpu"
         else:
             self.device = device
+
         if self.device == "cuda:0":
             self.force_cudnn_init()
 
@@ -45,12 +47,12 @@ class PESTO(nn.Module):
             pad_mode="constant",
         )
 
-        # sd = torch.load('weights.ckpt')['state_dict']
-        # sd = torch.load('audio/DeepModels/weights.ckpt')['state_dict']
+#       sd = torch.load('weights.ckpt')['state_dict']
+#       sd = torch.load('audio/DeepModels/weights.ckpt')['state_dict']
         sd = torch.load("audio/DeepModels/last.ckpt")["state_dict"]
-        # sd = torch.load('audio/DeepModels/weights_140.ckpt')['state_dict']
+#       sd = torch.load('audio/DeepModels/weights_140.ckpt')['state_dict']
         self.load_state_dict(sd)
-        # self.get_CQT = CQTCausal(sr=16000,
+#       self.get_CQT = CQTCausal(sr=16000,
         self.get_CQT = nnAudio.features.CQT(
             sr=16000, output_format="Complex", **cqt_kwargs
         ).to(self.device)
@@ -76,22 +78,24 @@ class PESTO(nn.Module):
     def forward(self, x):
         x = torch.FloatTensor(x).to(self.device)
         out = self.get_CQT(x)
-        # self.save(out[0, :, -1].unsqueeze(0))
+#       self.save(out[0, :, -1].unsqueeze(0))
         out = torch.view_as_complex(out)
         cqt = torch.abs(out[0])
         out = cqt[17 + 16 :, :].transpose(0, 1).unsqueeze(1)
         out = self.module(out)
         out = out[-1]
-        # out = out[0]*(1.-(.5+.3333)) + .3333*out[1] + .5*out[2]
+#       out = out[0]*(1.-(.5+.3333)) + .3333*out[1] + .5*out[2]
         return out.to("cpu").detach().numpy(), cqt.to("cpu")[:, -1].detach().numpy()
 
     def get_features(self, x, D):
         if x.shape[0] < 17000:
             return {"pitch": 0}
+
         pesto_info, cqt = self.forward(x.reshape(1, -1))
 
         if D["dsmooth_low"] > 0.01:
             pesto_info = self.prev_pesto_info
+
         self.prev_pesto_info = pesto_info
         am = np.argmax(pesto_info)
 
@@ -166,6 +170,7 @@ class Resnet1d(nn.Module):
 
         n_in = n_chan_input
         n_ch = n_chan_layers
+
         if len(n_ch) < 5:
             n_ch.append(1)
 
@@ -179,6 +184,7 @@ class Resnet1d(nn.Module):
 
         # Layer normalization over frequency and channels (harmonics of HCQT)
         self.layernorm = nn.LayerNorm(normalized_shape=[n_in, n_bins_in])
+
         # Prefiltering
         self.conv1 = nn.Sequential(
             nn.Conv1d(
@@ -193,6 +199,7 @@ class Resnet1d(nn.Module):
         )
         self.n_prefilt_layers = n_prefilt_layers
         self.prefilt_list = nn.ModuleList()
+
         for p in range(1, n_prefilt_layers):
             self.prefilt_list.append(
                 nn.Sequential(
@@ -207,6 +214,7 @@ class Resnet1d(nn.Module):
                     nn.Dropout(p=p_dropout),
                 )
             )
+
         self.residual = residual
 
         # Binning to MIDI pitches
@@ -253,6 +261,7 @@ class Resnet1d(nn.Module):
             activation_layer(),
             nn.Dropout(p=p_dropout),
         )
+
         # Chroma reduction
         self.conv4 = nn.Sequential(
             nn.Conv1d(
@@ -277,6 +286,7 @@ class Resnet1d(nn.Module):
 
         layers = []
         pre_fc_dim = n_bins_out * n_ch[4]
+
         for i in range(num_output_layers - 1):
             layers.extend(
                 [
@@ -285,7 +295,9 @@ class Resnet1d(nn.Module):
                     nn.Dropout(p=p_dropout),
                 ]
             )
+
         self.pre_fc = nn.Sequential(*layers)
+
         if final_fc == "toeplitz":
             self.fc = ToeplitzLinear(pre_fc_dim, output_dim)
         elif final_fc == "linear":
@@ -293,9 +305,7 @@ class Resnet1d(nn.Module):
 
         if final_norm == "softmax":
             self.final_norm = nn.Softmax(dim=-1)
-        elif (
-            final_norm == "sigmoid"
-        ):  # this shit returns nan in gradients, don't use it
+        elif final_norm == "sigmoid":  # this shit returns nan in gradients, don't use it
             self.final_norm = nn.Sigmoid()
         elif final_norm == "none":
             self.final_norm = nn.Identity()
@@ -309,15 +319,17 @@ class Resnet1d(nn.Module):
             x (torch.Tensor): shape (batch, channels, freq_bins)
         """
         x_norm = self.layernorm(x)
-
         x = self.conv1(x_norm)
+
         for p in range(0, self.n_prefilt_layers - 1):
             prefilt_layer = self.prefilt_list[p]
+
             if self.residual:
                 x_new = prefilt_layer(x)
                 x = x_new + x
             else:
                 x = prefilt_layer(x)
+
         conv2_lrelu = self.conv2(x)
         conv3_lrelu = self.conv3(conv2_lrelu)
 
@@ -334,6 +346,7 @@ if __name__ == "__main__":
     import time
 
     x = torch.randn(1, 17000)
+
     for i in range(10):
         tic = time.time()
         print(model(x).shape)

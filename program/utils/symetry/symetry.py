@@ -1,17 +1,10 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Utils
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_SYMETRY = name_to_opcode("symetry")
 
@@ -32,6 +25,7 @@ class Symetry(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -63,17 +57,19 @@ class Symetry(ProgramBase):
         self.smlow = 1
         self.rotation_amplification = 1
         self.energy_amplification = 1
-        # self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
-        # self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
+#       self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
+#       self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
         self.automatic_mode = 1
         self.symetry_mode = 1
-        # self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
-        # self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
+#       self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
+#       self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
 
     def updateParams(self, af=None):
         if af is None:
             return
+
         self.t += af["smooth_full"]
+
         if af["on_chill"] and not self.chill:
             self.chill = True
 
@@ -88,7 +84,6 @@ class Symetry(ProgramBase):
             )
 
         self.smlow = af["smooth_low"] * (self.energy_amplification * 2.5 + 0.5)
-
         self.t_final = self.t * 5.0
         self.t_angle_final = self.t_angle * 5.0
 
@@ -99,7 +94,9 @@ class Symetry(ProgramBase):
     def render(self, textures, af=None):
         self.bindUniform(af)
         self.updateParams(af)
+
         textures[0].use(1)
+
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -122,8 +119,10 @@ class SymetryNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture

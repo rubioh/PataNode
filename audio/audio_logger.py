@@ -1,6 +1,4 @@
 import numpy as np
-import pickle
-import scipy
 
 
 class AudioLogger:
@@ -16,22 +14,25 @@ class AudioLogger:
         data : audio flux for this frame
         chunk : info_dict for frame i
         """
-
         size = self.log_buffer_size
         for k, v in res.items():
-            # TODO DEGUEULASSE CHANGER CA
+            # TODO: DEGUEULASSE CHANGER CA
             if k == "_bpm_on_kick":
                 k = "on_kick"
+
             if k == "_on_snare":
                 k = "on_snare"
+
             if k == "_on_hat":
                 k = "on_hat"
+
             try:
                 if v.shape[0] == 4:
                     new_key_slow = k + "_slow"
                     new_key_mid = k + "_mid"
                     new_key_fast = k + "_fast"
                     new_key_instant = k + "_instaneous"
+
                     if new_key_slow not in self.information.keys():
                         self.information[new_key_slow] = np.zeros(size)
                         self.information[new_key_slow][-1] = v[1]
@@ -54,17 +55,20 @@ class AudioLogger:
                         tmp = self.information[new_key_instant]
                         tmp[:-1] = tmp[1:]
                         tmp[-1] = v[0]
+
                 if k == "smooth_dft":
                     self.information[k] = np.copy(v)
-            except:
+            except Exception:
                 if k not in self.information.keys():
                     self.information[k] = np.zeros(size)
+
                 tmp = self.information[k]
                 tmp[:-1] = tmp[1:]
                 tmp[-1] = v
 
-        # self.i += 1
-        # if self.i > self.wait:
-        #    self.information["audio"] = self.audio
-        #    pickle.dump(self.information, open("info.pickle", "wb"))
-        #    print("Log saved")
+#       self.i += 1
+#
+#       if self.i > self.wait:
+#          self.information["audio"] = self.audio
+#          pickle.dump(self.information, open("info.pickle", "wb"))
+#          print("Log saved")

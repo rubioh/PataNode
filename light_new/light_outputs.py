@@ -1,11 +1,15 @@
-import numpy as np
 import time
 import abc
-import usb.core
-import usb.util
-from artnet import ArtNetControllerThread, Universe, PortAddr, IPv4Address
+
+import numpy as np
+import usb.core # type: ignore[import-untyped]
+import usb.util # type: ignore[import-untyped]
+
 from typing import Callable, Generic, TypeVar, Literal, Annotated, List
-from pydantic import BaseModel, model_validator, PositiveInt, NonNegativeInt, Field
+
+from artnet import ArtNetControllerThread, IPv4Address, PortAddr, Universe
+from pydantic import BaseModel, Field, NonNegativeInt, PositiveInt, model_validator
+
 
 DMX_CHANNELS_NUM = 512
 
@@ -93,8 +97,9 @@ class PataboiteOutput(LightOutput[PataboiteConfig]):
             print(device)
 
     def init_usb_device(self):
-        # self.check_usb_devices()
+#       self.check_usb_devices()
         self.dev = usb.core.find(idVendor=0x0000, idProduct=0x0001)
+
         if self.dev is None:
             print("No pataboite gros noob")
         else:
@@ -147,11 +152,11 @@ class LightOutputs:
 
     def write(self, buffer) -> None:
         buffer = np.clip(buffer * 255, 0, 255).astype("u1")
-
         univ_i = 0
+
         for output in self.outputs:
             output.write(buffer[univ_i : univ_i + output.universes].tobytes())
             univ_i += output.universes
-        self.artnet_sync()
 
+        self.artnet_sync()
         self.prev_ts = time.time()

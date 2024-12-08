@@ -1,17 +1,11 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_LUMTRIANGLE = name_to_opcode("lumtriangle")
@@ -19,7 +13,6 @@ OP_CODE_LUMTRIANGLE = name_to_opcode("lumtriangle")
 
 @register_program(OP_CODE_LUMTRIANGLE)
 class LumTriangle(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "LumTriangle"
@@ -32,6 +25,7 @@ class LumTriangle(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -67,19 +61,24 @@ class LumTriangle(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         self.energy = af["smooth_low"]
         self.energy_cum += af["smooth_low"] * 0.2 + 0.01
         self.energy_cum %= 10000
+
         if af["on_kick"]:
             self.count_beat += 1
 
         if self.count_beat > 64 and self.gox:
             self.tc += 0.0003 + af["smooth_low"] * 0.006
+
             if self.tc < 1:
                 self.x0 = np.sin(self.tc * np.pi / 2)
+
             if self.tc > 1 and self.tc < 2:
                 self.x0 = 1
                 self.y0 = np.sin(self.tc * np.pi / 2)
+
             if self.y0 < 0.01:
                 self.count_beat = 0
                 self.gox ^= 1
@@ -88,11 +87,14 @@ class LumTriangle(ProgramBase):
                 self.tc = 0
         elif self.count_beat > 64 and not self.gox:
             self.tc += 0.0003 + af["smooth_low"] * 0.006
+
             if self.tc < 1:
                 self.y0 = np.sin(self.tc * np.pi / 2)
+
             if self.tc > 1 and self.tc < 2:
                 self.y0 = 1
                 self.x0 = np.sin(self.tc * np.pi / 2)
+
             if self.x0 < 0.01:
                 self.count_beat = 0
                 self.gox ^= 1
@@ -132,4 +134,5 @@ class LumTriangleNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

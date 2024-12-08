@@ -1,21 +1,26 @@
 import os
-import rtmidi
 import sys
 import pickle
-from PyQt5.QtCore import pyqtSignal, QObject, Qt
+
 import numpy as np
+import rtmidi # type: ignore[import-untyped]
+
+from PyQt5.QtCore import pyqtSignal, QObject, Qt
 
 
 def get_port_by_name(port_name, client):
     for i in range(client.get_port_count()):
         print(client.get_port_name(i))
+
         if port_name in client.get_port_name(i):
             return client.open_port(i)
 
     # Report available ports if not found
     msg = f"Unknown port {port_name}"
+
     for i in range(client.get_port_count()):
         msg += f"\n - {client.get_port_name(i)}"
+
     print(msg)
     return None
 
@@ -35,8 +40,8 @@ class SimpleMidiReceiver:
 
     def init_controller(self):
         self._time_ms = 0
-
         self._midi_in = get_port_by_name(self.MIDI_IN_PORT, rtmidi.MidiIn())
+
         if self._midi_in is None:
             self.usable = False
             return
@@ -50,6 +55,7 @@ class SimpleMidiReceiver:
         self._time_ms += int(msg_time_ms_tup[1] * 1000)
         msg = msg_time_ms_tup[0]
         status = msg[0]
+
         if status == 176:
             self.handle_cc(msg[1], msg[2])
         elif self.maybe_handle_sysex(msg):
@@ -66,8 +72,10 @@ class SimpleMidiReceiver:
     def bind_to_controller(self, uid="P0", vmin=0, vmax=1, scale="linear"):
         assert uid in self.get_uid_values()
         val = self.get_uid_values()[uid]
+
         if val is None:
             val = vmin
+
         if scale == "linear":
             return val / 127 * (vmax - vmin) + vmin
         elif scale == "log":
@@ -94,7 +102,7 @@ class SimpleMidiReceiver:
 
         try:
             self.load_settings()
-        except:
+        except Exception:
             print("No previous_state")
 
     def handle_cc(self, cc, value):
@@ -138,14 +146,14 @@ class MidiReceiver(QObject):
 
     def init_controller(self, midi_in_port):
         self._midi_in = get_port_by_name(midi_in_port, rtmidi.MidiIn())
+
         if self._midi_in is None:
             self.usable = False
             return
+
         self._midi_in.set_callback(self._midi_in_callback, self)
         self._time_ms = 0
-        self._queue_message.connect(
-            self._thread_safe_queue_message, Qt.QueuedConnection
-        )
+        self._queue_message.connect(self._thread_safe_queue_message, Qt.QueuedConnection)
         self.usable = True
 
     def _thread_safe_queue_message(self, status, data1, data2, time):
@@ -165,11 +173,14 @@ class MidiReceiver(QObject):
             var = self.potentiometre[bank][value]
         elif "S" in value:
             var = self.sliders[bank][value]
+
         if scale == "linear":
             var = var / 127 * (vmax - vmin) + vmin
+
         if scale == "log":
             step = (np.log(vmax) - np.log(vmin)) / (128)
             var = np.exp(np.log(vmin) + var * step)
+
         return var
 
     def init_params(self):
@@ -197,9 +208,10 @@ class MidiReceiver(QObject):
         self.precision = [
             {"molette": 0, "slider": 0, "rightB": 0, "leftB": 0} for i in range(4)
         ]
+
         try:
             self.load_settings()
-        except:
+        except Exception:
             print("No previous_state")
 
     # Parsing for midi Pocket Control
@@ -208,30 +220,39 @@ class MidiReceiver(QObject):
             if data1 in self.id_to_keys_pot.keys():
                 key = self.id_to_keys_pot[data1]
                 self.potentiometre[self.bank][key] = data2
+
             if data1 in self.id_to_keys_sliders.keys():
                 key = self.id_to_keys_sliders[data1]
                 self.sliders[self.bank][key] = data2
+
             if data1 in self.id_to_keys_buttons.keys():
                 key = self.id_to_keys_buttons[data1]
                 self.buttons[self.bank][key] = data2
 
             if data1 == 46:
                 self.control["stop"] ^= data2 % 2
+
             if data1 == 45:
                 self.control["play"] ^= data2 % 2
+
             if data1 == 48:
                 self.control["next"] = data2 % 2
+
             if data1 == 47:
                 self.control["previous"] = data2 % 2
+
             if data1 == 49:
                 self.control["reset"] = data2 % 2
+
             if data1 == 44:
                 self.control["rec"] ^= data2 % 2
 
             if data1 == 60:
                 self.precision[self.bank]["slider"] = data2
+
             if data1 == 64:
                 self.precision[self.bank]["rightB"] = data2
+
             if data1 == 67:
                 self.precision[self.bank]["leftB"] = data2
 
@@ -248,7 +269,6 @@ class MidiReceiver(QObject):
         elif status == 192:
             if data1 == 0:
                 self.precision[self.bank]["molette"] = data2
-
         elif status == 79:
             self.bank = data1
         else:
@@ -257,6 +277,7 @@ class MidiReceiver(QObject):
     def load_settings(self, name=None, full_path=False):
         if name is None:
             name = "controller_state"
+
         if full_path:
             state = pickle.load(open(name, "rb"))
         else:
@@ -279,6 +300,7 @@ class MidiReceiver(QObject):
             "potentiometre": self.potentiometre,
             "precision": self.precision,
         }
+
         if name is None:
             pickle.dump(state, open("controller/controller_state2.pickle", "wb"))
         else:

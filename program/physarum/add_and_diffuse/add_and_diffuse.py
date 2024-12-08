@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
 from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Physarum
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Physarum
 
 
 OP_CODE_ADD_AND_DIFFUSE = name_to_opcode("add_and_diffuse")
@@ -33,6 +25,7 @@ class AddAndDiffuse(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -58,12 +51,14 @@ class AddAndDiffuse(ProgramBase):
             "decay_rate": "decay_rate",
             "diffuse_amount": "diffuse_amount",
         }
+
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["AddTexture", "BaseTexture"])
 
     def updateParams(self, af):
         if af is None:
             return
+
         pass
 
     def bindUniform(self, af):
@@ -98,17 +93,22 @@ class AddAndDiffuseNode(ShaderNode, Physarum):
     def render(self, audio_features=None):
         if self.already_called:
             return self.program.norender()
+
         self.already_called = True
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return self.program.norender()
+
         if input_nodes[0].already_called:
             texture = input_nodes[0].program.norender()
         else:
             texture = input_nodes[0].render(audio_features)
+
         if input_nodes[1].already_called:
             add_texture = input_nodes[1].program.norender()
         else:
             add_texture = input_nodes[1].render(audio_features)
+
         output_texture = self.program.render([texture, add_texture], audio_features)
         return output_texture

@@ -1,6 +1,7 @@
+from typing import Self
+
 from bytechomp import dataclass, Parser
 from bytechomp.datatypes.declarations import U8
-from typing import Self
 
 from artnet.packet.base import ArtOp, ArtBase
 

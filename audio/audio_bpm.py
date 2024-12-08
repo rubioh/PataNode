@@ -80,11 +80,13 @@ class BPM_estimator:
                     self.gradient_bpm * self.m + (1.0 - self.m) * gradient
                 )  # Momentum
                 self.memory_gradient_bpm.append(self.gradient_bpm)  # Memory gradient
+
                 if len(self.memory_gradient_bpm) > 2:
                     self.lr = 2.0 / (
                         np.std(self.memory_gradient_bpm) + 1.0
                     )  # Adaptative rate
                     self.lr = np.clip(self.lr, 0, 1.0)
+
                 # Update short term BPM
                 self.shortterm_bpm = self.shortterm_bpm - self.lr * self.gradient_bpm
                 # Finally update shortterm bpm
@@ -98,14 +100,16 @@ class BPM_estimator:
                     self.momentum_final = np.clip(
                         1.0 / (1e-6 + np.std(self.previous_st_bpm) ** 2) * 2.0, 0.0, 1.0
                     )
+
                 # Momentum on the returned bpm
                 self.bpm = (1.0 - self.momentum_final) * self.bpm + (
                     self.momentum_final
                 ) * np.mean(self.previous_st_bpm)
+
             # Reset counting parameters
             self.count = 0
             self.tic = time.time()
-        #            print(self.bpm)
+#           print(self.bpm)
         else:
             self.count += 1
 
@@ -113,6 +117,7 @@ class BPM_estimator:
         for k in self.on_tempo.keys():
             self.on_tempo[k] -= self.bpm / 60 / 60 * self.multiply_coeff[k]
             self.on_tempo[k] = np.clip(self.on_tempo[k], 0, 1)
+
             if self.on_tempo[k] <= 0:
                 self.on_tempo[k] = 1 + self.on_tempo[k]
             self.lfo_on_tempo["lfo_"+k] = np.cos(self.on_tempo[k]*2.*3.14159)*.5+.5
@@ -124,9 +129,8 @@ class BPM_estimator:
         features = {}
         features["bpm"] = self.bpm
         features["shortterm_bpm"] = self.shortterm_bpm
+
         for k, v in self.on_tempo.items():
-            features[k] = v
-        for k, v in self.lfo_on_tempo.items():
             features[k] = v
         features["time"] = self.time
         return features

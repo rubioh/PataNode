@@ -1,14 +1,11 @@
-import os
 from qtpy.QtCore import Qt
-from qtpy.QtGui import QBrush, QPen, QFont, QColor, QPolygonF
-from qtpy.QtWidgets import QWidget, QVBoxLayout, QApplication, QMessageBox, QLabel, QGraphicsItem, QTextEdit, QPushButton, QAction, QMainWindow
-import os
-import time
-import threading
-from nodeeditor.node_scene import Scene, InvalidFile
+from qtpy.QtWidgets import QAction, QDockWidget, QMainWindow, QVBoxLayout#, QDMGraphicsNode
+
+from gui.map.polydockwidget import PolyDockWidget
 from gui.map.polygraphicscene import PolyGraphicScene
 from gui.map.polygraphicview import PolyGraphicView
-from gui.map.polydockwidget import *
+from node.node_conf import LISTBOX_MIMETYPE
+
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -61,11 +58,12 @@ class PataNodeMappingWindow(QMainWindow):
 
     def onSelected(self):
         pass
-        items = self.getSelectedItems()
-        item = items[0]
-        if isinstance(item, QDMGraphicsNode):
-            node = item.node
-            self.updateInspector(node)
+#       items = self.getSelectedItems()
+#       item = items[0]
+#
+#       if isinstance(item, QDMGraphicsNode):
+#           node = item.node
+#           self.updateInspector(node)
 
     def updateInspector(self, node):
         self.app.updateInspector(node)
@@ -74,18 +72,19 @@ class PataNodeMappingWindow(QMainWindow):
         self._close_event_listeners.append(callback)
 
     def closeEvent(self, event):
-        for callback in self._close_event_listeners: callback(self, event)
+        for callback in self._close_event_listeners:
+            callback(self, event)
 
     def onDragEnter(self, event):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             event.acceptProposedAction()
         else:
-            # print(" ... denied drag enter event")
+#           print(" ... denied drag enter event")
             event.setAccepted(False)
 
     def onDrop(self, event):
         pass
 
     def contextMenuEvent(self, event):
-        pass    
+        pass
 

@@ -1,17 +1,11 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_PATATRACK3D = name_to_opcode("patatrack3D!")
@@ -19,10 +13,8 @@ OP_CODE_PATATRACK3D = name_to_opcode("patatrack3D!")
 
 @register_program(OP_CODE_PATATRACK3D)
 class Patatrack3D(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Patatrack3D"
 
         self.initProgram()
@@ -37,6 +29,7 @@ class Patatrack3D(ProgramBase):
             [self.win_size, 4, "f4"],
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -112,10 +105,13 @@ class Patatrack3D(ProgramBase):
     def updateParams(self, af=None):
         if af is None:
             return
+
         self.time = af["time"]
         self.nrj = af["smooth_low"] ** 0.5
+
         if af["on_kick"]:
             self.prev_tz ^= 1
+
         self.tz = (self.prev_tz + af["decaying_kick"] ** 2.0) * 3.14159
         self.tr += af["smooth_low"] * 0.1 + 0.04
         self.tf += af["smooth_low"] * 0.5 + 0.05
@@ -125,19 +121,23 @@ class Patatrack3D(ProgramBase):
         self.mode_ptt = 1
         self.th += (0.01 + af["smooth_low"] * 0.1) * 0.1
         self.th %= 2.0 * 3.14159
+
         if af["mini_chill"]:
             self.mini_chill += 0.08
             self.count_beat = 63
             self.count_beat1 = 31
+
         self.mini_chill = np.clip(self.mini_chill, 0, 1)
 
         if af["on_kick"]:
             self.count_kick += 1
             self.count_beat += 1
             self.count_beat1 += 1
+
             if self.count_beat >= 64:
                 self.count_beat = 0
                 self.mode_sym ^= 1
+
             if self.count_beat1 >= 64:
                 self.count_beat1 = 0
                 self.mode ^= 1
@@ -183,4 +183,5 @@ class Patatrack3DNode(ShaderNode, Scene):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         return self.program.render(audio_features)

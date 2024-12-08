@@ -1,18 +1,13 @@
-import time
 import numpy as np
+
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_CUBE = name_to_opcode("cube")
@@ -20,10 +15,8 @@ OP_CODE_CUBE = name_to_opcode("cube")
 
 @register_program(OP_CODE_CUBE)
 class Cube(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Cube"
 
         self.initProgram()
@@ -34,6 +27,7 @@ class Cube(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -85,6 +79,7 @@ class Cube(ProgramBase):
     def updateParams(self, fa=None):
         if fa is None:
             return
+
         self.time = fa["time"] / 2 * 0.25
         self.smooth_fast_final = (
             np.log(self.smooth_tmp + 1.0) * fa["bpm"] / 75 + self.deep_tic
@@ -105,6 +100,7 @@ class Cube(ProgramBase):
             self.deep_tic += 0.01
         else:
             self.deep_tic -= 0.2
+
         self.deep_tic = np.clip(self.deep_tic, 0.0, 2.0)
 
         if fa["on_kick"]:
@@ -146,4 +142,5 @@ class CubeNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

@@ -1,19 +1,13 @@
-import time
-import numpy as np
 import PIL
-from os.path import dirname, basename, isfile, join
+import numpy as np
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
-from nodeeditor.utils import dumpException
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
+
 
 OP_CODE_GSSTYLIZED = name_to_opcode("gsstylized")
 
@@ -22,8 +16,8 @@ OP_CODE_GSSTYLIZED = name_to_opcode("gsstylized")
 class GSStylized(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "GS Stylized"
+
         self.initParams()
         self.initFBOSpecifications()
         self.initProgram()
@@ -37,21 +31,24 @@ class GSStylized(ProgramBase):
             [self.win_size, 4, "f4"],
             [self.bwin_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
 
     def initProgram(self, reload=False):
-        # ReacDif PROGRAM
+        # ReacDif program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "ReacDifShader/ReacDif.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, name="reacdif_")
-        # Init PROGRAM
+
+        # Init program
         if not reload:
             vert_path = SQUARE_VERT_PATH
             frag_path = join(dirname(__file__), "InitShader/frag.glsl")
             self.loadProgramToCtx(vert_path, frag_path, reload, name="init_")
+
         # Program
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "gsstylized.glsl")
@@ -92,7 +89,7 @@ class GSStylized(ProgramBase):
         self.init_program["iResolution"] = np.array(self.bwin_size)
         self.init_program["mode"] = self.init_mode
 
-        # self.patat_texture.use(2)
+#       self.patat_texture.use(2)
         self.fbos[3].clear()
         self.fbos[3].use()
         self.init_vao.render()
@@ -166,30 +163,35 @@ class GSStylized(ProgramBase):
 
     def updateParams(self, af):
         self.time += 0.001
+
         if self.fbos[0] is not None and self.loaded is False:
             self.load_data()
             self.init_texture4()
             self.loaded = True
+
         if af is None:
             return
+
         af["on_kick"] = 0
         self.dkick = (1.0 - af["decaying_kick"]) ** 1.0 / 4.0
+
         if self.on_chill == 1 and af["mini_chill"] == 0:
             self.on_chill = 0
             self.change = 4
             self.change_triangle = 8
             self.initialize = True
-            # self.get_init_texture()
+#           self.get_init_texture()
 
         if af["on_chill"]:
             self.K += 0.01 * self.sens
+
             if self.K > 1:
                 self.K = 1
                 self.sens = -1
+
             if self.K < 0:
                 self.K = 0
                 self.sens = 1
-
         else:
             self.K = np.round(self.K)
 
@@ -197,30 +199,35 @@ class GSStylized(ProgramBase):
         self.n_iter = int(np.clip((self.smooth_fast * 10.0), 1, 17))
         self.change = 0
         self.change_init = 0
+
         if af["on_kick"]:
             self.on_kick = 1
             self.change += 1
             self.change_init += 1
             self.radius_triangle -= 0.05
             self.go_flick += 1
+
             if self.change > 4:
                 self.preset_idx = np.random.randint(0, len(self.preset))
+
                 if self.preset_idx == 2:
                     self.preset_idx += 1
+
                 self.change = 0
+
             if self.change_init >= 32:
                 self.change_init %= 32
-                # self.get_init_texture()
+#               self.get_init_texture()
                 self.radius_triangle = 1
                 self.init_mode += 1
                 self.init_mode %= 4
+
             if self.go_flick >= 128:
                 self.go_flick = 0
                 self.mode_flick ^= 1
 
             self.center[0] = np.random.rand() - 0.5
             self.center[1] = (np.random.rand() - 0.5) * 9 / 16
-
         else:
             self.on_kick = 0
 
@@ -278,4 +285,5 @@ class GSStylizedNode(ShaderNode, Scene):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         return self.program.render(audio_features)

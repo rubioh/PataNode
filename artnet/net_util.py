@@ -6,6 +6,7 @@ from ipaddress import IPv4Address
 def prefix_length_to_subnet_mask(prefix_length: int) -> Tuple[int, int, int, int]:
     if not 0 <= prefix_length <= 32:
         raise ValueError("Invalid prefix length. It must be between 0 and 32.")
+
     subnet_mask = (0xFFFFFFFF << (32 - prefix_length)) & 0xFFFFFFFF
     return ((subnet_mask >> i) & 0xFF for i in (24, 16, 8, 0))  #  type: ignore
 

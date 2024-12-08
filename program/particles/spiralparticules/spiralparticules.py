@@ -1,19 +1,14 @@
-from os.path import dirname, basename, isfile, join
-import time
 import numpy as np
 import moderngl as mgl
-from pyrr import Matrix44
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Particles
+from pyrr import Matrix44 # type: ignore[import-untyped]
+
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Particles
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_SPIRALPARTICULES = name_to_opcode("spiralparticules")
@@ -38,11 +33,13 @@ class SpiralParticules(ProgramBase):
             [self.win_size, 4, "f4", False],
             [self.win_size, 4, "f4", False],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
             self.fbos_dtypes.append(specification[2])
             self.fbos_depth_requirement.append(specification[3])
+
         self.initVBOs()
 
     def initVBOs(self):
@@ -60,6 +57,7 @@ class SpiralParticules(ProgramBase):
         vert_path = join(dirname(__file__), "part/draw.vert")
         frag_path = join(dirname(__file__), "part/alpha.frag")
         vao_binding = [(self.vbo1, "4f4", "in_position")]
+
         self.loadProgramToCtx(
             vert_path, frag_path, reload, "alpha_", vao_binding=vao_binding
         )
@@ -68,6 +66,7 @@ class SpiralParticules(ProgramBase):
         frag_path = None
         varyings = ["out_pos", "out_prev"]
         vao_binding = [(self.vbo1, "4f4 4f4", "in_pos", "prev_pos")]
+
         self.loadProgramToCtx(
             vert_path,
             frag_path,
@@ -76,6 +75,7 @@ class SpiralParticules(ProgramBase):
             vao_binding=vao_binding,
             varyings=varyings,
         )
+
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "spiralparticules.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload, "")
@@ -89,8 +89,10 @@ class SpiralParticules(ProgramBase):
         self.near = 1
         self.far = 100
         self.fov = 60
+
         rotation = Matrix44.from_eulers((0.0, 0.0, 0.0), dtype="f4")
         translation = Matrix44.from_translation((0, 0, -10), dtype="f4")
+
         self.modelview = translation * rotation
         self.projection = Matrix44.perspective_projection(
             self.fov, self.aspect_ratio, self.near, self.far, dtype="f4"
@@ -131,20 +133,25 @@ class SpiralParticules(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         self.time = af["time"] * 0.01
         self.iFrame += 1
+
         if af["on_kick"]:
             self.mod_fract += 1
             self.go_mnext += 1
             self.go_mnext %= 4
+
             if self.go_mnext == 0:
                 self.next += 1
                 self.mnext += 1 * self.sens_m
 
                 if self.mnext > 50:
                     self.sens_m = -1
+
                 if self.mnext < 2:
                     self.sens_m = 1
+
         self.mod_fract %= self.N_part // 10
         self.next %= self.N_part
 
@@ -152,10 +159,9 @@ class SpiralParticules(ProgramBase):
 
         self.wait_change_angle += 1
         self.wait_starting_rot += 0.005
+
         if self.wait_change_angle >= 60 * 20 and af["on_kick"]:
-            self.target = np.array(self.base) + 2.0 * np.pi * np.sign(
-                np.random.rand(3) - 0.5
-            )
+            self.target = np.array(self.base) + 2.0 * np.pi * np.sign(np.random.rand(3) - 0.5)
             self.vel = 0.5 + np.random.rand(3)
             self.wait_change_angle = 0
             self.wait_starting_rot = 0
@@ -166,10 +172,7 @@ class SpiralParticules(ProgramBase):
             else:
                 self.target_angle = 2.0 * np.pi - 3.14159 / 2
 
-        if (
-            np.linalg.norm(self.target - self.base) < 0.01
-            and self.wait_starting_rot > 1.0
-        ):
+        if np.linalg.norm(self.target - self.base) < 0.01 and self.wait_starting_rot > 1.0:
             self.base = np.array([-3.14159 / 2, 0.0, 0.0])
             self.target = self.base
         else:
@@ -185,6 +188,7 @@ class SpiralParticules(ProgramBase):
                 * self.vel
             )
             self.wait_change_angle = 0
+
         self.timeaf = af["time"]
         self.decay_kick = af["decaying_kick"]
         self.nrj_slow = af["low"][1]
@@ -290,5 +294,6 @@ class SpiralParticulesNode(ShaderNode, Particles):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         output_texture = self.program.render(audio_features)
         return output_texture

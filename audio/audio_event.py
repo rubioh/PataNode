@@ -1,6 +1,7 @@
 import librosa
 import numpy as np
 
+
 melbank = librosa.filters.mel(sr=16000, n_fft=1024)
 
 
@@ -37,6 +38,7 @@ class AudioEventTracker:
 
     def get_on_kick(self, bpm):
         amp = 0.5 if bpm > 160 else 1  # For high BPM the threshold needs to be reduce
+
         if (
             self.current_state["dsmooth_low"] > self.dlow_treshold * amp
             and self.current_state["smooth_low"] > self.smooth_low_treshold * amp
@@ -63,7 +65,6 @@ class AudioEventTracker:
         dft[10:] = 0
         self.all_mel[1:] = self.all_mel[:-1]
         self.all_mel[-1] = dft
-
         lag = 1
         onset_env = self.all_mel[lag:] - self.all_mel[:-lag]
         onset_env = np.maximum(0.0, onset_env)
@@ -100,6 +101,7 @@ class AudioEventTracker:
         else:
             self.decaying_snare = max(self.decaying_snare - 1.0 / 25.0, 0.0)
             self.event_features["_on_snare"] = 0
+
         self.event_features["snare_count"] = self.snare_count
         self.event_features["decaying_snare"] = self.decaying_snare
 
@@ -112,6 +114,7 @@ class AudioEventTracker:
             self.mini_chill = 1
         else:
             self.mini_chill = 0
+
         self.event_features["mini_chill"] = self.mini_chill
 
     def __call__(self, af, bpm=140):

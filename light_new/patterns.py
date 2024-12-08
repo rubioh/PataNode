@@ -1,12 +1,12 @@
-from light_new.fixture import Fixture, Lyre, LightString, Z1020
-from light_new.cracra import Cracra
+import abc
+import math
+import time
 
 import numpy as np
-import time
-import math
-import abc
 
-from controller.launch_control_xl import LaunchControlMidiReceiver, ButtonEvent
+from controller.launch_control_xl import ButtonEvent, LaunchControlMidiReceiver
+from light_new.fixture import Fixture, LightString, Lyre, Z1020
+from light_new.cracra import Cracra
 
 
 def blackout(length: int):
@@ -26,11 +26,9 @@ def dimm(length: int):
 
 def sine(string: LightString):
     length = string.config.length
-
     pos_2d = np.linspace(
         string.config.position_start, string.config.position_end, length
     )
-
     z = pos_2d[:, 2]
     fz = np.sin(z * math.pi + time.monotonic())
     y = pos_2d[:, 1] * 4
@@ -41,7 +39,6 @@ def sine(string: LightString):
 
 def map_smooth_low(string: LightString, af, pos_s=None, pos_e=None):
     length = string.config.length
-
     pos_2d = np.linspace(pos_s, pos_e, length)
     pixels = np.zeros((length, 3))
     pixels[:, 0] = ((1.0 - af["decaying_kick"]) < (abs(pos_2d[:, 0]) + 0.05)) * (
@@ -53,13 +50,11 @@ def map_smooth_low(string: LightString, af, pos_s=None, pos_e=None):
 def map_smooth_low_vertical(string: LightString, af, pos_s=None, pos_e=None):
     length = string.config.length
     pixels = np.zeros((length, 3))
-
     f0 = 1.5
     dim = 0.75
     alpha = np.sin(time.time() + pos_s[0] * 3.14159 * af["on_tempo32"]) * 0.5 + 0.5
     lfo = np.sin(time.time() + pos_s[0] * 3.14159 * f0) * (0.5 + 0.5) * 0.5 + 0.5
     lfo = lfo * 0.75 * (1 - alpha) + alpha
-
     v = np.linspace(0, 8, 8) * (1 - lfo)
     pixels[:, 0] = (v < af["smooth_low"] * 3.0) * af["smooth_low"] ** 0.5 * 2.0
     return pixels * dim
@@ -67,15 +62,11 @@ def map_smooth_low_vertical(string: LightString, af, pos_s=None, pos_e=None):
 
 def tempo_2(string: LightString, af, ctrl, pos_s, pos_e):
     control_width = ctrl.bind_to_controller("F0", 0.1, 2)  # min 0.0001 max 1
-
     length = string.config.length
     pos_2d = np.linspace(pos_s, pos_e, length)
     pixels = np.zeros((length, 3))
-
-    # pos_2d_y_offset = 1 - abs(pos_2d[:, 0]) * 0.2
-
-    # pos_2d[:, 1] += pos_2d_y_offset
-
+#   pos_2d_y_offset = 1 - abs(pos_2d[:, 0]) * 0.2
+#   pos_2d[:, 1] += pos_2d_y_offset
     t = math.sin(af["on_tempo2"] * 2 * 3.1415)
 
     pixels[:, 0] = np.clip(0, 1, 1 - abs(pos_2d[:, 1] - t) / control_width) ** 0.5
@@ -93,12 +84,15 @@ class OK:
         if (time.time() - self.t) > 1 / 120:
             self.t = time.time()
             self._updated = False
+
         if self._updated:
             return
+
         if af["on_kick"]:
             self.count += 1
             self.count %= 4
             self.dim = 0.25 + 0.75 * (1.0 - (self.count + 1) * 0.25)
+
         self._updated = True
 
     def __call__(self, string, af, pos_s, pos_e):
@@ -108,8 +102,10 @@ class OK:
 
         if pos_s[2] < 1 or pos_e[2] < 1:
             pixels[:, 0] = af["decaying_kick"] * self.dim
+
         if abs(pos_e[0]) - 0.1 < (self.count + 1) * 0.25:
             pixels[:, 0] = af["decaying_kick"] * (self.dim + abs(pos_e[0]) ** 2 * 0.75)
+
         return pixels
 
 
@@ -128,10 +124,13 @@ class Chill1:
     def update(self, af, string=None):
         if len(self.N_string) < 16:
             self.N_string[string.config.name] = 0
+
         if self.wait > 16 * self.wait_time:
             self.N_string[string.config.name] = np.random.rand(8) ** self.pow
+
             if string.config.name == "octostrip 2 strip 8":
                 self.wait = 0
+
         self.wait += 1
         self.N_string[string.config.name] *= self.decay_rate
 
@@ -147,7 +146,6 @@ def chill2(string, af, pos_s, pos_e):
     length = string.config.length
     pixels = np.zeros((length, 3))
     pos_lin = np.linspace(pos_s, pos_e, length)
-
     tone_mapping_lin = 0.8
     tone_mapping_pow = 2.0
 
@@ -185,6 +183,7 @@ def chill2(string, af, pos_s, pos_e):
             + 0.5
         )
         pixels[:, 0] = lfoy
+
     return (pixels * tone_mapping_lin) ** tone_mapping_pow
 
 
@@ -201,20 +200,22 @@ class OnKickSin:
         self.tone_mapping_lin = 0.8
         self.tone_mapping_pow = 2.0
         self.t = time.time()
-        # TODO MINI CHILL CHANGE DE PRESET MAIS PAS POUR LUI
+        # TODO: MINI CHILL CHANGE DE PRESET MAIS PAS POUR LUI
         self._use_mini_chill = False
 
     def update(self, af):
         if (time.time() - self.t) > 1 / 120:
             self.t = time.time()
             self._updated = False
+
         if self._updated:
             return
+
         if af["mini_chill"] and self.wait_next > 5 and not af["on_chill"]:
             self.sens *= -1
             self.wait_next = 0
-        self.wait_next += 1 / 60 / 8
 
+        self.wait_next += 1 / 60 / 8
         self.frequency = 0.5  # + .25 * np.sin(time.time() * .1)
         self.f0 = self.frequency
         self.cumul += (
@@ -226,6 +227,7 @@ class OnKickSin:
         length = string.config.length
         pixels = np.zeros((length, 3))
         pos_lin = np.linspace(pos_s, pos_e, length)
+
         if pos_s[2] == 1:
             lfox = (
                 np.sin(self.cumul * 2.0 * 3.14159 * self.f0 + pos_lin[:, 0] * 3.14159)
@@ -265,6 +267,7 @@ class OnKickSin:
                 + 0.5
             )
             pixels[:, 0] = lfoy
+
         return (pixels * self.tone_mapping_lin) ** self.tone_mapping_pow
 
 
@@ -280,27 +283,22 @@ def bubble_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels):
     pos_3d = np.linspace(
         string.config.position_start, string.config.position_end, length
     )
-
     diff_origin = np.array([0.0, -0.5, 0.75])
-
     x, y, z = np.meshgrid([-1, 1], [-1, 1], [-1, 1])
     far_away = np.vstack([x.flatten(), y.flatten(), z.flatten()]).T
     far_away_dist = np.linalg.norm(far_away - diff_origin, ord=2, axis=1.0)
     far_away_max = np.max(far_away_dist)
-
     distance = np.linalg.norm(pos_3d - diff_origin, ord=2, axis=1.0) / far_away_max
     amplitude = 1 - distance / bubble_range
     amplitude = np.clip(amplitude, 0, 1)
     bubble_curve = np.interp(bubble_curve, [-1, 0, 1], [0.0001, 0.5, 3])
     amplitude = amplitude ** (1 / (2 * bubble_curve))
-
     amplitude = amplitude_min + amplitude * (1 - amplitude_min)
-
     return pixels * amplitude.reshape(-1, 1)
 
 
-def master_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels): ...
-
+def master_effect(string: LightString, af, ctrl, pos_s, pos_e, pixels):
+    ...
 
 def breathe(string: LightString, af, ctrl, pos_s, pos_e):
     color = np.array([1, 0, 0])
@@ -322,20 +320,19 @@ class Pattern(abc.ABC):
         ctrl: LaunchControlMidiReceiver,
         pos_s,
         pos_e,
-    ) -> np.ndarray: ...
+    ) -> np.ndarray:
+        ...
 
     def get_normalized_pos(self, strips: list[LightString]):
         self.strips = strips
         pos_start = np.array([f.config.position_start for f in self.strips])
         pos_end = np.array([f.config.position_end for f in self.strips])
-
         max_x = max(np.max(pos_start[:, 0]), np.max(pos_end[:, 0]))
         min_x = min(np.min(pos_start[:, 0]), np.min(pos_end[:, 0]))
         max_y = max(np.max(pos_start[:, 1]), np.max(pos_end[:, 1]))
         min_y = min(np.min(pos_start[:, 1]), np.min(pos_end[:, 1]))
         max_z = max(np.max(pos_start[:, 2]), np.max(pos_end[:, 2]))
         min_z = min(np.min(pos_start[:, 2]), np.min(pos_end[:, 2]))
-
         min_ = np.array([min_x, min_y, min_z])
         max_ = np.array([max_x, max_y, max_z])
         self.pos_start = (pos_start - min_) / (max_ - min_) * 2 - 1
@@ -344,6 +341,7 @@ class Pattern(abc.ABC):
     def render(self, strips: list[LightString], af, ctrl):
         if self.strips is None:
             self.get_normalized_pos(strips)
+
         for i, f in enumerate(strips):
             f.set_pixels(self.pattern(f, af, ctrl, self.pos_start[i], self.pos_end[i]))
 
@@ -375,11 +373,13 @@ class MasterEffect:
         smoke_on = ctrl.bind_to_controller("K7", -1, 1) > 0
         strobe = ctrl.bind_to_controller("K15")
         strobe = ctrl.bind_to_controller("K23")
+
         for c in cracras:
             for i in range(8):
                 # TODO: c'est cense afficher qqchose dans previs ?
                 c.pixels[i][0] = dimm
                 c.pixels[i][1] = strobe
+
         for s in smoke:
             s.attrib["enable"] = 1 if smoke_on else 0
             # TODO: auto turn on and off based on value ?
@@ -425,6 +425,7 @@ class PatternManager:
                 self.ctrl.load_settings()
             except FileNotFoundError:
                 pass
+
             self.ctrl.set_callback("B18", make_change_pattern_cb(-1))  # left
             self.ctrl.set_callback("B19", make_change_pattern_cb(1))  # right
 
@@ -436,6 +437,7 @@ class PatternManager:
         light_strings = list[LightString]()
         cracras = list[Cracra]()
         smoke = list[Z1020]()
+
         for i, f in enumerate(fixtures):
             if isinstance(f, Lyre):
                 f.lookAt([3, 1, 3])
@@ -445,7 +447,8 @@ class PatternManager:
                 cracras.append(f)
             elif isinstance(f, Z1020):
                 smoke.append(f)
-            elif isinstance(f, LightCubeLZR):
-                f.color = colors
+            elif isinstance(f, LightCubeLZR): # FIXME: LightCubeLZR is not defined
+                f.color = colors # FIXME: colors is not defined
+
         self.current_pattern.render(light_strings, af, self.ctrl)
         self.master_effect.update(self.ctrl, cracras, smoke)

@@ -1,16 +1,14 @@
 import numpy as np
 
-from gui.patanode import PataNode
 from PyQt5.QtCore import QTimer
-from program.program_manager import ProgramManager, FBOManager
 
-# from light_new import LightEngine
 from audio.audio_pipeline import AudioEngine
+from gui.patanode import PataNode
 from light.light import LightEngine
+#from light_new import LightEngine
 
 
 class PataShade(PataNode):
-
     def __init__(self):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
@@ -21,6 +19,7 @@ class PataShade(PataNode):
         # Features for light new engine
         self._last_main_colors = np.zeros(3)
         self._last_audio_features = np.zeros(3)
+
         # Audio features parameters
         self.last_kick_count = self.last_hat_count = self.last_snare_count = 0
 
@@ -32,6 +31,7 @@ class PataShade(PataNode):
     def last_main_colors(self, v):
         if v is None:
             v = np.zeros(3)
+
         self._last_main_colors = v
 
     @property
@@ -60,9 +60,9 @@ class PataShade(PataNode):
         af["on_kick"] = 1 if self.last_kick_count != af["kick_count"] else 0
         af["on_hat"] = 1 if self.last_hat_count != af["hat_count"] else 0
         af["on_snare"] = 1 if self.last_snare_count != af["snare_count"] else 0
-        last_kick_count = af["kick_count"]
-        last_hat_count = af["hat_count"]
-        last_snare_count = af["snare_count"]
+#       last_kick_count = af["kick_count"]
+#       last_hat_count = af["hat_count"]
+#       last_snare_count = af["snare_count"]
         self._last_audio_features = af
 
     def update_audio(self):
