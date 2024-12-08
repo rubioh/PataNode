@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Utils
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_MASK = name_to_opcode("Mask")
@@ -33,6 +25,7 @@ class Mask(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -53,7 +46,9 @@ class Mask(ProgramBase):
             "iChannel1": "iChannel1",
             "iResolution": "win_size",
         }
+
         super().initUniformsBinding(binding, program_name="")
+
         self.addProtectedUniforms(["iChannel0"])
         self.addProtectedUniforms(["iChannel1"])
 
@@ -63,16 +58,19 @@ class Mask(ProgramBase):
 
     def bindUniform(self, af):
         super().bindUniform(af)
+
         self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, textures, af=None):
         self.bindUniform(af)
         self.updateParams(af)
+
         if textures[0] != None:
             textures[0].use(0)
 
         if textures[1] != None:
             textures[1].use(1)
+
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -95,8 +93,10 @@ class BlendNode(ShaderNode, Utils):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
+
         texture1 = input_nodes[0].render(audio_features)
         texture2 = input_nodes[1].render(audio_features)
         output_texture = self.program.render([texture1, texture2], audio_features)

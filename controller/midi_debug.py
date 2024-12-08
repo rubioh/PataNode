@@ -1,10 +1,13 @@
 #!/usr/bin/env python3.11
 
-import rtmidi
 import time
 
+import rtmidi
+
 m = rtmidi.MidiOut()
+
 print(m.get_ports())
+
 for i, p in enumerate(m.get_ports()):
     print(f"opening output port {p}")
     m = rtmidi.MidiOut()

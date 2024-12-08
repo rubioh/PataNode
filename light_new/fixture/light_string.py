@@ -1,8 +1,10 @@
+import numpy as np
+
 from typing import Literal, NamedTuple
 
-from light_new.fixture.fixture import Fixture, FixtureConfigBase
 from pydantic import Field, PositiveInt, NonNegativeInt
-import numpy as np
+
+from light_new.fixture.fixture import Fixture, FixtureConfigBase
 
 
 class Position3D(NamedTuple):
@@ -14,7 +16,8 @@ class Position3D(NamedTuple):
 class LightStringConfig(FixtureConfigBase):
     fixture: Literal["light_string"]
     length: PositiveInt
-    # special value of 0 means it has a neon aspect
+
+    # Special value of 0 means it has a neon aspect
     px_per_section: NonNegativeInt = Field(default=1)
 
     position_start: Position3D = Field(default=[0, 0, 0])

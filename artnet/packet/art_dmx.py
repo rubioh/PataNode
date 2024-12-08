@@ -1,4 +1,5 @@
 from artnet.packet.base import ArtOp, ArtBase, ArtParseError
+
 from bytechomp import dataclass, Parser
 from bytechomp.datatypes.declarations import U8
 
@@ -70,6 +71,7 @@ class ArtDmx(ArtBase[ArtDmxPayload]):
     @staticmethod
     def validate(data: ArtDmxPayload, extra: bytes) -> None:
         length = 2**8 * data.length_hi + data.length
+
         if not 2 <= length <= 512:
             raise ArtParseError(f"artdmx data length is out of range: {length}")
         elif len(extra) < length:

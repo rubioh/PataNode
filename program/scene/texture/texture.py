@@ -1,19 +1,11 @@
-import time
 from PIL import Image
-import moderngl
-import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_TEXTURE = name_to_opcode("texture")
@@ -21,11 +13,10 @@ OP_CODE_TEXTURE = name_to_opcode("texture")
 
 @register_program(OP_CODE_TEXTURE)
 class Texture(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "texture"
+
         self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
@@ -34,6 +25,7 @@ class Texture(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -55,13 +47,13 @@ class Texture(ProgramBase):
         bmp_image = jpg_image.convert("RGB")
         b = list(bmp_image.getdata())
         b2 = []
+
         for x in b:
             for data in x:
                 b2.append(data)
+
         b = bytes(b2)
-        self.texture = self.ctx.texture(
-            (1024, 1024), components=3, dtype="f1", data=b
-        )
+        self.texture = self.ctx.texture((1024, 1024), components=3, dtype="f1", data=b)
         self.texture.repeat_x = True
         self.texture.repeat_y = True
 
@@ -74,6 +66,7 @@ class Texture(ProgramBase):
 
     def updateParams(self, af=None):
         v = self.getCpuAdaptableParameters()["program"]["text_path"]["eval_function"]["value"]
+
         if self.path != v:
             self.path = v
             self.reload_texture(v)
@@ -107,4 +100,5 @@ class TextureNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

@@ -1,7 +1,8 @@
+from enum import Enum
+from dataclasses import dataclass
+
 from bytechomp import Annotated
 from bytechomp.datatypes import U8, U16
-from dataclasses import dataclass
-from enum import Enum
 
 
 class ArtParseError(Exception):
@@ -12,8 +13,7 @@ class ArtOp(Enum):
     """
     This enum is directly derived from the ArtNet specification Table 1
     """
-
-    # no other data is contained in this UDP packet .
+    # No other data is contained in this UDP packet .
     POLL = 0x2000
     # It contains device status information.
     POLLREPLY = 0x2100
@@ -94,13 +94,15 @@ class ArtOp(Enum):
 class ArtHeader:
     # Magic ArtNet string. Must always be "Art-Net\0"
     _id: Annotated[bytes, 8] = b"Art-Net\0"
-    # TODO: Ensure correct byte order in serializatin (little endian)
+
+    # TODO: ensure correct byte order in serializatin (little endian)
     # Packet type
     op_code: U16 = U16(ArtOp.POLL.value)
 
     def __post_init__(self) -> None:
         if self._id != ArtHeader._id:
             raise ArtParseError(f"invalid artnet header id: `{self._id!r}'")
+
         if not ArtOp(self.op_code):
             raise ArtParseError("unknown artnet opcode {self.op_code}")
 
@@ -111,9 +113,9 @@ class ArtHeaderProtVer:
     separated protocol version from the art-net header because for some reason
     ArtPollReply does not include it...
     """
-
     # ArtNet protocol revision number high
     prot_ver_high: U8 = U8(0)
+
     # ArtNet protocol revision number low
     prot_ver_low: U8 = U8(14)
 

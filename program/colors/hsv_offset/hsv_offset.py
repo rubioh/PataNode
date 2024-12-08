@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Colors
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Colors
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_HSVOFFSET = name_to_opcode("hsvhsvhsvoffset")
@@ -33,6 +25,7 @@ class HSVOffset(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -71,7 +64,9 @@ class HSVOffset(ProgramBase):
     def render(self, textures, af=None):
         self.updateParams(af)
         self.bindUniform(af)
+
         textures[0].use(1)
+
         self.fbos[0].use()
         self.vao.render()
         return self.fbos[0].color_attachments[0]
@@ -95,9 +90,12 @@ class HSVNode(ShaderNode, Colors):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture

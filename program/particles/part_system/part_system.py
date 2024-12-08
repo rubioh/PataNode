@@ -1,18 +1,10 @@
-import time
+import moderngl as mgl
 import numpy as np
-import cv2
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
+from os.path import dirname, join
+
 from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Effects
-from node.node_conf import register_node
+from program.program_conf import SQUARE_VERT_PATH, name_to_opcode
 
 
 OP_CODE_PARTSYSTEM = name_to_opcode("PartSystem")
@@ -30,9 +22,12 @@ class PartSystem(ProgramBase):
 
     def initFBOSpecifications(self):
         rfbos = 4
+
         self.required_fbos = rfbos
+
         fbos_specification = [[self.win_size, 4, "f4"] for i in range(rfbos)]
         fbos_specification += [[(self.N_part, 1), 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -55,18 +50,18 @@ class PartSystem(ProgramBase):
         ### Transform
         vert_path = join(dirname(__file__), "transform/transform.vert")
         frag_path = None
-        varyings = ["out_pos", "out_col"]
+#       varyings = ["out_pos", "out_col"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="transform_")
 
         ### Colision
         vert_path = join(dirname(__file__), "transform/solve_collision.vert")
         frag_path = None
-        varyings = ["out_pos", "out_col"]
+#       varyings = ["out_pos", "out_col"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="collision_")
 
         vert_path = join(dirname(__file__), "transform/copy.vert")
         frag_path = None
-        varyings = ["out_pos"]
+#       varyings = ["out_pos"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="copy_")
 
         self.final_program.program["TrailImg"] = 3
@@ -124,7 +119,7 @@ class PartSystem(ProgramBase):
 
         win2 = (self.win_size[0] * 2, self.win_size[1] * 2)
         tile_frag = "program/transition/PartSystem/Idx/tile.frag"
-        self.tile_program = VertFragBase(
+        self.tile_program = VertFragBase( # FIXME: VertFragBase is not defined
             vert_path=None, frag_path=tile_frag, win_size=win2, **self.kwargs
         )
         self.tile_texture = self.ctx.texture(size=win2, components=4, dtype="f4")
@@ -169,26 +164,30 @@ class PartSystem(ProgramBase):
         kick_boom = (np.clip(af["low"][3] - af["low"][2], 0, 1)) * 5 + 1
         self.kick_boom = 0.8 * self.kick_boom + 0.2 * kick_boom
         self.part_size = 4.0 * self.kick_boom**2 + self.ps
-        # self.part_size = self.ps
+#       self.part_size = self.ps
         self.iFrame += 1
         self.gravity = (0.0, -0.00)
 
     def get_uniform(self, af):
         super().get_uniform(af)
         self.collision_program["part_radius"] = self.part_size / self.win_size[0]
+
         try:
             self.collision_program["particles"] = 10
-        except:
+        except Exception:
             pass
+
         try:
             self.collision_program["N"] = self.N_part
-        except:
+        except Exception:
             pass
+
         try:
             self.collision_program["part_size"] = self.part_size
             self.collision_program["TileIdx"] = 6
-        except:
+        except Exception:
             pass
+
         self.collision_program["iResolution"] = self.win_size
 
         self.part_program["gravity"] = self.gravity
@@ -197,23 +196,22 @@ class PartSystem(ProgramBase):
         self.part_program["on_kick"] = af["on_kick"]
         self.part_program["part_size"] = self.part_size
         self.part_program["pos_target"] = 8
-        # self.draw_program['part_radius'] = self.part_size/self.win_size[0]
+#       self.draw_program['part_radius'] = self.part_size/self.win_size[0]
         self.tile_program.program["part_radius"] = self.part_size
         self.tile_program.program["iResolution"] = self.win_size
         self.tile_program.program["IdxBuffer"] = 5
-
         self.final_program.program["wait_final"] = self.wait_final
         self.trail_program.program["wait_trail"] = self.wait_trail
-
         self.indices_program["iResolution"] = self.win_size
         self.indices_program["TileIdx"] = 6
         self.indices_program["part_size"] = self.part_size
         self.indices_program["part_radius"] = self.part_size / self.win_size[0]
+
         try:
             self.draw_program["part_size"] = self.part_size
             self.draw_program["iResolution"] = self.win_size
             self.draw_program["image"] = 1
-        except:
+        except Exception:
             pass
 
     def render(self, texture, af):
@@ -221,36 +219,35 @@ class PartSystem(ProgramBase):
         self.get_uniform(af)
 
         texture.use(1)
+
         self.target_textures.use(8)
         self.vao_verlet.transform(self.vbo2, mgl.POINTS, self.N_part)
         self.ctx.copy_buffer(self.vbo1, self.vbo2)
 
         for i in range(4):
-            # self.vao_copy.transform(self.vbo_copy, mgl.POINTS, self.N_part)
-
-            # self.particles.write(self.vbo_copy)
-
+#           self.vao_copy.transform(self.vbo_copy, mgl.POINTS, self.N_part)
+#           self.particles.write(self.vbo_copy)
             none = -10
             self.idx_fbo.clear(none, none, none, none)
             self.ctx.point_size = self.part_size
             self.idx_fbo.use()
             self.vao_idx.render(mgl.POINTS, self.N_part)
 
-            # self.tile_fbo.clear(-1,-1,-1,-1)
-            # self.idx_fbo.color_attachments[0].use(5)
-            # self.tile_fbo.use()
-            # self.vao_tile.render()
+#           self.tile_fbo.clear(-1,-1,-1,-1)
+#           self.idx_fbo.color_attachments[0].use(5)
+#           self.tile_fbo.use()
+#           self.vao_tile.render()
 
-            # self.particles.use(10)
+#           self.particles.use(10)
             self.idx_fbo.color_attachments[0].use(6)
             self.vao_col.transform(self.vbo2, mgl.POINTS, self.N_part)
 
             self.ctx.copy_buffer(self.vbo1, self.vbo2)
 
         self.img_fbo.clear(0.0, 0.0, 0.0)
-        # self.ctx.point_size = np.clip(self.part_size*2, 0, 200)
+#       self.ctx.point_size = np.clip(self.part_size*2, 0, 200)
         self.ctx.point_size = self.part_size
-        # self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
+#       self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
         self.ctx.enable(mgl.BLEND)
         texture.use(1)
         self.img_fbo.use()
@@ -271,7 +268,6 @@ class PartSystem(ProgramBase):
 def particle(ID):
     x = np.random.rand(1) * 2 - 1
     y = np.random.rand(1) * 2 - 1
-
     z = np.random.rand(1) * 2 - 1
     w = np.random.rand(1) * 2 - 1
     return (

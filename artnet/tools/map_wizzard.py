@@ -1,7 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
-from time import sleep
 import uuid
+
+import tkinter as tk
+
+from time import sleep
+
+from tkinter import ttk
 
 from artnet.controller import ArtNetController, Universe
 from light.light import nouveau_casino_offsets
@@ -18,8 +21,10 @@ class MapWizzard:
         selec = self.tree.selection()
         self.last_selec = selec
         univs = [self.items[item] for item in selec if item in self.items]
+
         for ip, port in univs:
             self.ctrl.set_universe(red, Universe(ip, port))
+
         self.ctrl.sync_universes()
 
     def __init__(self) -> None:
@@ -46,8 +51,10 @@ class MapWizzard:
                 ip: uuid.uuid4()
                 for ip in set([univ[0] for univ in nouveau_casino_offsets.keys()])
             }
+
             for ip, uid in ips.items():
                 self.tree.insert("", "end", str(uid), text=ip, open=True, tags="ip")
+
             for univ, offset in nouveau_casino_offsets.items():
                 ip_uid = ips[univ[0]]
                 port_uuid = uuid.uuid4()
@@ -60,11 +67,12 @@ class MapWizzard:
                     value=offset,
                     tags=["univ"],
                 )  # type: ignore
+
             self.tree.tag_bind(
                 "univ", "<<TreeviewSelect>>", self.update_lights_with_selec
             )
 
-            # json_tree(tree, "", data)
+#           json_tree(tree, "", data)
             self.tree.pack(fill=tk.BOTH, expand=1)
 
             # Limit windows minimum dimensions
@@ -74,6 +82,7 @@ class MapWizzard:
             print(self.last_selec)
             selec = self.last_selec
             univs = [self.items[item] for item in selec if item in self.items]
+
             for ip, port in univs:
                 print(Universe(ip, port))
 

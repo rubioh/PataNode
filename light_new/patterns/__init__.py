@@ -1,41 +1,40 @@
-from light_new.fixture import (
-    Fixture,
-    Lyre,
-    LightString,
-    Z1020,
-    Par2Brod,
-    LightCubeLZR,
-    CameoThunderWash,
-    Dynamo250,
-    GhostXS70,
-    Kub400RGB,
-    Kub250RGB,
-    XtremLed,
-    AmericanMegaPar,
-)
-from light_new.cracra import Cracra
-
-import pickle
 import enum
+import pickle
+
 import numpy as np
-import time
 
 from controller.launch_control_xl import (
-    LaunchControlMidiReceiver,
     ButtonEvent,
     LEDColor,
+    LaunchControlMidiReceiver,
+)
+from light_new.cracra import Cracra
+from light_new.fixture import (
+#   AmericanMegaPar,
+#   CameoThunderWash,
+#   Dynamo250,
+    Fixture,
+#   GhostXS70,
+#   Kub250RGB,
+#   Kub400RGB,
+    LightCubeLZR,
+    LightString,
+    Lyre,
+    Par2Brod,
+#   XtremLed,
+    Z1020,
 )
 from light_new.patterns.patterns import (
-    LambdaPattern,
-    middleboom,
     Alternate,
     Ascent,
-    map_smooth_low_vertical,
+    Chill1,
+    LambdaPattern,
+    Ok,
     OnKickSin,
     chill2,
+    map_smooth_low_vertical,
+    middleboom,
     tempo_2,
-    Chill1,
-    Ok,
 )
 
 
@@ -47,10 +46,12 @@ class MasterEffect:
         dimm = 0 if self.blackout else ctrl.bind_to_controller("F7", 0, 1)
         smoke_on = ctrl.bind_to_controller("K7", -1, 1) > 0
         strobe = ctrl.bind_to_controller("K15", 0, 1)
+
         for c in cracras:
             for i in range(8):
                 c.pixels[i][0] = dimm
                 c.pixels[i][1] = strobe
+
         for s in smoke:
             s.attrib["enable"] = 1 if smoke_on else 0
             # TODO: auto turn on and off based on value ?
@@ -87,6 +88,7 @@ class BrodParEffect:
             p.attrib["uv"] = ctrl.bind_to_controller("K6", 0, 1)
             p.attrib["white"] = ctrl.bind_to_controller("K14", 0, 1)
             p.attrib["strobe"] = ctrl.bind_to_controller("K22", 0, 1)
+
         ctrl.set_led("B6", LEDColor.RED_HI if self.blackout else LEDColor.GREEN_HI)
 
     def toggle_blackout(self) -> None:
@@ -110,11 +112,13 @@ class VirtualControl(LaunchControlMidiReceiver):
         try:
             self.set_leds()
             uid = self.cc_to_uid.get(cc)
+
             if uid is not None:
                 prev = self.uid_values[uid]
                 super().handle_cc(cc, value)
                 new = self.uid_values[uid]
                 current = self.virtual_uid_values[uid]
+
                 if prev <= current <= new or new <= current <= prev:
                     self.virtual_uid_values[uid] = self.uid_values[uid]
             else:
@@ -128,28 +132,34 @@ class VirtualControl(LaunchControlMidiReceiver):
         super().load_settings(file)
         self.virtual_uid_values = self.uid_values.copy()
         self.set_leds()
+
         try:
             filename = "presets.pickle"
             self.presets = pickle.load(open(filename, "rb"))
-        except:
+        except Exception:
             pass
 
     def load_preset(self, bank_id: str, slot_id: int):
         if bank_id not in self.presets:
             self.presets[bank_id] = {}
+
         if slot_id not in self.presets[bank_id]:
             return
+
         loaded_keys = [f"K{i + (i // 5) * 3}" for i in range(15)] + [
             f"F{i}" for i in range(5)
         ]
+
         for k, v in self.presets[bank_id][slot_id].items():
             if k in loaded_keys:
                 self.virtual_uid_values[k] = v
+
         self.set_leds()
 
     def save_preset(self, bank_id: str, slot_id: int):
         if bank_id not in self.presets:
             self.presets[bank_id] = {}
+
         self.presets[bank_id][slot_id] = self.virtual_uid_values.copy()
         filename = "presets.pickle"
         pickle.dump(self.presets, open(filename, "wb"))
@@ -161,6 +171,7 @@ class VirtualControl(LaunchControlMidiReceiver):
 
         def diff(uid):
             d = self.virtual_uid_values[uid] - self.uid_values[uid]
+
             if not d:
                 return LEDColor.AMBER_MI
             elif d > 0:
@@ -181,6 +192,7 @@ class VirtualControl(LaunchControlMidiReceiver):
 
         def diff(uid):
             d = self.virtual_uid_values[uid] - self.uid_values[uid]
+
             if not d:
                 return LEDColor.AMBER_MI
             elif d > 0:
@@ -265,9 +277,11 @@ class PatternManager:
                 self.ctrl.load_settings()
             except FileNotFoundError:
                 pass
+
             self.ctrl.set_callback("B18", make_change_pattern_cb(-1))  # left
             self.ctrl.set_callback("B19", make_change_pattern_cb(1))  # right
             self.ctrl.set_callback("B23", make_change_mode(ControllerMode.RECORD))
+
             for i in range(16):
                 self.ctrl.set_callback(f"B{i}", self.handle_pad_button)
 
@@ -277,17 +291,20 @@ class PatternManager:
 
     def handle_pad_button(self, uid, event, _time_ms, _dur):
         pad = int(uid[1:])
+
         if event is ButtonEvent.PRESS:
             if uid == "B6":
                 self.brod_par_effect.toggle_blackout()
             elif uid == "B7":
                 self.master_effect.toggle_blackout()
+
             if self.mode == ControllerMode.NORMAL:
                 if pad >= 8:
                     self.ctrl.load_preset(str(self.current_pattern), pad)
             elif self.mode == ControllerMode.RECORD:
                 if pad >= 8:
                     self.ctrl.save_preset(str(self.current_pattern), pad)
+
                 self.mode = ControllerMode.NORMAL
 
     def draw_leds(self, af) -> None:
@@ -295,10 +312,13 @@ class PatternManager:
             self.ctrl.set_led(
                 uid, LEDColor.RED_HI if af["on_tempo"] > 0.8 else LEDColor.BLACK
             )
+
         self.ctrl.set_leds_knobs()
+
         if self.mode == ControllerMode.NORMAL:
             self.ctrl.set_leds_buttons()
             bank = self.ctrl.presets.get(str(self.current_pattern), {})
+
             for i in range(8, 16):
                 if i in bank:
                     self.ctrl.set_led(
@@ -311,19 +331,18 @@ class PatternManager:
                     )
                 else:
                     self.ctrl.set_led(f"B{i}", LEDColor.BLACK)
-
         elif self.mode == ControllerMode.RECORD:
             bank = self.ctrl.presets.get(str(self.current_pattern), {})
-            for i in range(8, 16):  # TODO Reindex slots on 0 instead of 8
-                self.ctrl.set_led(
-                    f"B{i}", LEDColor.RED_LO if i in bank else LEDColor.RED_HI
-                )
+
+            for i in range(8, 16):  # TODO: Reindex slots on 0 instead of 8
+                self.ctrl.set_led(f"B{i}", LEDColor.RED_LO if i in bank else LEDColor.RED_HI)
 
     def update(self, fixtures: list[Fixture], af, colors):
         light_strings = list[LightString]()
         cracras = list[Cracra]()
         smoke = list[Z1020]()
         par = list[Par2Brod]()
+
         for i, f in enumerate(fixtures):
             if isinstance(f, Lyre):
                 f.lookAt([3, 1, 3])
@@ -341,6 +360,7 @@ class PatternManager:
                 f.color = colors
                 f.attrib["laser"] = 0.99
                 f.attrib["auto_rotation"] = 0.51
+
         self.master_effect.update(self.ctrl, cracras, smoke)
         color = self.current_pattern.render(light_strings, af, self.ctrl)
         self.brod_par_effect.update(self.ctrl, par, color)

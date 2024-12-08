@@ -1,19 +1,12 @@
-from os.path import dirname, basename, isfile, join
-import time
-import numpy as np
 import moderngl as mgl
-from pyrr import Matrix44
+import numpy as np
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Physarum
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Physarum
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_PHYSARUMPART = name_to_opcode("physa1")
@@ -35,6 +28,7 @@ class PhysarumPart(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4", True],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -72,34 +66,36 @@ class PhysarumPart(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-        # self.N_part = 150000*16
+#       self.N_part = 150000*16
         self.N_part = 1000000
         self.part_size = 1
-
         self.iFrame = -1
-
         self.sensor_direction = 1.2  # 22.5/180*np.pi # theta
         self.update_direction = 0.5  # 22.5/180*np.pi # phi
         self.trail_thresh = 2500  # TODO
         self.velocity_rate = 2.0
         self.sensor_length = 10
-
         self.to_center_amount = 0
-
         self.Trail = 0
         self.SeedTex = 1
 
         W = (self.win_size[0] * 2, self.win_size[1] * 2)
+
         self.seed_texture = self.ctx.texture(size=W, components=4, dtype="f4")
+
         random = np.float32(np.random.rand(*W, 4))
+
         self.seed_texture.write(random)
+
         print(self.win_size)
         print(self.velocity_rate)
 
     def updateParams(self, af):
         self.iFrame += 1
+
         if af is None:
             return
+
         return
 
     def initUniformsBinding(self):
@@ -134,7 +130,6 @@ class PhysarumPart(ProgramBase):
         textures[0].use(0)
         self.seed_texture.use(1)
         self.transform_vao.transform(self.vbo2, mgl.POINTS, self.N_part)
-
         self.fbos[0].clear()
         self.fbos[0].use()
         self.ctx.enable(mgl.BLEND)
@@ -163,13 +158,17 @@ class PhysarumPartNode(ShaderNode, Physarum):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         self.already_called = True
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return self.program.norender()
+
         if input_nodes[0].already_called:
             texture = input_nodes[0].program.norender()
         else:
             texture = input_nodes[0].render(audio_features)
+
         output_texture = self.program.render([texture], audio_features)
         return output_texture

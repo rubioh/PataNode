@@ -1,6 +1,9 @@
-import numpy as np
-from typing import TypeVar, Generic, NamedTuple
 import abc
+
+import numpy as np
+
+from typing import Generic, NamedTuple, TypeVar
+
 from pydantic import BaseModel, PositiveInt
 
 
@@ -33,12 +36,15 @@ class Fixture(abc.ABC, Generic[FixtureConfigVar]):
     def get_channel_values(self) -> np.ndarray:
         buffer_length = len(self.CHANNELS)
         fixture_buffer = np.zeros(buffer_length)
+
         for c, idx in self.CHANNELS.items():
             fixture_buffer[idx - 1] = self.attrib[c]
+
         return fixture_buffer
 
     def init_params(self) -> None:
         self.attrib = {k: 0.0 for k in self.CHANNELS.keys()}
+
         for k, v in self.CHANNELS_DEFAULTS.items():
             self.attrib[k] = v
 

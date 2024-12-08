@@ -1,19 +1,14 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
-
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Scene
-from node.node_conf import register_node
 import moderngl as mgl
+import numpy as np
+
+from os.path import dirname, join
+
 from matplotlib.colors import rgb_to_hsv, hsv_to_rgb
+
+from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_TRUCHET = name_to_opcode("truchet")
@@ -25,6 +20,7 @@ class Truchet(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Truchet"
+
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
@@ -38,6 +34,7 @@ class Truchet(ProgramBase):
             [(1980, 1980), 4, "f4"],
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -92,7 +89,7 @@ class Truchet(ProgramBase):
         }
         super().initUniformsBinding(binding, program_name="draw_")
         binding = {
-            "iTime": "iTime",
+#           "iTime": "iTime",
             "iResolution": "win_size",
             "iChannel1": "iChannel1",
             "energy_fast": "smooth_fast",
@@ -110,6 +107,7 @@ class Truchet(ProgramBase):
     def updateParams(self, fa):
         if fa is None:
             return
+
         self.smooth_low_final = (
             fa["smooth_low"] ** 2.0 * 3.0 + fa["on_chill"] * 2.0 + 0.1
         )
@@ -126,6 +124,7 @@ class Truchet(ProgramBase):
             self.deep_tic += 0.001
         else:
             self.deep_tic -= 0.005
+
         self.deep_tic = np.clip(self.deep_tic, 0.1, 0.3)
         self.angle_rot += self.toc + 0.001
 
@@ -140,8 +139,10 @@ class Truchet(ProgramBase):
 
         if self.K % 32 == 0.0 and not fa["on_chill"]:
             self.iFrame = 0
+
         if fa["on_chill"] and self.iFrame > 400:
             self.iFrame = 0
+
         self.iFrame += 1
 
         self.accum_rot += fa["smooth_low"]
@@ -192,4 +193,5 @@ class TruchetNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

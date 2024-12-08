@@ -1,55 +1,60 @@
+import time
+
 import yaml
+
+from typing import Annotated
+
+from pydantic import Field, BaseModel
+
 from light_new.light_outputs import LightOutputs
 from light_new.fixture import (
-    Fixture,
-    Mac301Config,
-    AlphaspotConfig,
-    Mac301,
     Alphaspot,
-    LightString,
-    LightStringConfig,
-    Z1020,
-    Z1020Config,
-    Par2Brod,
-    Par2BrodConfig,
-    LightCubeLZR,
-    LightCubeLZRConfig,
+    AlphaspotConfig,
+    AmericanMegaPar,
+    AmericanMegaParConfig,
     CameoThunderWash,
     CameoThunderWashConfig,
     Dynamo250,
     Dynamo250Config,
+    Fixture,
     GhostXS70,
     GhostXS70Config,
-    Kub400RGB,
-    Kub400RGBConfig,
     Kub250RGB,
     Kub250RGBConfig,
+    Kub400RGB,
+    Kub400RGBConfig,
+    LightCubeLZR,
+    LightCubeLZRConfig,
+    LightString,
+    LightStringConfig,
+    Mac301,
+    Mac301Config,
+    Par2Brod,
+    Par2BrodConfig,
     XtremLed,
     XtremLedConfig,
-    AmericanMegaPar,
-    AmericanMegaParConfig,
+    Z1020,
+    Z1020Config,
 )
 from light_new.cracra import Cracra, CracraConfig
 from light_new.patterns import PatternManager
-from typing import Annotated
-from pydantic import Field, BaseModel
-import time
+
 
 FixtureConfig = Annotated[
-    Z1020Config
-    | CracraConfig
-    | Mac301Config
-    | AlphaspotConfig
-    | LightStringConfig
-    | Par2BrodConfig
-    | LightCubeLZRConfig
+    AlphaspotConfig
+    | AmericanMegaParConfig
     | CameoThunderWashConfig
+    | CracraConfig
     | Dynamo250Config
     | GhostXS70Config
-    | Kub400RGBConfig
     | Kub250RGBConfig
+    | Kub400RGBConfig
+    | LightCubeLZRConfig
+    | LightStringConfig
+    | Mac301Config
+    | Par2BrodConfig
     | XtremLedConfig
-    | AmericanMegaParConfig,
+    | Z1020Config,
     Field(discriminator="fixture"),
 ]
 
@@ -64,6 +69,7 @@ class InvalidConfigurationError(Exception): ...
 class LightEngine:
     def __init__(self):
         DEFAULT_SCENO_PATH = "light_new/current_sceno.yml"
+
         try:
             self.sceno = yaml.load(open(DEFAULT_SCENO_PATH), Loader=yaml.CLoader)
         except FileNotFoundError:
@@ -75,8 +81,10 @@ class LightEngine:
 
         self.outputs = LightOutputs(self.sceno)
         self.init_fixtures(self.sceno)
+
         for f in self.fixtures:
             print(f.config)
+
         self.pattern_manager = PatternManager()
         self.last_kick_count = self.last_hat_count = self.last_snare_count = 0
 
@@ -84,12 +92,14 @@ class LightEngine:
         config = FixturesConfig.model_validate(fixtures_conf)
         fixtures = [self.config_to_fixture(conf) for conf in config.fixtures]
         names = list[str]()
+
         for i, f in enumerate(fixtures):
             if f.config.name in names:
                 raise InvalidConfigurationError(
                     f"duplicate name for fixture {i}: `{f.config.name}'"
                 )
             names += [f.config.name]
+
         self.fixtures = fixtures
 
     def config_to_fixture(self, conf: FixtureConfig) -> Fixture:
@@ -141,21 +151,25 @@ class LightEngine:
     def tick(self, colors=[(0, 0, 0)], audio_features=None):
         self.set_audio_features(audio_features)
         self.pattern_manager.update(self.fixtures, audio_features, colors)
+
         for f in self.fixtures:
             f.update()
 
         buffer = self.outputs.get_buffer()
+
         for f in self.fixtures:
             start_channel = f.config.address.dmx_start_channel - 1
             buffer[f.config.address.universe - 1][
                 start_channel : start_channel + len(f.CHANNELS)
             ] = f.get_channel_values()
+
         self.outputs.write(buffer)
 
 
 if __name__ == "__main__":
-    engine = LightEngine()
     import numpy as np
+
+    engine = LightEngine()
 
     while True:
         c = [
@@ -174,4 +188,5 @@ if __name__ == "__main__":
             },
         )
         time.sleep(1 / 60)
+
     exit(0)

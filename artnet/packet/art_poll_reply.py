@@ -1,5 +1,6 @@
 from enum import IntEnum, IntFlag, auto, StrEnum
 from typing import Tuple, Self, Annotated
+
 from bytechomp import dataclass, Parser
 from bytechomp.datatypes.declarations import U8, U16
 
@@ -97,10 +98,13 @@ class PortType:
 
     def serialize(self) -> int:
         n = self.protocol.value
+
         if self.can_input:
             n += 1 << 6
+
         if self.can_output:
             n += 1 << 7
+
         return n
 
 
@@ -272,5 +276,5 @@ class ArtPollReply(ArtExtBase[ArtPollReplyPayload, ArtPollReplyPayloadExt]):
                 mac=zeros(6),
             )
         )
-        # n.payload_ext = ArtPollReplyPayloadExt() #TODO
+#       n.payload_ext = ArtPollReplyPayloadExt() #TODO
         return n

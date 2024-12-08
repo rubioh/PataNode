@@ -1,19 +1,11 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
-
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Scene
-from node.node_conf import register_node
-
 import yaml
+
+from os.path import dirname, join
+
+from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_DIRECTIONALARCHE = name_to_opcode("directionalarche")
@@ -21,10 +13,8 @@ OP_CODE_DIRECTIONALARCHE = name_to_opcode("directionalarche")
 
 @register_program(OP_CODE_DIRECTIONALARCHE)
 class DirectionalArche(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "DirectionalArche"
 
         self.initProgram()
@@ -35,6 +25,7 @@ class DirectionalArche(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -60,6 +51,7 @@ class DirectionalArche(ProgramBase):
     def initParams(self):
         self.vitesse = 0.4
         self.time = 0
+
         with open("resources/zozo_conf.yaml") as stream:
             arch_conf = yaml.safe_load(stream)["arch"]
             self.width = arch_conf["width"]
@@ -103,4 +95,5 @@ class DirectionalArcheNode(ShaderNode, Scene):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         return self.program.render(audio_features)

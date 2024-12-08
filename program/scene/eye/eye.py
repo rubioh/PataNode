@@ -1,17 +1,13 @@
 import time
+
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_EYE = name_to_opcode("eye")
@@ -19,10 +15,8 @@ OP_CODE_EYE = name_to_opcode("eye")
 
 @register_program(OP_CODE_EYE)
 class Eye(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Eye"
 
         self.initProgram()
@@ -33,6 +27,7 @@ class Eye(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -74,18 +69,23 @@ class Eye(ProgramBase):
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
         self.tf += 0.01
+
         if af is None:
             return
+
         self.smooth_fast = self.smooth_fast * 0.2 + 0.8 * af["full"][3]
+
         if af["full"][1] < 1.0 or af["full"][2] < 0.7:
             self.vitesse += 0.01
             self.intensity += 0.05
+
             if self.time > 500 and self.vitesse > 1.5:
                 self.time = 0
                 self.tf = 0
         else:
             self.vitesse -= 0.04
             self.intensity -= 0.1
+
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
@@ -128,4 +128,5 @@ class EyeNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

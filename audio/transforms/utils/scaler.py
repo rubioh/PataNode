@@ -1,14 +1,10 @@
-import time
-import numpy as np
-import copy
-
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
 
 def name_to_opcode(name):
-    l = [ord(char) for char in name]
-    return sum(l)
+    lst = [ord(char) for char in name]
+    return sum(lst)
 
 
 OP_CODE_SCALER = name_to_opcode("scaler")
@@ -39,6 +35,7 @@ class Scaler:
             to_transform = af[settings["smooth_low"]]
             scaler_transform = ((to_transform + in_offset) * scale) ** pow_ + out_offset
             af["custom_parameters"][param_name] = scaler_transform
+
         return af
 
     def render(self, af):
@@ -59,6 +56,8 @@ class ScalerNode(AudioNode):
 
     def render(self, audio_features):
         input_nodes = self.getAudioInputs()
+
         if not len(input_nodes):
-            return af
+            return audio_features
+
         return self.program.render(audio_features)

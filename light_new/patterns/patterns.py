@@ -1,23 +1,20 @@
+import math
+import time
+
+import numpy as np
+
 from light_new.fixture import LightString
 from light_new.patterns.base import Pattern
 
-import numpy as np
-import time
-import math
 
-
-def map_smooth_low_vertical(
-    string: LightString, af, bind, color, pos_s=None, pos_e=None
-):
+def map_smooth_low_vertical(string: LightString, af, bind, color, pos_s=None, pos_e=None):
     length = string.config.length
     pixels = np.zeros((length, 3))
-
     f0 = 1.5
     dim = 0.75
     alpha = np.sin(time.time() + pos_s[0] * 3.14159 * af["on_tempo32"]) * 0.5 + 0.5
     lfo = np.sin(time.time() + pos_s[0] * 3.14159 * f0) * (0.5 + 0.5) * 0.5 + 0.5
     lfo = lfo * 0.75 * (1 - alpha) + alpha
-
     v = np.linspace(0, 8, 8) * (1 - lfo)
     pixels[:, 0] = (v < af["smooth_low"] * 3.0) * af["smooth_low"] ** 0.5 * 2.0
     pixels[:] = pixels[:, 0].reshape(-1, 1)
@@ -26,15 +23,11 @@ def map_smooth_low_vertical(
 
 def tempo_2(string: LightString, af, bind, color, pos_s, pos_e):
     control_width = bind("F0", 0.1, 2)  # min 0.0001 max 1
-
     length = string.config.length
     pos_2d = np.linspace(pos_s, pos_e, length)
     pixels = np.zeros((length, 3))
-
-    # pos_2d_y_offset = 1 - abs(pos_2d[:, 0]) * 0.2
-
-    # pos_2d[:, 1] += pos_2d_y_offset
-
+#   pos_2d_y_offset = 1 - abs(pos_2d[:, 0]) * 0.2
+#   pos_2d[:, 1] += pos_2d_y_offset
     t = math.sin(af["on_tempo2"] * 2 * 3.1415)
     amplitude = np.clip(0, 1, 1 - abs(pos_2d[:, 1] - t) / control_width) ** 0.5
     pixels[:] = color
@@ -52,12 +45,15 @@ class Ok:
         if (time.time() - self.t) > 1 / 120:
             self.t = time.time()
             self._updated = False
+
         if self._updated:
             return
+
         if af["on_kick"]:
             self.count += 1
             self.count %= 4
             self.dim = 0.25 + 0.75 * (1.0 - (self.count + 1) * 0.25)
+
         self._updated = True
 
     def __call__(self, string, af, bind, color, pos_s, pos_e):
@@ -69,10 +65,12 @@ class Ok:
 
         if pos_s[2] < 1 or pos_e[2] < 1:
             pixels[:, 0] = af["decaying_kick"] * self.dim**pow_ * scale
+
         if abs(pos_e[0]) - 0.1 < (self.count + 1) * 0.25:
             pixels[:, 0] = af["decaying_kick"] * (
                 self.dim + abs(pos_e[0]) ** pow_ * scale
             )
+
         return pixels**pow_ * scale
 
 
@@ -90,13 +88,17 @@ class Chill1(Pattern):
     def __update(self, af, string, color):
         if len(self.N_string) < 16:
             self.N_string[string.config.name] = 0
+
         wait_time = 8
         pow_ = self.map("F0", 0.5, 4)
         decay_rate = self.map("F1", 0.5, 0.95)
+
         if self.wait > 16 * wait_time:
             self.N_string[string.config.name] = np.random.rand(8) ** pow_
+
             if string.config.name == "octostrip 2 strip 8":
                 self.wait = 0
+
         self.wait += 1
         self.N_string[string.config.name] *= decay_rate
         alpha = self.map("F2", 0.0, 1.0)
@@ -114,16 +116,13 @@ class Chill1(Pattern):
 def middleboom(string, af, bind, color, pos_s, pos_e):
     length = string.config.length
     pixels = np.zeros((length, 3))
-
     sigma = bind("F0", 0.001, 0.01)
     offset = bind("F1", 0.1, 0.6)
     pow_ = bind("F2", 0.25, 8.0)
     tmp = np.array([4, 3, 2, 1, 1, 2, 3, 4]) - 0.5
-
     tmp = np.exp(
         -(tmp * tmp) * sigma * (abs(pos_s[0]) ** pow_ + offset) / af["smooth_low"]
     )
-
     pixels = color * tmp.reshape(-1, 1)
     return pixels
 
@@ -132,7 +131,6 @@ def chill2(string, af, bind, color, pos_s, pos_e):
     length = string.config.length
     pixels = np.zeros((length, 3))
     pos_lin = np.linspace(pos_s, pos_e, length)
-
     tone_mapping_lin = bind("F0", 0.0, 2.0)
     tone_mapping_pow = bind("F1", 0.2, 8.0)
     amp_kick = bind("F2", 0.0, 2.0)
@@ -181,6 +179,7 @@ def chill2(string, af, bind, color, pos_s, pos_e):
             + 0.5
         )
         pixels[:, 0] = lfoy
+
     pixels[:] = pixels[:, 0].reshape(-1, 1)
     return (pixels * color * tone_mapping_lin) ** tone_mapping_pow
 
@@ -195,17 +194,19 @@ class OnKickSin(Pattern):
         self.wait_next = 0
         self.tone_mapping_lin = 0.8
         self.tone_mapping_pow = 2.0
-        # TODO MINI CHILL CHANGE DE PRESET MAIS PAS POUR LUI
+        # TODO: MINI CHILL CHANGE DE PRESET MAIS PAS POUR LUI
         self._use_mini_chill = False
 
     def update(self, af, color):
         if af["mini_chill"] and self.wait_next > 5 and not af["on_chill"]:
             self.sens *= -1
             self.wait_next = 0
+
         self.wait_next += 1 / 60
 
         cumul_count = self.map("F0", 0.05, 0.3)
         cumul_count_nrj = self.map("F1", -0.2, 0.2)
+
         self.cumul += (
             cumul_count_nrj * af["smooth_low"] * 2.0 + cumul_count * 0.05
         ) * self.sens
@@ -214,6 +215,7 @@ class OnKickSin(Pattern):
         length = string.config.length
         pixels = np.zeros((length, 3))
         pos_lin = np.linspace(pos_s, pos_e, length)
+
         if pos_s[2] == 1:
             lfox = (
                 np.sin(self.cumul * 2.0 * 3.14159 + pos_lin[:, 0] * 3.14159) * 0.5 + 0.5
@@ -246,6 +248,7 @@ class OnKickSin(Pattern):
                 + 0.5
             )
             pixels[:, 0] = lfoy
+
         pixels[:] = color * pixels[:, 0].reshape(-1, 1)
         return (pixels * self.tone_mapping_lin) ** self.tone_mapping_pow
 
@@ -270,7 +273,6 @@ class Ascent(Pattern):
         length = string.config.length
         pixels = np.zeros((length, 3))
         pixels[:] = color
-
         f2 = self.map("F2", 1, 4)
         pos_3d = np.linspace(
             string.config.position_start, string.config.position_end, length
@@ -278,9 +280,7 @@ class Ascent(Pattern):
         f3 = self.map("F3", 0, 1)
         k3 = self.map("K3", -10, 10)
         k11 = self.map("K11", -10, 10)
-
         width = f2
-
         y = pos_3d[:, 1]
         y += f3 * k3 * abs(pos_3d[:, 0])
         y += f3 * k11 * abs(pos_3d[:, 2])
@@ -301,8 +301,10 @@ class Alternate(Pattern):
         if (time.time() - self.t) > 1 / 120:
             self.t = time.time()
             self._updated = False
+
         if self._updated:
             return
+
         if af["on_kick"]:
             self.count += 1
             self.count %= 2
@@ -317,9 +319,10 @@ class Alternate(Pattern):
     def pattern(self, string, af, color, pos_s, pos_e):
         self.__update(af)
         length = 8
-        # L = np.linspace(pos_s, pos_e, length)
+#       L = np.linspace(pos_s, pos_e, length)
         pixels = np.zeros((length, 3))
         choice = self.map("F0", 0, 3)
+
         if choice < 1:
             pixels[:] = abs(self.count - (pos_e[0] > 0))
         elif choice < 2:
@@ -332,6 +335,7 @@ class Alternate(Pattern):
             pixels[:] = abs(self.count - (pos_s[2] < 1)) * abs(
                 self.count5 % 2 - (pos_e[0] > 0)
             )
+
         pixels *= color
         return pixels
 
@@ -352,8 +356,7 @@ class LambdaPattern(Pattern):
         return self.pattern_fun(fixture, af, self.map, color, pos_s, pos_e)
 
     def __str__(self) -> str:
-        return (
-            self.pattern_fun.__name__
-            if hasattr(self.pattern_fun, "__name__")
-            else str(self.pattern_fun)
-        )
+        if hasattr(self.pattern_fun, "__name__"):
+            return self.pattern_fun.__name__
+
+        return str(self.pattern_fun)

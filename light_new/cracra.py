@@ -1,7 +1,8 @@
+import numpy as np
+
 from typing import Literal
 
 from light_new.fixture.fixture import Fixture, FixtureConfigBase
-import numpy as np
 
 
 class CracraConfig(FixtureConfigBase):
@@ -30,7 +31,6 @@ class Cracra(Fixture):
                 f"{i}_strobe": 0,
             }.items()
         }
-
         super().__init__(config)
 
     def init_params(self):

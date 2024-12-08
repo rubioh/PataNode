@@ -1,18 +1,12 @@
-import time
-import numpy as np
 import cv2
-from os.path import dirname, basename, isfile, join
+import numpy as np
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Effects
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, name_to_opcode
 
 
 OP_CODE_DOG = name_to_opcode("DoGDoG")
@@ -48,6 +42,7 @@ class DoG(ProgramBase):
         rfbos = 3
         self.required_fbos = rfbos
         fbos_specification = [[self.win_size, 4, "f4"] for i in range(rfbos)]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -236,12 +231,17 @@ class DoGNode(ShaderNode, Effects):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         input_nodes = self.getShaderInputs()
+
         if len(input_nodes) < 2:
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         sst = input_nodes[1].render(audio_features)
+
         if texture is None or sst is None:
             return self.program.norender()
+
         output_texture = self.program.render([texture, sst], audio_features)
         return output_texture

@@ -1,8 +1,3 @@
-from os.path import dirname, basename, isfile, join
-import os
-import inspect
-import traceback
-
 from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QRectF
 from PyQt5.QtWidgets import QLabel, QMessageBox
@@ -12,8 +7,6 @@ from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
-
-from program.program_conf import GLSLImplementationError, UnuseUniformError
 
 
 DEBUG = False
@@ -37,22 +30,24 @@ class AudioGraphicsNode(QDMGraphicsNode):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
         offset = 24.0
+
         if self.node.isDirty():
             offset = 0.0
+
         if self.node.isInvalid():
             offset = 48.0
 
-        painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
-        )
+        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
 
     def openDialog(self, msg):
         if isinstance(msg, list):
             msgs = ""
+
             for m in msg:
                 msgs += m
         else:
             msgs = msg
+
         dialog = QMessageBox()
         dialog.setText(msgs)
         dialog.exec()
@@ -79,9 +74,11 @@ class AudioNode(Node):
 
         self.value = None  # Using to store output texture reference
         self.program = None
+
         # Current OpenGL ctx
         self.ctx = scene.ctx
-        # it's really important to mark all nodes Dirty by default
+
+        # It's really important to mark all nodes Dirty by default
         self.markDirty()
 
     def initSettings(self):
@@ -92,6 +89,7 @@ class AudioNode(Node):
     def evalInputNodes(self):
         # TODO Several Textures test
         input_node = self.getInput(0)
+
         if not input_node:
             self.grNode.setToolTip("Input is not connected")
             self.markInvalid()
@@ -109,13 +107,12 @@ class AudioNode(Node):
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
             if DEBUG:
-                print(
-                    " _> returning cached %s value:" % self.__class__.__name__,
-                    self.value,
-                )
+                print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+
             return self.value
+
         try:
-            success = self.evalImplementation()
+            _ = self.evalImplementation()
             return self.value
         except Exception as e:
             self.markInvalid()
@@ -125,13 +122,13 @@ class AudioNode(Node):
     def onInputChanged(self, socket=None):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__)
+
         self.markDirty()
         self.eval()
 
     def serialize(self):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
-
         return res
 
     def deserialize(self, data, hashmap={}, restore_id=True):

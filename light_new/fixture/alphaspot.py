@@ -1,7 +1,7 @@
 from typing import Literal
 
 from light_new.fixture.fixture import Fixture
-from light_new.fixture.mixin import Lyre, CMY, PhysicalPositionFixtureConfig
+from light_new.fixture.mixin import CMY, Lyre, PhysicalPositionFixtureConfig
 
 
 class AlphaspotConfig(PhysicalPositionFixtureConfig):

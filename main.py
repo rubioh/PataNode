@@ -1,10 +1,11 @@
 import argparse
 import sys
 
+from PyQt5.QtWidgets import QApplication
+
 # Note: This import is here to avoid a circular import
 import program.program_conf # noqa: F401
 
-from PyQt5.QtWidgets import QApplication
 from app import PataShade
 
 if __name__ == "__main__":

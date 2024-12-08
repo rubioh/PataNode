@@ -1,13 +1,11 @@
-import pygltflib
 import glm
-import numpy as np
-from program.mesh_renderer.mesh_resource_manager import (
-    MeshResourceManager,
-    TextureResourceManager,
-)
-from program.mesh_renderer.renderer import render
+import pygltflib # type: ignore[import-untyped]
+
 from program.mesh_renderer.material import Material
+from program.mesh_renderer.mesh_resource_manager import MeshResourceManager, TextureResourceManager
+from program.mesh_renderer.renderer import render
 from program.mesh_renderer.texture_loader import load_texture_from_gltf
+
 
 # TODO: separate gltf loading in another file
 # TODO: create a retained renderer
@@ -18,7 +16,7 @@ class Texture:
         self.textureResourceIndex = textureResourceIndex
         self.sampler = sampler
 
-    def __str__():
+    def __str__(self):
         return str(self.textureResourceIndex + self.sampler)
 
 
@@ -68,6 +66,7 @@ class MeshScene:
         self.ctx = ctx
         self.mesh_resource_manager = MeshResourceManager(ctx)
         self.texture_resource_manager = TextureResourceManager(ctx)
+
         if file_path:
             self.load_scene(file_path)
 
@@ -90,13 +89,16 @@ class MeshScene:
 
         if gltfNode.matrix:
             m = gltfNode.matrix
+
         return m
 
     def load_node(self, gltfNode):
         transform = self.load_transform(gltfNode)
         mesh_resource_indices = []
+
         for idx in self.mesh_indices[gltfNode.mesh]:
             mesh_resource_indices.append(idx)
+
         n = Node(transform, mesh_resource_indices, gltfNode.children, gltfNode.name)
         return n
 
@@ -111,11 +113,12 @@ class MeshScene:
         index = bufferView.byteOffset + accessor.byteOffset
         d = data[index : index + bufferView.byteLength]
         return d
-        return np.array(d)
+#       return np.array(d)
 
     def load_meshes(self, gltf):
         for mesh in gltf.meshes:
             prim_mesh_indices = []
+
             for primitive in mesh.primitives:
                 accessors = [
                     primitive.attributes.POSITION,
@@ -126,23 +129,29 @@ class MeshScene:
                     primitive.attributes.TANGENT,
                 ]
                 buffers = []
+
                 for accessorID in accessors:
                     if accessorID is not None:
                         accessor = gltf.accessors[accessorID]
                         buffers.append(self.convert_accessor_to_list(gltf, accessor))
                     else:
                         buffers.append(None)
+
                 indice_type_size = 4
 
-                # if the numbers of indices is < 65535, the component type is gonna be 2 bytes long
-                # 5123 is opengl code for unsigned short
+                # If the numbers of indices is < 65535, the component type is
+                # going to be 2 bytes long.
+                # 5123 is opengl code for "unsigned short"
                 if gltf.accessors[primitive.indices].componentType == 5123:
                     indice_type_size = 2
+
                 material = None
+
                 if primitive.material is not None:
                     material = self.materials[primitive.material]
                 else:
                     material = Material(self.texture_resource_manager)
+
                 prim_mesh_indices.append(
                     self.mesh_resource_manager.create_mesh(
                         buffers[0],
@@ -155,6 +164,7 @@ class MeshScene:
                         material,
                     )
                 )
+
             self.mesh_indices.append(prim_mesh_indices)
 
     def load_materials(self, gltf):
@@ -197,9 +207,11 @@ class MeshScene:
         self.load_materials(gltf)
         self.load_meshes(gltf)
         self.load_nodes(gltf)
-        # print(gltf)
-        # 		for n in self.dag:
-        # 			print(n)
+#       print(gltf)
+#
+#       for n in self.dag:
+#           print(n)
+#
         del gltf
 
     def clone(self):
@@ -218,11 +230,13 @@ class MeshScene:
                 self.mesh_resource_manager,
                 self.texture_resource_manager,
             )
+
         for child in node.children:
             self.render_node(self.dag[child], matrix, mvp_uniform, surface)
 
     def render_scene(self, model, view, projection, surface):
         mvp_uniform = {"model": model, "view": view, "projection": projection}
+
         for scene in self.root_nodes:
             for node_idx in scene.nodes:
                 node = self.dag[node_idx]

@@ -1,14 +1,10 @@
-import time
-import numpy as np
-import copy
-
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
 
 def name_to_opcode(name):
-    l = [ord(char) for char in name]
-    return hash(name)
+    lst = [ord(char) for char in name]
+    return hash(lst)
 
 
 OP_CODE_INPUTAF = name_to_opcode("input_af")

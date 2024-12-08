@@ -1,16 +1,16 @@
-import time
 import copy
 import os
-import traceback
 import sys
+import time
+import traceback
 
-from PyQt5.QtGui import QImage
 from PyQt5.QtCore import QRectF
+from PyQt5.QtGui import QImage
 from PyQt5.QtWidgets import QLabel, QMessageBox
 
-from nodeeditor.node_node import Node
 from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
+from nodeeditor.node_node import Node
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
@@ -38,22 +38,24 @@ class ShaderGraphicsNode(QDMGraphicsNode):
         super().paint(painter, QStyleOptionGraphicsItem, widget)
 
         offset = 24.0
+
         if self.node.isDirty():
             offset = 0.0
+
         if self.node.isInvalid():
             offset = 48.0
 
-        painter.drawImage(
-            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
-        )
+        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
 
     def openDialog(self, msg):
         if isinstance(msg, list):
             msgs = ""
+
             for m in msg:
                 msgs += m
         else:
             msgs = msg
+
         dialog = QMessageBox()
         dialog.setText(msgs)
         dialog.exec()
@@ -76,16 +78,18 @@ class ShaderNode(Node):
     NodeContent_class = ShaderContent
 
     def __init__(self, scene, inputs=[2, 2], outputs=[1]):
-        # inputs = [0] + inputs
+#       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
         self.value = None  # Using to store output texture reference
         self.program = None
         self._container = None # GraphContainer reference
         self._win_size = (1920, 1080)
+
         # Current OpenGL ctx
         self.ctx = scene.ctx
-        # it's really important to mark all nodes Dirty by default
+
+        # It's really important to mark all nodes Dirty by default
         self.markDirty()
 
         # Evaluation Logics for loop in Graph
@@ -100,12 +104,9 @@ class ShaderNode(Node):
     @container.setter
     def container(self, value):
         if DEBUG:
-            print(
-                "ShaderNode::container.setter bind container ",
-                value,
-                "to ShaderNode",
-                self.__class__.__name__,
-            )
+            print("ShaderNode::container.setter bind container", value, "to ShaderNode",
+                  self.__class__.__name__)
+
         self._container = value
 
     @property
@@ -146,9 +147,10 @@ class ShaderNode(Node):
 
     def reload_program(self):
         state = self.serialize()
-
         program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
+
         del self.program
+
         self.program = program
 
         self.deserialize(state, restore_window_size=False)
@@ -158,16 +160,19 @@ class ShaderNode(Node):
     def getCpuAdaptableParameters(self):
         if self.program is not None:
             return self.program.getCpuAdaptableParameters()
+
         return None
 
     def getGpuAdaptableParameters(self):
         if self.program is not None:
             return self.program.getGpuAdaptableParameters()
+
         return None
 
     def getUniformsBinding(self):
         if self.program is not None:
             return self.program.getUniformsBinding()
+
         return None
 
     def initSettings(self):
@@ -182,76 +187,80 @@ class ShaderNode(Node):
         self, win_sizes, components=None, dtypes=None, depth=None, num_textures=None
     ):
         if self.program.fbos is not None:
-            # fbos already connected
+            # FBOs already connected
             return True
-        fbos = self.scene.fbo_manager.getFBO(
-            win_sizes, components, dtypes, depth, num_textures
-        )
+
+        fbos = self.scene.fbo_manager.getFBO(win_sizes, components, dtypes, depth, num_textures)
+
         try:
             self.program.connectFbos(fbos)
         except AssertionError:
-            print(
-                "Created fbos doesn't match the number of required fbos for %s"
-                % self.program.__class__.__name__
-            )
+            print("Created fbos doesn't match the number of required fbos for %s"
+                  % self.program.__class__.__name__)
+
             self.grNode.setToolTip("No fbo's found")
             self.markInvalid()
             return False
+
         return True
 
     def evalInputNodes(self):
         if DEBUG:
             print("Eval Inputs:", self)
-        # TODO Several Textures test
+
+        # TODO: test with several textures
         input_nodes = self.getShaderInputs()
+
         if not input_nodes:
             self.grNode.setToolTip("Input is not connected")
             self.markInvalid()
             return None
-        else:
-            textures = []
-            for input_node in input_nodes:
+
+        textures = []
+
+        for input_node in input_nodes:
+            if DEBUG:
+                print(f"\t Node: {self} evaluate Input Node {input_node}")
+
+            if input_node.evaluate:
+                texture = input_node.program.norender()
+
                 if DEBUG:
-                    print(f"\t Node: {self} evaluate Input Node {input_node}")
-                if input_node.evaluate:
-                    texture = input_node.program.norender()
-                    if DEBUG:
-                        print(
-                            f"\t\t ALREADY EVALUATE Input Node: {input_node} with texture {texture}"
-                        )
-                    textures.append(input_node.program.norender())
-                else:
-                    texture = input_node.eval()
-                    if DEBUG:
-                        print(
-                            f"\t\t EVALUATE Input Node: {input_node} with texture {texture}"
-                        )
-                    textures.append(texture)
-            if len(textures) != len(self.inputs):
-                self.grNode.setToolTip("Input is not connected")
-                self.markInvalid()
-                return None
-            return textures
+                    print(f"\t\t ALREADY EVALUATE Input Node: {input_node} with texture {texture}")
+
+                textures.append(input_node.program.norender())
+            else:
+                texture = input_node.eval()
+
+                if DEBUG:
+                    print(f"\t\t EVALUATE Input Node: {input_node} with texture {texture}")
+
+                textures.append(texture)
+
+        if len(textures) != len(self.inputs):
+            self.grNode.setToolTip("Input is not connected")
+            self.markInvalid()
+            return None
+
+        return textures
 
     def getShaderInputs(self):
         sockets = self.inputs
         ins = []
+
         for i, sockets in enumerate(sockets):
             ins += super().getInputs(i)
+
         return ins
 
     def evalRendering(self, textures=None):
         try:
             output_texture = self.program.render(textures)
+
             if DEBUG:
-                print(
-                    "ShaderNode::evalRendering output_texture is ",
-                    output_texture,
-                    "from ShaderNode",
-                    self,
-                    "of class",
-                    self.__class__.__name__,
-                )
+                print("ShaderNode::evalRendering output_texture is ", output_texture,
+                      "from ShaderNode", self, "of class", self.__class__.__name__)
+
             self.value = output_texture
             return True
         except Exception as e:
@@ -261,58 +270,70 @@ class ShaderNode(Node):
             print("Error during rendering")
             self.value = None
             return False
+
         return True
 
     def evalImplementation(self):
         if DEBUG:
             print("Eval Implementation:", self)
-        # Find and Connect required fbos
+
+        # Find and connect required FBOs
         win_sizes, components, dtypes, depth_requirements, num_texture = (
             self.program.getFBOSpecifications()
         )
         success = self.findAndConnectFbos(
             win_sizes, components, dtypes, depth_requirements, num_texture
         )
+
         if not success:
             return False
 
         # Eval Input Node
         inputs = []
+
         for ins in self.inputs:
             if ins.socket_type == 0:  # socket_type 0 means audio_input
                 continue
+
             inputs.append(ins)
+
         if inputs:
             inputs_texture = self.evalInputNodes()
+
             if inputs_texture is None:
                 return False
+
             for input_texture in inputs_texture:
                 success = self.evalRendering(inputs_texture)
         else:
             success = self.evalRendering()
+
         # Eval Rendering
         if success:
             self.markInvalid(False)
             self.markDirty(False)
             self.grNode.setToolTip("")
             return True
+
         return False
 
     def eval(self):
         if DEBUG:
             print("Eval:", self)
+
         if not self.isDirty() and not self.isInvalid():
             if DEBUG:
-                print(
-                    " _> returning cached %s value:" % self.__class__.__name__,
-                    self.value,
-                )
+                print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+
             return self.value
+
         self.setInputNodeToInEvaluation()
+
         try:
             if DEBUG:
                 print("Eval Try", self)
-            success = self.evalImplementation()
+
+            _ = self.evalImplementation()
             return self.value
         except ValueError as e:
             self.markInvalid()
@@ -327,11 +348,14 @@ class ShaderNode(Node):
         self.in_evaluation = True
         self.evaluate = False
         t = time.time()
+
         if t - self.previous_evaluation_time > 2:
             self.previous_evaluation_time = t
             input_nodes = self.getShaderInputs()
+
             for node in input_nodes:
                 node.setInputNodeToInEvaluation()
+
             if DEBUG:
                 print(f"{self} in evaluation:", self.in_evaluation)
         else:
@@ -340,12 +364,14 @@ class ShaderNode(Node):
     def onInputChanged(self, socket=None):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__)
+
         self.markDirty()
         self.eval()
 
     def reloadGLSLCode(self):
         if DEBUG:
             print("Program before reloading is: ", self.program.program)
+
         try:
             self.program.reloadProgramSafely()
             self.markDirty()
@@ -361,6 +387,7 @@ class ShaderNode(Node):
             self.grNode.setToolTip("Unuse Uniform Error")
             self.grNode.openDialog(traceback.format_exception(e))
             self.program.reloadPreviousProgramVersion()
+
         if DEBUG:
             print("Program after reloading is: ", self.program.program)
 
@@ -394,22 +421,23 @@ class ShaderNode(Node):
     def serialize(self):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
-
         adapt_params = copy.deepcopy(self.getCpuAdaptableParameters())
+
         for program in adapt_params.keys():
             program_params = adapt_params[program]
+
             for uniform in program_params.keys():
                 del program_params[uniform]["eval_function"]["connect"]
 
         res["cpu_adaptable_parameters"] = adapt_params
-
         adapt_params = copy.deepcopy(self.getGpuAdaptableParameters())
+
         for program in adapt_params.keys():
             program_params = adapt_params[program]
+
             for uniform in program_params.keys():
                 del program_params[uniform]["eval_function"]["connect"]
 
-        
         res["gpu_adaptable_parameters"] = adapt_params
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
         res["uniforms_binding"] = uniforms_binding
@@ -432,18 +460,23 @@ class ShaderNode(Node):
 
         adapt_params = data["gpu_adaptable_parameters"]
         gpu_node_params = self.getGpuAdaptableParameters()
+
         for program in adapt_params.keys():
             program_params = adapt_params[program]
+
             for uniform in program_params.keys():
                 eval_func = program_params[uniform]["eval_function"]["value"]
                 gpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
 
         uniforms_binding = data["uniforms_binding"]
         self.program.restoreUniformsBinding(uniforms_binding)
+
         if DEBUG:
             print("Deserialized ShaderNode '%s'" % self.__class__.__name__, "res:", res)
+
         if restore_window_size and "win_size" in data.keys():
             self.changeWindowSize(data["win_size"])
+
         return res
 
 class Utils:

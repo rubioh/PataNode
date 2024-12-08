@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Utils
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_RECONSTRUCT = name_to_opcode("Reconstruct")
@@ -33,6 +25,7 @@ class Reconstruct(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -71,8 +64,10 @@ class Reconstruct(ProgramBase):
 
     def render(self, af=None):
         self.updateParams(af)
-        if self.texture1 == None or self.texture2 == None:
+
+        if self.texture1 is None or self.texture2 is None:
             return self.fbos[0].color_attachments[0]
+
         self.bindUniform(af)
         self.texture1.use(1)
         self.texture2.use(2)
@@ -100,7 +95,9 @@ class ReconstructNode(ShaderNode, Utils):
         input_nodes = self.getShaderInputs()
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
+
         print("frame:", self.program.frame)
+
         if self.program.frame % 2:
             self.program.texture1 = input_nodes[0].render(audio_features, 0)
             print("oui")
@@ -108,7 +105,7 @@ class ReconstructNode(ShaderNode, Utils):
             self.program.texture2 = input_nodes[0].render(audio_features, 1)
             print("non")
 
-        if self.program.texture1 == None or self.program.texture2 == None:
+        if self.program.texture1 is None or self.program.texture2 is None:
             self.program.texture1 = input_nodes[0].render(audio_features, 0)
             self.program.texture2 = input_nodes[0].render(audio_features, 0)
 
