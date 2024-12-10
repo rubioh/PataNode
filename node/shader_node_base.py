@@ -418,13 +418,17 @@ class ShaderNode(Node):
 
     def deserialize(self, data, hashmap={}, restore_id=True, restore_window_size=True):
         res = super().deserialize(data, hashmap, restore_id)
-        adapt_params = data["cpu_adaptable_parameters"]
-        cpu_node_params = self.getCpuAdaptableParameters()
-        for program in adapt_params.keys():
-            program_params = adapt_params[program]
-            for uniform in program_params.keys():
-                eval_func = program_params[uniform]["eval_function"]["value"]
-                cpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
+
+        if "cpu_adaptable_parameters" in data.keys():
+            adapt_params = data["cpu_adaptable_parameters"]
+            cpu_node_params = self.getCpuAdaptableParameters()
+            for program in adapt_params.keys():
+                program_params = adapt_params[program]
+                for uniform in program_params.keys():
+                    eval_func = program_params[uniform]["eval_function"]["value"]
+                    cpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
+        else:
+            cpu_node_params[program] = {}
 
         adapt_params = data["gpu_adaptable_parameters"]
         gpu_node_params = self.getGpuAdaptableParameters()
@@ -432,6 +436,8 @@ class ShaderNode(Node):
             program_params = adapt_params[program]
             for uniform in program_params.keys():
                 eval_func = program_params[uniform]["eval_function"]["value"]
+                if not program in gpu_node_params:
+                    breakpoint()
                 gpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
 
         uniforms_binding = data["uniforms_binding"]
