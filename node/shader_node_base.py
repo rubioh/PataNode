@@ -436,8 +436,6 @@ class ShaderNode(Node):
             program_params = adapt_params[program]
             for uniform in program_params.keys():
                 eval_func = program_params[uniform]["eval_function"]["value"]
-                if not program in gpu_node_params:
-                    breakpoint()
                 gpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
 
         uniforms_binding = data["uniforms_binding"]
