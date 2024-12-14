@@ -3,8 +3,7 @@ from node.node_conf import register_node
 
 
 def name_to_opcode(name):
-    lst = [ord(char) for char in name]
-    return hash(lst)
+    return hash(name)
 
 
 OP_CODE_INPUTAF = name_to_opcode("input_af")
