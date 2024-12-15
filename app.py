@@ -100,6 +100,8 @@ class PataShadeApp(PataNode):
             af["on_hat"] = 1 if self.last_hat_count != af["hat_count"] else 0
             af["on_snare"] = 1 if self.last_snare_count != af["snare_count"] else 0
             self._last_audio_features = af
+        except KeyboardInterrupt as exc:
+            raise exc
         except Exception:
             pass
 

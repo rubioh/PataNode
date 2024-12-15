@@ -20,9 +20,15 @@ class Screen(ProgramBase):
         self.initParams()
 
     def initProgram(self, reload=False):
+        if reload:
+            return
+
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "screen.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
+
+    def initUniformsBinding(self):
+        super().initUniformsBinding(binding, program_name="")
 
     def initParams(self):
         pass

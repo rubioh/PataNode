@@ -55,7 +55,6 @@ class ShaderGraphicsNode(QDMGraphicsNode):
                 msgs += m
         else:
             msgs = msg
-
         dialog = QMessageBox()
         dialog.setText(msgs)
         dialog.exec()
