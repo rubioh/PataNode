@@ -90,7 +90,7 @@ class PataNode(NodeEditorWindow):
         self.mapsubwnd.hide()
 
     def initShaderWidget(self):
-        self.gl_widget = ShaderWidget(self, self.audio_engine)
+        self.gl_widget = ShaderWidget(self)
         self.ctx = self.gl_widget.ctx
         self.gl_widget.hide()
 
