@@ -50,6 +50,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         for node in self.scene.nodes:
             if isinstance(node, ScreenNode):
                 self.screen_node = node
+                break
 
     def render(self, audio_features=None):
         if self.screen_node is None:

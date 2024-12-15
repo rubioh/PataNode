@@ -29,9 +29,8 @@ DEBUG = False
 
 
 class PataNode(NodeEditorWindow):
-
-    def __init__(self, audio_engine=None):
-        self.audio_engine = audio_engine
+    def __init__(self):
+        # Calls initUI
         super().__init__()
 
     def initUI(self):
@@ -83,7 +82,7 @@ class PataNode(NodeEditorWindow):
 
         self.setWindowTitle("PataNode")
         self.initMapWindow()
-        self.current_program = None
+        self.current_node_editor_widget = None
 
     def initMapWindow(self):
         self.mapsubwnd = PataNodeMappingWindow(self)
@@ -112,12 +111,12 @@ class PataNode(NodeEditorWindow):
 
     def render(self, audio_features=None):
         # TODO: logic for choosing the rendering program
-        if self.current_program is None:
-            self.current_program = self.getCurrentNodeEditorWidget()
+        if self.current_node_editor_widget is None:
+            self.current_node_editor_widget = self.getCurrentNodeEditorWidget()
 
-        if self.current_program is not None:
-            self.current_program.render(audio_features)
-            self.last_main_colors = self.current_program.getLastMainColors()
+        if self.current_node_editor_widget is not None:
+            self.current_node_editor_widget.render(audio_features)
+            self.last_main_colors = self.current_node_editor_widget.getLastMainColors()
 
         if DEBUG:
             print("PataNode::render  No NodeEditorWidget detected, please set a new node scene")
@@ -216,6 +215,7 @@ class PataNode(NodeEditorWindow):
         self.gl_widget.hide()
 
     def showShaderWindow(self):
+        self.current_node_editor_widget = None
         self.gl_widget.showFullScreen()
 
     def hideAudioLogWindow(self):

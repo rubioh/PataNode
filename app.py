@@ -29,12 +29,11 @@ class Worker(QRunnable):
         self.signals.finished.emit()
 
 
-class PataShade(PataNode):
+class PataShadeApp(PataNode):
     def __init__(self):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
         super().__init__()
-        keyboard.add_hotkey("enter", self.light_engine.force_strobe.activate_10)
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
@@ -100,9 +99,6 @@ class PataShade(PataNode):
             af["on_kick"] = 1 if self.last_kick_count != af["kick_count"] else 0
             af["on_hat"] = 1 if self.last_hat_count != af["hat_count"] else 0
             af["on_snare"] = 1 if self.last_snare_count != af["snare_count"] else 0
-#           last_kick_count = af["kick_count"]
-#           last_hat_count = af["hat_count"]
-#           last_snare_count = af["snare_count"]
             self._last_audio_features = af
         except Exception:
             pass

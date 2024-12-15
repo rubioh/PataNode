@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QApplication
 # Note: This import is here to avoid a circular import
 import program.program_conf # noqa: F401
 
-from app import PataShade
+from app import PataShadeApp
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="PataNode", description="The node-oriented shader manager")
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setStyle("Fusion")
 
-    patanode = PataShade()
+    patanode = PataShadeApp()
     patanode.show()
 
     if args.open:
