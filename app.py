@@ -33,7 +33,7 @@ class PataShadeApp(PataNode):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
         super().__init__()
-        keyboard.add_hotkey("enter", self.light_engine.force_strobe.activate_10)
+        #keyboard.add_hotkey("enter", self.light_engine.force_strobe.activate_10)
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
