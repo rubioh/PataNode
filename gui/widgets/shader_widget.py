@@ -8,7 +8,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def __init__(
         self,
         app,
-        audio_engine=None,
         title="GL Widget",
         gl_version=(3, 3),
         size=(1280, 720),
@@ -17,7 +16,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     ):
         self.app = app
         self.app.setShaderWidget(self)
-        self.audio_engine = audio_engine
         self._title = title
         self.gl_version = gl_version
         self.width, self.height = int(size[0]), int(size[1])
