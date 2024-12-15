@@ -62,7 +62,7 @@ class QDMInspector(QWidget):
         checkbox.setChecked(bool(properties["value"]))
         connect = properties["connect"]
 
-        def fine_connect():
+        def fine_connect(v):
             connect(int(checkbox.isChecked()))
 
         checkbox.toggled.connect(fine_connect)

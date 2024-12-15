@@ -450,13 +450,13 @@ class ShaderNode(Node):
         if "cpu_adaptable_parameters" in data.keys():
             adapt_params = data["cpu_adaptable_parameters"]
             cpu_node_params = self.getCpuAdaptableParameters()
+
             for program in adapt_params.keys():
                 program_params = adapt_params[program]
+
                 for uniform in program_params.keys():
                     eval_func = program_params[uniform]["eval_function"]["value"]
                     cpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
-        else:
-            cpu_node_params[program] = {}
 
         adapt_params = data["gpu_adaptable_parameters"]
         gpu_node_params = self.getGpuAdaptableParameters()
@@ -469,6 +469,7 @@ class ShaderNode(Node):
                 gpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
 
         uniforms_binding = data["uniforms_binding"]
+
         self.program.restoreUniformsBinding(uniforms_binding)
 
         if DEBUG:
@@ -478,6 +479,7 @@ class ShaderNode(Node):
             self.changeWindowSize(data["win_size"])
 
         return res
+
 
 class Utils:
     node_type_reference = "Utils"
@@ -514,9 +516,9 @@ class Particles:
 class Gate:
     node_type_reference = "Gate"
 
+
 class Map:
     node_type_reference = "Mapping"
-
 
 
 class Physarum:
