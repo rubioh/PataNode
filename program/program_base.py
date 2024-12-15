@@ -178,7 +178,6 @@ class ProgramBase:
             vert = "\n"
 
         self.initUniformsForProgram(frag + vert, name, reload)
-#       self.initUniformsForProgram(frag+vert, name, reload)
 
         if reload:
             self.reloadUniformsBinding(None, name)
@@ -204,6 +203,7 @@ class ProgramBase:
     def releasePreviousProgramVersion(self):
         for key, program in self.previous_programs.items():
             program.release()
+
         for key, vao in self.previous_vaos.items():
             vao.release()
 

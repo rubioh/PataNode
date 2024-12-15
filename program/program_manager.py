@@ -51,12 +51,12 @@ class FBOManager:
             print("getFBOs:: in current FBOs :", self.current_fbos)
             print("getFBOs:: in current in_use:", self.in_use_fbos)
 
-        hashmaps = self.getHashmaps(win_sizes, components, dtypes, depth_requirements, num_textures)
-#       returned_fbos = [None for i in range(len(hashmaps))]
-        returned_fbos = self.checkForExistingFBOs(hashmaps)
+        hashes = self.getHashes(win_sizes, components, dtypes, depth_requirements, num_textures)
+#       returned_fbos = [None for i in range(len(hashes))]
+        returned_fbos = self.checkForExistingFBOs(hashes)
 
         for i in range(len(win_sizes)):
-            current_hashmap = hashmaps[i]
+            current_hash= hashes[i]
 
             if returned_fbos[i] is not None:
                 continue
@@ -93,33 +93,34 @@ class FBOManager:
 
             returned_fbos[i] = new_fbo
 
-            if current_hashmap not in self.current_fbos.keys():
-                self.current_fbos[current_hashmap] = []
-                self.in_use_fbos[current_hashmap] = []
+            if current_hash not in self.current_fbos.keys():
+                self.current_fbos[current_hash] = []
+                self.in_use_fbos[current_hash] = []
 
-            self.current_fbos[current_hashmap].append(new_fbo)
-            self.in_use_fbos[current_hashmap].append(1)
+            self.current_fbos[current_hash].append(new_fbo)
+            self.in_use_fbos[current_hash].append(1)
 
         if DEBUG:
             print("getFBOs:: out current FBOs:", self.current_fbos)
             print("getFBOs:: out current in_use:", self.in_use_fbos)
-
+        print(self.current_fbos)
+        print(self.in_use_fbos)
         return returned_fbos
 
-    def checkForExistingFBOs(self, hashmaps):
-        returned_fbos = [None for i in range(len(hashmaps))]
+    def checkForExistingFBOs(self, hashes):
+        returned_fbos = [None for i in range(len(hashes))]
 
         if DEBUG:
-            print("checkForExistingFBOs:: Current hashmap:", hashmaps,
+            print("checkForExistingFBOs:: Current hashmap:", hashes,
                   "\nCurrent fbos", self.current_fbos.keys())
 
-        for i, hashmap in enumerate(hashmaps):
-            if hashmap in self.current_fbos.keys():
-                for j, fbo in enumerate(self.current_fbos[hashmap]):
+        for i, current_hash in enumerate(hashes):
+            if current_hash in self.current_fbos.keys():
+                for j, fbo in enumerate(self.current_fbos[current_hash]):
                     # In use logic
-                    if not self.in_use_fbos[hashmap][j]:
-                        returned_fbos[i] = self.current_fbos[hashmap][j]
-                        self.in_use_fbos[hashmap][j] = 1
+                    if not self.in_use_fbos[current_hash][j]:
+                        returned_fbos[i] = self.current_fbos[current_hash][j]
+                        self.in_use_fbos[current_hash][j] = 1
                         break
 
         if DEBUG:
@@ -127,8 +128,8 @@ class FBOManager:
 
         return returned_fbos
 
-    def getHashmaps(self, win_sizes, components=None, dtypes=None, depths=None, num_textures=None):
-        hashmaps = list()
+    def getHashes(self, win_sizes, components=None, dtypes=None, depths=None, num_textures=None):
+        hashes = list()
 
         for i, win_size in enumerate(win_sizes):
             if components is not None:
@@ -151,17 +152,17 @@ class FBOManager:
             else:
                 num_texture = 1
 
-            hashmap = self.propertiesToHashmap(win_size, component, dtype, depth, num_texture)
-            hashmaps.append(hashmap)
+            current_hash = self.propertiesToHash(win_size, component, dtype, depth, num_texture)
+            hashes.append(current_hash)
 
-        return hashmaps
+        return hashes
 
-    def propertiesToHashmap(self, win_size, component, dtype, depth, num_texture):
-        hashmap = str(win_size[0] + win_size[1] * 10000)
-        hashmap += str(component)
+    def propertiesToHash(self, win_size, component, dtype, depth, num_texture):
+        current_hash = str(win_size[0] + win_size[1] * 10000)
+        current_hash += str(component)
         dtype_to_int = [ord(c) for c in dtype]
-        hashmap += str(sum(dtype_to_int))
-        hashmap += str(depth)
-        hashmap += str(num_texture)
-        hashmap = int(hashmap)
-        return hashmap
+        current_hash += str(sum(dtype_to_int))
+        current_hash += str(depth)
+        current_hash += str(num_texture)
+        current_hash = int(current_hash)
+        return current_hash
