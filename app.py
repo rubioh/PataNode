@@ -9,7 +9,6 @@ from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 from gui.patanode import PataNode
 from light.light import LightEngine
 #from light_new import LightEngine
-import time
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -95,10 +94,14 @@ class PataShadeApp(PataNode):
 
     def set_audio_features(self):
         af = copy.deepcopy(self.audio_engine.features)
+
         try:
             af["on_kick"] = 1 if self.last_kick_count != af["kick_count"] else 0
             af["on_hat"] = 1 if self.last_hat_count != af["hat_count"] else 0
             af["on_snare"] = 1 if self.last_snare_count != af["snare_count"] else 0
+            self.last_kick_count = af["kick_count"]
+            self.last_hat_count = af["hat_count"]
+            self.last_snare_count = af["snare_count"]
             self._last_audio_features = af
         except KeyboardInterrupt as exc:
             raise exc
