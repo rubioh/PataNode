@@ -65,10 +65,13 @@ class ScreenNode(ShaderNode, Output):
 
     def restoreFBODependencies(self):
         self.scene.fbo_manager.restoreFBOUsability()
+
         for node in self.scene.nodes:
             node.markDirty()
+
             if node != self:
                 node.restoreFBODependencies()
+
         self.eval()
 
     def evalImplementation(self):
@@ -95,7 +98,7 @@ class ScreenNode(ShaderNode, Output):
 
     def render(self, audio_features=None):
         for node in self.scene.nodes:
-            if isinstance(node, ShaderNode) and node is not None:
+            if isinstance(node, ShaderNode):
                 node.already_called = False
 
             if isinstance(node, PredominantColorNode):
