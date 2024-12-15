@@ -167,7 +167,7 @@ class QDMInspector(QWidget):
         vbox = QVBoxLayout()
         parameter_window = self.createParametersWindow(parameters_informations)
         vbox.addWidget(parameter_window)
-        vbox.sizeHint = lambda: QSize(450, 500)
+        vbox.sizeHint = lambda: QSize(450, 150)
         groupBox.setLayout(vbox)
         self.grid.addWidget(groupBox)
         self.grid.insertStretch(-1, -1)
@@ -351,6 +351,10 @@ class UniformWidget(QTabWidget):
         return list_widget
 
     def getToolButtonWidget(self, uniform_name, program_name):
+        """
+        Create a widget comprised of a Menu in which each element is bound to
+        an audio feature and a callback that will apply the audio features binding
+        """
         if self.uniforms_informations[program_name][uniform_name]["type"] is None:
             current_param = "default"
         else:
