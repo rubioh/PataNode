@@ -41,7 +41,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
         # Attach to the context
         self.init_mgl_context()
-        self.initQTimer()
         self.set_default_viewport()
 
         # Audio features parameters
@@ -96,16 +95,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.fmt.setStencilBufferSize(8)
         self.fmt.setDoubleBuffer(True)
         self.fmt.setSwapInterval(1 if self._vsync else 0)
-
-    def initQTimer(self):
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.app.start_shader_jobs)
-#       self.timer.timeout.connect(self.update)
-#       self.timer.start(int(1/60*1000))
-
-#   def set_default_viewport(self):
-#       self._viewport = (0, 0, self._buffer_width, self._buffer_height)
-#       self._ctx.screen.viewport = self._viewport
 
     def init_mgl_context(self):
         self._ctx = moderngl.create_context(self.gl_version[0] * 100 + self.gl_version[1])

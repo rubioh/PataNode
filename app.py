@@ -9,7 +9,7 @@ from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 from gui.patanode import PataNode
 from light.light import LightEngine
 #from light_new import LightEngine
-
+import time
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -40,6 +40,7 @@ class PataShade(PataNode):
 
         self.initAudioTimer()
         self.initLightTimer()
+        self.initShaderQTimer()
 
         # Features for light new engine
         self._last_main_colors = np.zeros(3)
@@ -77,6 +78,10 @@ class PataShade(PataNode):
         self.light_timer = QTimer()
         self.light_timer.timeout.connect(self.start_light_jobs)
 
+    def initShaderQTimer(self):
+        self.shader_timer = QTimer()
+        self.shader_timer.timeout.connect(self.start_shader_jobs)
+
     # Audio thread
     def start_audio_jobs(self):
         worker = Worker(self.update_audio)
@@ -108,7 +113,6 @@ class PataShade(PataNode):
             self.light_engine.__call__(
                 color=self.last_main_colors, audio_features=self.last_audio_features
             )
-
         worker = Worker(job)
         worker.signals.finished.connect(self.on_light_job_finished)
         self.threadpool.start(worker)
@@ -131,11 +135,10 @@ class PataShade(PataNode):
     def start_jobs(self):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
-        self.shader_widget.timer.start(int(1 / 60 * 1000))
+        self.shader_timer.start(int(1 / 60 * 1000))
 
     def closeEvent(self, event):
         self.audio_timer.stop()
         self.light_timer.stop()
-        self.shader_widget.timer.stop()
-#       self.light_engine.exit()
+        self.shader_timer.stop()
         super().closeEvent(event)
