@@ -91,8 +91,6 @@ class AddAndDiffuseNode(ShaderNode, Physarum):
         self.eval()
 
     def render(self, audio_features=None):
-        print(self, self.already_called)
-
         if self.already_called:
             return self.program.norender()
 
