@@ -248,7 +248,7 @@ class ShaderNode(Node):
         sockets = self.inputs
         ins = []
 
-        for i, sockets in enumerate(sockets):
+        for i, _ in enumerate(sockets):
             ins += super().getInputs(i)
 
         return ins
