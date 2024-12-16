@@ -3,6 +3,7 @@ import copy
 
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject, QTimer
 
+from audio.audio_conf import list_audio_features
 from audio.audio_pipeline import AudioEngine
 from light.core import LightEngine
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
@@ -42,7 +43,7 @@ class PataShadeApp(PataNode):
 
         # Features for light new engine
         self._last_main_colors = np.zeros(3)
-        self._last_audio_features = np.zeros(3)
+        self._last_audio_features = {feature: 0 for feature in list_audio_features}
 
         # Audio features parameters
         self.last_kick_count = self.last_hat_count = self.last_snare_count = 0
