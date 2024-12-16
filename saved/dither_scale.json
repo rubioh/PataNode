@@ -28,7 +28,7 @@
             ],
             "content": {},
             "op_code": 1598,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -73,7 +73,7 @@
             ],
             "content": {},
             "op_code": 2,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -118,7 +118,7 @@
             "outputs": [],
             "content": {},
             "op_code": 1,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -171,7 +171,7 @@
             ],
             "content": {},
             "op_code": 960,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -224,7 +224,7 @@
             ],
             "content": {},
             "op_code": 958,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {

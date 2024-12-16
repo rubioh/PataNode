@@ -35,7 +35,7 @@
             ],
             "content": {},
             "op_code": 532,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "adf_program": {
                     "iTime": {
                         "eval_function": {
@@ -436,7 +436,7 @@
             ],
             "content": {},
             "op_code": 1259,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -485,7 +485,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -656,7 +656,7 @@
             ],
             "content": {},
             "op_code": 1405,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -764,7 +764,7 @@
             ],
             "content": {},
             "op_code": 533,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -842,7 +842,7 @@
             ],
             "content": {},
             "op_code": 323,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -972,7 +972,7 @@
             ],
             "content": {},
             "op_code": 797,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -1072,7 +1072,7 @@
             "outputs": [],
             "content": {},
             "op_code": 1,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -1117,7 +1117,7 @@
             ],
             "content": {},
             "op_code": 1735,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "draw_program": {
                     "modelview": {
                         "eval_function": {
@@ -1622,7 +1622,7 @@
             ],
             "content": {},
             "op_code": 1353,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {

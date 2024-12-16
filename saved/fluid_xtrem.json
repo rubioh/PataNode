@@ -20,7 +20,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -69,7 +69,7 @@
             ],
             "content": {},
             "op_code": 1259,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {}
             },
             "uniforms_binding": {
@@ -113,7 +113,7 @@
             ],
             "content": {},
             "op_code": 532,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "adf_program": {
                     "iTime": {
                         "eval_function": {
@@ -403,7 +403,7 @@
             ],
             "content": {},
             "op_code": 533,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -477,7 +477,7 @@
             ],
             "content": {},
             "op_code": 323,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -603,7 +603,7 @@
             ],
             "content": {},
             "op_code": 797,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -707,7 +707,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -882,7 +882,7 @@
             ],
             "content": {},
             "op_code": 797,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -986,7 +986,7 @@
             ],
             "content": {},
             "op_code": 2364,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "rgb2lab_program": {
                     "iTime": {
                         "eval_function": {
@@ -1191,7 +1191,7 @@
             ],
             "content": {},
             "op_code": 500,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "vblur_program": {
                     "iTime": {
                         "eval_function": {

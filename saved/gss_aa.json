@@ -28,7 +28,7 @@
             ],
             "content": {},
             "op_code": 2364,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "rgb2lab_program": {
                     "iTime": {
                         "eval_function": {
@@ -222,7 +222,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -267,7 +267,7 @@
             ],
             "content": {},
             "op_code": 767,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "connex_program": {
                     "iTime": {
                         "eval_function": {
@@ -534,7 +534,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -705,7 +705,7 @@
             ],
             "content": {},
             "op_code": 1106,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "reacdif_program": {
                     "iTime": {
                         "eval_function": {
@@ -1027,7 +1027,7 @@
             ],
             "content": {},
             "op_code": 960,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -1080,7 +1080,7 @@
             ],
             "content": {},
             "op_code": 1598,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -1133,7 +1133,7 @@
             ],
             "content": {},
             "op_code": 958,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -1174,7 +1174,7 @@
             ],
             "content": {},
             "op_code": 1107,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "sdf_program": {
                     "iChannel0": {
                         "eval_function": {
@@ -1481,7 +1481,7 @@
             ],
             "content": {},
             "op_code": 1326,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "memory_program": {
                     "SST": {
                         "eval_function": {

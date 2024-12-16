@@ -28,7 +28,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -160,7 +160,7 @@
             ],
             "content": {},
             "op_code": 459,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "info_program": {
                     "iTime": {
                         "eval_function": {
@@ -374,7 +374,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
