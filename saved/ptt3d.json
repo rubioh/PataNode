@@ -20,7 +20,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -61,7 +61,7 @@
             ],
             "content": {},
             "op_code": 1107,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "sdf_program": {
                     "tz": {
                         "eval_function": {
@@ -336,7 +336,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -476,7 +476,7 @@
             ],
             "content": {},
             "op_code": 1658,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -576,7 +576,7 @@
             ],
             "content": {},
             "op_code": 1074,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {

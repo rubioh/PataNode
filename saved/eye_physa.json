@@ -35,7 +35,7 @@
             ],
             "content": {},
             "op_code": 1536,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -132,7 +132,7 @@
             ],
             "content": {},
             "op_code": 874,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -196,7 +196,7 @@
             ],
             "content": {},
             "op_code": 598,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "draw_program": {},
                 "transform_program": {
                     "Trail": {
@@ -357,7 +357,7 @@
             ],
             "content": {},
             "op_code": 1596,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -435,7 +435,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -480,7 +480,7 @@
             ],
             "content": {},
             "op_code": 323,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {

@@ -20,7 +20,7 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
@@ -73,7 +73,7 @@
             ],
             "content": {},
             "op_code": 1259,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iChannel0": {
                         "eval_function": {
@@ -129,7 +129,7 @@
             ],
             "content": {},
             "op_code": 1846,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -223,7 +223,7 @@
             ],
             "content": {},
             "op_code": 537,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -367,7 +367,7 @@
             ],
             "content": {},
             "op_code": 1184,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -423,7 +423,7 @@
             ],
             "content": {},
             "op_code": 459,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "info_program": {
                     "iTime": {
                         "eval_function": {
@@ -649,7 +649,7 @@
             ],
             "content": {},
             "op_code": 622,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
@@ -716,7 +716,7 @@
             ],
             "content": {},
             "op_code": 323,
-            "adaptable_parameters": {
+            "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
