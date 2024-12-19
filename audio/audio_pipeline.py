@@ -166,6 +166,7 @@ class AudioEngine:
         )  # BPM, tempo
 #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0
+        self.features["reset"] = 0
 
         # Get shared features for the next iteration
         self.get_shared_features()

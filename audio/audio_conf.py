@@ -40,6 +40,7 @@ list_audio_features = [
     "on_tempo_h",
     "on_tempo_q",
     "pitch",
+    "reset",
     "shortterm_bpm",
     "smooth_full",
     "smooth_high",

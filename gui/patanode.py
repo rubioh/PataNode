@@ -114,8 +114,15 @@ class PataNode(NodeEditorWindow):
         if self.current_node_editor_widget is None:
             self.current_node_editor_widget = self.getCurrentNodeEditorWidget()
 
+            if audio_features is not None:
+                audio_features["reset"] = 1
+
         if self.current_node_editor_widget is not None:
             self.current_node_editor_widget.render(audio_features)
+
+            if audio_features is not None and audio_features["reset"] == 1:
+                audio_features["reset"] = 0
+
             self.last_main_colors = self.current_node_editor_widget.getLastMainColors()
 
         if DEBUG:
