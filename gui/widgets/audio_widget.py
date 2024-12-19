@@ -12,7 +12,7 @@ from audio.audio_pipeline import AudioEngine
 from nodeeditor.utils import dumpException
 
 
-DEBUG = True
+DEBUG = False
 
 
 class AudioLogWidget(QWidget):

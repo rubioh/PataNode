@@ -6,7 +6,7 @@ from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, register_program
 
 
-DEBUG = True
+DEBUG = False
 
 OP_CODE_STDINPUT = 2
 
