@@ -115,7 +115,7 @@ class PhysarumPart(ProgramBase):
             "SeedTex": "SeedTex",
         }
         super().initUniformsBinding(binding, program_name="transform_")
-        self.addProtectedUniforms(["iChannel0", "Trail", "SeedTex"])
+        self.addProtectedUniforms(["iChannel0", "Trail", "SeedTex", "iFrame"])
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -123,6 +123,12 @@ class PhysarumPart(ProgramBase):
         self.programs_uniforms.bindUniformToProgram(af, program_name="transform_")
 
     def render(self, textures, af=None):
+        if af is not None:
+            reset = af["reset"]
+
+            if reset == 1:
+                self.iFrame = -1
+
         self.updateParams(af)
         self.bindUniform(af)
         self.ctx.point_size = self.part_size
