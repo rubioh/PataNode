@@ -103,8 +103,7 @@ class FBOManager:
         if DEBUG:
             print("getFBOs:: out current FBOs:", self.current_fbos)
             print("getFBOs:: out current in_use:", self.in_use_fbos)
-        print(self.current_fbos)
-        print(self.in_use_fbos)
+
         return returned_fbos
 
     def checkForExistingFBOs(self, hashes):
