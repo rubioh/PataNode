@@ -15,7 +15,7 @@ from nodeeditor.utils import dumpException
 from program.program_conf import GLSLImplementationError, UnuseUniformError
 
 
-DEBUG = True
+DEBUG = False
 
 
 class ShaderGraphicsNode(QDMGraphicsNode):
