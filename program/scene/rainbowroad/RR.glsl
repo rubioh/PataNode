@@ -195,14 +195,14 @@ float mapStarField(vec3 p, out vec2 id) {
     vec3 rep = vec3(5.);
     float scale = 1.;
     p.yz = rotate2d(3.14 / -2.) * p.yz;
-    float t = iTime * 15.;
+    float t = iTime * 2.;
     p /= scale;
     p.y += t;
     float d = p.z;
     vec3 pm = mod(p, rep) - rep / 2.;
     id.x = hash31(floor(p / rep));
  
-    if (id.x * (1 - c1) < .96) {
+    if (id.x * (1 - c1) < .996) {
         return rep.z / 2.;
     }
     pm.xz = rotate2d( 42.*iTime *id.x) * pm.xz;
@@ -440,7 +440,7 @@ void main()
     vec3 ro, rd;
     camera(ro, rd, uv);
     vec3 col = pow( render(ro, rd, uv)*1.6, (turfu == 0.3) ? vec3(energy*3.) : vec3(energy_slow*4.));
-    fragColor = vec4(pow(col, vec3(1.5))/4.,1.0);
+    fragColor = vec4(pow(col, vec3(1.0))/1.,1.0);
 }
 
 
