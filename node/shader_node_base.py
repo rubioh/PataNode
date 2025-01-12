@@ -14,10 +14,11 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
-from program.program_conf import GLSLImplementationError, UnuseUniformError
+from program.program_conf import GLSLImplementationError, UnuseUniformError, name_to_opcode
 
 
 DEBUG = False
+OP_CODE_MAPPING = name_to_opcode("Mapping")
 
 
 class ShaderGraphicsNode(QDMGraphicsNode):
@@ -416,11 +417,13 @@ class ShaderNode(Node):
 
     def render(self, audio_features=None):
         pass
-
     def serialize(self):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
         adapt_params = copy.deepcopy(self.getCpuAdaptableParameters())
+
+        if self.__class__.op_code == OP_CODE_MAPPING:
+            res["mapping_points"] = self.program.polygons
 
         for program in adapt_params.keys():
             program_params = adapt_params[program]
@@ -469,6 +472,8 @@ class ShaderNode(Node):
 
         uniforms_binding = data["uniforms_binding"]
 
+        if self.__class__.op_code == OP_CODE_MAPPING:
+            self.program.polygons = data["mapping_points"]
         self.program.restoreUniformsBinding(uniforms_binding)
 
         if DEBUG:
