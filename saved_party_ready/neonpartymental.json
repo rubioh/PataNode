@@ -1,0 +1,683 @@
+{
+    "id": 1708717184784,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 1708717212560,
+            "title": "Eye",
+            "pos_x": -373.0,
+            "pos_y": 2.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1708716748112,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1708717181648,
+            "title": "Screen",
+            "pos_x": 245.0,
+            "pos_y": 90.0,
+            "inputs": [
+                {
+                    "id": 1708717277840,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1708717184464,
+            "title": "Neon Party",
+            "pos_x": -459.0,
+            "pos_y": -146.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1708717496784,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 928,
+            "cpu_adaptable_parameters": {
+                "program": {},
+                "reconstruct_program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "stride": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "beat_count": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "low1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "low2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "drop": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "animate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "shape": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_chill": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "ro": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "reconstruct_program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "iResolution"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "stride": {
+                        "type": null,
+                        "param_name": "stride"
+                    },
+                    "beat_count": {
+                        "type": null,
+                        "param_name": "beat_count"
+                    },
+                    "low1": {
+                        "type": null,
+                        "param_name": "low1"
+                    },
+                    "low2": {
+                        "type": null,
+                        "param_name": "low2"
+                    },
+                    "drop": {
+                        "type": null,
+                        "param_name": "drop"
+                    },
+                    "animate": {
+                        "type": null,
+                        "param_name": "animate"
+                    },
+                    "shape": {
+                        "type": null,
+                        "param_name": "shape"
+                    },
+                    "on_chill": {
+                        "type": null,
+                        "param_name": "on_chill"
+                    },
+                    "ro": {
+                        "type": null,
+                        "param_name": "ro"
+                    }
+                },
+                "reconstruct_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1709045719632,
+            "title": "Mapping",
+            "pos_x": -213.0,
+            "pos_y": -122.0,
+            "inputs": [
+                {
+                    "id": 1708717389072,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1708817490128,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 716,
+            "mapping_points": [
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "cpu_adaptable_parameters": {},
+            "gpu_adaptable_parameters": {},
+            "uniforms_binding": {},
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1709045686672,
+            "title": "Symetry",
+            "pos_x": -340.0,
+            "pos_y": 143.0,
+            "inputs": [
+                {
+                    "id": 1709046102288,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1709045302352,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1709046103760,
+            "title": "HSV Offset",
+            "pos_x": -82.0,
+            "pos_y": 117.0,
+            "inputs": [
+                {
+                    "id": 1709045257680,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 1709046094288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1658,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "hue_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "iTime",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "saturation_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "value_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_offset": {
+                        "type": "audio_features",
+                        "param_name": "on_tempo"
+                    },
+                    "saturation_offset": {
+                        "type": null,
+                        "param_name": "saturation_offset"
+                    },
+                    "value_offset": {
+                        "type": "audio_features",
+                        "param_name": "on_kick"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 1709044967120,
+            "edge_type": 2,
+            "start": 1708717496784,
+            "end": 1708717389072
+        },
+        {
+            "id": 1709046249424,
+            "edge_type": 2,
+            "start": 1708817490128,
+            "end": 1709046102288
+        },
+        {
+            "id": 1709046548304,
+            "edge_type": 2,
+            "start": 1709045302352,
+            "end": 1709045257680
+        },
+        {
+            "id": 1709046547344,
+            "edge_type": 2,
+            "start": 1709046094288,
+            "end": 1708717277840
+        }
+    ]
+}

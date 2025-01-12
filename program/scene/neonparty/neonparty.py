@@ -152,7 +152,7 @@ class NeonParty(ProgramBase):
             self.animate = True
         else:
             self.shape = 1
-
+        self.animate = False
         self.iTime = af["time"] * 1.0
         self.stride = float(self.frame)
         self.beat_count = float(self.beat_count)
