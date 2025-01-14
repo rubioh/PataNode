@@ -305,6 +305,11 @@ class PolyGraphicScene(QGraphicsScene):
                 pl = self.getcurrentpoly().pointlist[i]
                 self.getcurrentpoly().pointlist[i] = mapPoint(pl.x() / 2., pl.y() / 2., pl.tx, pl.ty, pl.edge)
 
+        if event.key() == Qt.Key_D:
+            for i, p in enumerate(self.getcurrentpoly().pointlist):
+                pl = self.getcurrentpoly().pointlist[i]
+                self.getcurrentpoly().pointlist[i] = mapPoint(pl.x() * 2., pl.y() * 2., pl.tx, pl.ty, pl.edge)
+
         if event.key() == Qt.Key_F:
             self.rotate = True
 
