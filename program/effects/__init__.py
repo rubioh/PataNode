@@ -8,6 +8,7 @@ from program.effects.line_repetition import line_repetition
 from program.effects.orientationaa import orientationaa
 from program.effects.strings import strings
 from program.effects.ultraglitch import ultraglitch
+from program.effects.vignet import vignet
 
 __all__ = [
     "bumpmapping",
@@ -20,4 +21,5 @@ __all__ = [
     "orientationaa",
     "strings",
     "ultraglitch",
+    "vignet",
 ]
