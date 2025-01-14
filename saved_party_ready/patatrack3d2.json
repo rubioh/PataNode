@@ -700,7 +700,7 @@
                     "energy": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": ".1",
                             "widget": "TextEdit"
                         }
                     },

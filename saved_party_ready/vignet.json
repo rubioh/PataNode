@@ -1,0 +1,4450 @@
+{
+    "id": 2274329482768,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 2274329636560,
+            "title": "Screen",
+            "pos_x": 814.6249999999999,
+            "pos_y": 297.1249999999999,
+            "inputs": [
+                {
+                    "id": 2274329489552,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2274329677520,
+            "title": "Psy spin",
+            "pos_x": -1660.0,
+            "pos_y": -383.74999999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2274329632400,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 790,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "time_sym_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "time_tunnel_depth": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "time_tunnel_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "time_depth_mod": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tunnel_wave_amp": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tunnel_wave_freq": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "time_col_rotation": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "wave_time_freq": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "kick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "onTempo": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "iResolution"
+                    },
+                    "time_sym_rot": {
+                        "type": null,
+                        "param_name": "time_sym_rot"
+                    },
+                    "time_tunnel_depth": {
+                        "type": null,
+                        "param_name": "time_tunnel_depth"
+                    },
+                    "time_tunnel_rot": {
+                        "type": null,
+                        "param_name": "time_tunnel_rot"
+                    },
+                    "time_depth_mod": {
+                        "type": null,
+                        "param_name": "time_depth_mod"
+                    },
+                    "tunnel_wave_amp": {
+                        "type": null,
+                        "param_name": "tunnel_wave_amp"
+                    },
+                    "tunnel_wave_freq": {
+                        "type": null,
+                        "param_name": "tunnel_wave_freq"
+                    },
+                    "time_col_rotation": {
+                        "type": null,
+                        "param_name": "time_col_rotation"
+                    },
+                    "wave_time_freq": {
+                        "type": null,
+                        "param_name": "wave_time_freq"
+                    },
+                    "kick": {
+                        "type": null,
+                        "param_name": "kick"
+                    },
+                    "onTempo": {
+                        "type": null,
+                        "param_name": "onTempo"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2274606225808,
+            "title": "MAP_Blend",
+            "pos_x": -172.75,
+            "pos_y": 118.62500000000009,
+            "inputs": [
+                {
+                    "id": 2274606100560,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2274599557584,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2274329820112,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 835,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": "iChannel1"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2274429561424,
+            "title": "LumTriangle",
+            "pos_x": -667.2500000000005,
+            "pos_y": 8.500000000000057,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2274599717200,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1188,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_cum": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "2",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "zoom_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "10.",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_cum": {
+                        "type": null,
+                        "param_name": "energy_cum"
+                    },
+                    "energy": {
+                        "type": null,
+                        "param_name": "energy"
+                    },
+                    "x0": {
+                        "type": null,
+                        "param_name": "x0"
+                    },
+                    "y0": {
+                        "type": null,
+                        "param_name": "y0"
+                    },
+                    "zoom_factor": {
+                        "type": null,
+                        "param_name": "zoom_factor"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2274605685776,
+            "title": "Neon Party",
+            "pos_x": -1338.125,
+            "pos_y": -653.1249999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2274429688720,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 928,
+            "cpu_adaptable_parameters": {
+                "program": {},
+                "reconstruct_program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "stride": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "beat_count": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "low1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "low2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "drop": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "animate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "shape": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_chill": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "ro": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "reconstruct_program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "iResolution"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "stride": {
+                        "type": null,
+                        "param_name": "stride"
+                    },
+                    "beat_count": {
+                        "type": null,
+                        "param_name": "beat_count"
+                    },
+                    "low1": {
+                        "type": null,
+                        "param_name": "low1"
+                    },
+                    "low2": {
+                        "type": null,
+                        "param_name": "low2"
+                    },
+                    "drop": {
+                        "type": null,
+                        "param_name": "drop"
+                    },
+                    "animate": {
+                        "type": null,
+                        "param_name": "animate"
+                    },
+                    "shape": {
+                        "type": null,
+                        "param_name": "shape"
+                    },
+                    "on_chill": {
+                        "type": null,
+                        "param_name": "on_chill"
+                    },
+                    "ro": {
+                        "type": null,
+                        "param_name": "ro"
+                    }
+                },
+                "reconstruct_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2554954538256,
+            "title": "Fluid",
+            "pos_x": -286.875,
+            "pos_y": 533.125,
+            "inputs": [
+                {
+                    "id": 2550873799504,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2550941278032,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2554954539856,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data*.99",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".99",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2551728863824,
+            "title": "Dome",
+            "pos_x": -1364.9999999999995,
+            "pos_y": -78.12499999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2554904974288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 421,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2551728998864,
+            "title": "Hexagons",
+            "pos_x": -1218.1249999999995,
+            "pos_y": 151.87499999999997,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2554904694224,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 829,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rotationSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "offsetSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveFrequency": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "numLayer": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveOffset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "res": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thickness": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "rotationSpeed": {
+                        "type": null,
+                        "param_name": "rotationSpeed"
+                    },
+                    "offsetSpeed": {
+                        "type": null,
+                        "param_name": "offsetSpeed"
+                    },
+                    "waveFrequency": {
+                        "type": null,
+                        "param_name": "waveFrequency"
+                    },
+                    "waveSpeed": {
+                        "type": null,
+                        "param_name": "waveSpeed"
+                    },
+                    "numLayer": {
+                        "type": null,
+                        "param_name": "numLayer"
+                    },
+                    "waveOffset": {
+                        "type": null,
+                        "param_name": "waveOffset"
+                    },
+                    "res": {
+                        "type": null,
+                        "param_name": "res"
+                    },
+                    "thickness": {
+                        "type": null,
+                        "param_name": "thickness"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2554905290384,
+            "title": "Symetry",
+            "pos_x": -107.49999999999994,
+            "pos_y": 344.3749999999999,
+            "inputs": [
+                {
+                    "id": 2549137862800,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2554953773392,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550941849424,
+            "title": "SDF_BM",
+            "pos_x": -1302.4999999999995,
+            "pos_y": -273.1249999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2550186859216,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 459,
+            "cpu_adaptable_parameters": {
+                "info_program": {},
+                "normal_program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "info_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tz": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tp": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_sym": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_arms": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "normal_program": {
+                    "tm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tc": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_idx": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_idx2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "goBloom_arms": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "info_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": "tma"
+                    },
+                    "tz": {
+                        "type": null,
+                        "param_name": "tza"
+                    },
+                    "tp": {
+                        "type": null,
+                        "param_name": "tp_final"
+                    },
+                    "tptt": {
+                        "type": null,
+                        "param_name": "tptt"
+                    },
+                    "mode_sym": {
+                        "type": null,
+                        "param_name": "mode_sym"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "mode_ptt"
+                    },
+                    "go_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    },
+                    "go_arms": {
+                        "type": null,
+                        "param_name": "go_arms"
+                    }
+                },
+                "normal_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "tc": {
+                        "type": null,
+                        "param_name": "tc"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "go_idx": {
+                        "type": null,
+                        "param_name": "go_bloom"
+                    },
+                    "go_idx2": {
+                        "type": null,
+                        "param_name": "go_bloom2"
+                    },
+                    "goBloom_arms": {
+                        "type": null,
+                        "param_name": "goBloom_arms"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550874038480,
+            "title": "Cube",
+            "pos_x": -887.4999999999999,
+            "pos_y": -321.24999999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2550873709200,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 415,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "sens": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "vitesse": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "trigger": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "deep": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "face": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "side_col": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "color": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "N_sq": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "zoom_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "show_bulb": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "sens": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "vitesse": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "trigger": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "deep": {
+                        "type": null,
+                        "param_name": "deep_tic_final"
+                    },
+                    "face": {
+                        "type": null,
+                        "param_name": "face"
+                    },
+                    "go_rot": {
+                        "type": null,
+                        "param_name": "go_rot"
+                    },
+                    "side_col": {
+                        "type": null,
+                        "param_name": "side_col"
+                    },
+                    "color": {
+                        "type": null,
+                        "param_name": "color_final"
+                    },
+                    "N_sq": {
+                        "type": null,
+                        "param_name": "N_sq"
+                    },
+                    "zoom_factor": {
+                        "type": null,
+                        "param_name": "zoom_factor"
+                    },
+                    "show_bulb": {
+                        "type": null,
+                        "param_name": "show_bulb"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2549203707024,
+            "title": "Symetry",
+            "pos_x": -180.62499999999994,
+            "pos_y": -176.87499999999997,
+            "inputs": [
+                {
+                    "id": 2549203698256,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549136991952,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2549137856080,
+            "title": "Vignet",
+            "pos_x": -611.2499999999997,
+            "pos_y": -155.62499999999997,
+            "inputs": [
+                {
+                    "id": 2549137249616,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549204115280,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 653,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "decay": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".6",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "decay": {
+                        "type": null,
+                        "param_name": "decay"
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550942942544,
+            "title": "Symetry",
+            "pos_x": -693.7499999999999,
+            "pos_y": 312.50000000000006,
+            "inputs": [
+                {
+                    "id": 2550874042512,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549137923920,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2549204466896,
+            "title": "Eye",
+            "pos_x": -1679.6874999999993,
+            "pos_y": -31.250000000000114,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2550942885968,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2552799545680,
+            "title": "Abstract SQRT",
+            "pos_x": -1079.6874999999998,
+            "pos_y": -503.12499999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2549430679568,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1405,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_h": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "count_beat": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thresh": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "nrj_fast"
+                    },
+                    "t_h": {
+                        "type": null,
+                        "param_name": "t_h"
+                    },
+                    "count_beat": {
+                        "type": null,
+                        "param_name": "count_beat"
+                    },
+                    "thresh": {
+                        "type": null,
+                        "param_name": "thresh"
+                    },
+                    "t_rot": {
+                        "type": null,
+                        "param_name": "t_rot"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2549137701520,
+            "title": "Symetry",
+            "pos_x": -573.4374999999998,
+            "pos_y": 81.25,
+            "inputs": [
+                {
+                    "id": 2554905161872,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549431033680,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550411545808,
+            "title": "Symetry",
+            "pos_x": -1062.4999999999995,
+            "pos_y": 493.74999999999983,
+            "inputs": [
+                {
+                    "id": 2550411014352,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2550411014288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550411544400,
+            "title": "Mapping",
+            "pos_x": -1468.7499999999998,
+            "pos_y": 437.50000000000006,
+            "inputs": [
+                {
+                    "id": 2552799031440,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552799453008,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 716,
+            "mapping_points": [
+                [
+                    0.1078125,
+                    0.10833333333333334,
+                    0.0,
+                    0.0,
+                    0.1078125,
+                    0.35833333333333334,
+                    0.0,
+                    1.0,
+                    0.3578125,
+                    0.35833333333333334,
+                    1.0,
+                    1.0,
+                    0.3578125,
+                    0.10833333333333334,
+                    1.0,
+                    0.0,
+                    0.1078125,
+                    0.10833333333333334,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.1078125,
+                    0.6277777777777778,
+                    0.0,
+                    0.0,
+                    0.1078125,
+                    0.8777777777777778,
+                    0.0,
+                    1.0,
+                    0.3578125,
+                    0.8777777777777778,
+                    1.0,
+                    1.0,
+                    0.3578125,
+                    0.6277777777777778,
+                    1.0,
+                    0.0,
+                    0.1078125,
+                    0.6277777777777778,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.5890625,
+                    0.1,
+                    0.0,
+                    0.0,
+                    0.5890625,
+                    0.35,
+                    0.0,
+                    1.0,
+                    0.8390625,
+                    0.35,
+                    1.0,
+                    1.0,
+                    0.8390625,
+                    0.1,
+                    1.0,
+                    0.0,
+                    0.5890625,
+                    0.1,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ],
+                [
+                    0.584375,
+                    0.65,
+                    0.0,
+                    0.0,
+                    0.584375,
+                    0.9,
+                    0.0,
+                    1.0,
+                    0.834375,
+                    0.9,
+                    1.0,
+                    1.0,
+                    0.834375,
+                    0.65,
+                    1.0,
+                    0.0,
+                    0.584375,
+                    0.65,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "cpu_adaptable_parameters": {},
+            "gpu_adaptable_parameters": {},
+            "uniforms_binding": {},
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2554905152720,
+            "title": "Symetry",
+            "pos_x": -837.5000000000001,
+            "pos_y": 515.6250000000001,
+            "inputs": [
+                {
+                    "id": 2552799270992,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549430673232,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550412463312,
+            "title": "Vignet",
+            "pos_x": -334.375,
+            "pos_y": -453.1249999999998,
+            "inputs": [
+                {
+                    "id": 2552565065808,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552799223632,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 653,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "decay": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "2.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".2",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "decay": {
+                        "type": null,
+                        "param_name": "decay"
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2552799251664,
+            "title": "MAP_Blend",
+            "pos_x": 231.2500000000001,
+            "pos_y": -103.7499999999999,
+            "inputs": [
+                {
+                    "id": 2550873792528,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2552564416784,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552564432272,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 835,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": "iChannel1"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2549431028944,
+            "title": "Symetry",
+            "pos_x": -469.9999999999999,
+            "pos_y": -31.875000000000014,
+            "inputs": [
+                {
+                    "id": 2554952970384,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2550412468048,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550412465744,
+            "title": "OnKickGate",
+            "pos_x": 62.49999999999997,
+            "pos_y": -390.6249999999999,
+            "inputs": [
+                {
+                    "id": 2550413389968,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2549136575248,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549416213328,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1056,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "sens": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "translate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "camp": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "which": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "energy_low": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "sens": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "translate": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "camp": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "which": {
+                        "type": null,
+                        "param_name": "which"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2552798500432,
+            "title": "Sobel",
+            "pos_x": -1087.4999999999993,
+            "pos_y": -78.125,
+            "inputs": [
+                {
+                    "id": 2552564495824,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552798142288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 533,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "nrj": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    },
+                    "nrj": {
+                        "type": null,
+                        "param_name": "nrj"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550412596048,
+            "title": "Vignet",
+            "pos_x": -345.7031249999998,
+            "pos_y": -302.7343749999998,
+            "inputs": [
+                {
+                    "id": 2550415710800,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2550412396880,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 653,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "decay": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".6",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "decay": {
+                        "type": null,
+                        "param_name": "decay"
+                    },
+                    "intensity": {
+                        "type": "audio_features",
+                        "param_name": "decaying_kick"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550414691536,
+            "title": "Symetry",
+            "pos_x": 692.5000000000001,
+            "pos_y": -208.74999999999997,
+            "inputs": [
+                {
+                    "id": 2552798982480,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552799678608,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2552638072464,
+            "title": "HSV Pow",
+            "pos_x": 279.37499999999966,
+            "pos_y": 283.12499999999983,
+            "inputs": [
+                {
+                    "id": 2550412610832,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552564703056,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1353,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "hue_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "saturation_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "value_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_pow_factor": {
+                        "type": "audio_features",
+                        "param_name": "smooth_high"
+                    },
+                    "saturation_pow_factor": {
+                        "type": null,
+                        "param_name": "saturation_pow_factor"
+                    },
+                    "value_pow_factor": {
+                        "type": null,
+                        "param_name": "value_pow_factor"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2550416422288,
+            "title": "HSV Offset",
+            "pos_x": 462.49999999999994,
+            "pos_y": 121.87499999999997,
+            "inputs": [
+                {
+                    "id": 2552638388240,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2549430208272,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1658,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "hue_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "saturation_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "value_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_offset": {
+                        "type": "audio_features",
+                        "param_name": "on_kick"
+                    },
+                    "saturation_offset": {
+                        "type": null,
+                        "param_name": "saturation_offset"
+                    },
+                    "value_offset": {
+                        "type": null,
+                        "param_name": "value_offset"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2073211616400,
+            "title": "Rainbow road",
+            "pos_x": -1241.3085937499993,
+            "pos_y": -837.0117187499997,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2073588459152,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1818,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "turfu": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tic_tile": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "c1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "trigger": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy": {
+                        "type": null,
+                        "param_name": "energy"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "energy_fast"
+                    },
+                    "energy_fast2": {
+                        "type": null,
+                        "param_name": "energy_fast2"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "energy_mid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "energy_slow"
+                    },
+                    "turfu": {
+                        "type": null,
+                        "param_name": "turfu"
+                    },
+                    "tic_tile": {
+                        "type": null,
+                        "param_name": "tic_tile"
+                    },
+                    "c1": {
+                        "type": null,
+                        "param_name": "c1"
+                    },
+                    "trigger": {
+                        "type": null,
+                        "param_name": "trigger"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "mode"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2073588128720,
+            "title": "Vignet",
+            "pos_x": -261.2304687499999,
+            "pos_y": -651.8554687499998,
+            "inputs": [
+                {
+                    "id": 2073587676560,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2073662685776,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 653,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "decay": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".1",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "decay": {
+                        "type": null,
+                        "param_name": "decay"
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2073284799184,
+            "title": "Mapping",
+            "pos_x": -563.9648437499997,
+            "pos_y": -739.7460937499999,
+            "inputs": [
+                {
+                    "id": 2073587797392,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2073587670608,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 716,
+            "mapping_points": [
+                [
+                    0.375,
+                    0.375,
+                    0.0,
+                    0.0,
+                    0.375,
+                    0.625,
+                    0.0,
+                    1.0,
+                    0.625,
+                    0.625,
+                    1.0,
+                    1.0,
+                    0.625,
+                    0.375,
+                    1.0,
+                    0.0,
+                    0.375,
+                    0.375,
+                    0.0
+                ],
+                [
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    1.0,
+                    0.0,
+                    1.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0
+                ]
+            ],
+            "cpu_adaptable_parameters": {},
+            "gpu_adaptable_parameters": {},
+            "uniforms_binding": {},
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2073292801680,
+            "title": "MAP_Blend",
+            "pos_x": 863.7499999999999,
+            "pos_y": -53.75,
+            "inputs": [
+                {
+                    "id": 2073292802448,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2073285640720,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2073292803216,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 835,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": "iChannel1"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2073651055056,
+            "title": "OnKickGate",
+            "pos_x": -1026.5625,
+            "pos_y": -676.5624999999998,
+            "inputs": [
+                {
+                    "id": 2073661912336,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2073079602896,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2073651066320,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1056,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "sens": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "translate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "camp": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "which": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "energy_low": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "sens": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "translate": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "camp": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "which": {
+                        "type": null,
+                        "param_name": "which"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 2551715566992,
+            "edge_type": 2,
+            "start": 2274329820112,
+            "end": 2549203698256
+        },
+        {
+            "id": 2554904387344,
+            "edge_type": 2,
+            "start": 2554904694224,
+            "end": 2550874042512
+        },
+        {
+            "id": 2549430681040,
+            "edge_type": 2,
+            "start": 2549204115280,
+            "end": 2554905161872
+        },
+        {
+            "id": 2552799446032,
+            "edge_type": 2,
+            "start": 2552799453008,
+            "end": 2550411014352
+        },
+        {
+            "id": 2549138098128,
+            "edge_type": 2,
+            "start": 2550411014288,
+            "end": 2552799270992
+        },
+        {
+            "id": 2552799100112,
+            "edge_type": 2,
+            "start": 2274329632400,
+            "end": 2552565065808
+        },
+        {
+            "id": 2550410950736,
+            "edge_type": 2,
+            "start": 2554904694224,
+            "end": 2549137249616
+        },
+        {
+            "id": 2549430181968,
+            "edge_type": 2,
+            "start": 2274599717200,
+            "end": 2554952970384
+        },
+        {
+            "id": 2549430561872,
+            "edge_type": 2,
+            "start": 2550412468048,
+            "end": 2274606100560
+        },
+        {
+            "id": 2549416206736,
+            "edge_type": 2,
+            "start": 2550942885968,
+            "end": 2552799031440
+        },
+        {
+            "id": 2550412467088,
+            "edge_type": 2,
+            "start": 2274329820112,
+            "end": 2550413389968
+        },
+        {
+            "id": 2549430726672,
+            "edge_type": 2,
+            "start": 2550942885968,
+            "end": 2552564495824
+        },
+        {
+            "id": 2550416461072,
+            "edge_type": 2,
+            "start": 2549430673232,
+            "end": 2549137862800
+        },
+        {
+            "id": 2552798983440,
+            "edge_type": 2,
+            "start": 2550412396880,
+            "end": 2550873792528
+        },
+        {
+            "id": 2549136818704,
+            "edge_type": 2,
+            "start": 2552798142288,
+            "end": 2550415710800
+        },
+        {
+            "id": 2552798574288,
+            "edge_type": 2,
+            "start": 2554954539856,
+            "end": 2274599557584
+        },
+        {
+            "id": 2552638242256,
+            "edge_type": 2,
+            "start": 2552564432272,
+            "end": 2552798982480
+        },
+        {
+            "id": 2552638078800,
+            "edge_type": 2,
+            "start": 2549136991952,
+            "end": 2552564416784
+        },
+        {
+            "id": 2552564487632,
+            "edge_type": 2,
+            "start": 2550411014288,
+            "end": 2550873799504
+        },
+        {
+            "id": 2552638076624,
+            "edge_type": 2,
+            "start": 2550411014288,
+            "end": 2550941278032
+        },
+        {
+            "id": 2552800017872,
+            "edge_type": 2,
+            "start": 2552564432272,
+            "end": 2552638388240
+        },
+        {
+            "id": 2550416419920,
+            "edge_type": 2,
+            "start": 2549430208272,
+            "end": 2550412610832
+        },
+        {
+            "id": 2073291236368,
+            "edge_type": 2,
+            "start": 2073587670608,
+            "end": 2073587676560
+        },
+        {
+            "id": 2073290736656,
+            "edge_type": 2,
+            "start": 2073662685776,
+            "end": 2073285640720
+        },
+        {
+            "id": 2073588137552,
+            "edge_type": 2,
+            "start": 2073292803216,
+            "end": 2274329489552
+        },
+        {
+            "id": 2073293320848,
+            "edge_type": 2,
+            "start": 2552564432272,
+            "end": 2073292802448
+        },
+        {
+            "id": 2073285327568,
+            "edge_type": 2,
+            "start": 2274429688720,
+            "end": 2073661912336
+        },
+        {
+            "id": 2073650590352,
+            "edge_type": 2,
+            "start": 2073588459152,
+            "end": 2073079602896
+        },
+        {
+            "id": 2073292538896,
+            "edge_type": 2,
+            "start": 2073588459152,
+            "end": 2073587797392
+        }
+    ]
+}

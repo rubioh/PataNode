@@ -145,10 +145,10 @@ class NeonParty(ProgramBase):
 
         self.animate = False
 
-        if self.beat_count % 100 < 25 or self.drop:
+        if self.beat_count % 100 < 75 or self.drop:
             if af["on_kick"]:
                 self.shape = not self.shape
-        elif self.beat_count % 100 < 50:
+        elif self.beat_count % 100 < 90:
             self.animate = True
         else:
             self.shape = 1
