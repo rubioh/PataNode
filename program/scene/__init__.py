@@ -16,6 +16,7 @@ from program.scene.sdf_bm import sdf_bm
 from program.scene.template import template
 from program.scene.texture import texture
 from program.scene.truchet import truchet
+from program.scene.bangersponge import bangersponge
 
 __all__ = [
     "abstractsqrt",
