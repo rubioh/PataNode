@@ -281,7 +281,7 @@ class ParametersWidget(QTabWidget):
 
     def getLineEdit(self, parameter, program_name, uniform_name):
         textfield = QLineEdit(self)
-        textfield.setText(parameter["eval_function"]["value"])
+        textfield.setText(str(parameter["eval_function"]["value"]))
 
         callback = parameter["eval_function"]["connect"]
 

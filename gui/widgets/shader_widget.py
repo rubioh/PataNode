@@ -1,7 +1,7 @@
 import moderngl
 
 from PyQt5 import QtCore, QtOpenGL, QtWidgets
-
+import time
 from program.program_manager import FBOManager
 
 class ShaderWidget(QtOpenGL.QGLWidget):
@@ -107,7 +107,10 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def paintGL(self):
         self.makeCurrent()
         self._ctx.clear(color=(0.0, 0.0, 0.0))
+        p = time.perf_counter()
         self.app.render(self.app._last_audio_features)
+      #  self.ctx.finish()
+      #  print(time.perf_counter() - p)
 
     def resize(self, width: int, height: int) -> None: # type: ignore[override] # FIXME?
         self._width = width * self.devicePixelRatio()
