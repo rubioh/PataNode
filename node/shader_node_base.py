@@ -123,7 +123,8 @@ class ShaderNode(Node):
 
     @already_called.setter
     def already_called(self, value: bool):
-        self.program.already_called = value
+        if self.program is not None:
+            self.program.already_called = value
 
     @property
     def in_evaluation(self):
