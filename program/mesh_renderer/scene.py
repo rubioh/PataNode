@@ -96,8 +96,9 @@ class MeshScene:
         transform = self.load_transform(gltfNode)
         mesh_resource_indices = []
 
-        for idx in self.mesh_indices[gltfNode.mesh]:
-            mesh_resource_indices.append(idx)
+        if gltfNode.mesh is not None:
+            for idx in self.mesh_indices[gltfNode.mesh]:
+                mesh_resource_indices.append(idx)
 
         n = Node(transform, mesh_resource_indices, gltfNode.children, gltfNode.name)
         return n
@@ -177,6 +178,10 @@ class MeshScene:
         return self.textures[index]
 
     def load_textures(self, gltf):
+        if len(gltf.samplers) == 0:
+            self.samplers.append(
+                Sampler()
+            )
         for sampler in gltf.samplers:
             self.samplers.append(
                 Sampler(
@@ -191,12 +196,13 @@ class MeshScene:
                     (pil_texture[0], pil_texture[1]), pil_texture[2], self.ctx
                 )
             )
+       
 
         for texture in gltf.textures:
             self.textures.append(
                 Texture(
                     self.texture_resource_indices[texture.source],
-                    self.samplers[texture.sampler],
+                    self.samplers[texture.sampler or 0],
                 )
             )
 

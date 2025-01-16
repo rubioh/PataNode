@@ -21,17 +21,15 @@ class Dome(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Dome"
+        self.ctx = ctx
+        self.path = "./assets/mesh/dome.glb"
+        self.scene = MeshScene(self.path, ctx)
 
-        self.scene = MeshScene("./assets/mesh/dome.glb", ctx)
-        self.renderer = Renderer(
-            ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
-        )
-        self.renderer.add_scene(self.scene)
-        self.renderer.add_sun(glm.vec3(1.0, 0.0, 0.0), glm.vec3(1.0))
         self.initProgram()
         self.initFBOSpecifications()
-        self.initUniformsBinding()
         self.initParams()
+        self.initUniformsBinding()
+        self.load_mesh()
 
     def initFBOSpecifications(self):
         self.required_fbos = 2
@@ -73,7 +71,15 @@ class Dome(ProgramBase):
         self.smooth_fast_final = self.smooth_fast / 2.0
         self.scale_final = 16 + 8 * np.cos(time.time() * 0.1)
 
+    def load_mesh(self):
+        self.scene = MeshScene(self.path, self.ctx)
+        self.renderer = Renderer(
+            self.ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
+        )
+        self.renderer.add_scene(self.scene)
+        self.renderer.add_sun(glm.vec3(1.0, 0.0, 0.0), glm.vec3(1.0))
     def initUniformsBinding(self):
+
         binding = {
             "iTime": "time",
             "energy_fast": "smooth_fast_final",
@@ -83,10 +89,15 @@ class Dome(ProgramBase):
             "intensity": "intensity",
             "scale": "scale_final",
         }
+        self.add_text_edit_cpu_adaptable_parameter("object_path", self.path, self.load_mesh)
         super().initUniformsBinding(binding, program_name="")
         super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
+        v = self.getCpuAdaptableParameters()["program"]["object_path"]["eval_function"]["value"]
+        if self.path != v:
+            self.path = v
+            self.load_mesh()
         self.model = glm.rotate(self.model, 0.01, glm.vec3(0.0, 1.0, 0.0))
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)
