@@ -81,11 +81,13 @@ class MeshScene:
 
         if gltfNode.rotation:
             m = m * glm.mat4_cast(rotation)
-
         if gltfNode.scale:
-            m[0][0] = scale[0]
-            m[1][1] = scale[1]
-            m[2][2] = scale[2]
+            mat = glm.mat4()
+            mat = glm.scale(mat, glm.vec3(scale[0], scale[1], scale[2]))
+            m *= mat
+#            m[0][0] = scale[0]
+ #           m[1][1] = scale[1]
+  #          m[2][2] = scale[2]
 
         if gltfNode.matrix:
             m = gltfNode.matrix
@@ -99,7 +101,7 @@ class MeshScene:
         if gltfNode.mesh is not None:
             for idx in self.mesh_indices[gltfNode.mesh]:
                 mesh_resource_indices.append(idx)
-
+        print(transform, gltfNode.name)
         n = Node(transform, mesh_resource_indices, gltfNode.children, gltfNode.name)
         return n
 
@@ -225,6 +227,7 @@ class MeshScene:
 
     def render_node(self, node, matrix, mvp_uniform, surface):
         matrix *= node.transform
+        #print(node.transform)
         for mesh_rsc_idx in node.meshes:
             mesh = self.mesh_resource_manager.get_resource(mesh_rsc_idx)
             render(
@@ -246,4 +249,7 @@ class MeshScene:
         for scene in self.root_nodes:
             for node_idx in scene.nodes:
                 node = self.dag[node_idx]
+              #  print("model ", model)
+               # print("view ", view)
+                #print("proj ", projection)
                 self.render_node(node, glm.mat4(), mvp_uniform, surface)

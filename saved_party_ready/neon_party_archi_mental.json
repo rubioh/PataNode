@@ -73,8 +73,8 @@
         {
             "id": 140404682239952,
             "title": "Fluid",
-            "pos_x": -356.0,
-            "pos_y": -345.75,
+            "pos_x": -281.00000000000006,
+            "pos_y": -330.12500000000006,
             "inputs": [
                 {
                     "id": 140404682235088,
@@ -541,8 +541,8 @@
         {
             "id": 140404638211280,
             "title": "Sobel",
-            "pos_x": -177.75,
-            "pos_y": -339.75,
+            "pos_x": -60.56250000000003,
+            "pos_y": -445.21874999999994,
             "inputs": [
                 {
                     "id": 140404639259344,
@@ -1291,8 +1291,8 @@
         {
             "id": 140404638218896,
             "title": "Eye",
-            "pos_x": -732.5,
-            "pos_y": -360.0,
+            "pos_x": -682.5000000000001,
+            "pos_y": -328.75000000000006,
             "inputs": [],
             "outputs": [
                 {
@@ -1416,8 +1416,8 @@
         {
             "id": 2022477003152,
             "title": "Screen",
-            "pos_x": 774.9999999999999,
-            "pos_y": 146.87499999999994,
+            "pos_x": 1032.0312499999998,
+            "pos_y": -155.46875,
             "inputs": [
                 {
                     "id": 2020632299664,
@@ -1653,8 +1653,8 @@
         {
             "id": 2379441355600,
             "title": "Symetry",
-            "pos_x": -610.9374999999999,
-            "pos_y": 103.12499999999999,
+            "pos_x": -904.6874999999999,
+            "pos_y": 87.49999999999997,
             "inputs": [
                 {
                     "id": 2377302675216,
@@ -1764,8 +1764,8 @@
         {
             "id": 2377874812816,
             "title": "HSV Pow",
-            "pos_x": 76.56249999999994,
-            "pos_y": 343.74999999999994,
+            "pos_x": 101.56249999999994,
+            "pos_y": 387.49999999999994,
             "inputs": [
                 {
                     "id": 2379384774224,
@@ -1983,8 +1983,8 @@
         {
             "id": 2379441871632,
             "title": "Symetry",
-            "pos_x": 545.3124999999999,
-            "pos_y": 253.12499999999994,
+            "pos_x": 473.4374999999999,
+            "pos_y": -37.5,
             "inputs": [
                 {
                     "id": 2379441356752,
@@ -2090,6 +2090,1189 @@
                 1920,
                 1080
             ]
+        },
+        {
+            "id": 2640982706064,
+            "title": "Gradient Map",
+            "pos_x": -453.12499999999983,
+            "pos_y": -84.375,
+            "inputs": [
+                {
+                    "id": 2640982573712,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2640982473296,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1259,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2641769010512,
+            "title": "SquareGate",
+            "pos_x": 621.8749999999997,
+            "pos_y": 196.875,
+            "inputs": [
+                {
+                    "id": 2638182213072,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 2641769601552,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2641769402512,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1074,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel1": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "square_size": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "N_SQUARE": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "border_size": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "which": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "iChannel1": {
+                        "type": null,
+                        "param_name": "iChannel1"
+                    },
+                    "square_size": {
+                        "type": null,
+                        "param_name": "square_size"
+                    },
+                    "energy": {
+                        "type": null,
+                        "param_name": "energy"
+                    },
+                    "N_SQUARE": {
+                        "type": null,
+                        "param_name": "N_SQUARE"
+                    },
+                    "border_size": {
+                        "type": null,
+                        "param_name": "border_size"
+                    },
+                    "which": {
+                        "type": null,
+                        "param_name": "which"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2641768639120,
+            "title": "Hexagons",
+            "pos_x": -871.8749999999999,
+            "pos_y": -549.9999999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2641008121936,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 829,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rotationSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*2.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "offsetSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveFrequency": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveSpeed": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*3.",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "numLayer": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "waveOffset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "res": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thickness": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "rotationSpeed": {
+                        "type": null,
+                        "param_name": "rotationSpeed"
+                    },
+                    "offsetSpeed": {
+                        "type": null,
+                        "param_name": "offsetSpeed"
+                    },
+                    "waveFrequency": {
+                        "type": null,
+                        "param_name": "waveFrequency"
+                    },
+                    "waveSpeed": {
+                        "type": null,
+                        "param_name": "waveSpeed"
+                    },
+                    "numLayer": {
+                        "type": null,
+                        "param_name": "numLayer"
+                    },
+                    "waveOffset": {
+                        "type": null,
+                        "param_name": "waveOffset"
+                    },
+                    "res": {
+                        "type": null,
+                        "param_name": "res"
+                    },
+                    "thickness": {
+                        "type": null,
+                        "param_name": "thickness"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2638132286800,
+            "title": "HexShadows",
+            "pos_x": -871.8749999999999,
+            "pos_y": -403.12499999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2638132114768,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1086,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "iResolution"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                480,
+                270
+            ]
+        },
+        {
+            "id": 2638008376528,
+            "title": "SDF_BM",
+            "pos_x": -856.2499999999999,
+            "pos_y": -199.99999999999997,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2640982769040,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 459,
+            "cpu_adaptable_parameters": {
+                "info_program": {},
+                "normal_program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "info_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tz": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tp": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_sym": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_arms": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                },
+                "normal_program": {
+                    "tm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "tc": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_idx": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "go_idx2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "goBloom_arms": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode_ptt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "info_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": "tma"
+                    },
+                    "tz": {
+                        "type": null,
+                        "param_name": "tza"
+                    },
+                    "tp": {
+                        "type": null,
+                        "param_name": "tp_final"
+                    },
+                    "tptt": {
+                        "type": null,
+                        "param_name": "tptt"
+                    },
+                    "mode_sym": {
+                        "type": null,
+                        "param_name": "mode_sym"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "mode_ptt"
+                    },
+                    "go_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    },
+                    "go_arms": {
+                        "type": null,
+                        "param_name": "go_arms"
+                    }
+                },
+                "normal_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "tm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "tc": {
+                        "type": null,
+                        "param_name": "tc"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "go_idx": {
+                        "type": null,
+                        "param_name": "go_bloom"
+                    },
+                    "go_idx2": {
+                        "type": null,
+                        "param_name": "go_bloom2"
+                    },
+                    "goBloom_arms": {
+                        "type": null,
+                        "param_name": "goBloom_arms"
+                    },
+                    "mode_ptt": {
+                        "type": null,
+                        "param_name": "go_ptt"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2637599020368,
+            "title": "Pingouin",
+            "pos_x": -856.2499999999999,
+            "pos_y": 307.81249999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2638008450256,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 841,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "decaying_kick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "move_x": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "move_z": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_tempo": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_tempo2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_tempo4": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "l": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "color": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "angle_t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y_t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "trigger": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rot_final": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "min_dist": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "on_chill": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "iTime"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "iResolution"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "energy_fast"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "energy_slow"
+                    },
+                    "decaying_kick": {
+                        "type": null,
+                        "param_name": "decaying_kick"
+                    },
+                    "move_x": {
+                        "type": null,
+                        "param_name": "move_x"
+                    },
+                    "move_z": {
+                        "type": null,
+                        "param_name": "move_z"
+                    },
+                    "on_tempo": {
+                        "type": null,
+                        "param_name": "on_tempo"
+                    },
+                    "on_tempo2": {
+                        "type": null,
+                        "param_name": "on_tempo2"
+                    },
+                    "on_tempo4": {
+                        "type": null,
+                        "param_name": "on_tempo4"
+                    },
+                    "l": {
+                        "type": null,
+                        "param_name": "l"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "mode"
+                    },
+                    "color": {
+                        "type": null,
+                        "param_name": "color"
+                    },
+                    "angle_t": {
+                        "type": null,
+                        "param_name": "angle_t"
+                    },
+                    "y_t": {
+                        "type": null,
+                        "param_name": "y_t"
+                    },
+                    "trigger": {
+                        "type": null,
+                        "param_name": "trigger"
+                    },
+                    "rot_final": {
+                        "type": null,
+                        "param_name": "rot_final"
+                    },
+                    "min_dist": {
+                        "type": null,
+                        "param_name": "min_dist"
+                    },
+                    "on_chill": {
+                        "type": null,
+                        "param_name": "on_chill"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2637599288464,
+            "title": "BangerSponge",
+            "pos_x": -768.7499999999999,
+            "pos_y": 514.0624999999999,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2638008381328,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1275,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast2": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "onTempo": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "dist": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "onKick": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast_cam": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast2": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "onTempo": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "dist": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "onKick": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast_cam": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2641768884944,
+            "title": "Abstract SQRT",
+            "pos_x": -568.7499999999999,
+            "pos_y": 282.81249999999994,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 2638007841040,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1405,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_h": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "count_beat": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "thresh": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "t_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "nrj_fast"
+                    },
+                    "t_h": {
+                        "type": null,
+                        "param_name": "t_h"
+                    },
+                    "count_beat": {
+                        "type": null,
+                        "param_name": "count_beat"
+                    },
+                    "thresh": {
+                        "type": null,
+                        "param_name": "thresh"
+                    },
+                    "t_rot": {
+                        "type": null,
+                        "param_name": "t_rot"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 2637599200656,
+            "title": "Vignet",
+            "pos_x": 822.2656249999998,
+            "pos_y": 31.24999999999999,
+            "inputs": [
+                {
+                    "id": 2637599765392,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2638008488080,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 653,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "decay": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "1.5",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "decay": {
+                        "type": null,
+                        "param_name": "decay"
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
         }
     ],
     "edges": [
@@ -2136,12 +3319,6 @@
             "end": 140404630066640
         },
         {
-            "id": 2379195891280,
-            "edge_type": 2,
-            "start": 2379442734992,
-            "end": 140404682294352
-        },
-        {
             "id": 2379442567504,
             "edge_type": 2,
             "start": 2379442734992,
@@ -2160,21 +3337,51 @@
             "end": 2379384774224
         },
         {
-            "id": 2377875691600,
-            "edge_type": 2,
-            "start": 2379442339792,
-            "end": 2379413194448
-        },
-        {
             "id": 2379442669072,
             "edge_type": 2,
             "start": 2379412842000,
             "end": 2379441356752
         },
         {
-            "id": 2378217514704,
+            "id": 2637473155024,
             "edge_type": 2,
-            "start": 2379442339792,
+            "start": 2379442734992,
+            "end": 2640982573712
+        },
+        {
+            "id": 2640982518352,
+            "edge_type": 2,
+            "start": 2640982473296,
+            "end": 140404682294352
+        },
+        {
+            "id": 2638132292560,
+            "edge_type": 2,
+            "start": 140404628869904,
+            "end": 2379413194448
+        },
+        {
+            "id": 2637473305552,
+            "edge_type": 2,
+            "start": 140404628869904,
+            "end": 2638182213072
+        },
+        {
+            "id": 2641743382416,
+            "edge_type": 2,
+            "start": 2641008121936,
+            "end": 2641769601552
+        },
+        {
+            "id": 2637625826960,
+            "edge_type": 2,
+            "start": 2641769402512,
+            "end": 2637599765392
+        },
+        {
+            "id": 2637625888656,
+            "edge_type": 2,
+            "start": 2638008488080,
             "end": 2020632299664
         }
     ]

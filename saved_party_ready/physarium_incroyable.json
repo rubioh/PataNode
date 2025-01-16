@@ -63,7 +63,7 @@
                     "zoom_factor": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "x*.25",
+                            "value": ".5",
                             "widget": "TextEdit"
                         }
                     }
