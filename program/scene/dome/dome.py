@@ -24,7 +24,12 @@ class Dome(ProgramBase):
         self.ctx = ctx
         self.path = "./assets/mesh/dome.glb"
         self.scene = MeshScene(self.path, ctx)
-
+        self.x = 0.
+        self.y = 0.
+        self.z = 0.
+        self.rx = 0.
+        self.ry = 0.
+        self.rz = 0.
         self.initProgram()
         self.initFBOSpecifications()
         self.initParams()
@@ -53,9 +58,9 @@ class Dome(ProgramBase):
     def initParams(self):
         self.time = 0
         self.camera = glm.mat4()
-        self.camera = glm.translate(self.camera, glm.vec3(0.0, 0.0, -2.1))
+#        self.camera = glm.translate(self.camera, glm.vec3(0.0, -10.0, -2.1))
 #       self.camera = glm.translate(self.camera, glm.vec3(0., 10., -2.1))
-#       self.camera = glm.rotate(self.camera, .2, glm.vec3(1., 0., 0.))
+#        self.camera = glm.rotate(self.camera, .3, glm.vec3(1., 0., 0.))
         self.projection = glm.perspective(glm.radians(45.0), 16.0 / 9.0, 0.1, 1000.0)
         self.model = glm.mat4()
         self.model = glm.scale(self.model, glm.vec3(1.0, 1.0, 1.0))
@@ -77,7 +82,7 @@ class Dome(ProgramBase):
             self.ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
         )
         self.renderer.add_scene(self.scene)
-        self.renderer.add_sun(glm.vec3(1.0, 0.0, 0.0), glm.vec3(1.0))
+        self.renderer.add_sun(glm.vec3(1.0, .3, 0.0), glm.vec3(1.0))
     def initUniformsBinding(self):
 
         binding = {
@@ -90,15 +95,28 @@ class Dome(ProgramBase):
             "scale": "scale_final",
         }
         self.add_text_edit_cpu_adaptable_parameter("object_path", self.path, self.load_mesh)
+        self.add_text_edit_cpu_adaptable_parameter("x", self.x, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("y", self.y, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("z", self.z, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("rx", self.rx, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("ry", self.ry, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("rz", self.rz, lambda: 0)
         super().initUniformsBinding(binding, program_name="")
         super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
         v = self.getCpuAdaptableParameters()["program"]["object_path"]["eval_function"]["value"]
+        self.x = float(self.getCpuAdaptableParameters()["program"]["x"]["eval_function"]["value"])
+        self.y = float(self.getCpuAdaptableParameters()["program"]["y"]["eval_function"]["value"])
+        self.z = float(self.getCpuAdaptableParameters()["program"]["z"]["eval_function"]["value"])
+        self.rx = float(self.getCpuAdaptableParameters()["program"]["rx"]["eval_function"]["value"])
+        self.ry = float(self.getCpuAdaptableParameters()["program"]["ry"]["eval_function"]["value"])
+        self.rz = float(self.getCpuAdaptableParameters()["program"]["rz"]["eval_function"]["value"])
+
         if self.path != v:
             self.path = v
             self.load_mesh()
-        self.model = glm.rotate(self.model, 0.01, glm.vec3(0.0, 1.0, 0.0))
+        self.model = glm.rotate(self.model, 0.002, glm.vec3(1.0, 0.0, 0.0))
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)
         self.time += 1 / 60 * (1 + self.vitesse)
@@ -139,9 +157,14 @@ class Dome(ProgramBase):
         self.bindUniform(af)
         self.fbos[0].use()
         self.fbos[0].clear()
-        self.vao.render()
+        #self.vao.render()
+        camera = glm.mat4()
+        camera = glm.translate(camera, glm.vec3(self.x, self.y, self.z))
+       # camera = glm.rotate(self.camera, self.rx, glm.vec3(1., 0., 0.))
+       # camera = glm.rotate(self.camera, self.ry, glm.vec3(0., 1., 0.))
+       # camera = glm.rotate(self.camera, self.rz, glm.vec3(0., 0., 1.))
         self.renderer.renderGBUFFER(
-            self.model, self.camera, self.projection, self.fbos[0]
+            self.model, camera, self.projection, self.fbos[0]
         )
         self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
         return self.fbos[1].color_attachments[0]

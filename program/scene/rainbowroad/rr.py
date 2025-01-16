@@ -49,7 +49,6 @@ class RainbowRoad(ProgramBase):
             "turfu": "turfu",
             "tic_tile": "tic_tile",
             "mode": "mode",
-            "c1": "c1",
             "trigger": "trigger",
         }
         super().initUniformsBinding(binding, program_name="")
@@ -72,7 +71,6 @@ class RainbowRoad(ProgramBase):
         self.r = 0
         self.wait = 0
         self.tac = 0
-        self.c1 = 0
         self.mode = 1
         self.time_au = 0
         self.trigger = np.zeros(4)
@@ -109,14 +107,12 @@ class RainbowRoad(ProgramBase):
 
             if self.count_kick >= 16:
                 self.count_kick = 0
-                self.c1 ^= 1
 
         if not fa["on_chill"] and self.on_chill:
             self.count_kick = 0
 
         if fa["on_chill"]:
             self.on_chill = 1
-            self.c1 = 0
             self.turfu += 0.01
         else:
             self.on_chill = 0
@@ -143,7 +139,6 @@ class RainbowRoad(ProgramBase):
         self.trigger = self.trigger
         self.turfu = self.turfu
         self.tic_tile = self.tic_tile
-        self.c1 = self.c1
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -174,7 +169,7 @@ class RRNode(ShaderNode, Scene):
 
     def render(self, audio_features=None):
         if self.program.already_called:
-            output_texture = self.program.norender()
+            output_texture = self.program.norender(audio_features)
         else:
             output_texture = self.program.render(audio_features)
 
