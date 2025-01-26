@@ -18,6 +18,7 @@ from program.scene.texture import texture
 from program.scene.truchet import truchet
 from program.scene.bangersponge import bangersponge
 from program.scene.fractal import fractal
+from program.scene.particles import particles
 
 __all__ = [
     "abstractsqrt",

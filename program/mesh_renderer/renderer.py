@@ -68,6 +68,10 @@ class Renderer:
         for scene in self.scenes:
             scene.render_scene(model, view, projection, surface)
 
+    def renderGBUFFERinstance(self, num, instance_buffer, model, view, projection, surface):
+        for scene in self.scenes:
+            scene.render_scene_instance(num, instance_buffer, model, view, projection, surface)
+
     def renderSun(self, surface, view, gbuffer):
         for sun in self.suns:
             self.sun_program["albedoMetallicTexture"] = 0
@@ -101,8 +105,13 @@ def render(
     ctx,
     mesh_resource_manager,
     texture_resource_manager,
+    num_instance = None,
+    instance_buffer = None,
 ):
-    program = mesh.program
+    if not instance_buffer:
+        program = mesh.program
+    else:
+        program = mesh.program_instance
     material = mesh.material
     surface.use()
     ctx.front_face = "ccw"
@@ -124,14 +133,14 @@ def render(
 
         # Scalar value dont need to be reshaped, vec3 are automatically cast to vec4
         if isinstance(v, float) or isinstance(v, int):
-            mesh.program[k] = float(v)
+            program[k] = float(v)
         else:
             value = v
 
             if len(value) == 3:
                 value = glm.vec4(v[0], v[1], v[2], 0.0)
 
-            mesh.program[k] = np.array(value).reshape(1, len(value))[0]
+            program[k] = np.array(value).reshape(1, len(value))[0]
 
     location = 0
 
@@ -145,6 +154,10 @@ def render(
 #       for k, v in mesh.uniform.items():
 #           mesh.program[k] = np.array(v).reshape(1, 16)[0]
 
-    mesh.vao.render(4)
+    if not instance_buffer:
+        mesh.vao.render(4)
+    else:
+        mesh.vao_instance.render(4, instances=num_instance)
+
     ctx.disable(ctx.CULL_FACE)
     ctx.disable(mgl.DEPTH_TEST)

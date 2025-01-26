@@ -51,7 +51,7 @@ class Node:
 
 
 class MeshScene:
-    def __init__(self, file_path, ctx):
+    def __init__(self, file_path, ctx, instance_buffer = None, instance_buffer_layout = None):
         self.dag = []
         self.mesh_indices = []  # The indices of meshes relative to the gltf scenes
         self.materials = []
@@ -66,7 +66,8 @@ class MeshScene:
         self.ctx = ctx
         self.mesh_resource_manager = MeshResourceManager(ctx)
         self.texture_resource_manager = TextureResourceManager(ctx)
-
+        self.instance_buffer = instance_buffer
+        self.instance_buffer_layout = instance_buffer_layout
         if file_path:
             self.load_scene(file_path)
 
@@ -165,6 +166,9 @@ class MeshScene:
                         buffers[5],
                         indice_type_size,
                         material,
+                        None,
+                        self.instance_buffer,
+                        self.instance_buffer_layout
                     )
                 )
 
@@ -243,6 +247,26 @@ class MeshScene:
         for child in node.children:
             self.render_node(self.dag[child], matrix, mvp_uniform, surface)
 
+    def render_node_instance(self, num, instance_buffer, node, matrix, mvp_uniform, surface):
+        matrix *= node.transform
+        #print(node.transform)
+        for mesh_rsc_idx in node.meshes:
+            mesh = self.mesh_resource_manager.get_resource(mesh_rsc_idx)
+            render(
+                matrix,
+                mvp_uniform,
+                surface,
+                mesh,
+                self.ctx,
+                self.mesh_resource_manager,
+                self.texture_resource_manager,
+                num, 
+                instance_buffer
+            )
+
+        for child in node.children:
+            self.render_node_instance(self.dag[child], num, instance_buffer, matrix, mvp_uniform, surface)
+
     def render_scene(self, model, view, projection, surface):
         mvp_uniform = {"model": model, "view": view, "projection": projection}
 
@@ -253,3 +277,15 @@ class MeshScene:
                # print("view ", view)
                 #print("proj ", projection)
                 self.render_node(node, glm.mat4(), mvp_uniform, surface)
+
+    def render_scene_instance(self, num, instance_buffer, model, view, projection, surface):
+        mvp_uniform = {"model": model, "view": view, "projection": projection}
+
+        for scene in self.root_nodes:
+            for node_idx in scene.nodes:
+                node = self.dag[node_idx]
+              #  print("model ", model)
+               # print("view ", view)
+                #print("proj ", projection)
+                self.render_node_instance(num, instance_buffer, node, glm.mat4(), mvp_uniform, surface)
+
