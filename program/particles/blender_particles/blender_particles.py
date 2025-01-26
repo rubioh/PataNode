@@ -41,8 +41,8 @@ class ParticleSystem:
 
     def init_compute(self):
         self.position_buffer[(self.iFrame + 0) % 2].bind_to_storage_buffer(0, 0, self.buffer_size)
-        self.position_buffer[(self.iFrame + 1) % 2].bind_to_storage_buffer(1, 0, self.buffer_size)
-        self.velocity_buffer[(self.iFrame + 0) % 2].bind_to_storage_buffer(2, 0, self.buffer_size)
+        self.position_buffer[(self.iFrame + 1) % 2].bind_to_storage_buffer(2, 0, self.buffer_size)
+        self.velocity_buffer[(self.iFrame + 0) % 2].bind_to_storage_buffer(1, 0, self.buffer_size)
         self.velocity_buffer[(self.iFrame + 1) % 2].bind_to_storage_buffer(3, 0, self.buffer_size)
         self.init_shader.run(self.num_group, 1, 1)
         self.ctx.finish()

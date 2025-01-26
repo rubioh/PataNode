@@ -18,14 +18,14 @@ class Particle(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Particle"
-        self.path = "./assets/mesh/Earth2.glb"
-        self.particle_system = ParticleSystem(self.ctx, 1000)
+        self.path = "./assets/mesh/spheretiny.glb"
+        self.particle_system = ParticleSystem(self.ctx, 1000000)
         self.scene = MeshScene(self.path, ctx, self.particle_system.get_particle_buffer(), self.particle_system.get_particle_buffer_unit_size())
         self.camera = glm.mat4()
         self.projection = glm.perspective(glm.radians(45.0), 16.0 / 9.0, 0.1, 1000.0)
         self.model = glm.mat4()
-        self.camera = glm.translate(self.camera, glm.vec3(0, 0., -10.))
-        self.model = glm.scale(self.model, glm.vec3(.1, .1, .1))
+        self.camera = glm.translate(self.camera, glm.vec3(0, 0., -1.))
+       # self.model = glm.scale(self.model, glm.vec3(.01, .01, .01))
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
@@ -39,7 +39,7 @@ class Particle(ProgramBase):
             self.ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
         )
         self.renderer.add_scene(self.scene)
-        self.renderer.add_sun(glm.vec3(1.0, .3, 0.0), glm.vec3(1.0))
+        self.renderer.add_sun(glm.vec3(0.0, 0., 1.0), glm.vec3(1.))
 
     def initFBOSpecifications(self):
         self.required_fbos = 2
@@ -82,12 +82,14 @@ class Particle(ProgramBase):
         self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def render(self, af=None):
+        if not af:
+            return
         self.updateParams(af)
         self.particle_system.update()
         self.bindUniform(af)
         self.fbos[0].use()
         self.fbos[0].clear()
-        self.renderer.renderGBUFFERinstance(10, self.particle_system.get_particle_buffer(),
+        self.renderer.renderGBUFFERinstance(100000, self.particle_system.get_particle_buffer(),
             self.model, self.camera, self.projection, self.fbos[0]
         )
         self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
