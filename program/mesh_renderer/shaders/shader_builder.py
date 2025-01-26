@@ -25,9 +25,16 @@ out vec3 tangent;\n"
 out_tbn = "out mat3 tbn;\n"
 in_tbn = "in mat3 tbn;\n"
 #  mat4 mvp = model_transform * model *  view * projection;\n\
+
 main = "void main() {\n\
     vec4 v = vec4(in_position, 1.);\n\
     v = v * mvp;\n\
+    gl_Position = v;\n\
+    p = v.xyz;\n"
+
+main_instance = "void main() {\n\
+    vec4 v = vec4(in_position, 1.);\n\
+    v = (v + in_particle_position) *mvp;\n\
     gl_Position = v;\n\
     p = v.xyz;\n"
 
@@ -87,11 +94,16 @@ fragment_end = "    albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
     normalRoughness = vec4( bump_normal, roughnessFactor);\n\
     emissive.xyz = in_emissive.xyz;\n"
 
+particle_data_struct = "in vec4 in_particle_position;\n"
+#uniform particleData in_particle_data;"
 
-def build_vertex_shader(mesh_layout):
+def build_vertex_shader(mesh_layout, instance):
     shader = ""
     shader += layout + str(0) + position
     layout_index = 1
+
+    if instance:
+        shader += particle_data_struct
 
     if mesh_layout["vertex_normal"]:
         shader += layout + str(layout_index) + normal
@@ -114,8 +126,10 @@ def build_vertex_shader(mesh_layout):
 
     if mesh_layout["vertex_tangent"]:
         shader += out_tbn
-
-    shader += main
+    if instance:
+        shader += main_instance
+    else:
+        shader += main
 
     if mesh_layout["vertex_normal"]:
         shader += normal_inter
@@ -191,6 +205,5 @@ def build_fragment_shader(material):
     result += "}"
     return result
 
-
-def build_shaders(mesh_layout, material):
-    return (build_vertex_shader(mesh_layout), build_fragment_shader(material))
+def build_shaders(mesh_layout, material, instance = False):
+    return (build_vertex_shader(mesh_layout, instance), build_fragment_shader(material))

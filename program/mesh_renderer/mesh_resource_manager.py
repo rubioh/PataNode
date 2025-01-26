@@ -11,9 +11,12 @@ class Mesh:
         vertex_color,
         vertex_tangent,
         program,
+        program_instance,
         ctx,
         idx_size,
         material,
+        instance_buffer = None,
+        instance_buffer_layout = None,
     ):
         self.ctx = ctx
         self.vbo_position = self.ctx.buffer(vertex_position)
@@ -52,7 +55,13 @@ class Mesh:
         self.vao = self.ctx.vertex_array(
             program, layout, index_buffer=self.vbo_indices, index_element_size=idx_size
         )
+        if instance_buffer is not None:
+            layout.append((instance_buffer, instance_buffer_layout, "in_particle_position"))
+            self.vao_instance = self.ctx.vertex_array(
+                program_instance, layout, index_buffer=self.vbo_indices, index_element_size=idx_size
+            )
         self.program = program
+        self.program_instance = program_instance
         self.material = material
 
 
@@ -75,6 +84,8 @@ class MeshResourceManager:
         idx_size,
         material,
         program=None,
+        instance_buffer = None,
+        instance_buffer_layout = None
     ):
         mesh_layout = {
             "vertex_normal": vertex_normal is not None,
@@ -85,6 +96,7 @@ class MeshResourceManager:
 
         if not program:
             program = self.load_program(mesh_layout, material)
+            program_instance = self.load_instance_program(mesh_layout, material)
 
         mesh = Mesh(
             vertex_position,
@@ -94,9 +106,12 @@ class MeshResourceManager:
             vertex_color,
             vertex_tangent,
             program,
+            program_instance,
             self.ctx,
             idx_size,
             material,
+            instance_buffer,
+            instance_buffer_layout
         )
 
         self.resources.append(mesh)
@@ -105,7 +120,17 @@ class MeshResourceManager:
     def load_program(self, mesh_layout, material):
         self.code_version = "#version "
         self.code_version += str(3) + str(3) + str("0 core\n")
-        vertex_code, fragment_code = build_shaders(mesh_layout, material)
+        vertex_code, fragment_code = build_shaders(mesh_layout, material, False)
+        self.vertex_code = self.code_version + vertex_code
+        self.fragment_code = self.code_version + fragment_code
+        program = self.ctx.program(
+            vertex_shader=self.vertex_code, fragment_shader=self.fragment_code)
+        return program
+
+    def load_instance_program(self, mesh_layout, material):
+        self.code_version = "#version "
+        self.code_version += str(3) + str(3) + str("0 core\n")
+        vertex_code, fragment_code = build_shaders(mesh_layout, material, True)
         self.vertex_code = self.code_version + vertex_code
         self.fragment_code = self.code_version + fragment_code
         program = self.ctx.program(
