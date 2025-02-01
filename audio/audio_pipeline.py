@@ -15,6 +15,7 @@ from audio.audio_bpm import BPM_estimator
 import serial
 import threading
 import time
+import struct
 
 PORT = "/dev/ttyACM0"
 BAUDRATE = 115200
@@ -34,22 +35,28 @@ def read_serial():
     try:
         ser = serial.Serial(PORT, BAUDRATE, timeout=1)
         print(f"[Serial Thread] Connected to {PORT}")
+        samples = 0
+        last_s = 0
 
         while True:
-            line = ser.readline().decode("utf-8").strip()
+            data = ser.read(NUM_ADC_PINS * 2)  # 2 bytes per ADC reading
 
-            if line.startswith("ADC:"):
-                try:
-                    # Extract ADC values from text
-                    values = list(map(int, line.replace("ADC:", "").split(",")))
+            if len(data) == NUM_ADC_PINS * 2:  # Ensure full data is received
+                # Unpack the binary data into ADC readings
+                values = struct.unpack("<" + "H" * NUM_ADC_PINS, data)
 
-                    if len(values) == NUM_ADC_PINS:
-                        with lock:  # Ensure safe access to shared data
-                            adc_values = values
-                            scaled_values = [value / 1023.0 for value in values]
+                with lock:  # Ensure safe access to shared data
+                    adc_values = values
+                    # Scale ADC values between 0 and 1
+                    scaled_values = [value / 1023.0 for value in values]
 
-                except ValueError:
-                    print(f"[Serial Thread] Invalid data received: {line}")
+            if int(time.time()) > last_s:
+                print(f"received {samples} samples this time")
+                last_s = int(time.time())
+                samples = 0
+            else:
+                samples += 1
+            time.sleep(0.005)
 
 
     except serial.SerialException:
