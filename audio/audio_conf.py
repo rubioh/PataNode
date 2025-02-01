@@ -49,6 +49,12 @@ list_audio_features = [
     "time",
     "smooth_dft",
     "smooth_very_low",
+    "adc0",
+    "adc1",
+    "adc2",
+    "adc3",
+    "adc4",
+    "adc5",
 ]
 
 dict_audio_features = {
@@ -100,5 +106,6 @@ dict_audio_features = {
     ],
     "Mode features": ["mini_chill", "on_chill"],
     "Incremental features": ["hat_count", "kick_count", "snare_count", "time"],
+    "CV In": ["adc0", "adc1", "adc2", "adc3", "adc4", "adc5"],
     "Other": ["boost", "bpm", "shortterm_bpm", "pitch"],
 }

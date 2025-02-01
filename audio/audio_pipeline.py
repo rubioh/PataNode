@@ -12,6 +12,55 @@ from audio.audio_logger import AudioLogger
 from audio.audio_event import AudioEventTracker
 from audio.audio_bpm import BPM_estimator
 
+import serial
+import threading
+import time
+
+PORT = "/dev/ttyACM0"
+BAUDRATE = 115200
+NUM_ADC_PINS = 6
+
+# Shared state for ADC values (initialized to 0)
+adc_values = [0] * NUM_ADC_PINS
+scaled_values = [0.0] * NUM_ADC_PINS  # Scaled values between 0 and 1
+lock = threading.Lock()  # Ensure thread safety
+
+
+def read_serial():
+    """Thread function that continuously reads ADC values from serial (text format)."""
+    global adc_values
+    global scaled_values
+
+    try:
+        ser = serial.Serial(PORT, BAUDRATE, timeout=1)
+        print(f"[Serial Thread] Connected to {PORT}")
+
+        while True:
+            line = ser.readline().decode("utf-8").strip()
+
+            if line.startswith("ADC:"):
+                try:
+                    # Extract ADC values from text
+                    values = list(map(int, line.replace("ADC:", "").split(",")))
+
+                    if len(values) == NUM_ADC_PINS:
+                        with lock:  # Ensure safe access to shared data
+                            adc_values = values
+                            scaled_values = [value / 1023.0 for value in values]
+
+                except ValueError:
+                    print(f"[Serial Thread] Invalid data received: {line}")
+
+
+    except serial.SerialException:
+        print(f"[Serial Thread] Could not open port {PORT}. Check your connection.")
+    except Exception as e:
+        print(f"[Serial Thread] Error: {e}")
+
+
+# Start the serial reading thread
+serial_thread = threading.Thread(target=read_serial, daemon=True)
+serial_thread.start()
 
 class AudioEngine:
     def __init__(self, n_fft=1024, sample_rate=16000, get_log=True):
@@ -178,4 +227,8 @@ class AudioEngine:
 
         self.previous_length = self.buffer.shape[0]
 
+        #formatted_values = ", ".join([f"{scaled:.3f}" for scaled in scaled_values])  # 3 decimals
+        #print(f"\r[Main] Scaled ADC Readings: {formatted_values}", end="")
+        for i, v in enumerate(scaled_values):
+            self.features[f"adc{i}"] = v
         return self.features
