@@ -118,6 +118,7 @@ class PolyGraphicScene(QGraphicsScene):
             self.polyproxies.append(n)
 
     def makePolygons(self):
+        return [p.to_polys() for p in self.polyproxies]
 #       scisor_id = 0
         polyproxies = copy.deepcopy(self.polyproxies)
         for poly, scisor in zip(polyproxies[::2], polyproxies[1::2]):
