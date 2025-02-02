@@ -1,4 +1,5 @@
 git+https://github.com/pata-tech/pyqt-node-editor@master
+opencv-python-headless
 pyglm
 moderngl
 pygame
@@ -16,4 +17,3 @@ pyyaml
 pyrr
 pyqtgraph
 librosa
-opencv-python
