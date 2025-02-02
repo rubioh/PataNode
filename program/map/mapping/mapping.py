@@ -41,8 +41,8 @@ class Mapping(ProgramBase):
         self.polygons = new_polygons
 
     def initFBOSpecifications(self):
-        self.required_fbos = 1
-        fbos_specification = [[self.win_size, 4, "f4"]]
+        self.required_fbos = 2
+        fbos_specification = [[self.win_size, 4, "f4"], [self.win_size, 4, "f4"] ]
 
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
@@ -70,7 +70,7 @@ class Mapping(ProgramBase):
 
     def updateEarcut(self):
         self.vaos = []
-        for i, p in enumerate(self.polygons[::2]):
+        for i, p in enumerate(self.polygons):
             n_p = []
             vertex_pos = []
             vertex_tcs = []
@@ -80,19 +80,24 @@ class Mapping(ProgramBase):
                 n_p.append(p[j * 4+ 1])
                 vertex_pos.append(p[j * 4])
                 vertex_pos.append(p[j * 4 + 1])
-                vertex_tcs.append(p[j * 4 + 2] )
+                vertex_tcs.append(p[j * 4 + 2])
                 vertex_tcs.append(p[j * 4 + 3])
 
             indices = earcut(n_p)
             gpu_vertex_buffer = np.array([],dtype='f4')
             gpu_tcs_buffer = np.array([],dtype='f4')
-
-            for idx in indices:
-                gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
-                gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
-                gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 0]) )
-                gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 1]) )
-
+            if i  % 2 == 0:
+                for idx in indices:
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 0]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_tcs[idx * 2 + 1]) )
+            else:
+                for idx in indices:
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer,   float (vertex_pos[idx * 2] ) )
+                    gpu_vertex_buffer = np.append(gpu_vertex_buffer, float(vertex_pos[idx * 2 + 1]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_pos[idx * 2 + 0]) )
+                    gpu_tcs_buffer = np.append(gpu_tcs_buffer, float(vertex_pos[idx * 2 + 1]) )
             gpu_vertex_buffer = gpu_vertex_buffer.astype("f4")
             gpu_tcs_buffer = gpu_tcs_buffer.astype("f4")
             self.vaos.append( self.ctx.vertex_array(self.program,
@@ -113,23 +118,39 @@ class Mapping(ProgramBase):
         self.program["iChannel0"] = 0
 
         textures[0].use(0)
-
         self.fbos[0].use()
         self.fbos[0].clear()
+        self.fbos[1].clear()
 
-        for vao in self.vaos:
+        for vao in self.vaos[1::2]:
+            vao.render()
+
+        self.fbos[0].color_attachments[0].use(0)
+        self.fbos[1].use()
+
+        for vao in self.vaos[0::2]:
             vao.render()
 
         if self.wireframe:
             self.program["white"] = 1
             shape = moderngl.LINE_STRIP
 
-            for vao in self.vaos:
-                vao.render(shape)
+            self.fbos[0].use()
+            self.fbos[0].clear()
+            self.fbos[1].clear()
+
+            for vao in self.vaos[1::2]:
+                vao.render(moderngl.LINE_STRIP)
+
+            self.fbos[0].color_attachments[0].use(0)
+            self.fbos[1].use()
+
+            for vao in self.vaos[0::2]:
+                vao.render(moderngl.LINE_STRIP)
 
         self.program["white"] = 0
 
-        return self.fbos[0].color_attachments[0]
+        return self.fbos[1].color_attachments[0]
 
 @register_node(OP_CODE_MAPPING)
 class MappingNode(ShaderNode, Map):
