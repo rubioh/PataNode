@@ -68,14 +68,24 @@ class LightEngine:
         for light in self.lights:
             if self.force_strobe():
                 if "strobe" in light.attrib:
-                    light.attrib["strobe"] = 100
+                    light.attrib["strobe"] = 84./255.
+                    light.attrib["white"] = 1
+                    light.attrib["red"] = 1
+                    light.attrib["green"] = 1
+                    light.attrib["blue"] = 1
             else:
                 if "strobe" in light.attrib:
-                    print("no_strobe")
+                    light.attrib["strobe"] = 1
+                    light.attrib["white"] = 0
+                    light.attrib["red"] = 0
+                    light.attrib["green"] = 0
+                    light.attrib["blue"] = 0
 
             light_buffer = light.get_dmx_buffer()
+
             if self.wait > 1000:
                 print(light, light.color)
+
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
         self.wait += 1
         self.wait %= 1002

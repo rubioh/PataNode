@@ -27,7 +27,7 @@ class AudioEngine:
         self.current_wav_frame = np.zeros(self.chunk)
         self.wav_std = 0.25
         self.queue_callback = True
-        device_index = os.environ.get("PATASHADE_INPUT_DEVICE", 0)
+        device_index = os.environ.get("PATASHADE_INPUT_DEVICE", 1)
         print(sd.query_devices())
         try:
             self._stream = sd.InputStream(

@@ -1,16 +1,72 @@
 {
-    "id": 140045726423568,
+    "id": 1691543073520,
     "scene_width": 64000,
     "scene_height": 64000,
     "nodes": [
         {
-            "id": 140045726642960,
+            "id": 1691543073472,
+            "title": "octostrip",
+            "pos_x": -447.0,
+            "pos_y": -78.0,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 1691543064496,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1094,
+            "adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "iTime",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "num_kick": {
+                        "eval_function": {
+                            "name": "num_kick",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "num_kick": {
+                        "type": null,
+                        "param_name": "num_kick"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 1691543149680,
             "title": "Screen",
-            "pos_x": 466.0,
-            "pos_y": -30.0,
+            "pos_x": 199.0,
+            "pos_y": 46.0,
             "inputs": [
                 {
-                    "id": 140045726582800,
+                    "id": 1691543083856,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -49,41 +105,13 @@
             ]
         },
         {
-            "id": 140045726590480,
-            "title": "WhiteScreen",
-            "pos_x": -536.0,
-            "pos_y": -175.0,
-            "inputs": [],
-            "outputs": [
-                {
-                    "id": 140045726631952,
-                    "index": 0,
-                    "multi_edges": true,
-                    "position": 5,
-                    "socket_type": 3
-                }
-            ],
-            "content": {},
-            "op_code": 1280,
-            "adaptable_parameters": {
-                "program": {}
-            },
-            "uniforms_binding": {
-                "": {}
-            },
-            "win_size": [
-                1920,
-                1080
-            ]
-        },
-        {
-            "id": 140045726563344,
-            "title": "HSV Offset",
-            "pos_x": -367.0,
-            "pos_y": -40.0,
+            "id": 2552293225584,
+            "title": "Symetry",
+            "pos_x": -268.0,
+            "pos_y": -106.0,
             "inputs": [
                 {
-                    "id": 140045726726288,
+                    "id": 2552293217472,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -92,7 +120,7 @@
             ],
             "outputs": [
                 {
-                    "id": 140045726586704,
+                    "id": 2552294278256,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -100,7 +128,7 @@
                 }
             ],
             "content": {},
-            "op_code": 1658,
+            "op_code": 797,
             "adaptable_parameters": {
                 "program": {
                     "iTime": {
@@ -119,25 +147,33 @@
                             "protected": true
                         }
                     },
-                    "hue_offset": {
+                    "smooth_low": {
                         "eval_function": {
-                            "name": "hue_offset",
-                            "value": "x*.002",
+                            "name": "smooth_low",
+                            "value": "x",
                             "widget": "TextEdit",
                             "protected": false
                         }
                     },
-                    "saturation_offset": {
+                    "mode": {
                         "eval_function": {
-                            "name": "saturation_offset",
-                            "value": "1.-x**3*100.",
+                            "name": "mode",
+                            "value": "x",
                             "widget": "TextEdit",
                             "protected": false
                         }
                     },
-                    "value_offset": {
+                    "t": {
                         "eval_function": {
-                            "name": "value_offset",
+                            "name": "t",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "t_angle",
                             "value": "x",
                             "widget": "TextEdit",
                             "protected": false
@@ -153,23 +189,27 @@
                     },
                     "iResolution": {
                         "type": null,
-                        "param_name": "win_size"
+                        "param_name": null
                     },
                     "iChannel0": {
                         "type": null,
                         "param_name": "iChannel0"
                     },
-                    "hue_offset": {
-                        "type": "audio_features",
-                        "param_name": "kick_count"
-                    },
-                    "saturation_offset": {
-                        "type": "audio_features",
-                        "param_name": "smooth_low"
-                    },
-                    "value_offset": {
+                    "smooth_low": {
                         "type": null,
-                        "param_name": "value_offset"
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
                     }
                 }
             },
@@ -179,13 +219,13 @@
             ]
         },
         {
-            "id": 140045726581968,
+            "id": 2552431047792,
             "title": "LedSymetry",
-            "pos_x": -101.0,
-            "pos_y": 17.0,
+            "pos_x": -418.0,
+            "pos_y": 112.0,
             "inputs": [
                 {
-                    "id": 140045726719376,
+                    "id": 2552431050288,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -194,7 +234,7 @@
             ],
             "outputs": [
                 {
-                    "id": 140045726515344,
+                    "id": 2552429331712,
                     "index": 0,
                     "multi_edges": true,
                     "position": 5,
@@ -209,91 +249,112 @@
                         "eval_function": {
                             "name": "iTime",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "mode",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode_mask": {
                         "eval_function": {
                             "name": "mode_mask",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "blink_force": {
                         "eval_function": {
                             "name": "blink_force",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "kick_count": {
                         "eval_function": {
                             "name": "kick_count",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "no_sym_mode": {
                         "eval_function": {
                             "name": "no_sym_mode",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "on_tempo": {
                         "eval_function": {
                             "name": "on_tempo",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "real_kick_count": {
                         "eval_function": {
                             "name": "real_kick_count",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "black_mode": {
                         "eval_function": {
                             "name": "black_mode",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "go_strobe": {
                         "eval_function": {
                             "name": "go_strobe",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "black": {
                         "eval_function": {
                             "name": "black",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "noise_time": {
                         "eval_function": {
                             "name": "noise_time",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode_2_sym": {
                         "eval_function": {
                             "name": "mode_2_sym",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -366,26 +427,117 @@
                 1920,
                 1080
             ]
+        },
+        {
+            "id": 2552429028144,
+            "title": "Map Led 2D",
+            "pos_x": -52.0,
+            "pos_y": 8.0,
+            "inputs": [
+                {
+                    "id": 2552294577296,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 2552429028288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 1
+                }
+            ],
+            "content": {},
+            "op_code": 967,
+            "adaptable_parameters": {
+                "get_pixel_col_program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "iChannel0",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    }
+                },
+                "view_led_program": {
+                    "input_texture": {
+                        "eval_function": {
+                            "name": "input_texture",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    },
+                    "LightsBuffer": {
+                        "eval_function": {
+                            "name": "LightsBuffer",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": true
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "get_pixel_col_": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": 1
+                    }
+                },
+                "view_led_": {
+                    "iResolution": {
+                        "type": null,
+                        "param_name": [
+                            1920,
+                            1080
+                        ]
+                    },
+                    "input_texture": {
+                        "type": null,
+                        "param_name": 3
+                    },
+                    "LightsBuffer": {
+                        "type": null,
+                        "param_name": 12
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
         }
     ],
     "edges": [
         {
-            "id": 140045726500432,
+            "id": 2552294430272,
             "edge_type": 2,
-            "start": 140045726631952,
-            "end": 140045726726288
+            "start": 1691543064496,
+            "end": 2552293217472
         },
         {
-            "id": 140044339826896,
+            "id": 2552429345968,
             "edge_type": 2,
-            "start": 140045726586704,
-            "end": 140045726719376
+            "start": 1691543064496,
+            "end": 2552431050288
         },
         {
-            "id": 140435883710288,
+            "id": 2552294317264,
             "edge_type": 2,
-            "start": 140045726515344,
-            "end": 140045726582800
+            "start": 2552294278256,
+            "end": 2552294577296
+        },
+        {
+            "id": 2552294326192,
+            "edge_type": 2,
+            "start": 2552429028288,
+            "end": 1691543083856
         }
     ]
 }

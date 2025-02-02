@@ -77,7 +77,7 @@ float get_no_sym_mask(vec2 uv){
         if (K == 2) pos = 1.;
         if (K == 3) pos = 0.;
         pos *= .25;
-        mask = smoothstep(.01, .0, abs(uv.y-pos)-.15);
+        mask = smoothstep(.01, .0, abs(uv.y-pos)-.2);
     }
     if (no_sym_mode == 3){
         float K = kick_count;
@@ -86,7 +86,7 @@ float get_no_sym_mask(vec2 uv){
         if (K == 2) pos = 1.;
         if (K == 3) pos = 0.;
         pos *= .25;
-        mask = smoothstep(.01, .0, abs(uv.x-pos)-.15);
+        mask = smoothstep(.01, .0, abs(uv.x-pos)-.2);
     }
     if (no_sym_mode == 4){
         if (on_tempo < .5)
@@ -95,7 +95,7 @@ float get_no_sym_mask(vec2 uv){
             pos = on_tempo*-2 + 2;
         pos -= .5;
         pos *= .8;
-        mask = smoothstep(.01, .0, abs(uv.x-pos)-.15);
+        mask = smoothstep(.01, .0, abs(uv.x-pos)-.2);
     }
     return mask;
 }
@@ -125,9 +125,7 @@ void main()
         mask = get_no_sym_mask(uv);
         col = texture(iChannel0, uv).rgb;
     }
-    col = col*mask*clamp(
-            pow(blink_force, 1.)*10+.025, 
-            0., 1.);
+    col = col*mask*blink_force;
     if (black == 1.){
         if (black_mode == 0)
             col *= 0.;
@@ -141,7 +139,7 @@ void main()
         float s = cos(on_tempo*4*2.*3.14159)*.5+.5;
         s = pow(s, 3.);
         st.x = abs(st.x)-.5;
-        col += s*get_mask(st);
+        col += s*get_mask(st)*.00001;
     }
     //col = mix(col, 1.-col, smoothstep(.2, .4, length(col)));
     fragColor = vec4(col,1.0);
