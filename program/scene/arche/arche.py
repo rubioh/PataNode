@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_ARCHE = name_to_opcode("arche")
@@ -19,10 +11,8 @@ OP_CODE_ARCHE = name_to_opcode("arche")
 
 @register_program(OP_CODE_ARCHE)
 class Arche(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Arche"
 
         self.initProgram()
@@ -33,6 +23,7 @@ class Arche(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -95,4 +86,5 @@ class ArcheNode(ShaderNode, Scene):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         return self.program.render(audio_features)

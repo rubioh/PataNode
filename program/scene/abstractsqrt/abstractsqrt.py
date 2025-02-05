@@ -1,17 +1,11 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Scene
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Scene
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_ABSQRT = name_to_opcode("abstract_sqrt")
@@ -21,7 +15,6 @@ OP_CODE_ABSQRT = name_to_opcode("abstract_sqrt")
 class AbstractSQRT(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Abstract SQRT"
 
         self.initProgram()
@@ -32,6 +25,7 @@ class AbstractSQRT(ProgramBase):
     def initFBOSpecifications(self):
         self.required_fbos = 1
         fbos_specification = [[self.win_size, 4, "f4"]]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -73,27 +67,37 @@ class AbstractSQRT(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         self.nrj_fast = af["smooth_low"] * 2.0 + 0.2
+
         if af["full"][1] < 0.8:
             self.accel += 0.002
         else:
             self.accel -= 0.01
+
         self.accel = np.clip(self.accel, 0.0, 3)
+
         if af["on_snare"]:
             self.count_beat += 1
+
         if af["on_kick"] == 1:
             self.sens *= -1
             self.tic += 1
+
             if self.tic == 8:
                 self.tic = 0
                 self.offset *= -1
+
             self.thresh += 0.1 * self.sens_thresh
+
             if self.thresh >= 0.9:
                 self.thresh = 0.9
                 self.sens_thresh = -1
+
             if self.thresh <= 0.1:
                 self.thresh = 0.1
                 self.sens_thresh = 1
+
         self.tc += 0.001
         self.time += (
             (af["bpm"] / 60 * 2 * np.pi / 60 * 0.5 * np.cos(self.tc))
@@ -135,4 +139,5 @@ class AbastractSQRTNode(ShaderNode, Scene):
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)
+
         return output_texture

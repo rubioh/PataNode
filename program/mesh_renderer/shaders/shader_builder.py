@@ -9,12 +9,12 @@ color = ") in vec3 in_color;\n"
 tangent = ") in vec3 in_tangent;\n"
 
 # matrix = "uniform mat4 model_transform; \n\
-# 			uniform mat4 model;\n\
-# 			uniform mat4 view;\n\
-# 			uniform mat4 projection;\n"
+#             uniform mat4 model;\n\
+#             uniform mat4 view;\n\
+#             uniform mat4 projection;\n"
 
 matrix = "uniform mat4 model;\n\
-		  uniform mat4 mvp;\n"
+          uniform mat4 mvp;\n"
 
 out = "out vec2 tcs;\n\
 out vec3 normal;\n\
@@ -25,11 +25,18 @@ out vec3 tangent;\n"
 out_tbn = "out mat3 tbn;\n"
 in_tbn = "in mat3 tbn;\n"
 #  mat4 mvp = model_transform * model *  view * projection;\n\
+
 main = "void main() {\n\
     vec4 v = vec4(in_position, 1.);\n\
     v = v * mvp;\n\
     gl_Position = v;\n\
-	p = v.xyz;\n"
+    p = v.xyz;\n"
+
+main_instance = "void main() {\n\
+    vec4 v = vec4(in_position, 1.);\n\
+    v = (v + in_particle_position) *mvp;\n\
+    gl_Position = v;\n\
+    p = v.xyz;\n"
 
 col_inter = "color = in_color;\n"
 normal_inter = "normal = (vec4(in_normal, 0.) * model).xyz;\n"
@@ -72,45 +79,58 @@ color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
 # todo metallic
 metallic_rougness_texture = "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
-	float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
+    float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
 
-metallic_roughness_no_texture = "	float metallicFactor = in_metallic;\n\
-	float roughnessFactor = in_roughness;\n"
+metallic_roughness_no_texture = "    float metallicFactor = in_metallic;\n\
+    float roughnessFactor = in_roughness;\n"
 
-normal_texture = "	vec3 bump_map = texture(normalTexture, tcs).xyz;\n\
+normal_texture = "    vec3 bump_map = texture(normalTexture, tcs).xyz;\n\
 bump_map = bump_map * 2.0 - 1.0;\n\
 vec3 bump_normal = normalize(tbn * bump_map);\n"
 
 normal_no_texture = "vec3 bump_normal = normal;\n"
 
-fragment_end = "	albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
-	normalRoughness = vec4( bump_normal, roughnessFactor);\n\
-	emissive.xyz = in_emissive.xyz;\n"
+fragment_end = "    albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
+    normalRoughness = vec4( bump_normal, roughnessFactor);\n\
+    emissive.xyz = in_emissive.xyz;\n"
 
+particle_data_struct = "in vec4 in_particle_position;\n"
+#uniform particleData in_particle_data;"
 
-def build_vertex_shader(mesh_layout):
+def build_vertex_shader(mesh_layout, instance):
     shader = ""
     shader += layout + str(0) + position
     layout_index = 1
+
+    if instance:
+        shader += particle_data_struct
+
     if mesh_layout["vertex_normal"]:
         shader += layout + str(layout_index) + normal
         layout_index = layout_index + 1
+
     if mesh_layout["vertex_tcs"]:
         shader += layout + str(layout_index) + tc
         layout_index = layout_index + 1
+
     if mesh_layout["vertex_color"]:
         shader += layout + str(layout_index) + color
         layout_index = layout_index + 1
+
     if mesh_layout["vertex_tangent"]:
         shader += layout + str(layout_index) + tangent
         layout_index = layout_index + 1
 
     shader += matrix
     shader += out
+
     if mesh_layout["vertex_tangent"]:
         shader += out_tbn
+    if instance:
+        shader += main_instance
+    else:
+        shader += main
 
-    shader += main
     if mesh_layout["vertex_normal"]:
         shader += normal_inter
     else:
@@ -118,6 +138,7 @@ def build_vertex_shader(mesh_layout):
 
     if mesh_layout["vertex_tangent"]:
         shader += tbn_compute
+
     if mesh_layout["vertex_tcs"]:
         shader += tcs_inter
     else:
@@ -132,21 +153,25 @@ def build_vertex_shader(mesh_layout):
         shader += tangent_inter
     else:
         shader += "tangent = vec3(1., 0., 0.);\n"
+
     shader += "}"
     return shader
 
 
 def build_fragment_shader(material):
     result = ""
+
     if "baseColorTexture" in material.textures:
         result += baseColorTexture
+
     if "metallicRoughnessTexture" in material.textures:
         result += metallicRoughnessTexture
+
     if "normalTexture" in material.textures:
         result += normalTexture
 
-    # 	if not "metallicRoughnessTexture" in material.textures:
-    # 		result += uniform_roughness + uniform_metallic
+#   if not "metallicRoughnessTexture" in material.textures:
+#       result += uniform_roughness + uniform_metallic
 
     result += uniform_albedo
     result += uniform_roughness
@@ -176,11 +201,9 @@ def build_fragment_shader(material):
         result += normal_no_texture
 
     result += fragment_end
-
     result += "albedoMetallic.x += tcs.x * 0.000001;\n"
     result += "}"
     return result
 
-
-def build_shaders(mesh_layout, material):
-    return (build_vertex_shader(mesh_layout), build_fragment_shader(material))
+def build_shaders(mesh_layout, material, instance = False):
+    return (build_vertex_shader(mesh_layout, instance), build_fragment_shader(material))

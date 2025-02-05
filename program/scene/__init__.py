@@ -1,17 +1,42 @@
-import program.scene.eye.eye
-import program.scene.sdf_bm.sdf_bm
-import program.scene.template.template
-import program.scene.abstractsqrt.abstractsqrt
-import program.scene.truchet.truchet
-import program.scene.lumtriangle.lumtriangle
-import program.scene.gsstylized.gsstylized
-import program.scene.patatrack3d.patatrack3d
-import program.scene.cube.cube
-import program.scene.rainbowroad.rr
-import program.scene.psyspin.psyspin
-import program.scene.hexshadows.hexshadows
-import program.scene.neonparty.neonparty
-import program.scene.pharmacy.pharmacy
-import program.scene.pingouin.pingouin
-import program.scene.dome.dome
-import program.scene.hexagons.hexagons
+from program.scene.abstractsqrt import abstractsqrt
+from program.scene.cube import cube
+from program.scene.dome import dome
+from program.scene.eye import eye
+from program.scene.gsstylized import gsstylized
+from program.scene.hexagons import hexagons
+from program.scene.hexshadows import hexshadows
+from program.scene.lumtriangle import lumtriangle
+from program.scene.neonparty import neonparty
+from program.scene.patatrack3d import patatrack3d
+from program.scene.pharmacy import pharmacy
+from program.scene.pingouin import pingouin
+from program.scene.psyspin import psyspin
+from program.scene.rainbowroad import rr
+from program.scene.sdf_bm import sdf_bm
+from program.scene.template import template
+from program.scene.texture import texture
+from program.scene.truchet import truchet
+from program.scene.bangersponge import bangersponge
+from program.scene.fractal import fractal
+from program.scene.particles import particles
+
+__all__ = [
+    "abstractsqrt",
+    "cube",
+    "dome",
+    "eye",
+    "gsstylized",
+    "hexagons",
+    "hexshadows",
+    "lumtriangle",
+    "neonparty",
+    "patatrack3d",
+    "pharmacy",
+    "pingouin",
+    "psyspin",
+    "rr",
+    "sdf_bm",
+    "template",
+    "texture",
+    "truchet",
+]

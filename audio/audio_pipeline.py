@@ -1,13 +1,16 @@
-import numpy as np
-import time
-import scipy.fft
-import sounddevice as sd
 import os
+import time
+
+import numpy as np
+import scipy.fft
+import sounddevice as sd # type: ignore[import-untyped]
+
 from collections import deque
-from .audio_utils import EnergyTracker
-from .audio_logger import AudioLogger
-from .audio_event import AudioEventTracker
-from .audio_bpm import BPM_estimator
+
+from audio.audio_utils import EnergyTracker
+from audio.audio_logger import AudioLogger
+from audio.audio_event import AudioEventTracker
+from audio.audio_bpm import BPM_estimator
 
 
 class AudioEngine:
@@ -29,6 +32,7 @@ class AudioEngine:
         self.queue_callback = True
         device_index = os.environ.get("PATASHADE_INPUT_DEVICE", 1)
         print(sd.query_devices())
+
         try:
             self._stream = sd.InputStream(
                 samplerate=self.sr,
@@ -58,7 +62,7 @@ class AudioEngine:
         self.tracker = AudioEventTracker()
         self.bpm_estimator = BPM_estimator(0.5, 16, 110, 15)
         self.ET = EnergyTracker(sr=self.sr)
-        # self.pesto = Pesto.PESTO()
+#       self.pesto = Pesto.PESTO()
 
         self.true_bpm = None
         self.previous_length = 0
@@ -85,6 +89,7 @@ class AudioEngine:
             self.in_data.append(indata.mean(1))
         else:  # Direct callback
             self.in_data = indata.mean(1)
+
         self.treatment()
 
     def treatment(self):
@@ -95,6 +100,7 @@ class AudioEngine:
             self.current_chunk = signal[: self.chunk]
         else:  # Direct callback
             self.current_chunk = np.array(self.in_data).reshape(-1)
+
         self.buffer = np.concatenate((self.buffer, self.current_chunk))
 
     def normalize_dft(self, dft):
@@ -135,6 +141,7 @@ class AudioEngine:
 
         # Remove usless part of the audio buffer (desature RAM)
         self.update_buffer()
+
         # Compute discrete Fourier transform from the current chunk and normalize it
         dft = scipy.fft.rfft(self.buffer[-self.n_fft :])
         dft = self.normalize_dft(dft)
@@ -145,6 +152,7 @@ class AudioEngine:
             _on_kick = self.features["_on_kick"]
         else:
             _on_kick = 0
+
         self.features = {}
         self.features["_on_kick"] = _on_kick
         self.features["fft"] = np.abs(self.fft)  # First get dft
@@ -156,7 +164,7 @@ class AudioEngine:
         self.add_to_features(
             self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
         )  # BPM, tempo
-        # self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
+#       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0
 
         # Get shared features for the next iteration
@@ -167,6 +175,7 @@ class AudioEngine:
             self.logger.update_info(self.current_chunk, self.features)
         else:
             self.logger.update_info(self.buffer[self.previous_length :], self.features)
+
         self.previous_length = self.buffer.shape[0]
 
         return self.features

@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Physarum
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Physarum
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_DIFFUSE = name_to_opcode("diffuse")
@@ -33,6 +25,7 @@ class Diffuse(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -62,6 +55,7 @@ class Diffuse(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         pass
 
     def bindUniform(self, af):
@@ -95,13 +89,17 @@ class DiffuseNode(ShaderNode, Physarum):
     def render(self, audio_features=None):
         if self.already_called:
             return self.program.norender()
+
         self.already_called = True
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return self.program.norender()
+
         if input_nodes[0].already_called:
             texture = input_nodes[0].program.norender()
         else:
             texture = input_nodes[0].render(audio_features)
+
         output_texture = self.program.render([texture], audio_features)
         return output_texture

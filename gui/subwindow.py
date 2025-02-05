@@ -1,24 +1,18 @@
-from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtCore import QDataStream, QIODevice, Qt
-from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu, QDockWidget
+from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
 
-# nodeeditor package
-from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
+from nodeeditor.node_editor_widget import NodeEditorWidget
+from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
-from nodeeditor.node_graphics_node import QDMGraphicsNode
 
-# patanode package
-from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.shader_node_base import ShaderNode
 from node.graph_container_node import GraphContainerNode
-
+from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+from node.shader_node_base import ShaderNode, Map
 from program.output.screen.screen import ScreenNode
 
-import os
-import time
-import threading
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -29,9 +23,11 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.app = app
         self.light_engine = app.light_engine
         super().__init__()
-        # self.setAttribute(Qt.WA_DeleteOnClose)
+#       self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.setTitle()
+
+        self.map_scene = app.map_scene
 
         self.setOpenGLSharedObject()
 
@@ -50,15 +46,16 @@ class PataNodeSubWindow(NodeEditorWidget):
 
 
     def searchScreenNodes(self):
-        # TODO better logic if multiple screen or output nodes
+        # TODO: better logic if multiple screen or output nodes
         for node in self.scene.nodes:
             if isinstance(node, ScreenNode):
                 self.screen_node = node
+                break
 
     def render(self, audio_features=None):
         if self.screen_node is None:
             self.searchScreenNodes()
-        # Logic when the screen node is remove (he is not destroyed...)
+        # Logic when the screen node is removed (it is not destroyed...)
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
@@ -82,11 +79,12 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def getNodeClassFromData(self, data):
         if "op_code" not in data:
-            return Node
+            return None
+
         return get_class_from_opcode(data["op_code"])
 
     def doEvalOutputs(self):
-        # eval all output nodes
+        # Eval all output nodes
         for node in self.scene.nodes:
             if node.__class__.__name__ == "CalcNode_Output":
                 node.eval()
@@ -96,7 +94,7 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def fileLoad(self, filename):
         if super().fileLoad(filename):
-            # self.scene.fbo_manager.restoreFBOUsability()
+#           self.scene.fbo_manager.restoreFBOUsability()
             self.doEvalOutputs()
             return True
 
@@ -106,6 +104,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.node_actions = {}
         keys = list(SHADER_NODES.keys())
         keys.sort()
+
         for key in keys:
             node = SHADER_NODES[key]
             self.node_actions[node.op_code] = QAction(QIcon(node.icon), node.op_title)
@@ -115,8 +114,10 @@ class PataNodeSubWindow(NodeEditorWidget):
         context_menu = QMenu(self)
         keys = list(SHADER_NODES.keys())
         keys.sort()
+
         for key in keys:
             context_menu.addAction(self.node_actions[key])
+
         return context_menu
 
     def setTitle(self):
@@ -125,9 +126,13 @@ class PataNodeSubWindow(NodeEditorWidget):
     def onSelected(self):
         items = self.getSelectedItems()
         item = items[0]
+
         if isinstance(item, QDMGraphicsNode):
             node = item.node
             self.updateInspector(node)
+
+        if isinstance(item.node, Map):
+            self.map_scene.reload_from_node(item.node)
 
     def updateInspector(self, node):
         self.app.updateInspector(node)
@@ -143,7 +148,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             event.acceptProposedAction()
         else:
-            # print(" ... denied drag enter event")
+#           print(" ... denied drag enter event")
             event.setAccepted(False)
 
     def onDrop(self, event):
@@ -154,7 +159,6 @@ class PataNodeSubWindow(NodeEditorWidget):
             dataStream >> pixmap
             op_code = dataStream.readInt()
             text = dataStream.readQString()
-
             mouse_position = event.pos()
             scene_position = self.scene.grScene.views()[0].mapToScene(mouse_position)
 
@@ -168,10 +172,11 @@ class PataNodeSubWindow(NodeEditorWidget):
                 )
 
             try:
-                node_class = get_class_from_opcode(op_code)
-                node = self.init_node(node_class)
+                node = get_class_from_opcode(op_code)(self.scene)
+
                 if isinstance(node, GraphContainerNode):
                     node.setApp(self.app)
+
                 node.setPos(scene_position.x(), scene_position.y())
                 self.scene.history.storeHistory(
                     "Created node %s" % node.__class__.__name__
@@ -181,7 +186,7 @@ class PataNodeSubWindow(NodeEditorWidget):
             event.setDropAction(Qt.MoveAction)
             event.accept()
         else:
-            # print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
+#           print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
             event.ignore()
 
     def init_node(self, node_class):
@@ -194,17 +199,18 @@ class PataNodeSubWindow(NodeEditorWidget):
     def contextMenuEvent(self, event):
         try:
             item = self.scene.getItemAt(event.pos())
+
             if DEBUG_CONTEXT:
                 print(item)
 
-            if type(item) == QGraphicsProxyWidget:
+            if isinstance(item, QGraphicsProxyWidget):
                 item = item.widget()
 
             if hasattr(item, "node") or hasattr(item, "socket"):
                 self.handleNodeContextMenu(event)
             elif hasattr(item, "edge"):
                 self.handleEdgeContextMenu(event)
-            # elif item is None:
+#           elif item is None:
             else:
                 self.handleNewNodeContextMenu(event)
 
@@ -215,9 +221,11 @@ class PataNodeSubWindow(NodeEditorWidget):
     def handleNodeContextMenu(self, event):
         if DEBUG_CONTEXT:
             print("CONTEXT: NODE")
+
         selected = None
         item = self.scene.getItemAt(event.pos())
-        if type(item) == QGraphicsProxyWidget:
+
+        if isinstance(item, QGraphicsProxyWidget):
             item = item.widget()
 
         if hasattr(item, "node"):
@@ -236,79 +244,99 @@ class PataNodeSubWindow(NodeEditorWidget):
 
         if isinstance(selected, ShaderNode):
             reloadGLSLAct = context_menu.addAction("Reload glsl code")
+
         if isinstance(selected, ScreenNode):
             restoreFBOAct = context_menu.addAction("Restore FBOs dependencies")
+
         if isinstance(selected, ShaderNode):
             open_glsl_menu = context_menu.addMenu("Open glsl code")
             full_paths = selected.getGLSLCodePath()
             actOpenGLSL = []
+
             for path in full_paths:
                 short_path = path.split("/")[-1]
                 actOpenGLSL.append(open_glsl_menu.addAction(short_path))
+
         if isinstance(selected, GraphContainerNode):
             openSubWindow = context_menu.addAction("Open a new graph")
 
-        # if selected and action == openGLSLAct: selected.openGLSLCode()
+#       if selected and action == openGLSLAct:
+#           selected.openGLSLCode()
 
-        # openInspectorAct = context_menu.addAction("Open Parameters Inspector")
+#       openInspectorAct = context_menu.addAction("Open Parameters Inspector")
 
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
         if DEBUG_CONTEXT:
             print("got item:", selected)
+
         if selected and action == markDirtyAct:
             selected.markDirty()
+
         if selected and action == markDirtyDescendantsAct:
             selected.markDescendantsDirty()
+
         if selected and action == markInvalidAct:
             selected.markInvalid()
+
         if selected and action == unmarkInvalidAct:
             selected.markInvalid(False)
+
         if selected and action == evalAct:
             val = selected.eval()
+
             if DEBUG_CONTEXT:
                 print("EVALUATED:", val)
+
         if isinstance(selected, ShaderNode) and action == reloadGLSLAct:
             selected.reloadGLSLCode()
+
         if isinstance(selected, ScreenNode) and action == restoreFBOAct:
             selected.restoreFBODependencies()
+
         if isinstance(selected, ShaderNode):
             for path, act in zip(full_paths, actOpenGLSL):
                 if selected and action == act:
                     selected.openGLSLInTerminal(path)
+
         if isinstance(selected, GraphContainerNode) and action == openSubWindow:
             selected.openNewGraph()
 
     def handleEdgeContextMenu(self, event):
         if DEBUG_CONTEXT:
             print("CONTEXT: EDGE")
+
         context_menu = QMenu(self)
         bezierAct = context_menu.addAction("Bezier Edge")
         directAct = context_menu.addAction("Direct Edge")
         squareAct = context_menu.addAction("Square Edge")
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
-
         selected = None
         item = self.scene.getItemAt(event.pos())
+
         if hasattr(item, "edge"):
             selected = item.edge
 
         if selected and action == bezierAct:
             selected.edge_type = EDGE_TYPE_BEZIER
+
         if selected and action == directAct:
             selected.edge_type = EDGE_TYPE_DIRECT
+
         if selected and action == squareAct:
             selected.edge_type = EDGE_TYPE_SQUARE
 
-    # helper functions
+    # Helper functions
     def determine_target_socket_of_node(self, was_dragged_flag, new_calc_node):
         target_socket = None
+
         if was_dragged_flag:
             if len(new_calc_node.inputs) > 0:
                 target_socket = new_calc_node.inputs[0]
         else:
             if len(new_calc_node.outputs) > 0:
                 target_socket = new_calc_node.outputs[0]
+
         return target_socket
 
     def finish_new_node_state(self, new_calc_node):
@@ -317,9 +345,9 @@ class PataNodeSubWindow(NodeEditorWidget):
         new_calc_node.grNode.onSelected()
 
     def handleNewNodeContextMenu(self, event):
-
         if DEBUG_CONTEXT:
             print("CONTEXT: EMPTY SPACE")
+
         context_menu = self.initNodesContextMenu()
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
@@ -327,20 +355,19 @@ class PataNodeSubWindow(NodeEditorWidget):
             new_calc_node = get_class_from_opcode(action.data())(self.scene)
             scene_pos = self.scene.getView().mapToScene(event.pos())
             new_calc_node.setPos(scene_pos.x(), scene_pos.y())
+
             if DEBUG_CONTEXT:
                 print("Selected node:", new_calc_node)
 
             if self.scene.getView().mode == MODE_EDGE_DRAG:
-                # if we were dragging an edge...
+                # If we were dragging an edge...
                 target_socket = self.determine_target_socket_of_node(
                     self.scene.getView().dragging.drag_start_socket.is_output,
                     new_calc_node,
                 )
+
                 if target_socket is not None:
                     self.scene.getView().dragging.edgeDragEnd(target_socket.grSocket)
                     self.finish_new_node_state(new_calc_node)
-
             else:
-                self.scene.history.storeHistory(
-                    "Created %s" % new_calc_node.__class__.__name__
-                )
+                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)

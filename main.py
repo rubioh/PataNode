@@ -1,21 +1,37 @@
-import os, sys
+import argparse
+import importlib
+import os
+import sys
+
 from PyQt5.QtWidgets import QApplication
-import program.program_conf
-
-# sys.path.insert(0, os.path.join( os.path.dirname(__file__), "..", ".." ))
-# from app import PataShade
-from app import PataShade
-
-# from window import Window, WindowSize
-# from glcontext import GLWindow, MGLW, QModernGLWidget
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(prog="PataNode", description="The node-oriented shader manager")
+    parser.add_argument("-o", "--open", metavar="filename")
+    parser.add_argument("--debug", metavar="module_to_debug", nargs="+")
 
-    # print(QStyleFactory.keys())
-    app = QApplication(sys.argv)
-    app.setStyle("Fusion")
+    args = parser.parse_args()
 
-    patanode = PataShade()
+    if args.debug:
+        for module_to_debug in args.debug:
+            if os.path.exists(module_to_debug):
+                module_to_debug = module_to_debug.replace(os.sep, ".")[:-3]
+
+            print(f"[debug] debugging {module_to_debug}")
+            importlib.import_module(module_to_debug).DEBUG = True
+
+    # Note: This import is here to avoid a circular import
+    import program.program_conf # noqa: F401
+
+    import app
+
+    the_app = QApplication(sys.argv)
+    the_app.setStyle("Fusion")
+
+    patanode = app.PataShadeApp()
     patanode.show()
 
-    sys.exit(app.exec_())
+    if args.open:
+        patanode.openFile(args.open)
+
+    sys.exit(the_app.exec_())

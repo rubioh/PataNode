@@ -1,4 +1,5 @@
 import rtmidi
+
 from controller.qt_controller import SimpleMidiReceiver, get_port_by_name
 from typing import Callable, NewType
 from enum import IntEnum, IntFlag, Enum, auto
@@ -67,9 +68,11 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
         super().__init__()
         midi_out_port = "Launch Control XL:Launch Control XL Launch Contro 20:0"
         self._midi_out = get_port_by_name(midi_out_port, rtmidi.MidiOut())
+
         if self._midi_out is None:
             self.usable = False
             return
+
         self.set_template(0)
         self._button_pressed_ts = {}
         self._event_cb = {}
@@ -85,8 +88,10 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
 
     def handle_cc(self, cc, value) -> None:
         uid = self.cc_to_uid.get(cc)
+
         if uid is None:
             return super().handle_cc(cc, value)
+
         previous_value = self.value(uid)
         super().handle_cc(cc, value)
 
@@ -99,11 +104,12 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
                 if uid not in self._button_pressed_ts:
                     print(f"ignoring {uid} release")
                     return
+
                 pressed_ts, is_long = self._button_pressed_ts.pop(uid)
                 dur = self._time_ms - pressed_ts
                 self.callback(uid, ButtonEvent.RELEASE, self._time_ms, dur)
         else:
-            # TODO move smoothed value callback in tick() together with long button pressed
+            # TODO: move smoothed value callback in tick() together with long button pressed
             self.callback(uid, value, self._time_ms, 0)
 
     def maybe_handle_sysex(self, msg) -> bool:
@@ -120,6 +126,7 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
             self.template = msg[7]
             print(f"changed template to n{self.template}")
             return True
+
         return False
 
     def set_template(self, template: int) -> None:
@@ -139,6 +146,7 @@ class LaunchControlMidiReceiver(SimpleMidiReceiver):
     def set_led(self, index_key: str, color: LEDColor) -> None:
         if not self.usable:
             return
+
         index = self.LED_INDICES[index_key]
         self.set_led_raw(
             self.template, index, color.value | LEDFlag.CLEAR | LEDFlag.COPY

@@ -1,17 +1,9 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
-
-from node.shader_node_base import ShaderNode, Utils
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Utils
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_FLUID = name_to_opcode("fluid")
@@ -32,6 +24,7 @@ class Fluid(ProgramBase):
         rfbo = 6
         self.required_fbos = rfbo
         fbos_specification = [[self.win_size, 4, "f4"] for i in range(rfbo)]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -68,7 +61,6 @@ class Fluid(ProgramBase):
         self.InkState = 2
         self.VelocityInput = 3
         self.FieldStateSP = 4
-
         self.vort_amount = 0.1
         self.dt = 0.2
         self.advect_amount = 3.0  # Advect amount
@@ -135,6 +127,7 @@ class Fluid(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         self.iFrame += 1
         self.on_kick = af["on_kick"]
 
@@ -155,7 +148,7 @@ class Fluid(ProgramBase):
         vel_input = textures[1]
 
         # Ink Texture
-        # texture.use(21)
+#       texture.use(21)
         self.fbos[2].color_attachments[0].use(1)
         self.fbos[1].color_attachments[0].use(2)
         ink_input.use(0)
@@ -212,12 +205,17 @@ class FluidNode(ShaderNode, Utils):
     def render(self, audio_features=None):
         if self.program.already_called:
             return self.program.norender()
+
         input_nodes = self.getShaderInputs()
+
         if len(input_nodes) < 2:
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         vel = input_nodes[1].render(audio_features)
+
         if texture is None or vel is None:
             return self.program.norender()
+
         output_texture = self.program.render([texture, vel], audio_features)
         return output_texture

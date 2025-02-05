@@ -1,2 +1,7 @@
-import program.output.screen.screen
-import program.output.std_output.std_output
+from program.output.screen import screen
+from program.output.std_output import std_output
+
+__all__ = [
+    "screen",
+    "std_output"
+]

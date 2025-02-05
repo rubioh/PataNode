@@ -10,7 +10,6 @@ uniform float energy_mid;
 uniform float energy_slow;
 uniform float turfu;
 uniform float tic_tile;
-uniform float c1;
 uniform vec4 trigger;
 uniform float mode;
 
@@ -189,28 +188,6 @@ vec3 archCOL(vec3 p ) {
     c+= .3;
     return c;
 }
- 
-float mapStarField(vec3 p, out vec2 id) {
-
-    vec3 rep = vec3(5.);
-    float scale = 1.;
-    p.yz = rotate2d(3.14 / -2.) * p.yz;
-    float t = iTime * 15.;
-    p /= scale;
-    p.y += t;
-    float d = p.z;
-    vec3 pm = mod(p, rep) - rep / 2.;
-    id.x = hash31(floor(p / rep));
- 
-    if (id.x * (1 - c1) < .96) {
-        return rep.z / 2.;
-    }
-    pm.xz = rotate2d( 42.*iTime *id.x) * pm.xz;
-    id.x = fract(id.x *112.131);
-    id.y = 1.;
-   // id.x = .2;
-    return opExtrusion(pm  / 2., .05)-100000;
-}
 
 float mapArch(vec3 p) {
     float rep = 52.;
@@ -251,7 +228,6 @@ float mapFence(vec3 p) {
 
 float mapRoad(vec3 p, out vec2 id) {
  
-    
     vec2 rep = vec2(1, 1.);
     
     vec2 mp = mod(p.xz, rep) - rep / 2.;
@@ -289,11 +265,6 @@ vec2 map(vec3 p, out vec2 id) {
     if (resArch.x < res.x) {
         res = resArch;
     }
-    //vec2 resStar = vec2(mapStarField(ps, id2), 4.);
-    //if (resStar.x < res.x) {
-    //    res = resStar;
-    //    id = id2;
-    //}
     return res;
 }
 
@@ -315,7 +286,7 @@ vec2 castRay(vec3 ro, vec3 rd, out vec2 id) {
 
     float t = NEAR;
     
-    for (int i = 0; i < 80 && t < FAR; ++i) {
+    for (int i = 0; i < 300 && t < 600; ++i) {
     
         pos = ro + rd * t;
         
@@ -324,7 +295,7 @@ vec2 castRay(vec3 ro, vec3 rd, out vec2 id) {
             res = vec2(t, h.y);
             break ;
         }
-        t += t < 5. ? h.x * .4: h.x;
+        t += h.x*.5;
     }
     
     return res;
@@ -440,7 +411,7 @@ void main()
     vec3 ro, rd;
     camera(ro, rd, uv);
     vec3 col = pow( render(ro, rd, uv)*1.6, (turfu == 0.3) ? vec3(energy*3.) : vec3(energy_slow*4.));
-    fragColor = vec4(pow(col, vec3(1.5))/4.,1.0);
+    fragColor = vec4(pow(col, vec3(1.0))/1.,1.0);
 }
 
 

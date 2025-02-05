@@ -1,14 +1,14 @@
 import time
+
 import numpy as np
-import copy
 
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
 
 
 def name_to_opcode(name):
-    l = [ord(char) for char in name]
-    return sum(l)
+    lst = [ord(char) for char in name]
+    return sum(lst)
 
 
 OP_CODE_LFO = name_to_opcode("lfo")
@@ -39,6 +39,7 @@ class LFO:
             offset = settings["offset"]
             lfo_transform = np.cos(f0 * t + phi) * amplitude + offset
             af["custom_parameters"][param_name] = lfo_transform
+
         return af
 
     def render(self, af):
@@ -59,6 +60,8 @@ class LFONode(AudioNode):
 
     def render(self, audio_features):
         input_nodes = self.getAudioInputs()
+
         if not len(input_nodes):
             return af
+
         return self.program.render(audio_features)

@@ -1,17 +1,13 @@
-from PyQt5 import QtOpenGL, QtCore, QtWidgets, QtGui
-from program.program_manager import FBOManager
 import moderngl
-import numpy as np
+
+from PyQt5 import QtCore, QtOpenGL, QtWidgets
 import time
-
-import PyQt5
-
+from program.program_manager import FBOManager
 
 class ShaderWidget(QtOpenGL.QGLWidget):
     def __init__(
         self,
         app,
-        audio_engine=None,
         title="GL Widget",
         gl_version=(3, 3),
         size=(1280, 720),
@@ -20,7 +16,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     ):
         self.app = app
         self.app.setShaderWidget(self)
-        self.audio_engine = audio_engine
         self._title = title
         self.gl_version = gl_version
         self.width, self.height = int(size[0]), int(size[1])
@@ -29,11 +24,14 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self._fixed_aspect_ratio = 16 / 9
         self._vsync = True
         self._ctx = None
+
         # Internal states
         if self.fullscreen:
             self.resizable = False
+
         # Specify OpenGL context parameters
         self.initFormat()
+
         # Create the OpenGL widget
         super().__init__(self.fmt)
         self.title = self._title
@@ -43,7 +41,6 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
         # Attach to the context
         self.init_mgl_context()
-        self.initQTimer()
         self.set_default_viewport()
 
         # Audio features parameters
@@ -78,6 +75,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.move(*center_window_position)
         self._buffer_width = self._width
         self._buffer_height = self._height
+
         # Needs to be set before show()
         self.resizeGL = self.resize
 
@@ -85,6 +83,9 @@ class ShaderWidget(QtOpenGL.QGLWidget):
 
         # We want mouse position events
         self.setMouseTracking(True)
+
+        # Disable cursor
+        self.setCursor(QtCore.Qt.BlankCursor)
 
     def initFormat(self):
         self.fmt = QtOpenGL.QGLFormat()
@@ -95,64 +96,43 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.fmt.setDoubleBuffer(True)
         self.fmt.setSwapInterval(1 if self._vsync else 0)
 
-    def initQTimer(self):
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.app.start_shader_jobs)
-        # self.timer.timeout.connect(self.update)
-        # self.timer.start(int(1/60*1000))
-
-    def set_default_viewport(self):
-        self._viewport = (0, 0, self._buffer_width, self._buffer_height)
-        self._ctx.screen.viewport = self._viewport
-
     def init_mgl_context(self):
-        self._ctx = moderngl.create_context(
-            self.gl_version[0] * 100 + self.gl_version[1]
-        )
+        self._ctx = moderngl.create_context(self.gl_version[0] * 100 + self.gl_version[1])
         self.screen = self._ctx.detect_framebuffer()
         self.init_fbo_manager()
 
     def init_fbo_manager(self):
         self.fbo_manager = FBOManager(self.ctx)
 
-    def set_audio_features(self):
-        audio_features = self.app._last_audio_features
-        self.af = audio_features
-        self.af["on_kick"] = 1 if self.last_kick_count != self.af["kick_count"] else 0
-        self.af["on_hat"] = 1 if self.last_hat_count != self.af["hat_count"] else 0
-        self.af["on_snare"] = (
-            1 if self.last_snare_count != self.af["snare_count"] else 0
-        )
-        self.last_kick_count = self.af["kick_count"]
-        self.last_hat_count = self.af["hat_count"]
-        self.last_snare_count = self.af["snare_count"]
-
     def paintGL(self):
         self.makeCurrent()
         self._ctx.clear(color=(0.0, 0.0, 0.0))
-        self.set_audio_features()
-        self.app.render(self.af)
+        p = time.perf_counter()
+        self.app.render(self.app._last_audio_features)
+      #  self.ctx.finish()
+      #  print(time.perf_counter() - p)
 
-    def resize(self, width: int, height: int) -> None:
+    def resize(self, width: int, height: int) -> None: # type: ignore[override] # FIXME?
         self._width = width * self.devicePixelRatio()
         self._height = height * self.devicePixelRatio()
-        self.width = self._width
-        self.height = self._height
+        self.width = self._width # type: ignore[assignment] # FIXME?
+        self.height = self._height # type: ignore[assignment] # FIXME?
         self._buffer_width = width
         self._buffer_height = height
+
         if self._ctx is not None:
             self.set_default_viewport()
 
     def set_default_viewport(self) -> None:
         """
-        Calculates the and sets the viewport based on window configuration.
+        Calculates and sets the viewport based on window configuration.
 
-        The viewport will based on the configured fixed aspect ratio if set.
-        If no fixed aspect ratio is set the viewport will be scaled
-        to the entire window size regardless of size.
+        The viewport is based on the configured fixed aspect ratio if set.
+        If no fixed aspect ratio is set, the viewport is scaled to the entire
+        window size regardless of size.
 
-        Will add black borders and center the viewport if the window
-        do not match the configured viewport (fixed only)
+        Will add black borders and center the viewport if the window does not
+        match the configured viewport (fixed only)
         """
         if self._fixed_aspect_ratio:
             expected_width = int(self._buffer_height * self._fixed_aspect_ratio)

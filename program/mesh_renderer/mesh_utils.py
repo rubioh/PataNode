@@ -1,5 +1,7 @@
 import struct
+
 import glm
+import numpy as np
 
 
 def buffer_as_np_array(buffer, element_size, element_count, type):
@@ -13,10 +15,13 @@ class MeshBufferAccessor:
         self.t = t
         self.element_count = element_count
         self.char = "I"
+
         if self.element_size == 2 and self.t is not float:
             self.char = "H"
+
         if self.t is float:
             self.char = "f"
+
         self.char *= self.element_count
 
     def __getitem__(self, index):
@@ -42,7 +47,7 @@ def get_vertice(indice_accessor, vertices_accessor, index):
     return vertices_accessor[vertice_index]
 
 
-# wip
+# WIP
 def compute_tangent(in_indices, in_tcs, in_normals, in_position, indice_size):
     position = MeshBufferAccessor(in_position, 4, float, 3)
     tcs = MeshBufferAccessor(in_tcs, 4, float, 2)

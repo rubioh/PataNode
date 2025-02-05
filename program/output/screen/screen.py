@@ -1,38 +1,34 @@
-import time
-import numpy as np
-from os.path import dirname, basename, isfile, join
+from os.path import dirname, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-)
-from program.program_base import ProgramBase
-from program.colors.predominant_color.predominant_color import PredominantColorNode
-
-from node.shader_node_base import ShaderNode, Output
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Output
+from program.colors.predominant_color.predominant_color import PredominantColorNode
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program
 
-import time
 
 OP_CODE_SCREEN = 0
 
 
 @register_program(OP_CODE_SCREEN)
 class Screen(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
-
         self.title = "Screen"
 
         self.initProgram()
         self.initParams()
 
     def initProgram(self, reload=False):
+        if reload:
+            return
+
         vert_path = SQUARE_VERT_PATH
         frag_path = join(dirname(__file__), "screen.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
+
+    def initUniformsBinding(self):
+        super().initUniformsBinding(binding, program_name="")
 
     def initParams(self):
         pass
@@ -49,7 +45,9 @@ class Screen(ProgramBase):
     def render(self, textures, af=None):
         self.updateParams(af)
         self.bindUniform(af)
+
         textures[0].use(0)
+
         self.ctx.screen.use()
         self.vao.render()
         return True
@@ -73,14 +71,18 @@ class ScreenNode(ShaderNode, Output):
 
     def restoreFBODependencies(self):
         self.scene.fbo_manager.restoreFBOUsability()
+
         for node in self.scene.nodes:
             node.markDirty()
+
             if node != self:
                 node.restoreFBODependencies()
+
         self.eval()
 
     def evalImplementation(self):
         input_node = self.getInput(0)
+
         if not input_node:
             self.grNode.setToolTip("Input is not connected")
             self.markDirty()
@@ -94,6 +96,7 @@ class ScreenNode(ShaderNode, Output):
             return False
 
         success_render = self.program.render([input_texture])
+
         self.markInvalid(not success_render)
         self.markDirty(not success_render)
         self.grNode.setToolTip("")
@@ -103,13 +106,19 @@ class ScreenNode(ShaderNode, Output):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.already_called = False
+
             if isinstance(node, PredominantColorNode):
                 self.plreturn = node
+
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes):
             return False
+
         texture = input_nodes[0].render(audio_features)
+
         if self.plreturn is not None:
             self.buffer_col = self.plreturn.render(texture)
+
         self.program.render([texture], audio_features)
         return True

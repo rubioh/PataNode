@@ -1,5 +1,6 @@
-from typing import NewType, NamedTuple
 from ipaddress import IPv4Address
+from typing import NewType, NamedTuple
+
 
 ARTNET_POLL_INTERVAL_S = 2.5
 DMX_REFRESH_RATE_MAX_HZ = 44

@@ -1,17 +1,11 @@
-import time
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-from program.program_conf import (
-    SQUARE_VERT_PATH,
-    get_square_vertex_data,
-    register_program,
-    name_to_opcode,
-)
-from program.program_base import ProgramBase
+from os.path import dirname, join
 
-from node.shader_node_base import ShaderNode, Effects
 from node.node_conf import register_node
+from node.shader_node_base import ShaderNode, Effects
+from program.program_base import ProgramBase
+from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
 
 
 OP_CODE_BUMPMAPPING = name_to_opcode("bumpmapping")
@@ -33,6 +27,7 @@ class BumpMapping(ProgramBase):
         fbos_specification = [
             [self.win_size, 4, "f4"],
         ]
+
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -59,6 +54,7 @@ class BumpMapping(ProgramBase):
     def updateParams(self, af):
         if af is None:
             return
+
         tmp = np.clip(af["low"][3] - af["low"][2], 0, 100000)
         self.smooth_low = self.smooth_low * 0.5 + 0.5 * tmp
 
@@ -108,8 +104,10 @@ class BumpMappingNode(ShaderNode, Effects):
 
     def render(self, audio_features=None):
         input_nodes = self.getShaderInputs()
+
         if not len(input_nodes) or self.program.already_called:
             return self.program.norender()
+
         texture = input_nodes[0].render(audio_features)
         output_texture = self.program.render([texture], audio_features)
         return output_texture

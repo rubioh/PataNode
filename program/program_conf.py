@@ -1,7 +1,9 @@
 import numpy as np
-from os.path import dirname, basename, isfile, join
 
-SHADER_PROGRAMS = {}
+from os.path import dirname, join
+
+
+SHADER_PROGRAMS = {} # type: ignore[var-annotated] # FIXME: add type annotation
 SQUARE_VERT_PATH = join(dirname(__file__), "base/vertex_base.glsl")
 
 
@@ -31,6 +33,7 @@ def register_program_now(op_code, class_reference):
             "Duplicate program registration of '%s'. There is already %s" % op_code,
             SHADER_PROGRAMS[op_code],
         )
+
     SHADER_PROGRAMS[op_code] = class_reference
 
 
@@ -50,8 +53,8 @@ def get_square_vertex_data():
 
 
 def name_to_opcode(name):
-    l = [ord(char) for char in name]
-    return sum(l)
+    lst = [ord(char) for char in name]
+    return sum(lst)
 
 
 import program.output

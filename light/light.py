@@ -1,26 +1,25 @@
-import usb.core
-import usb.util
 import time
-import os
-import colorsys
-from math import cos
+
 import numpy as np
+import usb.core # type: ignore[import-untyped]
+import usb.util # type: ignore[import-untyped]
+
 from light.light_func import All
 
-class LightEngine():
 
+class LightEngine:
     def __init__(self):
         self.USB_VID = 0xcafe
         self.DMX_CHANNELS_NUM = 512
-        self.NUM_PIXELS = 150 # number of ball in pataguirlande
+        self.NUM_PIXELS = 150  # Number of ball in pataguirlande
         self.init_usb_device()
         self.func = All()
-
         self.wait = 0
 
 
     def init_usb_device(self):
         self.dev = usb.core.find(idVendor=0x0000, idProduct=0x0001)
+
         if self.dev is None:
             print('No patalight gros noob')
         else:
@@ -63,9 +62,9 @@ class LightEngine():
         return res
 
     def get_colors(self, color, af):
-        # color is a np array of shape 3
+        # Color is a np array of shape 3
         return self.func.current_pattern(color, af, size=self.NUM_PIXELS)
-        #return np.ones((self.NUM_PIXELS, 3)) * np.array(color).reshape(1,-1)
+#       return np.ones((self.NUM_PIXELS, 3)) * np.array(color).reshape(1,-1)
 
     def __call__(self, color=(0,0,0), audio_features=None):
         af = audio_features
@@ -74,7 +73,9 @@ class LightEngine():
         data = self.get_colors(color, af)
         data_par = self.get_color_par(color, af)
         byte_array = self.to_bytes(data, data_par)
+
         if self.dev is None:
             return
+
         self.outep.write(byte_array)
         self.prev_ts = time.time()

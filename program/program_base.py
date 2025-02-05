@@ -1,13 +1,14 @@
 import copy
+
 import numpy as np
+
 from program.program_conf import (
     CTXError,
+    GLSLImplementationError,
     SQUARE_VERT_PATH,
     UnuseUniformError,
-    GLSLImplementationError,
     get_square_vertex_data,
 )
-from nodeeditor.utils import dumpException
 
 
 DEBUG = False
@@ -15,7 +16,6 @@ DEBUG_EVAL = False
 
 
 class ProgramBase:
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         if ctx is None:
             raise CTXError(
@@ -34,13 +34,11 @@ class ProgramBase:
         self._output_fbo = None
         self.vao = None
 
-        # Fbos specification
-        (
-            self.fbos_win_size,
-            self.fbos_components,
-            self.fbos_dtypes,
-            self.fbos_depth_requirement,
-        ) = ([], [], [], [])
+        # FBOs specification
+        self.fbos_win_size = []
+        self.fbos_components = []
+        self.fbos_dtypes = []
+        self.fbos_depth_requirement = []
         self.fbos_num_textures = []
         self._required_fbos = 1
         self.fbos = None
@@ -49,6 +47,7 @@ class ProgramBase:
         self.fragment_shader_glsl_paths = []
 
         self.adaptable_parameters_dict = {}
+        self.cpu_adaptable_parameters_dict = {}
         self.programs_uniforms = ProgramsUniforms(self)
 
         self.previous_programs = {}
@@ -131,95 +130,103 @@ class ProgramBase:
                 " with varyings %s and vao_binding %s"
                 % (str(varyings), str(vao_binding)),
             )
+
         vert = open(vert_path, "r").read()
         frag = None
+        self.name = name
+
         if frag_path is not None:
             frag = open(frag_path, "r").read()
+
         if not reload:
             if vert_path != SQUARE_VERT_PATH:
                 self.vertex_shader_glsl_paths.append(vert_path)
             else:
                 setattr(self, name + "vbo", self.ctx.buffer(get_square_vertex_data()))
+
             if frag_path is not None:
                 self.fragment_shader_glsl_paths.append(frag_path)
-            # Instanciate the vertex buffer object {name}vbo
+
+        # Instanciate the vertex buffer object {name}vbo
         if varyings is None:
             program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)
         else:
-            program = self.ctx.program(
-                vertex_shader=vert, fragment_shader=frag, varyings=varyings
-            )
+            program = self.ctx.program(vertex_shader=vert, fragment_shader=frag, varyings=varyings)
+
         if vao_binding is None:
             vao = self.ctx.vertex_array(
                 program, [(getattr(self, name + "vbo"), "2f", "in_position")]
             )
         else:
             vao = self.ctx.vertex_array(program, vao_binding)
+
         if reload:
             # Save a copy of the previous program on reload
             self.storePreviousProgramVersion(program, vao, name)
-            # TODO self.storePreviousUniformsBinding()
+            # TODO: self.storePreviousUniformsBinding()
         else:
             setattr(self, name + "program", program)
             setattr(self, name + "vao", vao)
+
         self.adaptable_parameters_dict[name + "program"] = {}
+        self.cpu_adaptable_parameters_dict[name + "program"] = {}
+
         if frag is None:
             frag = ""
+
         if vert_path == SQUARE_VERT_PATH:
             vert = "\n"
+
         self.initUniformsForProgram(frag + vert, name, reload)
-        # self.initUniformsForProgram(frag+vert, name, reload)
+
         if reload:
             self.reloadUniformsBinding(None, name)
+
 
     def storePreviousProgramVersion(self, program, vao, name):
         # Program
         setattr(self, name + "program_old", getattr(self, name + "program"))
         setattr(self, name + "program", program)
         self.previous_programs[name] = getattr(self, name + "program_old")
+
         # VAO
         setattr(self, name + "vao_old", getattr(self, name + "vao"))
         setattr(self, name + "vao", vao)
         self.previous_vaos[name] = getattr(self, name + "vao_old")
+
         if DEBUG:
-            print(
-                "New program version is ",
-                getattr(self, name + "program"),
-                "\nOld program version is ",
-                getattr(self, name + "program_old"),
-            )
+            print("New program version is",
+                  getattr(self, name + "program"),
+                  "\nOld program version is",
+                  getattr(self, name + "program_old"),)
 
     def releasePreviousProgramVersion(self):
         for key, program in self.previous_programs.items():
             program.release()
+
         for key, vao in self.previous_vaos.items():
             vao.release()
-        # inutile mais au cas où...
+
+        # Useless, but you never know..
         self.previous_programs = {}
         self.previous_vaos = {}
 
     def reloadPreviousProgramVersion(self):
         for name, program in self.previous_programs.items():
             if DEBUG:
-                print(
-                    "Program %s" % name,
-                    "with reference",
-                    getattr(self, name + "program"),
-                    " is reloaded with ",
-                    program,
-                )
+                print("Program", name, "with reference", getattr(self, name + "program"),
+                      "is reloaded with", program)
+
             setattr(self, name + "program", program)
+
         for name, vao in self.previous_vaos.items():
             if DEBUG:
-                print(
-                    "Vao %s" % name,
-                    "with reference",
-                    getattr(self, name + "vao"),
-                    " is reloaded with ",
-                    vao,
-                )
+                print("VAO", name, "with reference", getattr(self, name + "vao"),
+                      "is reloaded with", vao,)
+
             setattr(self, name + "program", program)
             setattr(self, name + "vao", vao)
+
         self.bindUniform(None)
 
     def reloadProgram(self):
@@ -229,41 +236,42 @@ class ProgramBase:
     def reloadProgramSafely(self):
         if DEBUG:
             print("Program %s: start reloading safely" % self.__class__.__name__)
-        if DEBUG:
             print(self.vbo, self.vao, self.program)
+
         # Try to reload the program
         try:
             self.reloadProgram()
-        except:
+        except Exception:
             raise GLSLImplementationError
 
         # Try to bind uniforms to the program
         try:
-            self.bindUniform(None)  # TODO remove None here
-        except:
+            self.bindUniform(None)  # TODO: remove None here
+        except Exception:
             self.reloadPreviousUniformsState()
             raise UnuseUniformError
+
         if DEBUG:
             print(self.vbo, self.vao, self.program)
-        if DEBUG:
-            print(
-                "Program %s: success while reloading program" % self.__class__.__name__
-            )
+            print("Program %s: success while reloading program" % self.__class__.__name__)
 
     def getGLSLCodePath(self):
         return self.vertex_shader_glsl_paths + self.fragment_shader_glsl_paths
 
-    ############################
+    ###########################################
 
     ##############
     # FBO Things #
     ##############
     def getFBOSpecifications(self):
         dr = None
+
         if len(self.fbos_depth_requirement):
             dr = self.fbos_depth_requirement
+
         if len(self.fbos_num_textures) == 0.0:
             self.fbos_num_textures = [1 for i in range(len(self.fbos_win_size))]
+
         return (
             self.fbos_win_size,
             self.fbos_components,
@@ -277,7 +285,7 @@ class ProgramBase:
         self.fbos = fbos
         return True
 
-    ##########################
+    ###########################################
 
     #####################
     # Parameters Things #
@@ -295,16 +303,15 @@ class ProgramBase:
     ):
         if uniform_name not in self.adaptable_parameters_dict[program_name].keys():
             self.adaptable_parameters_dict[program_name][uniform_name] = {}
+
         uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
         uniform_parameters[name] = {
-            "name": uniform_name,
-            # "minimum": minimum,
-            # "maximum": maximum,
-            # "type":  type,
+            "name": name,
+#           "minimum": minimum,
+#           "maximum": maximum,
+#           "type":  type,
             "value": value,
-            "connect": lambda v: self.setAdaptableParameters(
-                program_name, uniform_name, name, v
-            ),
+            "connect": lambda v: self.setAdaptableParameters(program_name, uniform_name, name, v),
             "widget": widget_type,
         }
 
@@ -318,6 +325,25 @@ class ProgramBase:
                 else:
                     gui_uni["protected"] = False
 
+    def setCpuAdaptableParameters(self, progam_name, name, value):
+        self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"][
+            "value"
+        ] = value
+#
+#       if self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"]:
+#           self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"](value)
+
+    def add_text_edit_cpu_adaptable_parameter(self, name, value, callback=None):
+        uniform_parameters = self.cpu_adaptable_parameters_dict[self.name + "program"]
+        uniform_parameters[name] = {
+            "eval_function": {
+                "name": name,
+                "value": value,
+                "connect": lambda v: self.setCpuAdaptableParameters(self.name + "program", name, v),
+#               "callback": callback,
+                "widget": "TextEdit",
+            }
+        }
 
     def initUniformsAdaptableParameters(self, program_name, uniform_name):
         self.initAdaptableParameters(
@@ -335,23 +361,24 @@ class ProgramBase:
         evaluation = self.adaptable_parameters_dict[program_name][uniform_name][
             "eval_function"
         ]["value"]
+
         try:
             modified_data = eval(evaluation)
             modified_data = float(modified_data)
-        except:
+        except Exception:
             if DEBUG_EVAL:
-                print(
-                    "eval_function %s" % evaluation,
-                    "is not correct.",
-                    self.__class__.__name__,
-                    "for uniform %s" % uniform_name,
-                )
-            if DEBUG_EVAL:
-                print("giving raw input in uniforms %s" % uniform_name)
+                print("eval_function", evaluation, "is not correct.", self.__class__.__name__,
+                      "for uniform", uniform_name)
+                print("giving raw input in uniforms", uniform_name)
+
             modified_data = x
+
         return modified_data
 
-    def getAdaptableParameters(self):
+    def getCpuAdaptableParameters(self):
+        return self.cpu_adaptable_parameters_dict
+
+    def getGpuAdaptableParameters(self):
         return self.adaptable_parameters_dict
 
     def setAdaptableParameters(self, program_name, uniform_name, params, value):
@@ -360,16 +387,11 @@ class ProgramBase:
         value : float or anything...
         """
         if DEBUG:
-            print(
-                "Params %s set to value" % params,
-                str(value),
-                "for programs %s" % program_name,
-            )
-        self.adaptable_parameters_dict[program_name][uniform_name][params][
-            "value"
-        ] = value
+            print("Params", params, "set to value", value, "for programs", program_name)
 
-    #####################
+        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = value
+
+    ###########################################
 
     ###################
     # Uniforms Things #
@@ -407,9 +429,10 @@ class ProgramBase:
 
     def bindUniform(self, af):
         self.already_called = True
+
         try:
             self.program["iResolution"] = self.win_size
-        except:
+        except Exception:
             pass
 
     def isCalled(self):
@@ -435,13 +458,17 @@ class UniformsLookup:
 
     def protect(self, uniforms):
         uniforms_copy = copy.deepcopy(uniforms)
+
         if DEBUG:
             print("Lookup uniforms :", uniforms)
+
         self._all_bindings = copy.deepcopy(uniforms)
+
         for program in uniforms_copy.keys():
             for to_protect in self.protected:
                 if to_protect in uniforms_copy[program].keys():
                     del uniforms_copy[program][to_protect]
+
         return uniforms_copy
 
     def update(self, uniforms):
@@ -478,9 +505,11 @@ class ProgramsUniforms:
             self.previous_uniforms = self.uniforms
             self.programs = {}
             self.uniforms = {}
+
         self.uniforms[program_name] = {}
         self.programs[program_name] = getattr(self.parent, program_name + "program")
         file_lines = file.split(";")
+
         for line in file_lines:
             if "uniform" in line:
                 tmp = line.split(" ")
@@ -496,10 +525,9 @@ class ProgramsUniforms:
             "type": type_name,
             "param_name": None,
         }
+
         if uniform_name not in self.protected:
-            self.parent.initUniformsAdaptableParameters(
-                program_name + "program", uniform_name
-            )
+            self.parent.initUniformsAdaptableParameters(program_name + "program", uniform_name)
 
     def addProtectedUniforms(self, uniforms_name):
         """
@@ -512,11 +540,10 @@ class ProgramsUniforms:
         Get the uniforms binding in order to expose it (without protected uniforms)
         """
         if self.lookup is None:
-            self.lookup = UniformsLookup(
-                self.uniforms, self.changeBinding, self.protected
-            )
+            self.lookup = UniformsLookup(self.uniforms, self.changeBinding, self.protected)
         else:
             self.lookup.update(self.uniforms)
+
         return self.lookup
 
     def initBinding(self, program_name, binding, reload=False):
@@ -526,14 +553,17 @@ class ProgramsUniforms:
         if reload:
             self.uniforms[program_name] = self.init_binding[program_name]
             return
+
         uniforms = self.uniforms[program_name]
+
         for uniform_name, param_name in binding.items():
             if DEBUG:
                 print(uniforms)
-            if DEBUG:
                 print(uniform_name, param_name)
+
             uniforms[uniform_name]["type"] = None
             uniforms[uniform_name]["param_name"] = param_name
+
         self.init_binding[program_name] = copy.deepcopy(uniforms)
 
     def reloadPreviousUniformsState(self):
@@ -572,15 +602,11 @@ class ProgramsUniforms:
         bind all the uniforms to the program 'program_name' for rendering
         """
         program = self.programs[program_name]
+
         if DEBUG:
-            print(
-                "Bind uniforms to program :",
-                program,
-                " with name ",
-                program_name,
-                " for node ",
-                self.parent.__class__.__name__,
-            )
+            print("Bind uniforms to program :", program, "with name", program_name, "for node",
+                  self.parent.__class__.__name__)
+
         for uniform_name, info in self.uniforms[program_name].items():
             if info["param_name"] is not None:  # ie if this uniform is set to a params
                 if uniform_name not in self.protected:
@@ -589,25 +615,21 @@ class ProgramsUniforms:
                             data = audio_features[info["param_name"]]
                     else:
                         data = getattr(self.parent, info["param_name"])
+
                     modified_data = self.parent.getAdaptableEvaluationForUniform(
                         program_name + "program", uniform_name, data
                     )
+
                     if DEBUG:
-                        print(
-                            "ProgramUniform::bindUniformToProgram Trying to bind parameters ",
-                            info["param_name"],
-                            " with value ",
-                            modified_data,
-                            " to uniform ",
-                            uniform_name,
-                            " in program ",
-                            program_name + "program",
-                            " for node ",
-                            self.parent.__class__.__name__,
-                        )
+                        print("ProgramUniform::bindUniformToProgram Trying to bind parameters",
+                              info["param_name"], "with value", modified_data, "to uniform",
+                              uniform_name, "in program", program_name + "program", " for node ",
+                              self.parent.__class__.__name__)
+
                     program[uniform_name] = modified_data
                 else:
                     data = getattr(self.parent, info["param_name"])
+
                     if isinstance(data, np.ndarray):
                         program[uniform_name].write(data)
                     else:
