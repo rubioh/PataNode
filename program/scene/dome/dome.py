@@ -166,7 +166,7 @@ class Dome(ProgramBase):
         self.renderer.renderGBUFFER(
             self.model, camera, self.projection, self.fbos[0]
         )
-        self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
+        self.renderer.renderSun(self.fbos[1], -self.camera, self.fbos[0])
         return self.fbos[1].color_attachments[0]
 
     def norender(self):

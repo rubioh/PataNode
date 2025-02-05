@@ -15,6 +15,8 @@ class ParticleSystem:
         self.buffer_size = num_particle * 16
         self.compute_shader_initialized = False
         #group size is 256
+        self.bounce_factor = 0.5
+        self.damping_factor = 0.001
         self.num_group = (num_particle // 256) + 1
         self.position_buffer = [ctx.buffer(None, self.buffer_size, True), ctx.buffer(None, self.buffer_size, True)]
         self.velocity_buffer = [ctx.buffer(None, self.buffer_size, True), ctx.buffer(None, self.buffer_size, True)]
@@ -48,6 +50,9 @@ class ParticleSystem:
         self.ctx.finish()
         self.compute_shader_initialized = True
 
+    def reset(self, num_particle):
+        self.compute_shader_initialized = False
+
     def update(self):
         if not self.compute_shader_initialized:
             self.init_compute()
@@ -55,7 +60,8 @@ class ParticleSystem:
         self.position_buffer[(self.iFrame + 1) % 2].bind_to_storage_buffer(2, 0, self.buffer_size)
         self.velocity_buffer[(self.iFrame + 0) % 2].bind_to_storage_buffer(1, 0, self.buffer_size)
         self.velocity_buffer[(self.iFrame + 1) % 2].bind_to_storage_buffer(3, 0, self.buffer_size)
-
+        self.compute_shader["damping_factor"] = self.damping_factor
+        self.compute_shader["bounce_factor"] = self.bounce_factor
         self.compute_shader.run(self.num_group, 1, 1)
         self.ctx.finish()
         self.iFrame = (self.iFrame + 1) % 2
