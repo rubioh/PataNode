@@ -52,6 +52,16 @@ class BPM_estimator:
             "on_tempo16": 0.125 * 0.5,
             "on_tempo32": 0.125 * 0.25,
         }
+        self.lfo_on_tempo = {
+            "lfo_on_tempo_q": 0,
+            "lfo_on_tempo_h": 0,  
+            "lfo_on_tempo": 0,  
+            "lfo_on_tempo2": 0,  
+            "lfo_on_tempo4": 0,  
+            "lfo_on_tempo8": 0,
+            "lfo_on_tempo16": 0,
+            "lfo_on_tempo32": 0,
+        }
         self.time = 0.0
 
     def update_bpm(self, on_kick):
@@ -110,6 +120,7 @@ class BPM_estimator:
 
             if self.on_tempo[k] <= 0:
                 self.on_tempo[k] = 1 + self.on_tempo[k]
+            self.lfo_on_tempo["lfo_"+k] = np.cos(self.on_tempo[k]*2.*3.14159)*.5+.5
 
     def update_time(self):
         self.time += self.bpm / 60.0 * 2.0 * np.pi / 60.0
@@ -121,7 +132,6 @@ class BPM_estimator:
 
         for k, v in self.on_tempo.items():
             features[k] = v
-
         features["time"] = self.time
         return features
 

@@ -238,6 +238,8 @@ class ParametersWidget(QTabWidget):
             self._all_line_edit_widgets[program_name] = list()
             displayed_name = program_name.replace("_", " ").capitalize()
             program_widget = self.createWidget(program_name)
+            if len(program_widget) == 0:
+                continue
             self.addTab(program_widget, displayed_name)
 
     def createWidget(self, program_name):
@@ -245,11 +247,14 @@ class ParametersWidget(QTabWidget):
         parameters = self.parameters_informations[program_name]
 
         for idx, uniform_name in enumerate(parameters.keys()):
+            if parameters[uniform_name]["eval_function"]["protected"]:
+                continue
+                
             item = QListWidgetItem()
 
             parameter_widget = QWidget()
             parameter_layout = QHBoxLayout()
-
+            
             line_edit_widget = self.getLineEdit(
                 parameters[uniform_name], program_name, uniform_name
             )
@@ -293,7 +298,7 @@ class ParametersWidget(QTabWidget):
             return lambda: custom_callback()
 
         textfield.returnPressed.connect(get_callback())
-        textfield.hide()
+        #textfield.hide()
         return textfield
 
 
@@ -324,6 +329,8 @@ class UniformWidget(QTabWidget):
         for program_name in self.uniforms_informations:
             displayed_name = program_name.replace("_", " ").capitalize() + "Program"
             program_widget = self.createWidget(program_name)
+            if len(program_widget) == 0:
+                continue
             self.addTab(program_widget, displayed_name)
 
     def createWidget(self, program_name):

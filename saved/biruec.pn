@@ -6,8 +6,8 @@
         {
             "id": 140147911297360,
             "title": "Physarum particules",
-            "pos_x": -641.0,
-            "pos_y": -146.0,
+            "pos_x": -533.0,
+            "pos_y": -59.0,
             "inputs": [
                 {
                     "id": 140147911319312,
@@ -34,14 +34,14 @@
                     "Trail": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "1",
                             "widget": "TextEdit"
                         }
                     },
                     "SeedTex": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
@@ -55,49 +55,49 @@
                     "part_size": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "sensor_direction": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "trail_thresh": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "velocity_rate": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "2",
                             "widget": "TextEdit"
                         }
                     },
                     "sensor_length": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "6",
                             "widget": "TextEdit"
                         }
                     },
                     "update_direction": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "to_center_amount": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "8.",
+                            "value": "4.",
                             "widget": "TextEdit"
                         }
                     }
@@ -162,8 +162,8 @@
         {
             "id": 140148278466192,
             "title": "AddAndDiffuse",
-            "pos_x": -99.0,
-            "pos_y": -31.0,
+            "pos_x": -95.0,
+            "pos_y": -33.0,
             "inputs": [
                 {
                     "id": 140147912545104,
@@ -196,7 +196,7 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
@@ -217,14 +217,14 @@
                     "decay_rate": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": ".9",
                             "widget": "TextEdit"
                         }
                     },
                     "diffuse_amount": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "1.",
                             "widget": "TextEdit"
                         }
                     }
@@ -300,7 +300,7 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
@@ -321,7 +321,7 @@
                     "substract_amount": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*-.2",
+                            "value": "x*-64",
                             "widget": "TextEdit"
                         }
                     }
@@ -359,8 +359,8 @@
         {
             "id": 140147334114128,
             "title": "Eye",
-            "pos_x": -563.0,
-            "pos_y": 263.0,
+            "pos_x": -552.0,
+            "pos_y": 209.0,
             "inputs": [],
             "outputs": [
                 {
@@ -378,56 +378,56 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "energy_fast": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "energy_mid": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "energy_slow": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "bpm": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "tf": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "scale": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     }
@@ -567,21 +567,21 @@
                     "hue_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "saturation_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "value_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*2.",
+                            "value": "x*2.",
                             "widget": "TextEdit"
                         }
                     }
@@ -623,7 +623,7 @@
         {
             "id": 140147891438352,
             "title": "HSV Offset",
-            "pos_x": 72.0,
+            "pos_x": 74.0,
             "pos_y": -141.0,
             "inputs": [
                 {
@@ -650,7 +650,7 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
@@ -664,21 +664,21 @@
                     "hue_offset": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "saturation_offset": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data+.8",
+                            "value": "x+.8",
                             "widget": "TextEdit"
                         }
                     },
                     "value_offset": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     }
@@ -747,7 +747,7 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
@@ -768,14 +768,14 @@
                     "compression": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*.5",
+                            "value": "x*.5",
                             "widget": "TextEdit"
                         }
                     },
                     "bloom_rate": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "input_data*4.",
+                            "value": "x*4.",
                             "widget": "TextEdit"
                         }
                     }

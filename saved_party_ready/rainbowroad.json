@@ -79,56 +79,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_fast": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_mid": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_slow": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bpm": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "tf": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "scale": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -281,70 +289,80 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_fast": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_fast2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_mid": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_slow": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "turfu": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "tic_tile": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "trigger": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -428,42 +446,48 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_cum": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x*2",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x*1.5",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "y0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "zoom_factor": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "6",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -616,21 +640,24 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "1.",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -696,35 +723,40 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Bloom": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "10",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "compression": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bloom_rate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "10",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -733,28 +765,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "level": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Prev": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -763,14 +799,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -885,28 +923,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "0.1",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -981,28 +1023,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "0.001",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "0.002",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1077,28 +1123,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "0.001",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".2",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1173,14 +1223,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1242,35 +1294,40 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Bloom": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "compression": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bloom_rate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -1279,28 +1336,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "level": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Prev": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -1309,14 +1370,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1431,28 +1494,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1549,56 +1616,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sens": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "translate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "camp": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "which": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1711,56 +1786,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sens": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "translate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "camp": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "which": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1844,28 +1927,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dry_wet": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "nrj": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -1962,56 +2049,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sens": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "translate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "camp": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "which": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2102,28 +2197,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".2",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "x2": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".01",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2191,42 +2290,48 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "smooth_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "t": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "t_angle": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2302,42 +2407,48 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "smooth_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "t": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "t_angle": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2413,28 +2524,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dry_wet": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "nrj": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2621,56 +2736,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_fast": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_mid": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_slow": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bpm": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "tf": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "scale": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2761,14 +2884,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel1": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2828,14 +2953,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2895,28 +3022,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dry_wet": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "nrj": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -2984,28 +3115,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dry_wet": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "nrj": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3073,35 +3208,40 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "hue_offset": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".4",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "saturation_offset": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "value_offset": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3202,56 +3342,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sens": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "translate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "camp": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "which": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3335,21 +3483,24 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".5",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": ".6",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3502,56 +3653,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "FieldState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "VelocityState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dt": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "advect_amount": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "input_vel_intensity": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "input_vel_intensity_passthrough": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "gate_open": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -3560,70 +3719,80 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "InkState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "FieldState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dt": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "advect_amount": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "gate_open": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "decay_rate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "passthrough": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iFrame": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -3632,28 +3801,32 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "FieldState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "dt": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "kappa": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -3662,14 +3835,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "FieldState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -3678,21 +3853,24 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "FieldStateSP": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "vort_amount": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -3701,14 +3879,16 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "InkState": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3906,7 +4086,8 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -3987,56 +4168,64 @@
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_low": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sens": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "mode": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "translate": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "camp": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "which": {
                         "eval_function": {
                             "name": "eval_function",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -4087,13 +4276,13 @@
             ]
         },
         {
-            "id": 2387993146448,
-            "title": "Std Output",
-            "pos_x": 0.0,
-            "pos_y": 0.0,
+            "id": 2986638528272,
+            "title": "Screen",
+            "pos_x": 748.75,
+            "pos_y": -205.0,
             "inputs": [
                 {
-                    "id": 2388536864080,
+                    "id": 2986265301392,
                     "index": 0,
                     "multi_edges": false,
                     "position": 2,
@@ -4102,7 +4291,7 @@
             ],
             "outputs": [],
             "content": {},
-            "op_code": 1,
+            "op_code": 0,
             "cpu_adaptable_parameters": {
                 "program": {}
             },
@@ -4323,12 +4512,6 @@
             "end": 3069822131984
         },
         {
-            "id": 3069788209488,
-            "edge_type": 2,
-            "start": 3069684724048,
-            "end": 2388536864080
-        },
-        {
             "id": 3069967773840,
             "edge_type": 2,
             "start": 3069682506960,
@@ -4363,6 +4546,12 @@
             "edge_type": 2,
             "start": 3069682506960,
             "end": 1798085856464
+        },
+        {
+            "id": 2986265729872,
+            "edge_type": 2,
+            "start": 3069684724048,
+            "end": 2986265301392
         }
     ]
 }

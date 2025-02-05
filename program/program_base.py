@@ -315,6 +315,16 @@ class ProgramBase:
             "widget": widget_type,
         }
 
+    def protectAdaptableParameters(self, protected):
+        apd = self.adaptable_parameters_dict
+        for program_name in apd.keys():
+            for uniform_name in apd[program_name].keys():
+                gui_uni = apd[program_name][uniform_name]["eval_function"]
+                if gui_uni["name"] in protected:
+                    gui_uni["protected"] = True
+                else:
+                    gui_uni["protected"] = False
+
     def setCpuAdaptableParameters(self, progam_name, name, value):
         self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"][
             "value"
@@ -415,9 +425,7 @@ class ProgramBase:
 
     def addProtectedUniforms(self, uniforms_name):
         self.programs_uniforms.addProtectedUniforms(uniforms_name)
-
-    def isCalled(self):
-        self.already_called = True
+        self.protectAdaptableParameters(uniforms_name)
 
     def bindUniform(self, af):
         self.already_called = True
@@ -427,8 +435,10 @@ class ProgramBase:
         except Exception:
             pass
 
-    ###########################################
+    def isCalled(self):
+        self.already_called = True
 
+    #########################
     def render(self, *args):
         raise NotImplementedError
 

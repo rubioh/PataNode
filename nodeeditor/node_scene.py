@@ -13,6 +13,7 @@ from nodeeditor.node_scene_history import SceneHistory
 from nodeeditor.node_scene_clipboard import SceneClipboard
 
 
+
 DEBUG_REMOVE_WARNINGS = False
 
 
@@ -394,6 +395,13 @@ class Scene(Serializable):
             ]
         )
 
+    def init_node(self, node_class):
+        if node_class.__name__ == "MapLed2DNode":
+            node = node_class(self, self.app.light_engine)
+        else:
+            node = node_class(self)
+        return node
+
     def deserialize(
         self, data: dict, hashmap: dict = {}, restore_id: bool = True, *args, **kwargs
     ) -> bool:
@@ -419,7 +427,8 @@ class Scene(Serializable):
 
             if not found:
                 try:
-                    new_node = self.getNodeClassFromData(node_data)(self)
+                    node_class = self.getNodeClassFromData(node_data)
+                    new_node = self.init_node(node_class)
                     new_node.deserialize(
                         node_data, hashmap, restore_id, *args, **kwargs
                     )

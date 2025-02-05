@@ -1,0 +1,54 @@
+ClassicPar1:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 15
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[1560, 740]]
+        num_pixels: 1
+ClassicPar2:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 25
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[1560, 340]]
+        num_pixels: 1
+ClassicPar3:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 35
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 340]]
+        num_pixels: 1
+ClassicPar4:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 45
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+ClassicPar5:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 55
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[960, 340]]
+        num_pixels: 1
+ClassicPar6:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 65
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[960, 740]]
+        num_pixels: 1

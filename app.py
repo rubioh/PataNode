@@ -5,8 +5,9 @@ from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject, 
 
 from audio.audio_conf import list_audio_features
 from audio.audio_pipeline import AudioEngine
+from light.core import LightEngine
+from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 from gui.patanode import PataNode
-from light.light import LightEngine
 #from light_new import LightEngine
 
 class WorkerSignals(QObject):
@@ -32,7 +33,6 @@ class PataShadeApp(PataNode):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine()
         super().__init__()
-
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 

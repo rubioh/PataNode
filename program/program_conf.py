@@ -57,14 +57,15 @@ def name_to_opcode(name):
     return sum(lst)
 
 
-import program.output # noqa: E402
-import program.scene # noqa: E402
-import program.utils # noqa: E402
-import program.textures # noqa: E402
-import program.effects # noqa: E402
-import program.colors # noqa: E402
-import program.gate # noqa: E402
-import program.particles # noqa: E402
-import program.zozo # noqa: E402
-import program.physarum # noqa: E402
-import program.map # noqa: F401, E402
+import program.output
+import program.scene
+import program.utils
+import program.textures
+import program.effects
+import program.colors
+import program.gate
+import program.particles
+import program.zozo
+import program.physarum
+import program.led_mapping
+import program.map
