@@ -179,54 +179,6 @@
             ]
         },
         {
-            "id": 1905389172944,
-            "title": "Screen",
-            "pos_x": 1088.6249999999998,
-            "pos_y": 43.499999999999986,
-            "inputs": [
-                {
-                    "id": 1905518978320,
-                    "index": 0,
-                    "multi_edges": false,
-                    "position": 2,
-                    "socket_type": 1
-                }
-            ],
-            "outputs": [],
-            "content": {},
-            "op_code": 0,
-            "cpu_adaptable_parameters": {
-                "program": {}
-            },
-            "gpu_adaptable_parameters": {
-                "program": {
-                    "tex": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "x",
-                            "widget": "TextEdit"
-                        }
-                    }
-                }
-            },
-            "uniforms_binding": {
-                "": {
-                    "tex": {
-                        "type": null,
-                        "param_name": null
-                    },
-                    "iResolution": {
-                        "type": null,
-                        "param_name": null
-                    }
-                }
-            },
-            "win_size": [
-                1920,
-                1080
-            ]
-        },
-        {
             "id": 2087387453264,
             "title": "Mapping",
             "pos_x": -459.0,
@@ -4133,6 +4085,54 @@
                 1920,
                 1080
             ]
+        },
+        {
+            "id": 2387993146448,
+            "title": "Std Output",
+            "pos_x": 0.0,
+            "pos_y": 0.0,
+            "inputs": [
+                {
+                    "id": 2388536864080,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 1,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
         }
     ],
     "edges": [
@@ -4326,7 +4326,7 @@
             "id": 3069788209488,
             "edge_type": 2,
             "start": 3069684724048,
-            "end": 1905518978320
+            "end": 2388536864080
         },
         {
             "id": 3069967773840,
