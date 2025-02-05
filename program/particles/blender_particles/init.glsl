@@ -44,8 +44,8 @@ layout (std430, binding = 3) buffer OutputBuffer4 {
 
 void main() {
     uint index = gl_GlobalInvocationID.x;
-    vec3 bias = (hash3(index) - vec3(.5)) * 0.01;
-
+    vec3 bias = (hash3( ( index+21 ) * index) - vec3(.5)) * 0.05;
+    bias = length(bias) * normalize(bias);
     if (index >= 1000000)
         return;
     in_position[index] = vec4(0., 0., 0., 0.);

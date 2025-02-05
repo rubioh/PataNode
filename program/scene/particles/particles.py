@@ -18,19 +18,20 @@ class Particle(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Particle"
-        self.path = "./assets/mesh/spheretiny.glb"
-        self.particle_system = ParticleSystem(self.ctx, 1000000)
-        self.scene = MeshScene(self.path, ctx, self.particle_system.get_particle_buffer(), self.particle_system.get_particle_buffer_unit_size())
+        self.path = "./assets/mesh/sphere.glb"
         self.camera = glm.mat4()
         self.projection = glm.perspective(glm.radians(45.0), 16.0 / 9.0, 0.1, 1000.0)
         self.model = glm.mat4()
-        self.camera = glm.translate(self.camera, glm.vec3(0, 0., -1.))
+        self.camera = glm.translate(self.camera, glm.vec3(0, .1, -1.5))
        # self.model = glm.scale(self.model, glm.vec3(.01, .01, .01))
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
         self.initParams()
+        self.particle_system = ParticleSystem(self.ctx, self.num_particle)
+        self.scene = MeshScene(self.path, ctx, self.particle_system.get_particle_buffer(), self.particle_system.get_particle_buffer_unit_size())
         self.load_mesh()
+ 
         self.time = 0.
 
     def load_mesh(self):
@@ -70,11 +71,33 @@ class Particle(ProgramBase):
     def initParams(self):
         self.vitesse = 0.4
         self.time = 0
+        self.reset = 0.
+        self.particle_size = 1.
+        self.num_particle = 1000000
+        self.damping_factor = 0.001
+        self.bounce_factor = 0.5
+        self.add_text_edit_cpu_adaptable_parameter("reset", self.reset, self.load_mesh)
+        self.add_text_edit_cpu_adaptable_parameter("particle_size", self.particle_size, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("num_particle", self.num_particle, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("damping_factor", self.damping_factor, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("bounce_factor", self.bounce_factor, lambda: 0)
 
     def getParameters(self):
         return self.adaptableParametersDict
 
     def updateParams(self, af=None):
+        v = self.getCpuAdaptableParameters()["program"]["reset"]["eval_function"]["value"]
+        v2 = float(self.getCpuAdaptableParameters()["program"]["num_particle"]["eval_function"]["value"])
+        if v != self.reset:
+            self.reset = v
+            self.num_particle = v2
+            self.particle_system.reset(self.num_particle)
+        self.particle_size = float(self.getCpuAdaptableParameters()["program"]["particle_size"]["eval_function"]["value"])       
+        self.damping_factor = float(self.getCpuAdaptableParameters()["program"]["damping_factor"]["eval_function"]["value"])
+        self.bounce_factor = float(self.getCpuAdaptableParameters()["program"]["bounce_factor"]["eval_function"]["value"])
+        self.particle_system.bounce_factor = self.bounce_factor
+        self.particle_system.damping_factor = self.damping_factor
+        self.particle_size = self.particle_size
         self.time += 0.01 * self.vitesse
 
     def bindUniform(self, af):
@@ -89,7 +112,7 @@ class Particle(ProgramBase):
         self.bindUniform(af)
         self.fbos[0].use()
         self.fbos[0].clear()
-        self.renderer.renderGBUFFERinstance(100000, self.particle_system.get_particle_buffer(),
+        self.renderer.renderGBUFFERinstance(1000, self.particle_system.get_particle_buffer(),
             self.model, self.camera, self.projection, self.fbos[0]
         )
         self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
