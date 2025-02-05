@@ -183,7 +183,6 @@ class PataNode(NodeEditorWindow):
             triggered=self.openMapWindow,
             )
 
-
         self.actSeparator = QAction(self)
         self.actSeparator.setSeparator(True)
 
@@ -293,7 +292,7 @@ class PataNode(NodeEditorWindow):
         return nodeeditor, subwnd
 
     def about(self):
-        QMessageBox.about(self, "About PataNode", "Un logiciel de bg pour les bg")
+        QMessageBox.about(self, "About PataNode", "Un logiciel de bg pour les bgs")
 
     def createMenus(self):
         super().createMenus()

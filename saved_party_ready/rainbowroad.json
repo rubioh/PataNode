@@ -482,14 +482,14 @@
                     "energy_cum": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "x",
+                            "value": "x*2",
                             "widget": "TextEdit"
                         }
                     },
                     "energy": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "x",
+                            "value": "x*1.5",
                             "widget": "TextEdit"
                         }
                     },
@@ -503,14 +503,14 @@
                     "y0": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "x*4",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },
                     "zoom_factor": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "4.",
+                            "value": "6",
                             "widget": "TextEdit"
                         }
                     }
@@ -1747,7 +1747,7 @@
                     "num_kick": {
                         "eval_function": {
                             "name": "num_kick",
-                            "value": "2",
+                            "value": "32",
                             "widget": "TextEdit"
                         }
                     }

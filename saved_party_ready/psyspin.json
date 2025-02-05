@@ -63,7 +63,7 @@
                     "tunnel_wave_amp": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "x*2.",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     },

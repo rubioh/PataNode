@@ -135,9 +135,9 @@ class Mapping(ProgramBase):
             self.program["white"] = 1
             shape = moderngl.LINE_STRIP
 
-            self.fbos[0].use()
-            self.fbos[0].clear()
-            self.fbos[1].clear()
+            self.fbos[1].use()
+#            self.fbos[0].clear()
+#            self.fbos[1].clear()
 
             for vao in self.vaos[1::2]:
                 vao.render(moderngl.LINE_STRIP)
