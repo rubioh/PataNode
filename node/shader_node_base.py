@@ -148,7 +148,11 @@ class ShaderNode(Node):
 
     def reload_program(self):
         state = self.serialize()
-        program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
+        if self.content_label_objname == "shader_map_led_2d":
+            program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size, light_engine=self.scene.app.light_engine)
+        else:
+            program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
+
 
         del self.program
 
@@ -426,20 +430,26 @@ class ShaderNode(Node):
         if self.__class__.op_code == OP_CODE_MAPPING:
             res["mapping_points"] = self.program.polygons
 
-        for program in adapt_params.keys():
-            program_params = adapt_params[program]
+        if not adapt_params:
+            program_params = {}
+        else:
+            for program in adapt_params.keys():
+                program_params = adapt_params[program]
 
-            for uniform in program_params.keys():
-                del program_params[uniform]["eval_function"]["connect"]
+                for uniform in program_params.keys():
+                    del program_params[uniform]["eval_function"]["connect"]
 
         res["cpu_adaptable_parameters"] = adapt_params
         adapt_params = copy.deepcopy(self.getGpuAdaptableParameters())
 
-        for program in adapt_params.keys():
-            program_params = adapt_params[program]
+        if not adapt_params:
+            program_params = {}
+        else:
+            for program in adapt_params.keys():
+                program_params = adapt_params[program]
 
-            for uniform in program_params.keys():
-                del program_params[uniform]["eval_function"]["connect"]
+                for uniform in program_params.keys():
+                    del program_params[uniform]["eval_function"]["connect"]
 
         res["gpu_adaptable_parameters"] = adapt_params
         uniforms_binding = self.program.getUniformsBinding()._all_bindings
@@ -461,7 +471,10 @@ class ShaderNode(Node):
                     eval_func = program_params[uniform]["eval_function"]["value"]
                     cpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
 
-        adapt_params = data["gpu_adaptable_parameters"]
+        if "gpu_adaptable_parameters" in data:
+            adapt_params = data["gpu_adaptable_parameters"]
+        else:
+            adapt_params = {}
         gpu_node_params = self.getGpuAdaptableParameters()
 
         for program in adapt_params.keys():

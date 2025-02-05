@@ -136,7 +136,7 @@ class MapLed2DNode(ShaderNode, LED):
         super().__init__(scene, inputs=[1], outputs=[1])
         self.program = MapLed2D(
             ctx=self.scene.ctx, 
-            light_engine=light_engine
+            light_engine=scene.app.light_engine
         )
         self.eval()
 

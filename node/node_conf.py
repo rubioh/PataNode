@@ -65,7 +65,7 @@ def get_class_from_opcode(op_code):
     if op_code == GRAPH_CONTAINER_OPCODE:
         return GraphContainerNode
 
-    raise OpCodeNotRegistered("OpCode '%d' is not registered" % op_code)
+    raise OpCodeNotRegistered("OpCode %d is not registered" % op_code)
 
 
 # Import all nodes and register them

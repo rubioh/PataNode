@@ -172,8 +172,8 @@ class PataNodeSubWindow(NodeEditorWidget):
                 )
 
             try:
-                node = get_class_from_opcode(op_code)(self.scene)
-
+                node_class = get_class_from_opcode(op_code)
+                node = self.init_node(node_class)
                 if isinstance(node, GraphContainerNode):
                     node.setApp(self.app)
 

@@ -8,7 +8,6 @@ from audio.audio_pipeline import AudioEngine
 from light.core import LightEngine
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 from gui.patanode import PataNode
-from light.light import LightEngine
 #from light_new import LightEngine
 
 class WorkerSignals(QObject):
