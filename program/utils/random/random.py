@@ -18,10 +18,10 @@ class Random(ProgramBase):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "random"
 
+        self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
-        self.initParams()
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
@@ -41,21 +41,43 @@ class Random(ProgramBase):
 
     def initParams(self):
         self.index = 0
+        self.on_kick = False
+        self.kick_index = 0
         self.iChannel0 = 1
+        self.last_idx = 0
+        self.range_start = 5
+        self.range_end = 10
+        self.is_transi = False
         self.time_for_next = 0
 
     def initUniformsBinding(self):
         binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
+        self.add_text_edit_cpu_adaptable_parameter("range_start", self.range_start, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter("range_end", self.range_end, lambda: 0)
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, l, af):
+        self.range_start = float(self.getCpuAdaptableParameters()["program"]["range_start"]["eval_function"]["value"])
+        self.range_end = float(self.getCpuAdaptableParameters()["program"]["range_end"]["eval_function"]["value"])
         if af is None or l is None:
             return
+        if af["on_kick"] and not self.on_kick and self.is_transi:
+            self.on_kick = True
+            self.kick_index = self.kick_index + 1
+            if self.kick_index > 10:
+                self.is_transi == False
+                self.kick_index = 0
+                self.on_kick = False
 
         if time.perf_counter() > self.time_for_next:
+            self.is_transi = True
+            self.last_idx = self.index
             self.index = random.randrange(0, l)
-            self.time_for_next = time.perf_counter() + random.randrange(5, 6)
+            if self.range_start >= self.range_end:
+                self.time_for_next = time.perf_counter() + random.randrange(self.range_end, self.range_start + 1)
+            else:
+                self.time_for_next = time.perf_counter() + random.randrange(self.range_start, self.range_end)
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -71,7 +93,6 @@ class Random(ProgramBase):
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
-
 
 @register_node(OP_CODE_RANDOM)
 class RandomNode(ShaderNode, Utils):
@@ -92,6 +113,10 @@ class RandomNode(ShaderNode, Utils):
             return self.program.norender()
 
         if input_nodes[self.program.index]:
-            texture = input_nodes[self.program.index].render(audio_features)
+            indexes = [self.program.index, self.program.last_idx]
+            index = self.program.index
+            if self.program.is_transi:
+                index = indexes[self.program.kick_index % 2]
+            texture = input_nodes[index].render(audio_features)
         output_texture = self.program.render([texture], l, audio_features)
         return output_texture

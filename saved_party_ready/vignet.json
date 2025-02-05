@@ -1009,7 +1009,57 @@
             "content": {},
             "op_code": 421,
             "cpu_adaptable_parameters": {
-                "program": {}
+                "program": {
+                    "object_path": {
+                        "eval_function": {
+                            "name": "object_path",
+                            "value": "./assets/mesh/dome.glb",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "x": {
+                        "eval_function": {
+                            "name": "x",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "y": {
+                        "eval_function": {
+                            "name": "y",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "z": {
+                        "eval_function": {
+                            "name": "z",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rx": {
+                        "eval_function": {
+                            "name": "rx",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "ry": {
+                        "eval_function": {
+                            "name": "ry",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "rz": {
+                        "eval_function": {
+                            "name": "rz",
+                            "value": 0.0,
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
             },
             "gpu_adaptable_parameters": {
                 "program": {
@@ -3821,13 +3871,6 @@
                             "widget": "TextEdit"
                         }
                     },
-                    "c1": {
-                        "eval_function": {
-                            "name": "eval_function",
-                            "value": "x",
-                            "widget": "TextEdit"
-                        }
-                    },
                     "trigger": {
                         "eval_function": {
                             "name": "eval_function",
@@ -3882,10 +3925,6 @@
                         "type": null,
                         "param_name": "tic_tile"
                     },
-                    "c1": {
-                        "type": null,
-                        "param_name": "c1"
-                    },
                     "trigger": {
                         "type": null,
                         "param_name": "trigger"
@@ -3897,8 +3936,8 @@
                 }
             },
             "win_size": [
-                1920,
-                1080
+                960,
+                540
             ]
         },
         {
