@@ -105,7 +105,7 @@ class StdInputNode(ShaderNode, Input):
             print("StdInputNode::evalImplementation Eval Implementation:", self)
 
         # Find and Connect required FBOs
-        win_sizes, components, dtypes = self.program.getFBOSpecifications()
+        win_sizes, components, dtypes, bs2, bs1 = self.program.getFBOSpecifications()
         success = self.findAndConnectFbos(win_sizes, components, dtypes)
 
         print("FBOS INPUT OK")
