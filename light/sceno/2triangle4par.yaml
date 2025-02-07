@@ -5,7 +5,7 @@ Triangle1:
         dmx_address: 1
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 740]]
+        canvas_position: [[1560, 740]]
         num_pixels: 1
 Triangle2:
     type: "Triangle"
@@ -14,60 +14,60 @@ Triangle2:
         dmx_address: 11
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 740]]
+        canvas_position: [[1560, 340]]
         num_pixels: 1
-ClassicPar1:
-    type: "ClassicPar"
+Triangle3:
+    type: "Triangle"
     address:
         universe: 0
         dmx_address: 21
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[1560, 740]]
+        canvas_position: [[360, 340]]
         num_pixels: 1
-ClassicPar2:
-    type: "ClassicPar"
+Triangle4:
+    type: "Triangle"
     address:
         universe: 0
         dmx_address: 31
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[1560, 340]]
+        canvas_position: [[360, 740]]
         num_pixels: 1
-ClassicPar3:
+        Triangle1:
+ClassicPar1:
     type: "ClassicPar"
     address:
         universe: 0
         dmx_address: 41
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 340]]
+        canvas_position: [[960, 340]]
         num_pixels: 1
-ClassicPar4:
+ClassicPar2:
     type: "ClassicPar"
     address:
         universe: 0
         dmx_address: 51
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 740]]
+        canvas_position: [[960, 740]]
         num_pixels: 1
-Triangle3:
-    type: "Triangle"
+ClassicPar3:
+    type: "ClassicPar"
     address:
         universe: 0
         dmx_address: 61
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 740]]
+        canvas_position: [[960, 1140]]
         num_pixels: 1
-Triangle4:
-    type: "Triangle"
+ClassicPar4:
+    type: "ClassicPar"
     address:
         universe: 0
-        dmx_address: 71
+        dmx_address: 62
     position: [0,0,1]
     shader_binding:
-        canvas_position: [[360, 740]]
+        canvas_position: [[960, 1540]]
         num_pixels: 1
-        Triangle1:
