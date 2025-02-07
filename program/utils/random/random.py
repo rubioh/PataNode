@@ -69,6 +69,8 @@ class Random(ProgramBase):
                 self.is_transi == False
                 self.kick_index = 0
                 self.on_kick = False
+        else:
+            self.on_kick = False
 
         if time.perf_counter() > self.time_for_next:
             self.is_transi = True

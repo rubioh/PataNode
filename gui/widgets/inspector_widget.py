@@ -247,8 +247,9 @@ class ParametersWidget(QTabWidget):
         parameters = self.parameters_informations[program_name]
 
         for idx, uniform_name in enumerate(parameters.keys()):
-            if parameters[uniform_name]["eval_function"]["protected"]:
-                continue
+            if "protected" in parameters[uniform_name]["eval_function"]:
+                if parameters[uniform_name]["eval_function"]["protected"]:
+                    continue
                 
             item = QListWidgetItem()
 
