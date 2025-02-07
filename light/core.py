@@ -47,7 +47,8 @@ class LightEngine:
 
     def load_sceno(self, path: str):
         if path is None:
-            path = "light/sceno/plante_a_son.yaml"   
+            path = "light/sceno/2triangle4par.yaml"
+#            path = "light/sceno/plante_a_son.yaml"   
         sceno = yaml.safe_load(open(path, "r"))
         for light_name, infos in sceno.items():
             print(light_name)
@@ -64,30 +65,28 @@ class LightEngine:
 
     def __call__(self, color=(0, 0, 0), audio_features=None):
         af = audio_features
-        output_buffer = np.zeros((512))
+        output_buffer = list(np.zeros((512)))
         for light in self.lights:
-            if self.force_strobe():
-                if "strobe" in light.attrib:
-                    light.attrib["strobe"] = 84./255.
-                    light.attrib["white"] = 1
-                    light.attrib["red"] = 1
-                    light.attrib["green"] = 1
-                    light.attrib["blue"] = 1
-            else:
-                if "strobe" in light.attrib:
-                    light.attrib["strobe"] = 1
-                    light.attrib["white"] = 0
-                    light.attrib["red"] = 0
-                    light.attrib["green"] = 0
-                    light.attrib["blue"] = 0
+#            if self.force_strobe():
+#                if "strobe" in light.attrib:
+#                    light.attrib["strobe"] = 84./255.
+#                    light.attrib["white"] = 1
+#                    light.attrib["red"] = 1
+#                    light.attrib["green"] = 1
+#                    light.attrib["blue"] = 1
+#            else:
+#                if "strobe" in light.attrib:
+#                    light.attrib["strobe"] = 1
+#                    light.attrib["white"] = 0
+#                    light.attrib["red"] = 0
+#                    light.attrib["green"] = 0
+#                    light.attrib["blue"] = 0
 
             light_buffer = light.get_dmx_buffer()
 
             if self.wait > 1000:
-                print(light, light.color)
-
+                print(light, light.color, light_buffer)
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
         self.wait += 1
         self.wait %= 1002
-        #print(light_buffer)
         self.light_device.write(output_buffer)

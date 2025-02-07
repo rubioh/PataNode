@@ -1,8 +1,11 @@
-import usb.core
-import usb.util
+
 import time
 import numpy as np
+import libusb_package
+import usb.core
+import usb.backend.libusb1
 
+libusb1_backend = usb.backend.libusb1.get_backend(find_library=libusb_package.find_library)
 
 class LightDevice:
     def __init__(self, verbose=False):
@@ -36,8 +39,16 @@ class LightDevice:
         )
         assert self.outep[0] is not None
 
+    def check_usb_devices(self) -> None:
+        for printer in usb.core.find(find_all=True, bDeviceClass=7):
+            print (printer)
+        devs = usb.core.find(find_all=True)
+        for device in devs:
+            print(device)
+        print(list(usb.core.find(find_all=True, backend=libusb1_backend)))
+
     def load_pataboite(self):
-        #self.check_usb_devices()
+        self.check_usb_devices()
         self.dev = usb.core.find(idVendor=0x0000, idProduct=0x0001)
         #print("Pataboite detected : \n", self.dev)
         if self.dev is not None:

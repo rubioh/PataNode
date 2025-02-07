@@ -1,0 +1,73 @@
+Triangle1:
+    type: "Triangle"
+    address:
+        universe: 0
+        dmx_address: 1
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+Triangle2:
+    type: "Triangle"
+    address:
+        universe: 0
+        dmx_address: 11
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+ClassicPar1:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 21
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[1560, 740]]
+        num_pixels: 1
+ClassicPar2:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 31
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[1560, 340]]
+        num_pixels: 1
+ClassicPar3:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 41
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 340]]
+        num_pixels: 1
+ClassicPar4:
+    type: "ClassicPar"
+    address:
+        universe: 0
+        dmx_address: 51
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+Triangle3:
+    type: "Triangle"
+    address:
+        universe: 0
+        dmx_address: 61
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+Triangle4:
+    type: "Triangle"
+    address:
+        universe: 0
+        dmx_address: 71
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[360, 740]]
+        num_pixels: 1
+        Triangle1:

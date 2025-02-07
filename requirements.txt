@@ -8,6 +8,7 @@ scipy
 sounddevice
 pyqt5
 matplotlib
+libusb-package
 pyusb
 git+https://github.com/theof/bytechomp.git@main
 ifaddr

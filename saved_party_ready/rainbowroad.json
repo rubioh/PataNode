@@ -2682,7 +2682,7 @@
                     "object_path": {
                         "eval_function": {
                             "name": "object_path",
-                            "value": "C:\\Users\\otakek\\Documents\\Earth2.glb",
+                            "value": "./assets/mesh/Earth2.glb",
                             "widget": "TextEdit"
                         }
                     },
