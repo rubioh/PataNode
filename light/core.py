@@ -33,6 +33,15 @@ class TimedEvent:
 
 class LightEngine:
     def __init__(self, sceno_path: str = None):
+        self.shader_buffer = [0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,
+                              0.0, 0.0,0.0,]
         self.USB_VID = 0xCAFE
         self.DMX_CHANNELS_NUM = 512
 
@@ -65,6 +74,7 @@ class LightEngine:
             self.shader_mapper.add_light(light)
 
     def __call__(self, color=(0, 0, 0), audio_features=None):
+        #print("oui salut a tous", self.shader_buffer)
         af = audio_features
         output_buffer = list(np.zeros((512)))
         for light in self.lights:

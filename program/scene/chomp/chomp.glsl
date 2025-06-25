@@ -15,7 +15,7 @@ uniform sampler2D iChannel0;
 #define PI 3.141593
 
 float time() {
-    return iTime / 5.;
+    return iTime / 4.;
 }
 float noise2( in vec3 x )
 {

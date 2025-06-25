@@ -1,5 +1,5 @@
 from os.path import dirname, join
-
+import random
 from node.node_conf import register_node
 from node.shader_node_base import ShaderNode, Scene
 from program.program_base import ProgramBase
@@ -25,10 +25,10 @@ COLOR = [PAL1, PAL2, PAL3, PAL4]
 
 @register_program(OP_CODE_TRIFORCE)
 class Triforce(ProgramBase):
-    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
+    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540), light_engine=None):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Triforce"
-
+        self.light_engine = light_engine
         self.initParams()
         self.initProgram()
         self.initFBOSpecifications()
@@ -144,7 +144,7 @@ class Triforce(ProgramBase):
             self.interior(col)
 
     def effect_13(self, af=None):
-        col = af["decaying_kick"] * self.get_col()[(self.kick) % 4]
+        col = self.get_col()[(self.kick) % 4] * af["decaying_kick"]
         if self.kick % 2 == 0:
             self.exterior(col)
         else:
@@ -153,12 +153,12 @@ class Triforce(ProgramBase):
     def effect_3(self, af=None):
         col = self.get_col()[(self.kick // 3) % 4]
         p = af["decaying_kick"]
-        self.set_all(p * col)
+        self.set_all(col * p)
 
     def effect_6(self, af=None):
         col = self.get_col()[(self.kick) % 4]
         p = af["decaying_kick"]
-        self.set_all(p * col)
+        self.set_all(col * p)
 
     def effect_7(self, af=None):
         for i in range(9):
@@ -166,7 +166,7 @@ class Triforce(ProgramBase):
 
     def effect_12(self, af=None):
         for i in range(9):
-            self.colors[i] = af["decaying_kick"] * self.get_col()[(self.kick + i) % 3]
+            self.colors[i] = self.get_col()[(self.kick + i) % 3] * af["decaying_kick"]
 
     def effect_8(self, af=None):
         self.set_all(BLACK)
@@ -180,11 +180,11 @@ class Triforce(ProgramBase):
 
     def effect_10(self, af=None):
         self.set_all(BLACK)
-        self.interior(af["decaying_kick"] * self.get_col()[self.kick % 4])
+        self.interior(self.get_col()[self.kick % 4] * af["decaying_kick"])
 
     def effect_11(self, af=None):
         self.set_all(BLACK)
-        self.exterior(af["decaying_kick"] * self.get_col()[self.kick % 4])
+        self.exterior(self.get_col()[self.kick % 4] * af["decaying_kick"])
 
     def effect_1(self, af=None):
         col = self.get_col()[(self.kick // 3) % 4]
@@ -210,8 +210,47 @@ class Triforce(ProgramBase):
             self.kick = self.kick + 1
         if af["on_tempo"] <= 0.9:
             self.wo = False
+        if self.kick % 30 == 0:
+            self.kick = 1
+            self.effect_index = random.randrange(0, len(self.effects))
         self.effects[self.effect_index % len(self.effects)](af)
         self.apply_cols()
+        if self.light_engine:
+            self.light_engine.shader_buffer[0] = self.colors[0].x
+            self.light_engine.shader_buffer[1] = self.colors[0].y
+            self.light_engine.shader_buffer[2] = self.colors[0].z
+
+            self.light_engine.shader_buffer[3] = self.colors[1].x
+            self.light_engine.shader_buffer[4] = self.colors[1].y
+            self.light_engine.shader_buffer[5] = self.colors[1].z
+
+            self.light_engine.shader_buffer[6] = self.colors[2].x
+            self.light_engine.shader_buffer[7] = self.colors[2].y
+            self.light_engine.shader_buffer[8] = self.colors[2].z
+
+            self.light_engine.shader_buffer[9] = self.colors[3].x
+            self.light_engine.shader_buffer[10] = self.colors[3].y
+            self.light_engine.shader_buffer[11] = self.colors[3].z
+
+            self.light_engine.shader_buffer[12] = self.colors[4].x
+            self.light_engine.shader_buffer[13] = self.colors[4].y
+            self.light_engine.shader_buffer[14] = self.colors[4].z
+
+            self.light_engine.shader_buffer[15] = self.colors[5].x
+            self.light_engine.shader_buffer[16] = self.colors[5].y
+            self.light_engine.shader_buffer[17] = self.colors[5].z
+
+            self.light_engine.shader_buffer[18] = self.colors[6].x
+            self.light_engine.shader_buffer[19] = self.colors[6].y
+            self.light_engine.shader_buffer[20] = self.colors[6].z
+
+            self.light_engine.shader_buffer[21] = self.colors[7].x
+            self.light_engine.shader_buffer[22] = self.colors[7].y
+            self.light_engine.shader_buffer[23] = self.colors[7].z
+
+            self.light_engine.shader_buffer[24] = self.colors[8].x
+            self.light_engine.shader_buffer[25] = self.colors[8].y
+            self.light_engine.shader_buffer[26] = self.colors[8].z
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
@@ -237,7 +276,7 @@ class TriforceNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Triforce(ctx=self.scene.ctx, win_size=(1920, 1080))
+        self.program = Triforce(ctx=self.scene.ctx, win_size=(1920, 1080), light_engine=scene.app.light_engine)
         self.eval()
 
     def render(self, audio_features=None):
