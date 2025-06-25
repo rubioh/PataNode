@@ -7,7 +7,7 @@ from nodeeditor.node_content_widget import QDMNodeContentWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 
-#from node.node_conf import register_node
+# from node.node_conf import register_node
 
 DEBUG = False
 
@@ -37,7 +37,9 @@ class GraphContainerGraphicsNode(QDMGraphicsNode):
         if self.node.isInvalid():
             offset = 48.0
 
-        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
+        painter.drawImage(
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
+        )
 
     def openDialog(self, msg):
         if isinstance(msg, list):
@@ -59,7 +61,7 @@ class GraphContainerNodeContent(QDMNodeContentWidget):
         lbl.setObjectName(self.node.content_label_objname)
 
 
-#@register_node("GRAPHCONTAINER")
+# @register_node("GRAPHCONTAINER")
 class GraphContainerNode(Node):
     icon = ""
     op_code = 666
@@ -71,7 +73,7 @@ class GraphContainerNode(Node):
     NodeContent_class = GraphContainerNodeContent
 
     def __init__(self, scene, inputs=[], outputs=[3]):
-#       inputs = [0] + inputs
+        #       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
         self.app = None
         self.value = None  # Using to store output texture reference

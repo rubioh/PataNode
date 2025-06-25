@@ -14,7 +14,11 @@ from nodeeditor.node_node import Node
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
 
-from program.program_conf import GLSLImplementationError, UnuseUniformError, name_to_opcode
+from program.program_conf import (
+    GLSLImplementationError,
+    UnuseUniformError,
+    name_to_opcode,
+)
 
 
 DEBUG = False
@@ -46,7 +50,9 @@ class ShaderGraphicsNode(QDMGraphicsNode):
         if self.node.isInvalid():
             offset = 48.0
 
-        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
+        painter.drawImage(
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
+        )
 
     def openDialog(self, msg):
         if isinstance(msg, list):
@@ -78,12 +84,12 @@ class ShaderNode(Node):
     NodeContent_class = ShaderContent
 
     def __init__(self, scene, inputs=[2, 2], outputs=[1]):
-#       inputs = [0] + inputs
+        #       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
 
         self.value = None  # Using to store output texture reference
         self.program = None
-        self._container = None # GraphContainer reference
+        self._container = None  # GraphContainer reference
         self._win_size = (1920, 1080)
 
         # Current OpenGL ctx
@@ -104,8 +110,12 @@ class ShaderNode(Node):
     @container.setter
     def container(self, value):
         if DEBUG:
-            print("ShaderNode::container.setter bind container", value, "to ShaderNode",
-                  self.__class__.__name__)
+            print(
+                "ShaderNode::container.setter bind container",
+                value,
+                "to ShaderNode",
+                self.__class__.__name__,
+            )
 
         self._container = value
 
@@ -149,10 +159,13 @@ class ShaderNode(Node):
     def reload_program(self):
         state = self.serialize()
         if self.content_label_objname == "shader_map_led_2d":
-            program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size, light_engine=self.scene.app.light_engine)
+            program = self.program.__class__(
+                ctx=self.scene.ctx,
+                win_size=self.win_size,
+                light_engine=self.scene.app.light_engine,
+            )
         else:
             program = self.program.__class__(ctx=self.scene.ctx, win_size=self.win_size)
-
 
         del self.program
 
@@ -195,13 +208,17 @@ class ShaderNode(Node):
             # FBOs already connected
             return True
 
-        fbos = self.scene.fbo_manager.getFBO(win_sizes, components, dtypes, depth, num_textures)
+        fbos = self.scene.fbo_manager.getFBO(
+            win_sizes, components, dtypes, depth, num_textures
+        )
 
         try:
             self.program.connectFbos(fbos)
         except AssertionError:
-            print("Created fbos doesn't match the number of required fbos for %s"
-                  % self.program.__class__.__name__)
+            print(
+                "Created fbos doesn't match the number of required fbos for %s"
+                % self.program.__class__.__name__
+            )
 
             self.grNode.setToolTip("No fbo's found")
             self.markInvalid()
@@ -231,14 +248,18 @@ class ShaderNode(Node):
                 texture = input_node.program.norender()
 
                 if DEBUG:
-                    print(f"\t\t ALREADY EVALUATE Input Node: {input_node} with texture {texture}")
+                    print(
+                        f"\t\t ALREADY EVALUATE Input Node: {input_node} with texture {texture}"
+                    )
 
                 textures.append(input_node.program.norender())
             else:
                 texture = input_node.eval()
 
                 if DEBUG:
-                    print(f"\t\t EVALUATE Input Node: {input_node} with texture {texture}")
+                    print(
+                        f"\t\t EVALUATE Input Node: {input_node} with texture {texture}"
+                    )
 
                 textures.append(texture)
 
@@ -263,8 +284,14 @@ class ShaderNode(Node):
             output_texture = self.program.render(textures)
 
             if DEBUG:
-                print("ShaderNode::evalRendering output_texture is ", output_texture,
-                      "from ShaderNode", self, "of class", self.__class__.__name__)
+                print(
+                    "ShaderNode::evalRendering output_texture is ",
+                    output_texture,
+                    "from ShaderNode",
+                    self,
+                    "of class",
+                    self.__class__.__name__,
+                )
 
             self.value = output_texture
             return True
@@ -328,7 +355,10 @@ class ShaderNode(Node):
 
         if not self.isDirty() and not self.isInvalid():
             if DEBUG:
-                print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+                print(
+                    " _> returning cached %s value:" % self.__class__.__name__,
+                    self.value,
+                )
 
             return self.value
 
@@ -406,9 +436,15 @@ class ShaderNode(Node):
             term_program = os.environ.get("TERM_PROGRAM") or "Apple_Terminal"
 
             if term_program == "iTerm.app":
-                os.system("osascript -e 'tell app \"iTerm2\" to create window with default profile command \"vim %s\"'" % glsl_path)
+                os.system(
+                    'osascript -e \'tell app "iTerm2" to create window with default profile command "vim %s"\''
+                    % glsl_path
+                )
             else:
-                os.system("osascript -e 'tell app \"Terminal\" to activate' -e 'tell app \"Terminal\" to do script \"vim %s\"'" % glsl_path)
+                os.system(
+                    'osascript -e \'tell app "Terminal" to activate\' -e \'tell app "Terminal" to do script "vim %s"\''
+                    % glsl_path
+                )
         elif platform.startswith("linux"):
             os.system('gnome-terminal --command="vim {}"'.format(glsl_path))
         else:
@@ -422,6 +458,7 @@ class ShaderNode(Node):
 
     def render(self, audio_features=None):
         pass
+
     def serialize(self):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
@@ -469,7 +506,9 @@ class ShaderNode(Node):
 
                 for uniform in program_params.keys():
                     eval_func = program_params[uniform]["eval_function"]["value"]
-                    cpu_node_params[program][uniform]["eval_function"]["value"] = eval_func
+                    cpu_node_params[program][uniform]["eval_function"]["value"] = (
+                        eval_func
+                    )
 
         if "gpu_adaptable_parameters" in data:
             adapt_params = data["gpu_adaptable_parameters"]
@@ -541,6 +580,7 @@ class Map:
 
 class Physarum:
     node_type_reference = "Physarum"
+
 
 class LED:
     node_type_reference = "LED"

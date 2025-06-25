@@ -2,6 +2,7 @@
 """
 A module containing the Main Window class
 """
+
 import os, json
 from qtpy.QtCore import QSize, QSettings, QPoint
 from qtpy.QtWidgets import (

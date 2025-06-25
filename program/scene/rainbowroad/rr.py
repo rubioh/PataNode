@@ -168,7 +168,7 @@ class RRNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender(audio_features)
         else:
             output_texture = self.program.render(audio_features)

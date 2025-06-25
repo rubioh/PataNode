@@ -18,7 +18,10 @@ def print_device_info():
         if output:
             in_out = "(output)"
 
-        print("%2i: interface :%s:, name :%s:, opened :%s:  %s" % (i, interf, name, opened, in_out))
+        print(
+            "%2i: interface :%s:, name :%s:, opened :%s:  %s"
+            % (i, interf, name, opened, in_out)
+        )
 
 
 class MidiController:
@@ -136,7 +139,9 @@ class MidiController:
         if full_path:
             state = pickle.load(open(name, "rb"))
         else:
-            state = pickle.load(open(os.path.join("controller/", str(name) + ".pickle"), "rb"))
+            state = pickle.load(
+                open(os.path.join("controller/", str(name) + ".pickle"), "rb")
+            )
 
         if isinstance(state["precision"], dict):  # v.0.0 parsing state
             self.precision[0] = state["precision"]

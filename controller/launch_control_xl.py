@@ -44,11 +44,11 @@ Event = ButtonEvent | ValueChanged
 
 class LaunchControlMidiReceiver(SimpleMidiReceiver):
     LED_INDICES = {
-        **{f"K{i+0}": i for i in range(8)},
-        **{f"K{i+8}": i + 0x8 for i in range(8)},
-        **{f"K{i+16}": i + 0x10 for i in range(8)},
-        **{f"B{i+0}": i + 0x18 for i in range(8)},
-        **{f"B{i+8}": i + 0x20 for i in range(8)},
+        **{f"K{i + 0}": i for i in range(8)},
+        **{f"K{i + 8}": i + 0x8 for i in range(8)},
+        **{f"K{i + 16}": i + 0x10 for i in range(8)},
+        **{f"B{i + 0}": i + 0x18 for i in range(8)},
+        **{f"B{i + 8}": i + 0x20 for i in range(8)},
         "device": 0x28,
         "mute": 0x29,
         "solo": 0x2A,

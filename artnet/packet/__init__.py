@@ -25,7 +25,9 @@ def artnet_parse_packet(packet: bytes) -> ArtBase:
     header, payload = __art_header_parser.parse(packet)
 
     if header is None:
-        raise ArtParseError(f"packet is too short to be an ArtNet packet: len={len(packet)}")
+        raise ArtParseError(
+            f"packet is too short to be an ArtNet packet: len={len(packet)}"
+        )
     elif ArtOp(header.op_code) not in __art_op_handlers:
         raise NotImplementedError(
             f"no handler registered for ArtNet op {ArtOp(header.op_code).name}"
@@ -54,13 +56,13 @@ if __name__ == "__main__":
     hdr = b"Art-Net\0\x00\x50\0\x0e"
     not_implemented_packet = b"Art-Net\0\x00\x51\0\x0e"  # unhandled opcode
     fail_packets = [
-        hdr + b"\x00\x00\x00" b"",  # payload too short
-        hdr + b"\x00\x00\x00\x00\x00\x00" b"",  # length out of range
-        hdr + b"\x00\x00\x00\x00\x03\x00" b"",  # length out of range
-        hdr + b"\x00\x00\x00\x00\x02\x00" b"",  # missing extra bytes
+        hdr + b"\x00\x00\x00",  # payload too short
+        hdr + b"\x00\x00\x00\x00\x00\x00",  # length out of range
+        hdr + b"\x00\x00\x00\x00\x03\x00",  # length out of range
+        hdr + b"\x00\x00\x00\x00\x02\x00",  # missing extra bytes
     ]
     success_packets = [
-        hdr + b"\x00\x00\x00\x00\x00\x02" b"XD",  # missing extra bytes
+        hdr + b"\x00\x00\x00\x00\x00\x02XD",  # missing extra bytes
         hdr
         + b"\x00\x00\x00\x00\x02\x00"
         + b"dmx_data" * (512 // 8),  # missing extra bytes

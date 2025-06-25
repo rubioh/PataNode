@@ -73,7 +73,7 @@ class Offset(ProgramBase):
 
     def render(self, textures, af=None):
         self.bindUniform(af)
-        self.updateParams(af),
+        (self.updateParams(af),)
         textures[0].repeat_x = False
         textures[0].repeat_y = False
         textures[0].border_color = (0.0, 0.0, 0.0, 0.0)

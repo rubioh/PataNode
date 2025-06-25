@@ -1,6 +1,7 @@
 import numpy as np
 
-class Fixture():
+
+class Fixture:
     MODEL: str
     CHANNELS: dict[str, int]
     CHANNELS_DEFAULTS: dict[str, float]
@@ -28,7 +29,7 @@ class Fixture():
 
     def init_address(self, address_infos: dict):
         self.universe = address_infos["universe"]
-        self.dmx_address = address_infos["dmx_address"]-1
+        self.dmx_address = address_infos["dmx_address"] - 1
 
     def init_position(self, position_infos: list):
         self.position = position_infos
@@ -44,10 +45,10 @@ class Fixture():
             self.use_shader = False
 
     def get_dmx_buffer(self):
-        dmx_buffer = [0]*len(self.CHANNELS)
+        dmx_buffer = [0] * len(self.CHANNELS)
         for name, idx in self.CHANNELS.items():
-            dmx_buffer[idx-1] = self.attrib[name]
+            dmx_buffer[idx - 1] = self.attrib[name]
         return dmx_buffer
 
     def __str__(self):
-        return f"Name : {self.MODEL} \tUniverse : {self.universe}, Address : {self.dmx_address+1} \n"
+        return f"Name : {self.MODEL} \tUniverse : {self.universe}, Address : {self.dmx_address + 1} \n"

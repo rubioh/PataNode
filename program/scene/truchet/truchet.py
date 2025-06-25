@@ -16,7 +16,6 @@ OP_CODE_TRUCHET = name_to_opcode("truchet")
 
 @register_program(OP_CODE_TRUCHET)
 class Truchet(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Truchet"
@@ -89,7 +88,7 @@ class Truchet(ProgramBase):
         }
         super().initUniformsBinding(binding, program_name="draw_")
         binding = {
-#           "iTime": "iTime",
+            #           "iTime": "iTime",
             "iResolution": "win_size",
             "iChannel1": "iChannel1",
             "energy_fast": "smooth_fast",
@@ -189,7 +188,7 @@ class TruchetNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

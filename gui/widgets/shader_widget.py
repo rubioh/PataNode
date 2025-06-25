@@ -4,6 +4,7 @@ from PyQt5 import QtCore, QtOpenGL, QtWidgets
 import time
 from program.program_manager import FBOManager
 
+
 class ShaderWidget(QtOpenGL.QGLWidget):
     def __init__(
         self,
@@ -97,7 +98,9 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.fmt.setSwapInterval(1 if self._vsync else 0)
 
     def init_mgl_context(self):
-        self._ctx = moderngl.create_context(self.gl_version[0] * 100 + self.gl_version[1])
+        self._ctx = moderngl.create_context(
+            self.gl_version[0] * 100 + self.gl_version[1]
+        )
         self.screen = self._ctx.detect_framebuffer()
         self.init_fbo_manager()
 
@@ -109,14 +112,15 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self._ctx.clear(color=(0.0, 0.0, 0.0))
         p = time.perf_counter()
         self.app.render(self.app._last_audio_features)
-      #  self.ctx.finish()
-      #  print(time.perf_counter() - p)
 
-    def resize(self, width: int, height: int) -> None: # type: ignore[override] # FIXME?
+    #  self.ctx.finish()
+    #  print(time.perf_counter() - p)
+
+    def resize(self, width: int, height: int) -> None:  # type: ignore[override] # FIXME?
         self._width = width * self.devicePixelRatio()
         self._height = height * self.devicePixelRatio()
-        self.width = self._width # type: ignore[assignment] # FIXME?
-        self.height = self._height # type: ignore[assignment] # FIXME?
+        self.width = self._width  # type: ignore[assignment] # FIXME?
+        self.height = self._height  # type: ignore[assignment] # FIXME?
         self._buffer_width = width
         self._buffer_height = height
 

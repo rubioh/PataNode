@@ -8,6 +8,7 @@ from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opc
 
 OP_CODE_KICKCHANGE = name_to_opcode("kickchange")
 
+
 @register_program(OP_CODE_KICKCHANGE)
 class OnKickChange(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
@@ -56,7 +57,11 @@ class OnKickChange(ProgramBase):
         if af is None or self.already_called:
             return
 
-        self.count = int(self.getCpuAdaptableParameters()["program"]["num_kick"]["eval_function"]["value"])
+        self.count = int(
+            self.getCpuAdaptableParameters()["program"]["num_kick"]["eval_function"][
+                "value"
+            ]
+        )
         if af["on_kick"] and not self.was_on_kick:
             self.num_kick += 1
             self.was_on_kick = True

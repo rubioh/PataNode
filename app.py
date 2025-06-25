@@ -8,7 +8,8 @@ from audio.audio_pipeline import AudioEngine
 from light.core import LightEngine
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
 from gui.patanode import PataNode
-#from light_new import LightEngine
+# from light_new import LightEngine
+
 
 class WorkerSignals(QObject):
     finished = pyqtSignal()
@@ -114,12 +115,13 @@ class PataShadeApp(PataNode):
             self.light_engine.__call__(
                 color=self.last_main_colors, audio_features=self.last_audio_features
             )
+
         worker = Worker(job)
         worker.signals.finished.connect(self.on_light_job_finished)
         self.threadpool.start(worker)
 
     def on_light_job_finished(self):
-#       print("Light Job done")
+        #       print("Light Job done")
         pass
 
     # Shader thread

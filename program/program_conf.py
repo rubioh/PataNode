@@ -3,7 +3,7 @@ import numpy as np
 from os.path import dirname, join
 
 
-SHADER_PROGRAMS = {} # type: ignore[var-annotated] # FIXME: add type annotation
+SHADER_PROGRAMS = {}  # type: ignore[var-annotated] # FIXME: add type annotation
 SQUARE_VERT_PATH = join(dirname(__file__), "base/vertex_base.glsl")
 
 

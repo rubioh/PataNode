@@ -2,6 +2,7 @@
 """
 A module containing Graphics representation of :class:`~nodeeditor.node_node.Node`
 """
+
 from qtpy.QtWidgets import QGraphicsItem, QWidget, QGraphicsTextItem
 from qtpy.QtGui import QFont, QColor, QPen, QBrush, QPainterPath
 from qtpy.QtCore import Qt, QRectF

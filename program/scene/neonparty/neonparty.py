@@ -139,7 +139,9 @@ class NeonParty(ProgramBase):
             self.drop_t = time.perf_counter()
             self.waf_on_chill = False
 
-        if self.drop and time.perf_counter() - self.drop_t > 15:  # or af["on_chill"] > .9:
+        if (
+            self.drop and time.perf_counter() - self.drop_t > 15
+        ):  # or af["on_chill"] > .9:
             self.drop = False
             self.was_on_chill = False
 
@@ -181,7 +183,7 @@ class NeonPartyNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

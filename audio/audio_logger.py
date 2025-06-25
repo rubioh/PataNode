@@ -66,6 +66,7 @@ class AudioLogger:
                 tmp[:-1] = tmp[1:]
                 tmp[-1] = v
 
+
 #       self.i += 1
 #
 #       if self.i > self.wait:

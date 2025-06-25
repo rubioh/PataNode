@@ -3,7 +3,6 @@
 A module containing the Edge Snapping functions which are used in :class:`~nodeeditor.node_graphics_view.QDMGraphicsView` class.
 """
 
-
 from qtpy.QtCore import QPointF, QRectF
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 

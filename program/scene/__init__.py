@@ -15,10 +15,13 @@ from program.scene.rainbowroad import rr
 from program.scene.sdf_bm import sdf_bm
 from program.scene.template import template
 from program.scene.texture import texture
+from program.scene.triforce import triforce
 from program.scene.truchet import truchet
 from program.scene.bangersponge import bangersponge
 from program.scene.fractal import fractal
 from program.scene.particles import particles
+from program.scene.maze import maze
+from program.scene.chomp import chomp
 
 __all__ = [
     "abstractsqrt",

@@ -72,7 +72,7 @@ class MapWizzard:
                 "univ", "<<TreeviewSelect>>", self.update_lights_with_selec
             )
 
-#           json_tree(tree, "", data)
+            #           json_tree(tree, "", data)
             self.tree.pack(fill=tk.BOTH, expand=1)
 
             # Limit windows minimum dimensions

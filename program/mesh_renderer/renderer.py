@@ -6,15 +6,14 @@ from os.path import dirname
 
 from program.program_conf import SQUARE_VERT_PATH, get_square_vertex_data
 
-#class RenderNode:
+# class RenderNode:
 #    def __init__(self):
 #        self.meshes = []
 #        self.transform = glm.mat4()
 #
-#class Dag:
+# class Dag:
 #    def __init__(self, scene):
 #        pass
-
 
 
 def read_file(path):
@@ -68,9 +67,13 @@ class Renderer:
         for scene in self.scenes:
             scene.render_scene(model, view, projection, surface)
 
-    def renderGBUFFERinstance(self, num, instance_buffer, model, view, projection, surface):
+    def renderGBUFFERinstance(
+        self, num, instance_buffer, model, view, projection, surface
+    ):
         for scene in self.scenes:
-            scene.render_scene_instance(num, instance_buffer, model, view, projection, surface)
+            scene.render_scene_instance(
+                num, instance_buffer, model, view, projection, surface
+            )
 
     def renderSun(self, surface, view, gbuffer):
         for sun in self.suns:
@@ -105,8 +108,8 @@ def render(
     ctx,
     mesh_resource_manager,
     texture_resource_manager,
-    num_instance = None,
-    instance_buffer = None,
+    num_instance=None,
+    instance_buffer=None,
 ):
     if not instance_buffer:
         program = mesh.program
@@ -117,7 +120,7 @@ def render(
     ctx.front_face = "ccw"
     ctx.enable(mgl.DEPTH_TEST)
     ctx.enable(ctx.CULL_FACE)
-#   mvp = transform * mvp_uniform["model"] * mvp_uniform["view"] * mvp_uniform["projection"]
+    #   mvp = transform * mvp_uniform["model"] * mvp_uniform["view"] * mvp_uniform["projection"]
     mvp = (
         mvp_uniform["projection"]
         * mvp_uniform["view"]
@@ -126,10 +129,10 @@ def render(
     )
     program["model"] = np.array(mvp_uniform["model"] * transform).reshape(1, 16)[0]
     program["mvp"] = np.array(mvp).reshape(1, 16)[0]
-#   for k, v in mvp_uniform.items():
-#       mesh.program[k] = np.array(v).reshape(1, 16)[0]
+    #   for k, v in mvp_uniform.items():
+    #       mesh.program[k] = np.array(v).reshape(1, 16)[0]
     for k, v in material.uniforms.items():
-#       print(k, v)
+        #       print(k, v)
 
         # Scalar value dont need to be reshaped, vec3 are automatically cast to vec4
         if isinstance(v, float) or isinstance(v, int):
@@ -148,11 +151,11 @@ def render(
         gputexture = texture_resource_manager.get_resource(texture.textureResourceIndex)
         program[texture_name] = location
         gputexture.bind(texture.sampler, location)
-#       mesh.program[texture_name].use(location)
+        #       mesh.program[texture_name].use(location)
         location = location + 1
-#
-#       for k, v in mesh.uniform.items():
-#           mesh.program[k] = np.array(v).reshape(1, 16)[0]
+    #
+    #       for k, v in mesh.uniform.items():
+    #           mesh.program[k] = np.array(v).reshape(1, 16)[0]
 
     if not instance_buffer:
         mesh.vao.render(4)

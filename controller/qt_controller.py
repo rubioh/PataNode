@@ -3,7 +3,7 @@ import sys
 import pickle
 
 import numpy as np
-import rtmidi # type: ignore[import-untyped]
+import rtmidi  # type: ignore[import-untyped]
 
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
 
@@ -153,7 +153,9 @@ class MidiReceiver(QObject):
 
         self._midi_in.set_callback(self._midi_in_callback, self)
         self._time_ms = 0
-        self._queue_message.connect(self._thread_safe_queue_message, Qt.QueuedConnection)
+        self._queue_message.connect(
+            self._thread_safe_queue_message, Qt.QueuedConnection
+        )
         self.usable = True
 
     def _thread_safe_queue_message(self, status, data1, data2, time):

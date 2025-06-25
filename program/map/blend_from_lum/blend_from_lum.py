@@ -51,7 +51,7 @@ class MapBlendLum(ProgramBase):
             "iChannel1": "iChannel1",
             "iResolution": "win_size",
             "x1": "x1",
-            "x2": "x2"
+            "x2": "x2",
         }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])

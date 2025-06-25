@@ -94,7 +94,7 @@ class PredominantColor(ProgramBase):
             self.hist_vao.render()
 
             for i in range(0, self.N_pass - 1):
-#               self.fbo_hist[1 + i].clear()
+                #               self.fbo_hist[1 + i].clear()
                 self.hist_program["pass_number"] = i + 1
                 self.fbos[i].color_attachments[0].use(1)
                 self.fbos[i + 1].use()
@@ -123,7 +123,7 @@ class PredominantColorNode(ShaderNode, Colors):
         self.eval()
 
     def render(self, texture=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         if texture is None:

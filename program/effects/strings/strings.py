@@ -47,7 +47,7 @@ class Strings(ProgramBase):
     def initUniformsBinding(self):
         binding = {
             "iResolution": "win_size",
-#           "on_tempo" : "on_tempo",
+            #           "on_tempo" : "on_tempo",
             "iChannel0": "iChannel0",
             "nrj_low": "nrj_low",
             "n_col": "n_col",

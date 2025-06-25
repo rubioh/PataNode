@@ -15,15 +15,15 @@ class Mesh:
         ctx,
         idx_size,
         material,
-        instance_buffer = None,
-        instance_buffer_layout = None,
+        instance_buffer=None,
+        instance_buffer_layout=None,
     ):
         self.ctx = ctx
         self.vbo_position = self.ctx.buffer(vertex_position)
 
-#       if vertex_normal:
-#           tangent = compute_tangent(indice_buffer, vertex_tcs, vertex_normal, vertex_position, idx_size)
-#
+        #       if vertex_normal:
+        #           tangent = compute_tangent(indice_buffer, vertex_tcs, vertex_normal, vertex_position, idx_size)
+        #
         if vertex_normal:
             self.vbo_normal = self.ctx.buffer(vertex_normal)
 
@@ -56,9 +56,14 @@ class Mesh:
             program, layout, index_buffer=self.vbo_indices, index_element_size=idx_size
         )
         if instance_buffer is not None:
-            layout.append((instance_buffer, instance_buffer_layout, "in_particle_position"))
+            layout.append(
+                (instance_buffer, instance_buffer_layout, "in_particle_position")
+            )
             self.vao_instance = self.ctx.vertex_array(
-                program_instance, layout, index_buffer=self.vbo_indices, index_element_size=idx_size
+                program_instance,
+                layout,
+                index_buffer=self.vbo_indices,
+                index_element_size=idx_size,
             )
         self.program = program
         self.program_instance = program_instance
@@ -84,8 +89,8 @@ class MeshResourceManager:
         idx_size,
         material,
         program=None,
-        instance_buffer = None,
-        instance_buffer_layout = None
+        instance_buffer=None,
+        instance_buffer_layout=None,
     ):
         mesh_layout = {
             "vertex_normal": vertex_normal is not None,
@@ -111,7 +116,7 @@ class MeshResourceManager:
             idx_size,
             material,
             instance_buffer,
-            instance_buffer_layout
+            instance_buffer_layout,
         )
 
         self.resources.append(mesh)
@@ -124,7 +129,8 @@ class MeshResourceManager:
         self.vertex_code = self.code_version + vertex_code
         self.fragment_code = self.code_version + fragment_code
         program = self.ctx.program(
-            vertex_shader=self.vertex_code, fragment_shader=self.fragment_code)
+            vertex_shader=self.vertex_code, fragment_shader=self.fragment_code
+        )
         return program
 
     def load_instance_program(self, mesh_layout, material):
@@ -160,5 +166,7 @@ class TextureResourceManager:
         return self.resources[index]
 
     def create_texture(self, resolution, data, ctx, in_components=3, in_dtype="f1"):
-        self.resources.append(GPUTexture(resolution, data, self.ctx, in_components, in_dtype))
+        self.resources.append(
+            GPUTexture(resolution, data, self.ctx, in_components, in_dtype)
+        )
         return len(self.resources) - 1

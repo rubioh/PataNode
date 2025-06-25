@@ -2,6 +2,7 @@
 """
 A module containing Graphic representation of :class:`~nodeeditor.node_scene.Scene`
 """
+
 import math
 from qtpy.QtWidgets import QGraphicsScene, QWidget
 from qtpy.QtCore import Signal, QRect, QLine, Qt

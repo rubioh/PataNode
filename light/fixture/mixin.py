@@ -1,17 +1,18 @@
 import abc
 import numpy as np
 
+
 class Color:
     def __init__(self):
         self.color = np.zeros(3)
 
-    def update_color(self): 
-        ...
+    def update_color(self): ...
 
-    def update(self, color: list|None = None) -> None:
+    def update(self, color: list | None = None) -> None:
         if color is not None:
             self.color[:] = color
         self.update_color()
+
 
 class CMY(Color):
     def ColorToCMY(self) -> None:

@@ -13,7 +13,6 @@ OP_CODE_STDINPUT = 2
 
 @register_program(OP_CODE_STDINPUT)
 class StdInput(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Std Input"

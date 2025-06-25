@@ -66,7 +66,7 @@ class PhysarumPart(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initParams(self):
-#       self.N_part = 150000*16
+        #       self.N_part = 150000*16
         self.N_part = 1000000
         self.part_size = 1
         self.iFrame = -1
@@ -153,7 +153,7 @@ class PhysarumPartNode(ShaderNode, Physarum):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         self.already_called = True

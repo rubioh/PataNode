@@ -12,5 +12,5 @@ def load_texture_from_gltf(gltf, gltf_image):
     image_data = BytesIO(buf)
     # TODO: check if conversion
     image = Image.open(image_data).convert("RGB")
-#   image_data = bytes(image_data)
+    #   image_data = bytes(image_data)
     return (image.width, image.height, image.tobytes())

@@ -2,6 +2,7 @@
 """
 A module containing ``NodeEditorWidget`` class
 """
+
 import os
 from qtpy.QtCore import Qt
 from qtpy.QtGui import QBrush, QPen, QFont, QColor

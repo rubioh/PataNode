@@ -2,6 +2,7 @@
 """
 A module containing `Graphics View` for NodeEditor
 """
+
 from qtpy.QtCore import Signal, QPoint, Qt
 from qtpy.QtGui import QPainter
 from qtpy.QtWidgets import QGraphicsView
@@ -13,13 +14,13 @@ from nodeeditor.node_edge_snapping import EdgeSnapping
 from nodeeditor.node_graphics_cutline import QDMCutLine
 
 
-MODE_NOOP = 1               #: Mode representing ready state
-MODE_EDGE_DRAG = 2          #: Mode representing when we drag edge state
-MODE_EDGE_CUT = 3           #: Mode representing when we draw a cutting edge
-MODE_EDGES_REROUTING = 4    #: Mode representing when we re-route existing edges
-MODE_NODE_DRAG = 5          #: Mode representing when we drag a node to calculate dropping on intersecting edge
+MODE_NOOP = 1  #: Mode representing ready state
+MODE_EDGE_DRAG = 2  #: Mode representing when we drag edge state
+MODE_EDGE_CUT = 3  #: Mode representing when we draw a cutting edge
+MODE_EDGES_REROUTING = 4  #: Mode representing when we re-route existing edges
+MODE_NODE_DRAG = 5  #: Mode representing when we drag a node to calculate dropping on intersecting edge
 
-STATE_STRING = ['', 'Noop', 'Edge Drag', 'Edge Cut', 'Edge Rerouting', 'Node Drag']
+STATE_STRING = ["", "Noop", "Edge Drag", "Edge Cut", "Edge Rerouting", "Node Drag"]
 
 #: Distance when click on socket to enable `Drag Edge`
 EDGE_DRAG_START_THRESHOLD = 50
@@ -41,10 +42,11 @@ DEBUG_STATE = False
 
 class PolyGraphicView(QGraphicsView):
     """Class representing NodeEditor's `Graphics View`"""
+
     #: pyqtSignal emitted when cursor position on the `Scene` has changed
     scenePosChanged = Signal(int, int)
 
-    def __init__(self, grScene: 'QDMGraphicsScene', parent: 'QWidget'=None):
+    def __init__(self, grScene: "QDMGraphicsScene", parent: "QWidget" = None):
         """
         :param grScene: reference to the :class:`~nodeeditor.node_graphics_scene.QDMGraphicsScene`
         :type grScene: :class:`~nodeeditor.node_graphics_scene.QDMGraphicsScene`
@@ -89,7 +91,7 @@ class PolyGraphicView(QGraphicsView):
         self.cutline = QDMCutLine()
         self.grScene.addItem(self.cutline)
 
-        self.last_scene_mouse_position = QPoint(0,0)
+        self.last_scene_mouse_position = QPoint(0, 0)
         self.zoomInFactor = 1.25
         self.zoomClamp = True
         self.zoom = 10
@@ -100,10 +102,14 @@ class PolyGraphicView(QGraphicsView):
         self._drag_enter_listeners = []
         self._drop_listeners = []
 
-
     def initUI(self):
         """Set up this ``QGraphicsView``"""
-        self.setRenderHints(QPainter.Antialiasing | QPainter.HighQualityAntialiasing | QPainter.TextAntialiasing | QPainter.SmoothPixmapTransform)
+        self.setRenderHints(
+            QPainter.Antialiasing
+            | QPainter.HighQualityAntialiasing
+            | QPainter.TextAntialiasing
+            | QPainter.SmoothPixmapTransform
+        )
 
         self.setViewportUpdateMode(QGraphicsView.FullViewportUpdate)
 

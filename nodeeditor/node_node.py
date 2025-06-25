@@ -2,6 +2,7 @@
 """
 A module containing NodeEditor's class for representing `Node`.
 """
+
 from collections import OrderedDict
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_content_widget import QDMNodeContentWidget

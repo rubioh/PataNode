@@ -37,7 +37,9 @@ class AudioGraphicsNode(QDMGraphicsNode):
         if self.node.isInvalid():
             offset = 48.0
 
-        painter.drawImage(QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0))
+        painter.drawImage(
+            QRectF(-10, -10, 24.0, 24.0), self.icons, QRectF(offset, 0, 24.0, 24.0)
+        )
 
     def openDialog(self, msg):
         if isinstance(msg, list):
@@ -107,7 +109,10 @@ class AudioNode(Node):
     def eval(self):
         if not self.isDirty() and not self.isInvalid():
             if DEBUG:
-                print(" _> returning cached %s value:" % self.__class__.__name__, self.value)
+                print(
+                    " _> returning cached %s value:" % self.__class__.__name__,
+                    self.value,
+                )
 
             return self.value
 

@@ -54,10 +54,10 @@ class BPM_estimator:
         }
         self.lfo_on_tempo = {
             "lfo_on_tempo_q": 0,
-            "lfo_on_tempo_h": 0,  
-            "lfo_on_tempo": 0,  
-            "lfo_on_tempo2": 0,  
-            "lfo_on_tempo4": 0,  
+            "lfo_on_tempo_h": 0,
+            "lfo_on_tempo": 0,
+            "lfo_on_tempo2": 0,
+            "lfo_on_tempo4": 0,
             "lfo_on_tempo8": 0,
             "lfo_on_tempo16": 0,
             "lfo_on_tempo32": 0,
@@ -109,7 +109,7 @@ class BPM_estimator:
             # Reset counting parameters
             self.count = 0
             self.tic = time.time()
-#           print(self.bpm)
+        #           print(self.bpm)
         else:
             self.count += 1
 
@@ -120,7 +120,9 @@ class BPM_estimator:
 
             if self.on_tempo[k] <= 0:
                 self.on_tempo[k] = 1 + self.on_tempo[k]
-            self.lfo_on_tempo["lfo_"+k] = np.cos(self.on_tempo[k]*2.*3.14159)*.5+.5
+            self.lfo_on_tempo["lfo_" + k] = (
+                np.cos(self.on_tempo[k] * 2.0 * 3.14159) * 0.5 + 0.5
+            )
 
     def update_time(self):
         self.time += self.bpm / 60.0 * 2.0 * np.pi / 60.0

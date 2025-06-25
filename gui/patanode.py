@@ -39,7 +39,9 @@ class PataNode(NodeEditorWindow):
         self.name_company = "PataShade"
         self.name_product = "PataNode"
 
-        self.stylesheet_filename = os.path.join(os.path.dirname(__file__), "qss/nodeeditor.qss")
+        self.stylesheet_filename = os.path.join(
+            os.path.dirname(__file__), "qss/nodeeditor.qss"
+        )
 
         loadStylesheets(
             os.path.join(os.path.dirname(__file__), "qss/nodeeditor-dark.qss"),
@@ -119,7 +121,9 @@ class PataNode(NodeEditorWindow):
             self.last_main_colors = self.current_node_editor_widget.getLastMainColors()
 
         if DEBUG:
-            print("PataNode::render  No NodeEditorWidget detected, please set a new node scene")
+            print(
+                "PataNode::render  No NodeEditorWidget detected, please set a new node scene"
+            )
 
     def closeEvent(self, event):
         self.mdiArea.closeAllSubWindows()
@@ -131,6 +135,7 @@ class PataNode(NodeEditorWindow):
             event.accept()
             # Hacky fix for PyQt 5.14.x
             import sys
+
             sys.exit(0)
 
     def createActions(self):
@@ -176,12 +181,12 @@ class PataNode(NodeEditorWindow):
         )
 
         self.actMap = QAction(
-            '&Map',
+            "&Map",
             self,
-            shortcut='Ctrl+M',
+            shortcut="Ctrl+M",
             statusTip="Show mapping window",
             triggered=self.openMapWindow,
-            )
+        )
 
         self.actSeparator = QAction(self)
         self.actSeparator.setSeparator(True)
@@ -207,8 +212,9 @@ class PataNode(NodeEditorWindow):
             triggered=self.showShaderWindow,
             shortcut="Ctrl+D",
         )
-#       self.actHideAudioLogWindow = QAction("&Hide Audio Log Screen", self, statusTip="Hide the audio features logger", triggered=self.hideShaderWindow, shortcut='Ctrl+Alt+H')
-#       self.actShowAudioLogWindow = QAction("&Display Audio Log Screen", self, statusTip="Display the audio features logger", triggered=self.showShaderWindow, shortcut='Ctrl+Alt+D')
+
+    #       self.actHideAudioLogWindow = QAction("&Hide Audio Log Screen", self, statusTip="Hide the audio features logger", triggered=self.hideShaderWindow, shortcut='Ctrl+Alt+H')
+    #       self.actShowAudioLogWindow = QAction("&Display Audio Log Screen", self, statusTip="Display the audio features logger", triggered=self.showShaderWindow, shortcut='Ctrl+Alt+D')
 
     def hideShaderWindow(self):
         self.gl_widget.hide()
@@ -312,7 +318,7 @@ class PataNode(NodeEditorWindow):
         self.editMenu.aboutToShow.connect(self.updateEditMenu)
 
     def updateMenus(self):
-#       print("update Menus")
+        #       print("update Menus")
         active = self.getCurrentNodeEditorWidget()
         hasMdiChild = active is not None
 
@@ -330,7 +336,7 @@ class PataNode(NodeEditorWindow):
 
     def updateEditMenu(self):
         try:
-#           print("update Edit Menu")
+            #           print("update Edit Menu")
             active = self.getCurrentNodeEditorWidget()
             hasMdiChild = active is not None
 
@@ -366,8 +372,8 @@ class PataNode(NodeEditorWindow):
         self.windowMenu.addSeparator()
         self.windowMenu.addAction(self.actHideShaderWindow)
         self.windowMenu.addAction(self.actShowShaderWindow)
-#       self.windowMenu.addAction(self.actHideAudioLogWindow)
-#       self.windowMenu.addAction(self.actShowAudioLogWindow)
+        #       self.windowMenu.addAction(self.actHideAudioLogWindow)
+        #       self.windowMenu.addAction(self.actShowAudioLogWindow)
 
         windows = self.mdiArea.subWindowList()
         self.actSeparator.setVisible(len(windows) != 0)
@@ -421,11 +427,13 @@ class PataNode(NodeEditorWindow):
         self.statusBar().showMessage("Ready")
 
     def createMdiChild(self, child_widget=None):
-        nodeeditor = child_widget if child_widget is not None else PataNodeSubWindow(self)
+        nodeeditor = (
+            child_widget if child_widget is not None else PataNodeSubWindow(self)
+        )
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
-#       nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
-#       nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
+        #       nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
+        #       nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
         nodeeditor.addCloseEventListener(self.onSubWndClose)
         return subwnd
