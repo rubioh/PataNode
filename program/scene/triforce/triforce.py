@@ -21,11 +21,26 @@ PAL3 = glm.vec3(235.0 / 255.0, 54.0 / 255.0, 120.0 / 255.0)
 PAL4 = glm.vec3(251.0 / 255.0, 119.0 / 255.0, 60.0 / 255.0)
 
 COLOR = [PAL1, PAL2, PAL3, PAL4]
+COLOR2 = [
+    glm.vec3(228.0 / 255.0, 3.0 / 255.0, 3.0 / 255.0),
+    glm.vec3(255.0 / 255.0, 140.0 / 255.0, 0.0 / 255.0),
+    glm.vec3(255.0 / 255.0, 237.0 / 255.0, 0.0 / 255.0),
+    glm.vec3(0.0 / 255.0, 128.0 / 255.0, 38.0 / 255.0),
+    glm.vec3(0.0 / 255.0, 76.0 / 255.0, 255.0 / 255.0),
+    glm.vec3(115.0 / 255.0, 41.0 / 255.0, 130.0 / 255.0),
+]
 
 
 @register_program(OP_CODE_TRIFORCE)
 class Triforce(ProgramBase):
-    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540), light_engine=None):
+    def __init__(
+        self,
+        ctx=None,
+        major_version=3,
+        minor_version=3,
+        win_size=(960, 540),
+        light_engine=None,
+    ):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Triforce"
         self.light_engine = light_engine
@@ -49,6 +64,9 @@ class Triforce(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload, name="")
 
     def get_col(self):
+        return COLOR
+
+    def get_col2(self):
         return COLOR
 
     def apply_cols(self):
@@ -93,6 +111,9 @@ class Triforce(ProgramBase):
             self.effect_11,
             self.effect_12,
             self.effect_13,
+            self.effect_14,
+            self.effect_15,
+            self.effect_16,
         ]
 
     def initUniformsBinding(self):
@@ -137,62 +158,87 @@ class Triforce(ProgramBase):
 
     def effect_5(self, af=None):
         self.set_all(BLACK)
-        col = self.get_col()[(self.kick // 3) % 4]
+        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
         if self.kick % 2 == 0:
             self.exterior(col)
         else:
             self.interior(col)
 
     def effect_13(self, af=None):
-        col = self.get_col()[(self.kick) % 4] * af["decaying_kick"]
+        col = self.get_col()[(self.kick) % len(self.get_col())] * af["decaying_kick"]
         if self.kick % 2 == 0:
             self.exterior(col)
         else:
             self.interior(col)
 
     def effect_3(self, af=None):
-        col = self.get_col()[(self.kick // 3) % 4]
+        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
         p = af["decaying_kick"]
         self.set_all(col * p)
 
     def effect_6(self, af=None):
-        col = self.get_col()[(self.kick) % 4]
+        col = self.get_col()[(self.kick) % len(self.get_col())]
         p = af["decaying_kick"]
         self.set_all(col * p)
 
     def effect_7(self, af=None):
         for i in range(9):
-            self.colors[i] = self.get_col()[(self.kick + i) % 3]
+            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())]
+
+    def effect_14(self, af=None):
+        self.set_all(BLACK)
+        self.colors[self.kick % 9] = self.get_col()[(self.kick) % len(self.get_col())]
+
+    def effect_15(self, af=None):
+        self.set_all(BLACK)
+        self.colors[self.kick % 9] = self.get_col2()[(self.kick) % len(self.get_col2())]
+
+    def effect_16(self, af=None):
+        for i in range(9):
+            self.colors[i] = self.get_col2()[(self.kick + i) % len(self.get_col2())]
 
     def effect_12(self, af=None):
         for i in range(9):
-            self.colors[i] = self.get_col()[(self.kick + i) % 3] * af["decaying_kick"]
+            self.colors[i] = (
+                self.get_col()[(self.kick + i) % len(self.get_col())]
+                * af["decaying_kick"]
+            )
 
     def effect_8(self, af=None):
         self.set_all(BLACK)
-        self.interior(self.get_col()[self.kick % 4])
-        self.exterior(self.get_col()[(self.kick + 1) % 4])
+        self.interior(self.get_col()[self.kick % len(self.get_col())])
+        self.exterior(self.get_col()[(self.kick + 1) % len(self.get_col())])
 
     def effect_9(self, af=None):
-        self.self_whole_triangle(0, self.get_col()[(self.kick + 0) % 4])
-        self.self_whole_triangle(1, self.get_col()[(self.kick + 1) % 4])
-        self.self_whole_triangle(2, self.get_col()[(self.kick + 2) % 4])
+        self.self_whole_triangle(
+            0, self.get_col()[(self.kick + 0) % len(self.get_col())]
+        )
+        self.self_whole_triangle(
+            1, self.get_col()[(self.kick + 1) % len(self.get_col())]
+        )
+        self.self_whole_triangle(
+            2, self.get_col()[(self.kick + 2) % len(self.get_col())]
+        )
 
     def effect_10(self, af=None):
         self.set_all(BLACK)
-        self.interior(self.get_col()[self.kick % 4] * af["decaying_kick"])
+        self.interior(
+            self.get_col()[self.kick % len(self.get_col())] * af["decaying_kick"]
+        )
 
     def effect_11(self, af=None):
         self.set_all(BLACK)
-        self.exterior(self.get_col()[self.kick % 4] * af["decaying_kick"])
+        self.exterior(
+            self.get_col()[self.kick % len(self.get_col())] * af["decaying_kick"]
+        )
 
     def effect_1(self, af=None):
-        col = self.get_col()[(self.kick // 3) % 4]
+        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
         self.set_all(BLACK)
         self.self_whole_triangle(self.kick % 3, col)
 
     def effect_4(self, af=None):
-        col = self.get_col()[(self.kick) % 4]
+        col = self.get_col()[(self.kick) % len(self.get_col())]
         self.set_all(BLACK)
         self.self_whole_triangle(self.kick % 3, col)
 
@@ -276,7 +322,11 @@ class TriforceNode(ShaderNode, Scene):
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[], outputs=[3])
-        self.program = Triforce(ctx=self.scene.ctx, win_size=(1920, 1080), light_engine=scene.app.light_engine)
+        self.program = Triforce(
+            ctx=self.scene.ctx,
+            win_size=(1920, 1080),
+            light_engine=scene.app.light_engine,
+        )
         self.eval()
 
     def render(self, audio_features=None):

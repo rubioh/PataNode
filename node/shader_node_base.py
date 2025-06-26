@@ -158,7 +158,10 @@ class ShaderNode(Node):
 
     def reload_program(self):
         state = self.serialize()
-        if self.content_label_objname == "shader_map_led_2d" or self.content_label_objname == "shader_Triforce":
+        if (
+            self.content_label_objname == "shader_map_led_2d"
+            or self.content_label_objname == "shader_Triforce"
+        ):
             program = self.program.__class__(
                 ctx=self.scene.ctx,
                 win_size=self.win_size,
