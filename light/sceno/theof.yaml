@@ -1,0 +1,9 @@
+RubanLed1:
+    type: "RubanLed"
+    address:
+        universe: 0
+        dmx_address: 50
+    position: [0,0,1]
+    shader_binding:
+        canvas_position: [[0, 740], [1920, 740]]
+        num_pixels: 150

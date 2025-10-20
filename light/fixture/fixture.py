@@ -28,7 +28,7 @@ class Fixture():
 
     def init_address(self, address_infos: dict):
         self.universe = address_infos["universe"]
-        self.dmx_address = address_infos["dmx_address"]-1
+        self.dmx_address = np.array(address_infos["dmx_address"])-1
 
     def init_position(self, position_infos: list):
         self.position = position_infos
@@ -39,7 +39,6 @@ class Fixture():
             self.use_shader = True
             self.canvas_position = shader_binding["canvas_position"]
             self.num_pixels = shader_binding["num_pixels"]
-            assert self.num_pixels == len(self.canvas_position)
         else:
             self.use_shader = False
 

@@ -8,6 +8,7 @@ class InvalidLightRegistration(Exception):
     pass
 
 def register_light_now(op_code, class_reference):
+    print(op_code)
     if op_code in LIGHT_MODELS:
         raise InvalidLightRegistration(
             "Duplicate light registration of '%s'. There is already %s" % op_code,

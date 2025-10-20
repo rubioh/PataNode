@@ -47,7 +47,7 @@ class LightEngine:
 
     def load_sceno(self, path: str):
         if path is None:
-            path = "light/sceno/2triangle4par.yaml"
+            path = "light/sceno/theof.yaml"
 #            path = "light/sceno/plante_a_son.yaml"   
         sceno = yaml.safe_load(open(path, "r"))
         for light_name, infos in sceno.items():
@@ -83,10 +83,8 @@ class LightEngine:
 #                    light.attrib["blue"] = 0
 
             light_buffer = light.get_dmx_buffer()
-
-            if self.wait > 1000:
-                print(light, light.color, light_buffer)
             output_buffer[light.dmx_address:light.dmx_address+len(light_buffer)] = light_buffer
+            #print(output_buffer)
         self.wait += 1
         self.wait %= 1002
         self.light_device.write(output_buffer)

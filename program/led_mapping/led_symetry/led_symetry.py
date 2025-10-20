@@ -44,9 +44,11 @@ class LedSymetry(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {
+            "iTime": "time",
             "iChannel0": "iChannel0",
             "mode": "led_symetry_mode",
             "kick_count": "kick_count",
+            "smooth_low": "smooth_low",
             "mode_mask": "mode_mask",
             "blink_force": "blink_force",
             "no_sym_mode": "no_sym_mode",
@@ -70,6 +72,8 @@ class LedSymetry(ProgramBase):
         self.time_mask = 0
         self.wait_mode = 0
 
+        self.time = 0
+
         self.blink = 0
         self.blink_force = 0
 
@@ -88,19 +92,25 @@ class LedSymetry(ProgramBase):
 
         self.mode_2_sym = 0
 
+        self.smooth_low = 0
+
     def updateParams(self, af=None):
         if af is None:
             return
+    
+        self.smooth_low = af["smooth_low"]
+
+        self.time += .05
         self.kick_count = af["kick_count"] % 4
 
         self.time_mask += .0007*.33
         self.mode_mask = int(self.time_mask%2)
         
-        if af["mini_chill"] and self.wait_mode>10:
+        if af["mini_chill"] and self.wait_mode>60:
             self.led_symetry_mode += 1  
             self.float_no_sym_mode += 1
             self.wait_mode = 0
-        self.led_symetry_mode %= 6
+        self.led_symetry_mode %= 8
         self.wait_mode += 1/60
     
         self.blink += .0009*.31
