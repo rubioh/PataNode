@@ -39,7 +39,7 @@ class Pingouin(ProgramBase):
 
     def initParams(self):
         self.iTime = 0.0
-        self.go_x = 0.
+        self.go_x = 0.0
         self.wait = 0
         self.iResolution = self.win_size
         self.energy = 0.0
@@ -215,7 +215,7 @@ class PingouinNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

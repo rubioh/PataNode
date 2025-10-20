@@ -23,8 +23,8 @@ from PyQt5.QtWidgets import (
 )
 
 from audio.audio_conf import dict_audio_features
-#from nodeeditor.utils import dumpException
-#from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
+# from nodeeditor.utils import dumpException
+# from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
 
 class QDMInspector(QWidget):
@@ -40,7 +40,9 @@ class QDMInspector(QWidget):
         grid.addWidget(QCheckBox())
         self.setLayout(grid)
 
-    def addLayout(self, obj_connect=None):  # TODO: redraw layout at each onSelected -> Node
+    def addLayout(
+        self, obj_connect=None
+    ):  # TODO: redraw layout at each onSelected -> Node
         for name, properties in obj_connect.items():
             self.grid.addWidget(self.createWidget(properties))
 
@@ -78,7 +80,7 @@ class QDMInspector(QWidget):
         name = properties["name"].lower().capitalize()
         name = name.replace("_", " ")
         groupBox = QGroupBox(name)
-#       groupBox.setForeground("#FFB500")
+        #       groupBox.setForeground("#FFB500")
         slider = QSlider(Qt.Horizontal)
         slider.setFocusPolicy(Qt.StrongFocus)
         slider.setTickPosition(QSlider.TicksBothSides)
@@ -151,7 +153,9 @@ class QDMInspector(QWidget):
 
         for j, win_size in enumerate(win_sizes_list):
             action = menu.addAction(str(win_size))
-            action.triggered.connect(callback_factory(win_size, button_widget, callback))
+            action.triggered.connect(
+                callback_factory(win_size, button_widget, callback)
+            )
 
         button_widget.setMenu(menu)
         vbox.addWidget(button_widget)
@@ -198,8 +202,8 @@ class QDMInspector(QWidget):
         if self.uniform_window is not None:
             self.uniform_window.deleteLater()
 
-#       gpu_parameters_informations = obj.getGpuAdaptableParameters()
-#       cpu_parameters_informations = obj.getCpuAdaptableParameters()
+        #       gpu_parameters_informations = obj.getGpuAdaptableParameters()
+        #       cpu_parameters_informations = obj.getCpuAdaptableParameters()
         uniforms_binding = obj.getUniformsBinding()
         self.createSetWinSizeToolbox(obj)
         self.createGpuParametersToolbox(obj.getGpuAdaptableParameters())
@@ -215,7 +219,6 @@ class ParametersWidget(QTabWidget):
         self.initUI()
 
     def initUI(self):
-
         pal = QPalette()
         pal.setColor(QPalette.Window, QColor(40, 40, 40))
 
@@ -225,7 +228,9 @@ class ParametersWidget(QTabWidget):
         stylesheet = os.path.join(os.path.dirname(__file__), "qss/qlistwidget-styl.qss")
         stylesheet = open(stylesheet, "r").read()
 
-        stylesheet_tab = os.path.join(os.path.dirname(__file__), "qss/qtabwidget-styl.qss")
+        stylesheet_tab = os.path.join(
+            os.path.dirname(__file__), "qss/qtabwidget-styl.qss"
+        )
         stylesheet_tab = open(stylesheet_tab, "r").read()
 
         self.setStyleSheet(stylesheet + stylesheet_tab)
@@ -250,12 +255,12 @@ class ParametersWidget(QTabWidget):
             if "protected" in parameters[uniform_name]["eval_function"]:
                 if parameters[uniform_name]["eval_function"]["protected"]:
                     continue
-                
+
             item = QListWidgetItem()
 
             parameter_widget = QWidget()
             parameter_layout = QHBoxLayout()
-            
+
             line_edit_widget = self.getLineEdit(
                 parameters[uniform_name], program_name, uniform_name
             )
@@ -299,7 +304,7 @@ class ParametersWidget(QTabWidget):
             return lambda: custom_callback()
 
         textfield.returnPressed.connect(get_callback())
-        #textfield.hide()
+        # textfield.hide()
         return textfield
 
 
@@ -376,7 +381,9 @@ class UniformWidget(QTabWidget):
 
         callback = self.uniforms_informations.callback
 
-        def custom_callback(program_name, uniform_name, feature_name, type, current_widget):
+        def custom_callback(
+            program_name, uniform_name, feature_name, type, current_widget
+        ):
             current_widget.setText(feature_name)
             callback(program_name, uniform_name, feature_name, type)
 
@@ -395,7 +402,9 @@ class UniformWidget(QTabWidget):
 
             for j, feature in enumerate(features_list):
                 action = sub_menu.addAction(feature)
-                action.triggered.connect(callback_factory(feature, "audio_features", button_widget))
+                action.triggered.connect(
+                    callback_factory(feature, "audio_features", button_widget)
+                )
 
         button_widget.setMenu(menu)
 

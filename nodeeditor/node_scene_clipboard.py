@@ -2,6 +2,7 @@
 """
 A module containing all code for working with Clipboard
 """
+
 from collections import OrderedDict
 from nodeeditor.node_graphics_edge import QDMGraphicsEdge
 from nodeeditor.node_edge import Edge

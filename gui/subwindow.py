@@ -23,7 +23,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.app = app
         self.light_engine = app.light_engine
         super().__init__()
-#       self.setAttribute(Qt.WA_DeleteOnClose)
+        #       self.setAttribute(Qt.WA_DeleteOnClose)
 
         self.setTitle()
 
@@ -43,7 +43,6 @@ class PataNodeSubWindow(NodeEditorWidget):
         self._close_event_listeners = []
 
         self.screen_node = None
-
 
     def searchScreenNodes(self):
         # TODO: better logic if multiple screen or output nodes
@@ -94,7 +93,7 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def fileLoad(self, filename):
         if super().fileLoad(filename):
-#           self.scene.fbo_manager.restoreFBOUsability()
+            #           self.scene.fbo_manager.restoreFBOUsability()
             self.doEvalOutputs()
             return True
 
@@ -148,7 +147,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             event.acceptProposedAction()
         else:
-#           print(" ... denied drag enter event")
+            #           print(" ... denied drag enter event")
             event.setAccepted(False)
 
     def onDrop(self, event):
@@ -186,7 +185,7 @@ class PataNodeSubWindow(NodeEditorWidget):
             event.setDropAction(Qt.MoveAction)
             event.accept()
         else:
-#           print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
+            #           print(" ... drop ignored, not requested format '%s'" % LISTBOX_MIMETYPE)
             event.ignore()
 
     def init_node(self, node_class):
@@ -210,7 +209,7 @@ class PataNodeSubWindow(NodeEditorWidget):
                 self.handleNodeContextMenu(event)
             elif hasattr(item, "edge"):
                 self.handleEdgeContextMenu(event)
-#           elif item is None:
+            #           elif item is None:
             else:
                 self.handleNewNodeContextMenu(event)
 
@@ -260,10 +259,10 @@ class PataNodeSubWindow(NodeEditorWidget):
         if isinstance(selected, GraphContainerNode):
             openSubWindow = context_menu.addAction("Open a new graph")
 
-#       if selected and action == openGLSLAct:
-#           selected.openGLSLCode()
+        #       if selected and action == openGLSLAct:
+        #           selected.openGLSLCode()
 
-#       openInspectorAct = context_menu.addAction("Open Parameters Inspector")
+        #       openInspectorAct = context_menu.addAction("Open Parameters Inspector")
 
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
 
@@ -370,4 +369,6 @@ class PataNodeSubWindow(NodeEditorWidget):
                     self.scene.getView().dragging.edgeDragEnd(target_socket.grSocket)
                     self.finish_new_node_state(new_calc_node)
             else:
-                self.scene.history.storeHistory("Created %s" % new_calc_node.__class__.__name__)
+                self.scene.history.storeHistory(
+                    "Created %s" % new_calc_node.__class__.__name__
+                )

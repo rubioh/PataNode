@@ -2,6 +2,7 @@
 """
 A module containing the Edge Dragging functionality
 """
+
 from nodeeditor.node_graphics_socket import QDMGraphicsSocket
 from nodeeditor.node_edge import EDGE_TYPE_DEFAULT
 from nodeeditor.utils import dumpException
@@ -72,7 +73,6 @@ class EdgeDragging:
 
         # clicked on socket
         if isinstance(item, QDMGraphicsSocket):
-
             # check if edge would be valid
             if not self.drag_edge.validateEdge(self.drag_start_socket, item.socket):
                 print("NOT VALID EDGE")

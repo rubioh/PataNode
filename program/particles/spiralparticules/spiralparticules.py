@@ -3,7 +3,7 @@ import moderngl as mgl
 
 from os.path import dirname, join
 
-from pyrr import Matrix44 # type: ignore[import-untyped]
+from pyrr import Matrix44  # type: ignore[import-untyped]
 
 from node.node_conf import register_node
 from node.shader_node_base import ShaderNode, Particles
@@ -161,7 +161,9 @@ class SpiralParticules(ProgramBase):
         self.wait_starting_rot += 0.005
 
         if self.wait_change_angle >= 60 * 20 and af["on_kick"]:
-            self.target = np.array(self.base) + 2.0 * np.pi * np.sign(np.random.rand(3) - 0.5)
+            self.target = np.array(self.base) + 2.0 * np.pi * np.sign(
+                np.random.rand(3) - 0.5
+            )
             self.vel = 0.5 + np.random.rand(3)
             self.wait_change_angle = 0
             self.wait_starting_rot = 0
@@ -172,7 +174,10 @@ class SpiralParticules(ProgramBase):
             else:
                 self.target_angle = 2.0 * np.pi - 3.14159 / 2
 
-        if np.linalg.norm(self.target - self.base) < 0.01 and self.wait_starting_rot > 1.0:
+        if (
+            np.linalg.norm(self.target - self.base) < 0.01
+            and self.wait_starting_rot > 1.0
+        ):
             self.base = np.array([-3.14159 / 2, 0.0, 0.0])
             self.target = self.base
         else:
@@ -292,7 +297,7 @@ class SpiralParticulesNode(ShaderNode, Particles):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         output_texture = self.program.render(audio_features)

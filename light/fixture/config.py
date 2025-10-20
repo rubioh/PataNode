@@ -4,8 +4,10 @@ from os.path import dirname, basename, isfile, join
 
 LIGHT_MODELS = {}
 
+
 class InvalidLightRegistration(Exception):
     pass
+
 
 def register_light_now(op_code, class_reference):
     if op_code in LIGHT_MODELS:
@@ -22,6 +24,7 @@ def register_light(op_code):
         return original_class
 
     return decorator
+
 
 def name_to_opcode(name: str):
     return name

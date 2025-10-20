@@ -6,7 +6,9 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="PataNode", description="The node-oriented shader manager")
+    parser = argparse.ArgumentParser(
+        prog="PataNode", description="The node-oriented shader manager"
+    )
     parser.add_argument("-o", "--open", metavar="filename")
     parser.add_argument("--debug", metavar="module_to_debug", nargs="+")
 
@@ -21,7 +23,7 @@ if __name__ == "__main__":
             importlib.import_module(module_to_debug).DEBUG = True
 
     # Note: This import is here to avoid a circular import
-    import program.program_conf # noqa: F401
+    import program.program_conf  # noqa: F401
 
     import app
 

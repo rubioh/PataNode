@@ -89,7 +89,7 @@ class GSStylized(ProgramBase):
         self.init_program["iResolution"] = np.array(self.bwin_size)
         self.init_program["mode"] = self.init_mode
 
-#       self.patat_texture.use(2)
+        #       self.patat_texture.use(2)
         self.fbos[3].clear()
         self.fbos[3].use()
         self.init_vao.render()
@@ -180,7 +180,7 @@ class GSStylized(ProgramBase):
             self.change = 4
             self.change_triangle = 8
             self.initialize = True
-#           self.get_init_texture()
+        #           self.get_init_texture()
 
         if af["on_chill"]:
             self.K += 0.01 * self.sens
@@ -217,7 +217,7 @@ class GSStylized(ProgramBase):
 
             if self.change_init >= 32:
                 self.change_init %= 32
-#               self.get_init_texture()
+                #               self.get_init_texture()
                 self.radius_triangle = 1
                 self.init_mode += 1
                 self.init_mode %= 4
@@ -283,7 +283,7 @@ class GSStylizedNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         return self.program.render(audio_features)

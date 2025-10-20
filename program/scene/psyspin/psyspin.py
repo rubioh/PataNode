@@ -45,7 +45,7 @@ class PsySpin(ProgramBase):
             "time_tunnel_depth": "time_tunnel_depth",
             "time_tunnel_rot": "time_tunnel_rot",
             "time_depth_mod": "time_depth_mod",
-#           "tunnel_wave_amp": "tunnel_wave_amp",
+            #           "tunnel_wave_amp": "tunnel_wave_amp",
             "tunnel_wave_freq": "tunnel_wave_freq",
             "time_col_rotation": "time_col_rotation",
             "tunnel_wave_amp": "tunnel_wave_amp",
@@ -94,7 +94,7 @@ class PsySpin(ProgramBase):
         self.time_col_rotation = (-af["time"] * tm * -5.0) * self.G
         self.tunnel_wave_freq = 1.0 * self.G
         self.wave_time_freq = 1.0 * self.G
-#       onTempo = af["on_tempo"] * 3.14159
+        #       onTempo = af["on_tempo"] * 3.14159
         self.kick = (
             min(max(af["full"][3] - 0.8 * af["full"][2], 0.05) * 0.8, 0.48) * self.G
         )
@@ -128,7 +128,7 @@ class PsySpinNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

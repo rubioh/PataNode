@@ -35,8 +35,7 @@ class BangerSponge(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
     def initUniformsBinding(self):
-        binding = {
-        }
+        binding = {}
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
 
@@ -57,6 +56,7 @@ class BangerSponge(ProgramBase):
         ) / 24
 
         self.cumulativ_smooth += fa["smooth_full"] * 1.5
+
     def bindUniform(self, af):
         fa = af
         if not fa:
@@ -69,9 +69,7 @@ class BangerSponge(ProgramBase):
         )
         self.program["energy_fast2"] = fa["low"][3] / 2.0
         self.program["energy_slow"] = fa["full"][1] / 2.0
-        self.program["energy_mid"] = max(
-            fa["full"][3] - fa["full"][2] * 0.95, 0.0
-        )
+        self.program["energy_mid"] = max(fa["full"][3] - fa["full"][2] * 0.95, 0.0)
         self.program["energy"] = fa["full"][0] * 0.3
         self.program["onTempo"] = (1 - fa["on_tempo4"]) * 2 * 3.1415
         self.program["onKick"] = fa["on_kick"]
@@ -102,7 +100,7 @@ class BangerSpongeNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         return self.program.render(audio_features)

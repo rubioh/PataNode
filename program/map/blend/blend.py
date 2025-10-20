@@ -47,7 +47,7 @@ class MapBlend(ProgramBase):
         binding = {
             "iChannel0": "iChannel0",
             "iChannel1": "iChannel1",
-            "iResolution": "win_size"
+            "iResolution": "win_size",
         }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])

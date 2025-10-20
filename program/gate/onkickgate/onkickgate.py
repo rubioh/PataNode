@@ -64,11 +64,12 @@ class OnKickGate(ProgramBase):
         self.updateParams(af)
         self.bindUniform(af)
         return textures[self.which]
-#       self.bindUniform(af)
-#       textures[0].use(1)
-#       self.fbos[0].use()
-#       self.vao.render()
-#       return self.fbos[0].color_attachments[0]
+
+    #       self.bindUniform(af)
+    #       textures[0].use(1)
+    #       self.fbos[0].use()
+    #       self.vao.render()
+    #       return self.fbos[0].color_attachments[0]
 
     def norender(self):
         return self.fbos[0].color_attachments[0]

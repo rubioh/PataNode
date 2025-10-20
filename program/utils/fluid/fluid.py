@@ -148,7 +148,7 @@ class Fluid(ProgramBase):
         vel_input = textures[1]
 
         # Ink Texture
-#       texture.use(21)
+        #       texture.use(21)
         self.fbos[2].color_attachments[0].use(1)
         self.fbos[1].color_attachments[0].use(2)
         ink_input.use(0)
@@ -203,7 +203,7 @@ class FluidNode(ShaderNode, Utils):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         input_nodes = self.getShaderInputs()

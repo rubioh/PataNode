@@ -6,7 +6,7 @@ import torch.nn as nn
 from typing import Optional
 from functools import partial
 
-#from audio.DeepModels.CQTCausal import CQTCausal
+# from audio.DeepModels.CQTCausal import CQTCausal
 
 
 class PESTO(nn.Module):
@@ -47,12 +47,12 @@ class PESTO(nn.Module):
             pad_mode="constant",
         )
 
-#       sd = torch.load('weights.ckpt')['state_dict']
-#       sd = torch.load('audio/DeepModels/weights.ckpt')['state_dict']
+        #       sd = torch.load('weights.ckpt')['state_dict']
+        #       sd = torch.load('audio/DeepModels/weights.ckpt')['state_dict']
         sd = torch.load("audio/DeepModels/last.ckpt")["state_dict"]
-#       sd = torch.load('audio/DeepModels/weights_140.ckpt')['state_dict']
+        #       sd = torch.load('audio/DeepModels/weights_140.ckpt')['state_dict']
         self.load_state_dict(sd)
-#       self.get_CQT = CQTCausal(sr=16000,
+        #       self.get_CQT = CQTCausal(sr=16000,
         self.get_CQT = nnAudio.features.CQT(
             sr=16000, output_format="Complex", **cqt_kwargs
         ).to(self.device)
@@ -78,13 +78,13 @@ class PESTO(nn.Module):
     def forward(self, x):
         x = torch.FloatTensor(x).to(self.device)
         out = self.get_CQT(x)
-#       self.save(out[0, :, -1].unsqueeze(0))
+        #       self.save(out[0, :, -1].unsqueeze(0))
         out = torch.view_as_complex(out)
         cqt = torch.abs(out[0])
         out = cqt[17 + 16 :, :].transpose(0, 1).unsqueeze(1)
         out = self.module(out)
         out = out[-1]
-#       out = out[0]*(1.-(.5+.3333)) + .3333*out[1] + .5*out[2]
+        #       out = out[0]*(1.-(.5+.3333)) + .3333*out[1] + .5*out[2]
         return out.to("cpu").detach().numpy(), cqt.to("cpu")[:, -1].detach().numpy()
 
     def get_features(self, x, D):
@@ -305,7 +305,9 @@ class Resnet1d(nn.Module):
 
         if final_norm == "softmax":
             self.final_norm = nn.Softmax(dim=-1)
-        elif final_norm == "sigmoid":  # this shit returns nan in gradients, don't use it
+        elif (
+            final_norm == "sigmoid"
+        ):  # this shit returns nan in gradients, don't use it
             self.final_norm = nn.Sigmoid()
         elif final_norm == "none":
             self.final_norm = nn.Identity()

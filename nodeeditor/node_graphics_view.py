@@ -2,6 +2,7 @@
 """
 A module containing `Graphics View` for NodeEditor
 """
+
 from qtpy.QtWidgets import QGraphicsView, QApplication
 from qtpy.QtCore import Signal, QPoint, Qt, QEvent, QPointF, QRectF
 from qtpy.QtGui import (

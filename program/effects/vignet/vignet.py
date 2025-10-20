@@ -40,11 +40,16 @@ class Vignet(ProgramBase):
 
     def initParams(self):
         self.iChannel0 = 1
-        self.intensity = .5
-        self.decay = .1
+        self.intensity = 0.5
+        self.decay = 0.1
 
     def initUniformsBinding(self):
-        binding = {"iResolution": "win_size", "iChannel0": "iChannel0", "intensity": "intensity", "decay": "decay"}
+        binding = {
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "intensity": "intensity",
+            "decay": "decay",
+        }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])
 

@@ -16,17 +16,23 @@ from node.shader_node_base import ShaderNode, LED
 from node.node_conf import register_node
 
 
-
 OP_CODE_MAPLED2D = name_to_opcode("map_led_2d")
 
 
 @register_program(OP_CODE_MAPLED2D)
 class MapLed2D(ProgramBase):
-    def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(1920, 1080), light_engine=None):
+    def __init__(
+        self,
+        ctx=None,
+        major_version=3,
+        minor_version=3,
+        win_size=(1920, 1080),
+        light_engine=None,
+    ):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Map Led 2D"
         self.light_engine = light_engine
-    
+
         self.initParams()
         self.initVBOs()
         self.initProgram()
@@ -36,9 +42,7 @@ class MapLed2D(ProgramBase):
 
     def initFBOSpecifications(self):
         self.required_fbos = 1
-        fbos_specification = [
-            [self.win_size, 4, "f4"]
-        ]
+        fbos_specification = [[self.win_size, 4, "f4"]]
         for specification in fbos_specification:
             self.fbos_win_size.append(specification[0])
             self.fbos_components.append(specification[1])
@@ -51,12 +55,12 @@ class MapLed2D(ProgramBase):
         varyings = ["out_col"]
         vao_binding = [(self.vbo1, "2f4", "in_pos")]
         self.loadProgramToCtx(
-            vert_path, 
-            frag_path, 
-            reload, 
+            vert_path,
+            frag_path,
+            reload,
             name="get_pixel_col_",
             vao_binding=vao_binding,
-            varyings=varyings
+            varyings=varyings,
         )
 
         vert_path = SQUARE_VERT_PATH
@@ -64,8 +68,8 @@ class MapLed2D(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, reload, name="view_led_")
 
     def initVBOs(self):
-        self.vbo1 = self.ctx.buffer(reserve=self.N_part_max*8)
-        self.vbo2 = self.ctx.buffer(reserve=self.N_part_max*16)
+        self.vbo1 = self.ctx.buffer(reserve=self.N_part_max * 8)
+        self.vbo2 = self.ctx.buffer(reserve=self.N_part_max * 16)
 
     def initParams(self):
         self.N_part_max = 1000
@@ -81,22 +85,19 @@ class MapLed2D(ProgramBase):
 
         byte_array = self.shader_light_mapper.pixels_positions.tobytes()
         self.pos_texture = self.ctx.texture(
-            (self.N_part_max, 1), 
-            components=2, 
-            data=byte_array, 
+            (self.N_part_max, 1),
+            components=2,
+            data=byte_array,
             dtype="f4",
         )
 
-
     def initUniformsBinding(self):
-        binding = {
-            "iChannel0": self.iChannel0
-        }
+        binding = {"iChannel0": self.iChannel0}
         super().initUniformsBinding(binding, program_name="get_pixel_col_")
         binding = {
             "iResolution": self.win_size,
             "input_texture": self.input_texture,
-            "LightsBuffer": self.LightsBuffer
+            "LightsBuffer": self.LightsBuffer,
         }
         super().initUniformsBinding(binding, program_name="view_led_")
         self.addProtectedUniforms(["iChannel0", "input_texture", "LightsBuffer"])
@@ -106,18 +107,14 @@ class MapLed2D(ProgramBase):
 
     def render(self, texture, af=None):
         self.bindUniform(af)
-        # PREVIS SHOW
-        #texture[0].use(3)
-        #self.pos_texture.use(12)
-        #self.fbos[0].use()
-        #self.view_led_vao.render()
-        # WRITE COLOR
+        # PREVIS SHOW
+        # texture[0].use(3)
+        # self.pos_texture.use(12)
+        # self.fbos[0].use()
+        # self.view_led_vao.render()
+        # WRITE COLOR
         texture[0].use(1)
-        self.get_pixel_col_vao.transform(
-            self.vbo2, 
-            mgl.POINTS, 
-            self.N_part_max
-        )
+        self.get_pixel_col_vao.transform(self.vbo2, mgl.POINTS, self.N_part_max)
         self.shader_light_mapper.read_color(self.vbo2)
         return self.fbos[0].color_attachments[0]
 
@@ -134,14 +131,11 @@ class MapLed2DNode(ShaderNode, LED):
 
     def __init__(self, scene, light_engine):
         super().__init__(scene, inputs=[1], outputs=[1])
-        self.program = MapLed2D(
-            ctx=self.scene.ctx, 
-            light_engine=scene.app.light_engine
-        )
+        self.program = MapLed2D(ctx=self.scene.ctx, light_engine=scene.app.light_engine)
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
         input_nodes = self.getShaderInputs()
         if len(input_nodes) == 0:
@@ -151,5 +145,5 @@ class MapLed2DNode(ShaderNode, LED):
         if texture is None:
             return self.program.norender()
         out_texture = self.program.render([texture], audio_features)
-        #return out_texture
+        # return out_texture
         return texture

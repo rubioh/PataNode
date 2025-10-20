@@ -3,7 +3,6 @@
 A module containing the Edge Rerouting functionality
 """
 
-
 DEBUG_REROUTING = True
 
 

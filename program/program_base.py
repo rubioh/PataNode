@@ -151,7 +151,9 @@ class ProgramBase:
         if varyings is None:
             program = self.ctx.program(vertex_shader=vert, fragment_shader=frag)
         else:
-            program = self.ctx.program(vertex_shader=vert, fragment_shader=frag, varyings=varyings)
+            program = self.ctx.program(
+                vertex_shader=vert, fragment_shader=frag, varyings=varyings
+            )
 
         if vao_binding is None:
             vao = self.ctx.vertex_array(
@@ -182,7 +184,6 @@ class ProgramBase:
         if reload:
             self.reloadUniformsBinding(None, name)
 
-
     def storePreviousProgramVersion(self, program, vao, name):
         # Program
         setattr(self, name + "program_old", getattr(self, name + "program"))
@@ -195,10 +196,12 @@ class ProgramBase:
         self.previous_vaos[name] = getattr(self, name + "vao_old")
 
         if DEBUG:
-            print("New program version is",
-                  getattr(self, name + "program"),
-                  "\nOld program version is",
-                  getattr(self, name + "program_old"),)
+            print(
+                "New program version is",
+                getattr(self, name + "program"),
+                "\nOld program version is",
+                getattr(self, name + "program_old"),
+            )
 
     def releasePreviousProgramVersion(self):
         for key, program in self.previous_programs.items():
@@ -214,15 +217,27 @@ class ProgramBase:
     def reloadPreviousProgramVersion(self):
         for name, program in self.previous_programs.items():
             if DEBUG:
-                print("Program", name, "with reference", getattr(self, name + "program"),
-                      "is reloaded with", program)
+                print(
+                    "Program",
+                    name,
+                    "with reference",
+                    getattr(self, name + "program"),
+                    "is reloaded with",
+                    program,
+                )
 
             setattr(self, name + "program", program)
 
         for name, vao in self.previous_vaos.items():
             if DEBUG:
-                print("VAO", name, "with reference", getattr(self, name + "vao"),
-                      "is reloaded with", vao,)
+                print(
+                    "VAO",
+                    name,
+                    "with reference",
+                    getattr(self, name + "vao"),
+                    "is reloaded with",
+                    vao,
+                )
 
             setattr(self, name + "program", program)
             setattr(self, name + "vao", vao)
@@ -253,7 +268,9 @@ class ProgramBase:
 
         if DEBUG:
             print(self.vbo, self.vao, self.program)
-            print("Program %s: success while reloading program" % self.__class__.__name__)
+            print(
+                "Program %s: success while reloading program" % self.__class__.__name__
+            )
 
     def getGLSLCodePath(self):
         return self.vertex_shader_glsl_paths + self.fragment_shader_glsl_paths
@@ -307,11 +324,13 @@ class ProgramBase:
         uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
         uniform_parameters[name] = {
             "name": name,
-#           "minimum": minimum,
-#           "maximum": maximum,
-#           "type":  type,
+            #           "minimum": minimum,
+            #           "maximum": maximum,
+            #           "type":  type,
             "value": value,
-            "connect": lambda v: self.setAdaptableParameters(program_name, uniform_name, name, v),
+            "connect": lambda v: self.setAdaptableParameters(
+                program_name, uniform_name, name, v
+            ),
             "widget": widget_type,
         }
 
@@ -329,9 +348,10 @@ class ProgramBase:
         self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"][
             "value"
         ] = value
-#
-#       if self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"]:
-#           self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"](value)
+
+    #
+    #       if self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"]:
+    #           self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"]["callback"](value)
 
     def add_text_edit_cpu_adaptable_parameter(self, name, value, callback=None):
         uniform_parameters = self.cpu_adaptable_parameters_dict[self.name + "program"]
@@ -339,8 +359,10 @@ class ProgramBase:
             "eval_function": {
                 "name": name,
                 "value": value,
-                "connect": lambda v: self.setCpuAdaptableParameters(self.name + "program", name, v),
-#               "callback": callback,
+                "connect": lambda v: self.setCpuAdaptableParameters(
+                    self.name + "program", name, v
+                ),
+                #               "callback": callback,
                 "widget": "TextEdit",
             }
         }
@@ -367,8 +389,14 @@ class ProgramBase:
             modified_data = float(modified_data)
         except Exception:
             if DEBUG_EVAL:
-                print("eval_function", evaluation, "is not correct.", self.__class__.__name__,
-                      "for uniform", uniform_name)
+                print(
+                    "eval_function",
+                    evaluation,
+                    "is not correct.",
+                    self.__class__.__name__,
+                    "for uniform",
+                    uniform_name,
+                )
                 print("giving raw input in uniforms", uniform_name)
 
             modified_data = x
@@ -389,7 +417,9 @@ class ProgramBase:
         if DEBUG:
             print("Params", params, "set to value", value, "for programs", program_name)
 
-        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = value
+        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = (
+            value
+        )
 
     ###########################################
 
@@ -527,7 +557,9 @@ class ProgramsUniforms:
         }
 
         if uniform_name not in self.protected:
-            self.parent.initUniformsAdaptableParameters(program_name + "program", uniform_name)
+            self.parent.initUniformsAdaptableParameters(
+                program_name + "program", uniform_name
+            )
 
     def addProtectedUniforms(self, uniforms_name):
         """
@@ -540,7 +572,9 @@ class ProgramsUniforms:
         Get the uniforms binding in order to expose it (without protected uniforms)
         """
         if self.lookup is None:
-            self.lookup = UniformsLookup(self.uniforms, self.changeBinding, self.protected)
+            self.lookup = UniformsLookup(
+                self.uniforms, self.changeBinding, self.protected
+            )
         else:
             self.lookup.update(self.uniforms)
 
@@ -604,8 +638,14 @@ class ProgramsUniforms:
         program = self.programs[program_name]
 
         if DEBUG:
-            print("Bind uniforms to program :", program, "with name", program_name, "for node",
-                  self.parent.__class__.__name__)
+            print(
+                "Bind uniforms to program :",
+                program,
+                "with name",
+                program_name,
+                "for node",
+                self.parent.__class__.__name__,
+            )
 
         for uniform_name, info in self.uniforms[program_name].items():
             if info["param_name"] is not None:  # ie if this uniform is set to a params
@@ -621,10 +661,18 @@ class ProgramsUniforms:
                     )
 
                     if DEBUG:
-                        print("ProgramUniform::bindUniformToProgram Trying to bind parameters",
-                              info["param_name"], "with value", modified_data, "to uniform",
-                              uniform_name, "in program", program_name + "program", " for node ",
-                              self.parent.__class__.__name__)
+                        print(
+                            "ProgramUniform::bindUniformToProgram Trying to bind parameters",
+                            info["param_name"],
+                            "with value",
+                            modified_data,
+                            "to uniform",
+                            uniform_name,
+                            "in program",
+                            program_name + "program",
+                            " for node ",
+                            self.parent.__class__.__name__,
+                        )
 
                     program[uniform_name] = modified_data
                 else:

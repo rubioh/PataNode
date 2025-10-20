@@ -20,26 +20,38 @@ class Particle(ProgramBase):
         self.title = "Particle"
         self.path = "./assets/mesh/spheretiny.glb"
         self.particle_system = ParticleSystem(self.ctx, 1000000)
-        self.scene = MeshScene(self.path, ctx, self.particle_system.get_particle_buffer(), self.particle_system.get_particle_buffer_unit_size())
+        self.scene = MeshScene(
+            self.path,
+            ctx,
+            self.particle_system.get_particle_buffer(),
+            self.particle_system.get_particle_buffer_unit_size(),
+        )
         self.camera = glm.mat4()
         self.projection = glm.perspective(glm.radians(45.0), 16.0 / 9.0, 0.1, 1000.0)
         self.model = glm.mat4()
-        self.camera = glm.translate(self.camera, glm.vec3(0, 0., -1.))
-       # self.model = glm.scale(self.model, glm.vec3(.01, .01, .01))
+        self.camera = glm.translate(self.camera, glm.vec3(0, 0.0, -1.0))
+        # self.model = glm.scale(self.model, glm.vec3(.01, .01, .01))
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
         self.initParams()
         self.load_mesh()
-        self.time = 0.
+        self.time = 0.0
 
     def load_mesh(self):
-        self.scene = MeshScene(self.path, self.ctx, self.particle_system.get_particle_buffer(), self.particle_system.get_particle_buffer_unit_size())
+        self.scene = MeshScene(
+            self.path,
+            self.ctx,
+            self.particle_system.get_particle_buffer(),
+            self.particle_system.get_particle_buffer_unit_size(),
+        )
         self.renderer = Renderer(
-            self.ctx, self.scene.mesh_resource_manager, self.scene.texture_resource_manager
+            self.ctx,
+            self.scene.mesh_resource_manager,
+            self.scene.texture_resource_manager,
         )
         self.renderer.add_scene(self.scene)
-        self.renderer.add_sun(glm.vec3(0.0, 0., 1.0), glm.vec3(1.))
+        self.renderer.add_sun(glm.vec3(0.0, 0.0, 1.0), glm.vec3(1.0))
 
     def initFBOSpecifications(self):
         self.required_fbos = 2
@@ -89,8 +101,13 @@ class Particle(ProgramBase):
         self.bindUniform(af)
         self.fbos[0].use()
         self.fbos[0].clear()
-        self.renderer.renderGBUFFERinstance(100000, self.particle_system.get_particle_buffer(),
-            self.model, self.camera, self.projection, self.fbos[0]
+        self.renderer.renderGBUFFERinstance(
+            100000,
+            self.particle_system.get_particle_buffer(),
+            self.model,
+            self.camera,
+            self.projection,
+            self.fbos[0],
         )
         self.renderer.renderSun(self.fbos[1], self.camera, self.fbos[0])
         return self.fbos[1].color_attachments[0]
@@ -112,7 +129,7 @@ class ParticleNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         return self.program.render(audio_features)

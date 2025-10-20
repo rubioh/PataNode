@@ -2,6 +2,7 @@
 """
 A module containing NodeEditor's class for representing Edge and Edge Type Constants.
 """
+
 from collections import OrderedDict
 from nodeeditor.node_graphics_edge import QDMGraphicsEdge
 from nodeeditor.node_serializable import Serializable
@@ -21,9 +22,7 @@ class Edge(Serializable):
     Class for representing Edge in NodeEditor.
     """
 
-    edge_validators = (
-        []
-    )  #: class variable containing list of registered edge validators
+    edge_validators = []  #: class variable containing list of registered edge validators
 
     def __init__(
         self,

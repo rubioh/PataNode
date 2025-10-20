@@ -50,18 +50,18 @@ class PartSystem(ProgramBase):
         ### Transform
         vert_path = join(dirname(__file__), "transform/transform.vert")
         frag_path = None
-#       varyings = ["out_pos", "out_col"]
+        #       varyings = ["out_pos", "out_col"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="transform_")
 
         ### Colision
         vert_path = join(dirname(__file__), "transform/solve_collision.vert")
         frag_path = None
-#       varyings = ["out_pos", "out_col"]
+        #       varyings = ["out_pos", "out_col"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="collision_")
 
         vert_path = join(dirname(__file__), "transform/copy.vert")
         frag_path = None
-#       varyings = ["out_pos"]
+        #       varyings = ["out_pos"]
         self.loadProgramToCtx(vert_path, frag_path, reload, name="copy_")
 
         self.final_program.program["TrailImg"] = 3
@@ -119,7 +119,7 @@ class PartSystem(ProgramBase):
 
         win2 = (self.win_size[0] * 2, self.win_size[1] * 2)
         tile_frag = "program/transition/PartSystem/Idx/tile.frag"
-        self.tile_program = VertFragBase( # FIXME: VertFragBase is not defined
+        self.tile_program = VertFragBase(  # FIXME: VertFragBase is not defined
             vert_path=None, frag_path=tile_frag, win_size=win2, **self.kwargs
         )
         self.tile_texture = self.ctx.texture(size=win2, components=4, dtype="f4")
@@ -164,7 +164,7 @@ class PartSystem(ProgramBase):
         kick_boom = (np.clip(af["low"][3] - af["low"][2], 0, 1)) * 5 + 1
         self.kick_boom = 0.8 * self.kick_boom + 0.2 * kick_boom
         self.part_size = 4.0 * self.kick_boom**2 + self.ps
-#       self.part_size = self.ps
+        #       self.part_size = self.ps
         self.iFrame += 1
         self.gravity = (0.0, -0.00)
 
@@ -196,7 +196,7 @@ class PartSystem(ProgramBase):
         self.part_program["on_kick"] = af["on_kick"]
         self.part_program["part_size"] = self.part_size
         self.part_program["pos_target"] = 8
-#       self.draw_program['part_radius'] = self.part_size/self.win_size[0]
+        #       self.draw_program['part_radius'] = self.part_size/self.win_size[0]
         self.tile_program.program["part_radius"] = self.part_size
         self.tile_program.program["iResolution"] = self.win_size
         self.tile_program.program["IdxBuffer"] = 5
@@ -225,29 +225,29 @@ class PartSystem(ProgramBase):
         self.ctx.copy_buffer(self.vbo1, self.vbo2)
 
         for i in range(4):
-#           self.vao_copy.transform(self.vbo_copy, mgl.POINTS, self.N_part)
-#           self.particles.write(self.vbo_copy)
+            #           self.vao_copy.transform(self.vbo_copy, mgl.POINTS, self.N_part)
+            #           self.particles.write(self.vbo_copy)
             none = -10
             self.idx_fbo.clear(none, none, none, none)
             self.ctx.point_size = self.part_size
             self.idx_fbo.use()
             self.vao_idx.render(mgl.POINTS, self.N_part)
 
-#           self.tile_fbo.clear(-1,-1,-1,-1)
-#           self.idx_fbo.color_attachments[0].use(5)
-#           self.tile_fbo.use()
-#           self.vao_tile.render()
+            #           self.tile_fbo.clear(-1,-1,-1,-1)
+            #           self.idx_fbo.color_attachments[0].use(5)
+            #           self.tile_fbo.use()
+            #           self.vao_tile.render()
 
-#           self.particles.use(10)
+            #           self.particles.use(10)
             self.idx_fbo.color_attachments[0].use(6)
             self.vao_col.transform(self.vbo2, mgl.POINTS, self.N_part)
 
             self.ctx.copy_buffer(self.vbo1, self.vbo2)
 
         self.img_fbo.clear(0.0, 0.0, 0.0)
-#       self.ctx.point_size = np.clip(self.part_size*2, 0, 200)
+        #       self.ctx.point_size = np.clip(self.part_size*2, 0, 200)
         self.ctx.point_size = self.part_size
-#       self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
+        #       self.ctx.enable(mgl.PROGRAM_POINT_SIZE)
         self.ctx.enable(mgl.BLEND)
         texture.use(1)
         self.img_fbo.use()

@@ -57,7 +57,7 @@ class SolidStars:
     def __init__(self):
         self.buff_sprinkles = None
         self.buff_solid = None
-#       self.rng = np.random.default_rng(seed=42)
+        #       self.rng = np.random.default_rng(seed=42)
         self.count = 0
         self.last_on_tempo = 0
         self.current_color = (0.0, 0.0, 0.0)
@@ -176,7 +176,7 @@ class All:
             lightKick,
             self.kickwav,
             self.random_spots,
-#           self.pingpong
+            #           self.pingpong
             ## Disabled pingpong because only one led strip is addressed
             self.solid_stars,
         ]

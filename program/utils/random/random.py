@@ -52,14 +52,26 @@ class Random(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
-        self.add_text_edit_cpu_adaptable_parameter("range_start", self.range_start, lambda: 0)
-        self.add_text_edit_cpu_adaptable_parameter("range_end", self.range_end, lambda: 0)
+        self.add_text_edit_cpu_adaptable_parameter(
+            "range_start", self.range_start, lambda: 0
+        )
+        self.add_text_edit_cpu_adaptable_parameter(
+            "range_end", self.range_end, lambda: 0
+        )
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])
 
     def updateParams(self, l, af):
-        self.range_start = float(self.getCpuAdaptableParameters()["program"]["range_start"]["eval_function"]["value"])
-        self.range_end = float(self.getCpuAdaptableParameters()["program"]["range_end"]["eval_function"]["value"])
+        self.range_start = float(
+            self.getCpuAdaptableParameters()["program"]["range_start"]["eval_function"][
+                "value"
+            ]
+        )
+        self.range_end = float(
+            self.getCpuAdaptableParameters()["program"]["range_end"]["eval_function"][
+                "value"
+            ]
+        )
         if af is None or l is None:
             return
         if af["on_kick"] and not self.on_kick and self.is_transi:
@@ -77,9 +89,13 @@ class Random(ProgramBase):
             self.last_idx = self.index
             self.index = random.randrange(0, l)
             if self.range_start >= self.range_end:
-                self.time_for_next = time.perf_counter() + random.randrange(self.range_end, self.range_start + 1)
+                self.time_for_next = time.perf_counter() + random.randrange(
+                    self.range_end, self.range_start + 1
+                )
             else:
-                self.time_for_next = time.perf_counter() + random.randrange(self.range_start, self.range_end)
+                self.time_for_next = time.perf_counter() + random.randrange(
+                    self.range_start, self.range_end
+                )
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -95,6 +111,7 @@ class Random(ProgramBase):
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
+
 
 @register_node(OP_CODE_RANDOM)
 class RandomNode(ShaderNode, Utils):

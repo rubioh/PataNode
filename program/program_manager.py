@@ -40,23 +40,29 @@ class FBOManager:
         num_textures=None,
     ):
         if dtypes is not None and len(dtypes) != len(win_sizes):
-            print("FBOManager::getFBO lists win_sizes and dtypes are not of the same size")
+            print(
+                "FBOManager::getFBO lists win_sizes and dtypes are not of the same size"
+            )
             return None
 
         if components is not None and len(components) != len(win_sizes):
-            print("FBOManager::getFBO lists win_sizes and components are not of the same size")
+            print(
+                "FBOManager::getFBO lists win_sizes and components are not of the same size"
+            )
             return None
 
         if DEBUG:
             print("getFBOs:: in current FBOs :", self.current_fbos)
             print("getFBOs:: in current in_use:", self.in_use_fbos)
 
-        hashes = self.getHashes(win_sizes, components, dtypes, depth_requirements, num_textures)
-#       returned_fbos = [None for i in range(len(hashes))]
+        hashes = self.getHashes(
+            win_sizes, components, dtypes, depth_requirements, num_textures
+        )
+        #       returned_fbos = [None for i in range(len(hashes))]
         returned_fbos = self.checkForExistingFBOs(hashes)
 
         for i in range(len(win_sizes)):
-            current_hash= hashes[i]
+            current_hash = hashes[i]
 
             if returned_fbos[i] is not None:
                 continue
@@ -110,8 +116,12 @@ class FBOManager:
         returned_fbos = [None for i in range(len(hashes))]
 
         if DEBUG:
-            print("checkForExistingFBOs:: Current hashmap:", hashes,
-                  "\nCurrent fbos", self.current_fbos.keys())
+            print(
+                "checkForExistingFBOs:: Current hashmap:",
+                hashes,
+                "\nCurrent fbos",
+                self.current_fbos.keys(),
+            )
 
         for i, current_hash in enumerate(hashes):
             if current_hash in self.current_fbos.keys():
@@ -127,7 +137,9 @@ class FBOManager:
 
         return returned_fbos
 
-    def getHashes(self, win_sizes, components=None, dtypes=None, depths=None, num_textures=None):
+    def getHashes(
+        self, win_sizes, components=None, dtypes=None, depths=None, num_textures=None
+    ):
         hashes = list()
 
         for i, win_size in enumerate(win_sizes):
@@ -151,7 +163,9 @@ class FBOManager:
             else:
                 num_texture = 1
 
-            current_hash = self.propertiesToHash(win_size, component, dtype, depth, num_texture)
+            current_hash = self.propertiesToHash(
+                win_size, component, dtype, depth, num_texture
+            )
             hashes.append(current_hash)
 
         return hashes

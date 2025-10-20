@@ -13,6 +13,7 @@ class ArtOp(Enum):
     """
     This enum is directly derived from the ArtNet specification Table 1
     """
+
     # No other data is contained in this UDP packet .
     POLL = 0x2000
     # It contains device status information.
@@ -113,6 +114,7 @@ class ArtHeaderProtVer:
     separated protocol version from the art-net header because for some reason
     ArtPollReply does not include it...
     """
+
     # ArtNet protocol revision number high
     prot_ver_high: U8 = U8(0)
 

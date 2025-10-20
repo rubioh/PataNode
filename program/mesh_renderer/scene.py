@@ -1,8 +1,11 @@
 import glm
-import pygltflib # type: ignore[import-untyped]
+import pygltflib  # type: ignore[import-untyped]
 
 from program.mesh_renderer.material import Material
-from program.mesh_renderer.mesh_resource_manager import MeshResourceManager, TextureResourceManager
+from program.mesh_renderer.mesh_resource_manager import (
+    MeshResourceManager,
+    TextureResourceManager,
+)
 from program.mesh_renderer.renderer import render
 from program.mesh_renderer.texture_loader import load_texture_from_gltf
 
@@ -51,18 +54,16 @@ class Node:
 
 
 class MeshScene:
-    def __init__(self, file_path, ctx, instance_buffer = None, instance_buffer_layout = None):
+    def __init__(
+        self, file_path, ctx, instance_buffer=None, instance_buffer_layout=None
+    ):
         self.dag = []
         self.mesh_indices = []  # The indices of meshes relative to the gltf scenes
         self.materials = []
         self.root_nodes = []
         self.samplers = []
-        self.textures = (
-            []
-        )  # Textures as describe by gltf2.0 : a handlers to a image texture and a sampler
-        self.texture_resource_indices = (
-            []
-        )  # The indices of textures relative to the gltf scenes
+        self.textures = []  # Textures as describe by gltf2.0 : a handlers to a image texture and a sampler
+        self.texture_resource_indices = []  # The indices of textures relative to the gltf scenes
         self.ctx = ctx
         self.mesh_resource_manager = MeshResourceManager(ctx)
         self.texture_resource_manager = TextureResourceManager(ctx)
@@ -86,9 +87,9 @@ class MeshScene:
             mat = glm.mat4()
             mat = glm.scale(mat, glm.vec3(scale[0], scale[1], scale[2]))
             m *= mat
-#            m[0][0] = scale[0]
- #           m[1][1] = scale[1]
-  #          m[2][2] = scale[2]
+        #            m[0][0] = scale[0]
+        #           m[1][1] = scale[1]
+        #          m[2][2] = scale[2]
 
         if gltfNode.matrix:
             m = gltfNode.matrix
@@ -117,7 +118,8 @@ class MeshScene:
         index = bufferView.byteOffset + accessor.byteOffset
         d = data[index : index + bufferView.byteLength]
         return d
-#       return np.array(d)
+
+    #       return np.array(d)
 
     def load_meshes(self, gltf):
         for mesh in gltf.meshes:
@@ -168,7 +170,7 @@ class MeshScene:
                         material,
                         None,
                         self.instance_buffer,
-                        self.instance_buffer_layout
+                        self.instance_buffer_layout,
                     )
                 )
 
@@ -185,9 +187,7 @@ class MeshScene:
 
     def load_textures(self, gltf):
         if len(gltf.samplers) == 0:
-            self.samplers.append(
-                Sampler()
-            )
+            self.samplers.append(Sampler())
         for sampler in gltf.samplers:
             self.samplers.append(
                 Sampler(
@@ -202,7 +202,6 @@ class MeshScene:
                     (pil_texture[0], pil_texture[1]), pil_texture[2], self.ctx
                 )
             )
-       
 
         for texture in gltf.textures:
             self.textures.append(
@@ -219,11 +218,11 @@ class MeshScene:
         self.load_materials(gltf)
         self.load_meshes(gltf)
         self.load_nodes(gltf)
-#       print(gltf)
-#
-#       for n in self.dag:
-#           print(n)
-#
+        #       print(gltf)
+        #
+        #       for n in self.dag:
+        #           print(n)
+        #
         del gltf
 
     def clone(self):
@@ -231,7 +230,7 @@ class MeshScene:
 
     def render_node(self, node, matrix, mvp_uniform, surface):
         matrix *= node.transform
-        #print(node.transform)
+        # print(node.transform)
         for mesh_rsc_idx in node.meshes:
             mesh = self.mesh_resource_manager.get_resource(mesh_rsc_idx)
             render(
@@ -247,9 +246,11 @@ class MeshScene:
         for child in node.children:
             self.render_node(self.dag[child], matrix, mvp_uniform, surface)
 
-    def render_node_instance(self, num, instance_buffer, node, matrix, mvp_uniform, surface):
+    def render_node_instance(
+        self, num, instance_buffer, node, matrix, mvp_uniform, surface
+    ):
         matrix *= node.transform
-        #print(node.transform)
+        # print(node.transform)
         for mesh_rsc_idx in node.meshes:
             mesh = self.mesh_resource_manager.get_resource(mesh_rsc_idx)
             render(
@@ -260,12 +261,14 @@ class MeshScene:
                 self.ctx,
                 self.mesh_resource_manager,
                 self.texture_resource_manager,
-                num, 
-                instance_buffer
+                num,
+                instance_buffer,
             )
 
         for child in node.children:
-            self.render_node_instance(self.dag[child], num, instance_buffer, matrix, mvp_uniform, surface)
+            self.render_node_instance(
+                self.dag[child], num, instance_buffer, matrix, mvp_uniform, surface
+            )
 
     def render_scene(self, model, view, projection, surface):
         mvp_uniform = {"model": model, "view": view, "projection": projection}
@@ -273,19 +276,22 @@ class MeshScene:
         for scene in self.root_nodes:
             for node_idx in scene.nodes:
                 node = self.dag[node_idx]
-              #  print("model ", model)
-               # print("view ", view)
-                #print("proj ", projection)
+                #  print("model ", model)
+                # print("view ", view)
+                # print("proj ", projection)
                 self.render_node(node, glm.mat4(), mvp_uniform, surface)
 
-    def render_scene_instance(self, num, instance_buffer, model, view, projection, surface):
+    def render_scene_instance(
+        self, num, instance_buffer, model, view, projection, surface
+    ):
         mvp_uniform = {"model": model, "view": view, "projection": projection}
 
         for scene in self.root_nodes:
             for node_idx in scene.nodes:
                 node = self.dag[node_idx]
-              #  print("model ", model)
-               # print("view ", view)
-                #print("proj ", projection)
-                self.render_node_instance(num, instance_buffer, node, glm.mat4(), mvp_uniform, surface)
-
+                #  print("model ", model)
+                # print("view ", view)
+                # print("proj ", projection)
+                self.render_node_instance(
+                    num, instance_buffer, node, glm.mat4(), mvp_uniform, surface
+                )

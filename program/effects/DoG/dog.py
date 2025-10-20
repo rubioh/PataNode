@@ -229,7 +229,7 @@ class DoGNode(ShaderNode, Effects):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         input_nodes = self.getShaderInputs()

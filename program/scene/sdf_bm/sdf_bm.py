@@ -135,8 +135,8 @@ class SDF_BM(ProgramBase):
                 if self.mode_ptt >= 1:
                     self.sens_ptt = -1
 
-#       self.mode_ptt += .01*self.sens_ptt
-#       self.mode_ptt = np.clip(self.mode_ptt, 0, 1)
+        #       self.mode_ptt += .01*self.sens_ptt
+        #       self.mode_ptt = np.clip(self.mode_ptt, 0, 1)
 
         if af["mini_chill"] and self.wait_mc > 10:
             self.wait_mc = 0
@@ -249,7 +249,7 @@ class SDF_BMNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         return self.program.render(audio_features)

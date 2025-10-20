@@ -2,6 +2,7 @@
 """
 A module containing all code for working with History (Undo/Redo)
 """
+
 from nodeeditor.utils import dumpException
 
 DEBUG = False

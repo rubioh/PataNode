@@ -39,8 +39,7 @@ class Fractal(ProgramBase):
         self.loadProgramToCtx(vert_path, frag_path, False, name="oui_")
 
     def initUniformsBinding(self):
-        binding = {
-        }
+        binding = {}
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms([])
 
@@ -172,7 +171,7 @@ class FractalNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             return self.program.norender()
 
         return self.program.render(audio_features)

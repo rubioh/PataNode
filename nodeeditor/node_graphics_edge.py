@@ -2,6 +2,7 @@
 """
 A module containing the Graphics representation of an Edge
 """
+
 from qtpy.QtWidgets import QGraphicsPathItem, QWidget, QGraphicsItem
 from qtpy.QtGui import QColor, QPen, QPainterPath
 from qtpy.QtCore import Qt, QRectF, QPointF

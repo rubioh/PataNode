@@ -65,7 +65,8 @@ class ArtNetController:
     def tick(self) -> None:
         self.__maybe_discover()
         self.__maybe_handle_packets()
-#       self.__maybe_disconnect_nodes() #TODO
+
+    #       self.__maybe_disconnect_nodes() #TODO
 
     def __maybe_discover(self) -> None:
         if monotonic() > self.__last_discovery + ARTNET_POLL_INTERVAL_S:
@@ -89,7 +90,9 @@ class ArtNetController:
 
                     if isinstance(art, ArtPollReply):
                         self.__handle_art_poll_reply(art, addr[0])
-                    elif any(isinstance(art, ignore) for ignore in (ArtDmx, ArtPoll, ArtSync)):
+                    elif any(
+                        isinstance(art, ignore) for ignore in (ArtDmx, ArtPoll, ArtSync)
+                    ):
                         # TODO: The Controller that broadcasts an ArtPoll should also reply to its own message (by unicast) with an ArtPollReply
                         pass
                     else:
@@ -134,16 +137,16 @@ class ArtNetController:
 
     def __send(self, ip: IPv4Address, pack: ArtBase) -> None:
         sock = self.__get_sock_by_ip(ip)
-#       assert sock, f"no socket found for ip: {ip}"
+        #       assert sock, f"no socket found for ip: {ip}"
 
         if sock is None:
-#           print(f"artnet: no socket found for ip {ip}")
+            #           print(f"artnet: no socket found for ip {ip}")
             return
         try:
             sock.sendto(pack.serialize(), (str(ip), ARTNET_PORT))
         except (OSError, BlockingIOError):  # XXX
-#           print("could not send ", pack)
-#           print(e)
+            #           print("could not send ", pack)
+            #           print(e)
             pass
 
     def get_all_universes(self) -> List[Universe]:
@@ -186,7 +189,9 @@ class ArtNetController:
 
         self.sync_universes()
 
-    def set_universe(self, data: bytes, universe: Universe, offsets: Dict[Universe, int] = {}) -> None:
+    def set_universe(
+        self, data: bytes, universe: Universe, offsets: Dict[Universe, int] = {}
+    ) -> None:
         padding = max(offsets.values()) if offsets else 0
         data_with_padding = data + bytes([0] * padding)
         start = offsets.get(universe, 0)
@@ -230,12 +235,12 @@ class ArtNetControllerThread(threading.Thread):
 
 
 if __name__ == "__main__":
-#   from light.light import nouveau_casino_offsets
+    #   from light.light import nouveau_casino_offsets
 
     artnet_ctrl = ArtNetControllerThread()
     artnet_ctrl.start()
 
     while True:
         red = bytes([int((sin(monotonic()) + 1) / 2 * 255), 0, 0] * 170 + [0, 0])
-#       artnet_ctrl.show(red, nouveau_casino_offsets)
+        #       artnet_ctrl.show(red, nouveau_casino_offsets)
         time.sleep(1 / 60)

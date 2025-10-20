@@ -93,23 +93,23 @@ class LedSymetry(ProgramBase):
             return
         self.kick_count = af["kick_count"] % 4
 
-        self.time_mask += .0007*.33
-        self.mode_mask = int(self.time_mask%2)
-        
-        if af["mini_chill"] and self.wait_mode>10:
-            self.led_symetry_mode += 1  
+        self.time_mask += 0.0007 * 0.33
+        self.mode_mask = int(self.time_mask % 2)
+
+        if af["mini_chill"] and self.wait_mode > 10:
+            self.led_symetry_mode += 1
             self.float_no_sym_mode += 1
             self.wait_mode = 0
         self.led_symetry_mode %= 6
-        self.wait_mode += 1/60
-    
-        self.blink += .0009*.31
+        self.wait_mode += 1 / 60
+
+        self.blink += 0.0009 * 0.31
         self.blink %= 2
-        blink = int(self.blink+1) + af["smooth_low"]
+        blink = int(self.blink + 1) + af["smooth_low"]
         self.blink_force = np.clip(blink, 0, 1)
 
-        self.float_no_sym_mode += 0.00074*.36
-        self.no_sym_mode = int(self.float_no_sym_mode%5)
+        self.float_no_sym_mode += 0.00074 * 0.36
+        self.no_sym_mode = int(self.float_no_sym_mode % 5)
         self.real_kick_count = af["kick_count"]
         self.on_tempo = af["on_tempo2"]
 
@@ -120,23 +120,22 @@ class LedSymetry(ProgramBase):
             self.black = 0
             self.black_mode += 1
             if self.in_mini_chill:
-                if np.random.randint(10)>7:
+                if np.random.randint(10) > 7:
                     self.go_strobe = 1
                     self.time_strobe = 1
                 self.in_mini_chill = 0
-        self.time_strobe -= 1/60*.25
+        self.time_strobe -= 1 / 60 * 0.25
         self.time_strobe = max(self.time_strobe, 0)
         if self.time_strobe == 0:
             self.go_strobe = 0
         self.go_strobe = 0
         self.blink_force = 1
         self.black_mode %= 2
-        self.noise_time += .001
+        self.noise_time += 0.001
 
-        self.mode_2_sym += .000013*2
+        self.mode_2_sym += 0.000013 * 2
         self.mode_2_sym %= 5
-        #print(self.led_symetry_mode, self.mode_2_sym)
-
+        # print(self.led_symetry_mode, self.mode_2_sym)
 
     def bindUniform(self, af):
         super().bindUniform(af)

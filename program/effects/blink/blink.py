@@ -53,7 +53,11 @@ class Blink(ProgramBase):
         self.nrj_low = 0
 
     def initUniformsBinding(self):
-        binding = {"iResolution": "win_size", "iChannel0": "iChannel0", "NRJ_LOW":"nrj_low"}
+        binding = {
+            "iResolution": "win_size",
+            "iChannel0": "iChannel0",
+            "NRJ_LOW": "nrj_low",
+        }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])
 

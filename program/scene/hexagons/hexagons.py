@@ -65,7 +65,8 @@ class Hexagons(ProgramBase):
         if af is None:
             return
         self.time = af["time"] / 30.0
-#       self.waveOffset = self.waveOffset + af["low"][0];
+
+    #       self.waveOffset = self.waveOffset + af["low"][0];
 
     def bindUniform(self, af):
         super().bindUniform(af)
@@ -95,7 +96,7 @@ class HexagonsNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

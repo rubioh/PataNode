@@ -5,10 +5,10 @@ class Material:
     def __init__(self, texture_resource_manager):
         self.uniforms = {}
         self.textures = {}
-# 		self.textures["baseColorTexture"] = None
-# 		self.textures["normalTexture"] = None
-# 		self.textures["metallicRoughnessTexture"] = None
-# 		self.textures["emissiveTexture"] = None
+        # 		self.textures["baseColorTexture"] = None
+        # 		self.textures["normalTexture"] = None
+        # 		self.textures["metallicRoughnessTexture"] = None
+        # 		self.textures["emissiveTexture"] = None
         self.uniforms["in_albedo"] = glm.vec4(1.0, 1.0, 1, 0.0)
         self.uniforms["in_metallic"] = 0.0
         self.uniforms["in_roughness"] = 0.5

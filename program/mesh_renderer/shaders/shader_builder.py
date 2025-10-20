@@ -78,8 +78,10 @@ color_texture = (
 color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
 # todo metallic
-metallic_rougness_texture = "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
+metallic_rougness_texture = (
+    "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
     float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
+)
 
 metallic_roughness_no_texture = "    float metallicFactor = in_metallic;\n\
     float roughnessFactor = in_roughness;\n"
@@ -95,7 +97,8 @@ fragment_end = "    albedoMetallic = vec4(tx_albedo, metallicFactor);\n\
     emissive.xyz = in_emissive.xyz;\n"
 
 particle_data_struct = "in vec4 in_particle_position;\n"
-#uniform particleData in_particle_data;"
+# uniform particleData in_particle_data;"
+
 
 def build_vertex_shader(mesh_layout, instance):
     shader = ""
@@ -170,8 +173,8 @@ def build_fragment_shader(material):
     if "normalTexture" in material.textures:
         result += normalTexture
 
-#   if not "metallicRoughnessTexture" in material.textures:
-#       result += uniform_roughness + uniform_metallic
+    #   if not "metallicRoughnessTexture" in material.textures:
+    #       result += uniform_roughness + uniform_metallic
 
     result += uniform_albedo
     result += uniform_roughness
@@ -205,5 +208,6 @@ def build_fragment_shader(material):
     result += "}"
     return result
 
-def build_shaders(mesh_layout, material, instance = False):
+
+def build_shaders(mesh_layout, material, instance=False):
     return (build_vertex_shader(mesh_layout, instance), build_fragment_shader(material))

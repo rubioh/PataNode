@@ -57,12 +57,13 @@ class Symetry(ProgramBase):
         self.smlow = 1
         self.rotation_amplification = 1
         self.energy_amplification = 1
-#       self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
-#       self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
+        #       self.initAdaptableParameters("rotation_amplification", 1, minimum=-5, maximum=5)
+        #       self.initAdaptableParameters("energy_amplification", 1, minimum=.5, maximum=5)
         self.automatic_mode = 1
         self.symetry_mode = 1
-#       self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
-#       self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
+
+    #       self.initAdaptableParameters("automatic_mode", 1, widget_type="CheckBox")
+    #       self.initAdaptableParameters("symetry_mode", 1, widget_type="CheckBox")
 
     def updateParams(self, af=None):
         if af is None:

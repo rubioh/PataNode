@@ -44,7 +44,9 @@ def register_node_now(op_code, class_reference):
         AUDIO_NODES[op_code] = class_reference
 
     if GraphContainerNode in class_reference.__mro__:
-        GRAPH_CONTAINER_NODES[op_code] = class_reference # FIXME: Undefined name `GRAPH_CONTAINER_NODES`
+        GRAPH_CONTAINER_NODES[op_code] = (
+            class_reference  # FIXME: Undefined name `GRAPH_CONTAINER_NODES`
+        )
 
 
 def register_node(op_code):
@@ -69,9 +71,9 @@ def get_class_from_opcode(op_code):
 
 
 # Import all nodes and register them
-import program.scene # noqa: F401, E402
-import program.output # noqa: F401, E402
-import program.utils # noqa: F401E402
-import audio.transforms # noqa: F401, E402
+import program.scene  # noqa: F401, E402
+import program.output  # noqa: F401, E402
+import program.utils  # noqa: F401E402
+import audio.transforms  # noqa: F401, E402
 
-#print(SHADER_NODES)
+# print(SHADER_NODES)

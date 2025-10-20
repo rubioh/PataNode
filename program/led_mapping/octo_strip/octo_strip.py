@@ -19,7 +19,6 @@ OP_CODE_OCTOSTRIP = name_to_opcode("octo_strip")
 
 @register_program(OP_CODE_OCTOSTRIP)
 class OctoStrip(ProgramBase):
-
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
 
@@ -89,7 +88,7 @@ class OctoStripNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

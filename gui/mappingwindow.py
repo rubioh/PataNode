@@ -1,5 +1,10 @@
 from qtpy.QtCore import Qt
-from qtpy.QtWidgets import QAction, QDockWidget, QMainWindow, QVBoxLayout#, QDMGraphicsNode
+from qtpy.QtWidgets import (
+    QAction,
+    QDockWidget,
+    QMainWindow,
+    QVBoxLayout,
+)  # , QDMGraphicsNode
 
 from gui.map.polydockwidget import PolyDockWidget
 from gui.map.polygraphicscene import PolyGraphicScene
@@ -10,6 +15,7 @@ from node.node_conf import LISTBOX_MIMETYPE
 DEBUG = False
 DEBUG_CONTEXT = False
 
+
 class PataNodeMappingWindow(QMainWindow):
     def __init__(self, app=None):
         self.app = app
@@ -18,8 +24,24 @@ class PataNodeMappingWindow(QMainWindow):
         self.setOpenGLSharedObject()
         self.initNewNodeActions()
         self._close_event_listeners = []
-        self.addAction(QAction('&Map', self, shortcut='Ctrl+M', statusTip="Hide mapping window", triggered=self.hide))
-        self.addAction(QAction('E&xit', self, shortcut='Ctrl+Q', statusTip="Exit application", triggered=self.close))
+        self.addAction(
+            QAction(
+                "&Map",
+                self,
+                shortcut="Ctrl+M",
+                statusTip="Hide mapping window",
+                triggered=self.hide,
+            )
+        )
+        self.addAction(
+            QAction(
+                "E&xit",
+                self,
+                shortcut="Ctrl+Q",
+                statusTip="Exit application",
+                triggered=self.close,
+            )
+        )
         self.layout = QVBoxLayout()
         self.layout.setContentsMargins(0, 0, 0, 0)
         self.init_polygon_widget()
@@ -43,7 +65,6 @@ class PataNodeMappingWindow(QMainWindow):
     def setOpenGLSharedObject(self):
         pass
 
-
     def hasSelectedItems(self):
         return False
 
@@ -58,12 +79,13 @@ class PataNodeMappingWindow(QMainWindow):
 
     def onSelected(self):
         pass
-#       items = self.getSelectedItems()
-#       item = items[0]
-#
-#       if isinstance(item, QDMGraphicsNode):
-#           node = item.node
-#           self.updateInspector(node)
+
+    #       items = self.getSelectedItems()
+    #       item = items[0]
+    #
+    #       if isinstance(item, QDMGraphicsNode):
+    #           node = item.node
+    #           self.updateInspector(node)
 
     def updateInspector(self, node):
         self.app.updateInspector(node)
@@ -79,7 +101,7 @@ class PataNodeMappingWindow(QMainWindow):
         if event.mimeData().hasFormat(LISTBOX_MIMETYPE):
             event.acceptProposedAction()
         else:
-#           print(" ... denied drag enter event")
+            #           print(" ... denied drag enter event")
             event.setAccepted(False)
 
     def onDrop(self, event):
@@ -87,4 +109,3 @@ class PataNodeMappingWindow(QMainWindow):
 
     def contextMenuEvent(self, event):
         pass
-

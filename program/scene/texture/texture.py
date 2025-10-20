@@ -58,14 +58,17 @@ class Texture(ProgramBase):
         self.texture.repeat_y = True
 
     def initUniformsBinding(self):
-        binding = {
-        }
-        self.add_text_edit_cpu_adaptable_parameter("text_path", self.path, self.reload_texture)
+        binding = {}
+        self.add_text_edit_cpu_adaptable_parameter(
+            "text_path", self.path, self.reload_texture
+        )
         super().initUniformsBinding(binding, program_name="")
         super().addProtectedUniforms([])
 
     def updateParams(self, af=None):
-        v = self.getCpuAdaptableParameters()["program"]["text_path"]["eval_function"]["value"]
+        v = self.getCpuAdaptableParameters()["program"]["text_path"]["eval_function"][
+            "value"
+        ]
 
         if self.path != v:
             self.path = v
@@ -83,6 +86,7 @@ class Texture(ProgramBase):
         self.vao.render()
         return self.fbos[0].color_attachments[0]
 
+
 @register_node(OP_CODE_TEXTURE)
 class TextureNode(ShaderNode, Scene):
     op_title = "texture"
@@ -96,7 +100,7 @@ class TextureNode(ShaderNode, Scene):
         self.eval()
 
     def render(self, audio_features=None):
-        if self.program.already_called:
+        if self.program is not None and self.program.already_called:
             output_texture = self.program.norender()
         else:
             output_texture = self.program.render(audio_features)

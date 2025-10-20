@@ -39,11 +39,15 @@ class ArtBase(Generic[ArtPayload]):
         return serialize(ArtHeaderProtVer())  # type: ignore
 
     @classmethod
-    def parse_protocol_version(cls, packet: bytes) -> Tuple[ArtHeaderProtVer | None, bytes]:
+    def parse_protocol_version(
+        cls, packet: bytes
+    ) -> Tuple[ArtHeaderProtVer | None, bytes]:
         prot_ver, payload = cls.__protocol_version_parser.parse(packet)
 
         if prot_ver is None:
-            raise ArtParseError(f"packet is too short to parse protocol version: len={len(packet)}")
+            raise ArtParseError(
+                f"packet is too short to parse protocol version: len={len(packet)}"
+            )
 
         return prot_ver, payload
 

@@ -9,7 +9,7 @@ class PolyDockWidget(QWidget):
 
     def initUI(self):
         grid = QVBoxLayout()
-        grid.insertStretch(-1,-1)
+        grid.insertStretch(-1, -1)
         self.grid = grid
         source_select = QComboBox()
         source_select.addItems(["Source 1", "Source 2", "Source 3"])
@@ -20,4 +20,4 @@ class PolyDockWidget(QWidget):
         self.setLayout(grid)
 
     def get_current_data(self):
-    	return self.scene.polyproxies
+        return self.scene.polyproxies

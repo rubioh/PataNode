@@ -36,7 +36,7 @@ class ArtNetNode:
         self.__socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         self.__socket.bind((self.ip, ARTNET_PORT))
         self.__socket.settimeout(0.1)
-#       self.__socket.setblocking(False)
+        #       self.__socket.setblocking(False)
         return self
 
     def __exit__(self, exception_type, exception_value, exception_traceback) -> None:
@@ -74,7 +74,7 @@ class ArtNetNode:
                         if self.__dmx_cb:
                             self.__dmx_cb(art.extra)
                 elif isinstance(art, ArtSync):
-                    ... # TODO: Wait for artsync to trigger callback
+                    ...  # TODO: Wait for artsync to trigger callback
                 elif any(isinstance(art, ignore) for ignore in (ArtPollReply,)):
                     pass
                 else:
@@ -97,8 +97,8 @@ class ArtNetNode:
 
 
 if __name__ == "__main__":
-    import usb.core # type: ignore[import-untyped]
-    import usb.util # type: ignore[import-untyped]
+    import usb.core  # type: ignore[import-untyped]
+    import usb.util  # type: ignore[import-untyped]
 
     print("trying to open device with VID = 0x0000 & PID = 0x0001")
 

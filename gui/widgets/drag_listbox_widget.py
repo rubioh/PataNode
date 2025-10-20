@@ -16,7 +16,12 @@ from PyQt5.QtWidgets import (
 
 from nodeeditor.utils import dumpException
 
-from node.node_conf import AUDIO_NODES, LISTBOX_MIMETYPE, SHADER_NODES, get_class_from_opcode
+from node.node_conf import (
+    AUDIO_NODES,
+    LISTBOX_MIMETYPE,
+    SHADER_NODES,
+    get_class_from_opcode,
+)
 from node.graph_container_node import GraphContainerNode
 
 
@@ -33,7 +38,7 @@ class QDMDragListbox(QTreeWidget):
         self.setDragEnabled(True)
 
         self.addShaderNodes()
-#       self.addAudioNodes()
+        #       self.addAudioNodes()
         self.addContainerNodes()
 
     def addShaderNodes(self):
@@ -47,10 +52,14 @@ class QDMDragListbox(QTreeWidget):
             node_type_reference = node.node_type_reference
 
             if node_type_reference in shader_types.keys():
-                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
+                shader_types[node_type_reference].append(
+                    (node.op_title, node.icon, node.op_code)
+                )
             else:
                 shader_types[node_type_reference] = list()
-                shader_types[node_type_reference].append((node.op_title, node.icon, node.op_code))
+                shader_types[node_type_reference].append(
+                    (node.op_title, node.icon, node.op_code)
+                )
 
         for shader_type in shader_types:
             shader_type_item = QTreeWidgetItem(self)
@@ -95,7 +104,7 @@ class QDMDragListbox(QTreeWidget):
     def addMyItem(self, name, icon=None, op_code=0, parent=None):
         item = QTreeWidgetItem(parent)  # can be (icon, text, parent, <int>type)
 
-#       qname.setTextColor()
+        #       qname.setTextColor()
         item.setText(1, name)
         item.setForeground(1, QColor("#BAC18A"))
         pixmap = QPixmap(icon if icon is not None else ".")
@@ -107,7 +116,8 @@ class QDMDragListbox(QTreeWidget):
         # Set up data
         item.setData(1, Qt.UserRole, pixmap)
         item.setData(1, Qt.UserRole + 1, op_code)
-#       item.setHidden()
+
+    #       item.setHidden()
 
     def startDrag(self, *args, **kwargs):
         try:

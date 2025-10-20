@@ -3,10 +3,25 @@ import sys
 
 import numpy as np
 
-from PyQt5.QtWidgets import QAbstractItemView, QApplication, QHBoxLayout, QListWidget, QListWidgetItem, QWidget
-from PyQt5.QtCore import Qt, QByteArray, QDataStream, QIODevice, QMimeData, QSize, QTimer
+from PyQt5.QtWidgets import (
+    QAbstractItemView,
+    QApplication,
+    QHBoxLayout,
+    QListWidget,
+    QListWidgetItem,
+    QWidget,
+)
+from PyQt5.QtCore import (
+    Qt,
+    QByteArray,
+    QDataStream,
+    QIODevice,
+    QMimeData,
+    QSize,
+    QTimer,
+)
 from PyQt5.QtGui import QColor, QDrag
-from pyqtgraph import mkPen, GraphicsLayoutWidget # type: ignore[import-untyped]
+from pyqtgraph import mkPen, GraphicsLayoutWidget  # type: ignore[import-untyped]
 
 from audio.audio_pipeline import AudioEngine
 from nodeeditor.utils import dumpException
@@ -95,7 +110,7 @@ class AudioLogWidget(QWidget):
             self.graphLayout.nextRow()
             self.graphLayout.setBackground((40, 40, 40, 220))
             self.pen = mkPen(color=(255, 40, 40), width=2)
-#           graph.setBackground((30,30,30,220))
+            #           graph.setBackground((30,30,30,220))
             graph.setTitle(name.capitalize().replace("_", " "), color="w", size="10pt")
             graph.showGrid(x=True, y=True)
             graph.addLegend()
@@ -104,19 +119,20 @@ class AudioLogWidget(QWidget):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             pass
-#           pos = event.pos()
-#           selected_graph = None
-#           for name, graph in self.graphs.items():
-#               if self.getGraphItemFromPos(pos, graph):
-#                   selected_graph = graph
-#                   selected_name = name
-#           if selected_graph is not None:
-#               self.removeGraph(selected_graph, selected_name)
+
+    #           pos = event.pos()
+    #           selected_graph = None
+    #           for name, graph in self.graphs.items():
+    #               if self.getGraphItemFromPos(pos, graph):
+    #                   selected_graph = graph
+    #                   selected_name = name
+    #           if selected_graph is not None:
+    #               self.removeGraph(selected_graph, selected_name)
 
     def getGraphItemFromPos(self, pos, graph):
         gpos = graph.pos()
-#       gwidth = graph.width()
-#       gheight = graph.height()
+        #       gwidth = graph.width()
+        #       gheight = graph.height()
         if pos.x() > gpos.x() and pos.x() < gpos.x() + graph.width():
             if pos.y() > gpos.y() and pos.y() < gpos.y() + graph.height():
                 return True
@@ -133,7 +149,7 @@ class AudioLogWidget(QWidget):
         except Exception:
             print("Failed to remove item", graph)
 
-#       self.graphLayout.removeWidget(graph)
+    #       self.graphLayout.removeWidget(graph)
 
     def initTimer(self):
         self.timer = QTimer()
@@ -190,7 +206,7 @@ class AudioFeaturesDragListBox(QListWidget):
         try:
             item = self.currentItem()
 
-#           item_data = item.data(Qt.UserRole)
+            #           item_data = item.data(Qt.UserRole)
             itemData = QByteArray()
             dataStream = QDataStream(itemData, QIODevice.WriteOnly)
             dataStream.writeQString(item.text())
