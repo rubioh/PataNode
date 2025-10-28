@@ -30,9 +30,9 @@ class Worker(QRunnable):
 
 
 class PataShadeApp(PataNode):
-    def __init__(self):
+    def __init__(self, args):
         self.audio_engine = AudioEngine()
-        self.light_engine = LightEngine()
+        self.light_engine = LightEngine(args)
         super().__init__()
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool

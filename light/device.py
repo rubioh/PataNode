@@ -10,7 +10,10 @@ libusb1_backend = usb.backend.libusb1.get_backend(
 
 
 class LightDevice:
-    def __init__(self, verbose=False):
+    def __init__(self, args, verbose=False):
+        self.no_usb = args.no_usb
+        if self.no_usb:
+            return
         self.USB_VID = 0xCAFE
         self.outep = []
         if verbose:
@@ -67,6 +70,8 @@ class LightDevice:
         return flat.tobytes()
 
     def write(self, light_buffer):
+        if self.no_usb:
+            return
         byte_array = self.to_bytes(light_buffer)
         for idx, out in zip(range(len(self.outep)), self.outep):
             out.write(byte_array[512 * idx : 512 * (idx + 1)])

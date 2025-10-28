@@ -15,9 +15,9 @@ BLUE = glm.vec3(0.0, 0.0, 1.0)
 WHITE = glm.vec3(1.0, 1.0, 1.0)
 BLACK = glm.vec3(0.2, 0.2, 0.2)
 
-PAL1 = glm.vec3(24.0 / 255.0, 1.0 / 255.0, 97.0 / 255.0)
+PAL1 = glm.vec3(255.0 / 255.0, 1.0 / 255.0, 21.0 / 255.0)
 PAL2 = glm.vec3(79.0 / 255.0, 23.0 / 255.0, 135.0 / 255.0)
-PAL3 = glm.vec3(235.0 / 255.0, 54.0 / 255.0, 120.0 / 255.0)
+PAL3 = glm.vec3(35.0 / 255.0, 54.0 / 255.0, 255.0 / 255.0)
 PAL4 = glm.vec3(251.0 / 255.0, 119.0 / 255.0, 60.0 / 255.0)
 
 COLOR = [PAL1, PAL2, PAL3, PAL4]
@@ -70,15 +70,23 @@ class Triforce(ProgramBase):
         return COLOR
 
     def apply_cols(self):
-        self.d11 = self.colors[0]
-        self.d12 = self.colors[1]
-        self.d13 = self.colors[2]
-        self.d21 = self.colors[3]
-        self.d22 = self.colors[4]
-        self.d23 = self.colors[5]
-        self.d31 = self.colors[6]
-        self.d32 = self.colors[7]
-        self.d33 = self.colors[8]
+        self.l1 = self.colors[0]
+        self.l2 = self.colors[1]
+        self.l3 = self.colors[2]
+        self.l4 = self.colors[3]
+        self.l5 = self.colors[4]
+        self.l6 = self.colors[5]
+
+        self.strobe1 = self.strobes[0]
+        self.strobe2 = self.strobes[1]
+        self.strobe3 = self.strobes[2]
+        self.strobe4 = self.strobes[3]
+        self.strobe5 = self.strobes[4]
+        self.strobe6 = self.strobes[5]
+        #     dj     #
+        # l1      l4 #
+        # l2      l5 #
+        # l3      l6 #
 
     def initParams(self):
         keyboard.on_press_key("n", self.upp)
@@ -91,164 +99,69 @@ class Triforce(ProgramBase):
             glm.vec3(0.0, 0.0, 0.0),
             glm.vec3(0.0, 0.0, 0.0),
             glm.vec3(0.0, 0.0, 0.0),
-            glm.vec3(0.0, 0.0, 0.0),
-            glm.vec3(0.0, 0.0, 0.0),
-            glm.vec3(0.0, 0.0, 0.0),
         ]
+        self.strobes = [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+        ]
+
+        self.l1 = self.colors[0]
+        self.l2 = self.colors[1]
+        self.l3 = self.colors[2]
+        self.l4 = self.colors[3]
+        self.l5 = self.colors[4]
+        self.l6 = self.colors[5]
+
+        self.strobe1 = 0.0
+        self.strobe2 = 0.0
+        self.strobe3 = 0.0
+        self.strobe4 = 0.0
+        self.strobe5 = 0.0
+        self.strobe6 = 0.0
         self.apply_cols()
         self.kick = 0
         self.effect_index = 0
         self.effects = [
             self.effect_1,
+            self.effect_2,
             self.effect_3,
             self.effect_4,
             self.effect_5,
             self.effect_6,
-            self.effect_7,
-            self.effect_8,
-            self.effect_9,
-            self.effect_10,
-            self.effect_11,
-            self.effect_12,
-            self.effect_13,
-            self.effect_14,
-            self.effect_15,
-            self.effect_16,
+            self.strobe,
         ]
+
+#        self.effects = [
+#            self.effect_0
+#        ]
 
     def initUniformsBinding(self):
         binding = {
-            "d11": "d11",
-            "d12": "d12",
-            "d13": "d13",
-            "d21": "d21",
-            "d22": "d22",
-            "d23": "d23",
-            "d31": "d31",
-            "d32": "d32",
-            "d33": "d33",
+            "l1": "l1",
+            "l2": "l2",
+            "l3": "l3",
+            "l4": "l4",
+            "l5": "l5",
+            "l6": "l6",
         }
         super().initUniformsBinding(binding, program_name="")
-        super().addProtectedUniforms([])
-
-    def self_whole_triangle(self, id, col):
-        self.colors[id * 3 + 0] = col
-        self.colors[id * 3 + 1] = col
-        self.colors[id * 3 + 2] = col
+        col = self.get_col()[(self.kick) % len(self.get_col())]
 
     def set_all(self, col):
-        self.self_whole_triangle(0, col)
-        self.self_whole_triangle(1, col)
-        self.self_whole_triangle(2, col)
+        for i in range(len(self.colors)):
+            self.colors[i] = col
 
-    def exterior(self, col):
-        self.colors[0] = col
-        self.colors[2] = col
-
-        self.colors[0 + 3] = col
-        self.colors[1 + 3] = col
-
-        self.colors[1 + 6] = col
-        self.colors[2 + 6] = col
-
-    def interior(self, col):
-        self.colors[1] = col
-        self.colors[2 + 3] = col
-        self.colors[0 + 6] = col
-
-    def effect_5(self, af=None):
-        self.set_all(BLACK)
-        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
-        if self.kick % 2 == 0:
-            self.exterior(col)
-        else:
-            self.interior(col)
-
-    def effect_13(self, af=None):
-        col = self.get_col()[(self.kick) % len(self.get_col())] * af["decaying_kick"]
-        if self.kick % 2 == 0:
-            self.exterior(col)
-        else:
-            self.interior(col)
-
-    def effect_3(self, af=None):
-        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
-        p = af["decaying_kick"]
-        self.set_all(col * p)
-
-    def effect_6(self, af=None):
-        col = self.get_col()[(self.kick) % len(self.get_col())]
-        p = af["decaying_kick"]
-        self.set_all(col * p)
-
-    def effect_7(self, af=None):
-        for i in range(9):
-            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())]
-
-    def effect_14(self, af=None):
-        self.set_all(BLACK)
-        self.colors[self.kick % 9] = self.get_col()[(self.kick) % len(self.get_col())]
-
-    def effect_15(self, af=None):
-        self.set_all(BLACK)
-        self.colors[self.kick % 9] = self.get_col2()[(self.kick) % len(self.get_col2())]
-
-    def effect_16(self, af=None):
-        for i in range(9):
-            self.colors[i] = self.get_col2()[(self.kick + i) % len(self.get_col2())]
-
-    def effect_12(self, af=None):
-        for i in range(9):
-            self.colors[i] = (
-                self.get_col()[(self.kick + i) % len(self.get_col())]
-                * af["decaying_kick"]
-            )
-
-    def effect_8(self, af=None):
-        self.set_all(BLACK)
-        self.interior(self.get_col()[self.kick % len(self.get_col())])
-        self.exterior(self.get_col()[(self.kick + 1) % len(self.get_col())])
-
-    def effect_9(self, af=None):
-        self.self_whole_triangle(
-            0, self.get_col()[(self.kick + 0) % len(self.get_col())]
-        )
-        self.self_whole_triangle(
-            1, self.get_col()[(self.kick + 1) % len(self.get_col())]
-        )
-        self.self_whole_triangle(
-            2, self.get_col()[(self.kick + 2) % len(self.get_col())]
-        )
-
-    def effect_10(self, af=None):
-        self.set_all(BLACK)
-        self.interior(
-            self.get_col()[self.kick % len(self.get_col())] * af["decaying_kick"]
-        )
-
-    def effect_11(self, af=None):
-        self.set_all(BLACK)
-        self.exterior(
-            self.get_col()[self.kick % len(self.get_col())] * af["decaying_kick"]
-        )
-
-    def effect_1(self, af=None):
-        col = self.get_col()[(self.kick // 3) % len(self.get_col())]
-        self.set_all(BLACK)
-        self.self_whole_triangle(self.kick % 3, col)
-
-    def effect_4(self, af=None):
-        col = self.get_col()[(self.kick) % len(self.get_col())]
-        self.set_all(BLACK)
-        self.self_whole_triangle(self.kick % 3, col)
-
-    def upp(self, b):
-        self.effect_index = self.effect_index + 1
-
-    def down(self, b):
-        self.effect_index = self.effect_index - 1
+    def set_all_strobe(self, value):
+        for i in range(len(self.strobes)):
+            self.strobes[i] = value
 
     def updateParams(self, af=None):
+        self.set_all(glm.vec3(0.))
+        self.set_all_strobe(1.0)
         if af is None:
             return
         if af["on_tempo"] > 0.9 and not self.wo:
@@ -258,45 +171,66 @@ class Triforce(ProgramBase):
             self.wo = False
         if self.kick % 30 == 0:
             self.kick = 1
-            self.effect_index = random.randrange(0, len(self.effects))
+            self.effect_index = random.randrange(0, len(self.effects) - 1)
         self.effects[self.effect_index % len(self.effects)](af)
         self.apply_cols()
+        offset = 0
+        indirect = [0, 1, 2, 3, 4, 5]
+        strobe_offset = [7, 7, 7, 7, 7, 7]
         if self.light_engine:
-            self.light_engine.shader_buffer[0] = self.colors[0].x
-            self.light_engine.shader_buffer[1] = self.colors[0].y
-            self.light_engine.shader_buffer[2] = self.colors[0].z
+            for i in range(len(self.colors)):
+                self.light_engine.shader_buffer[offset] = self.colors[indirect[i]].x
+                self.light_engine.shader_buffer[offset + 1] = self.colors[indirect[i]].y
+                self.light_engine.shader_buffer[offset + 2] = self.colors[indirect[i]].z
+                self.light_engine.shader_buffer[offset + 6] = 1.0
 
-            self.light_engine.shader_buffer[3] = self.colors[1].x
-            self.light_engine.shader_buffer[4] = self.colors[1].y
-            self.light_engine.shader_buffer[5] = self.colors[1].z
+#                self.light_engine.shader_buffer[offset + 7] = 1.0
+    #            self.light_engine.shader_buffer[offset + 4] = 1.#self.colors[indirect[i]].x
+    #            self.light_engine.shader_buffer[offset + 5] = 1.#self.colors[indirect[i]].x
+    #            self.light_engine.shader_buffer[offset + strobe_offset[i]] = self.strobes[indirect[i]]
+                offset = offset + 15
+    def effect_0(self, af):
+        self.colors[0] = glm.vec3(1.0, 0.0, 0.0)
+        self.colors[1] = glm.vec3(0.0, 1.0, 0.0)
+        self.colors[2] = glm.vec3(0.0, 0.0, 1.0)
+        self.colors[3] = glm.vec3(1.0, 0.0, 1.0)
+        self.colors[4] = glm.vec3(0.0, 1.0, 1.0)
+        self.colors[5] = glm.vec3(1.0, 1.0, 0.0)
 
-            self.light_engine.shader_buffer[6] = self.colors[2].x
-            self.light_engine.shader_buffer[7] = self.colors[2].y
-            self.light_engine.shader_buffer[8] = self.colors[2].z
+    def effect_1(self, af):
+        self.colors[(self.kick) % 6] = self.get_col()[(self.kick // 2) % len(self.get_col())]
 
-            self.light_engine.shader_buffer[9] = self.colors[3].x
-            self.light_engine.shader_buffer[10] = self.colors[3].y
-            self.light_engine.shader_buffer[11] = self.colors[3].z
+    def effect_2(self, af):
+        for i in range(len(self.colors)):
+            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
 
-            self.light_engine.shader_buffer[12] = self.colors[4].x
-            self.light_engine.shader_buffer[13] = self.colors[4].y
-            self.light_engine.shader_buffer[14] = self.colors[4].z
+    def effect_3(self, af):
+        self.colors[self.kick % 3] = self.get_col()[0]
+        self.colors[self.kick % 3 + 3] = self.get_col()[0]
 
-            self.light_engine.shader_buffer[15] = self.colors[5].x
-            self.light_engine.shader_buffer[16] = self.colors[5].y
-            self.light_engine.shader_buffer[17] = self.colors[5].z
+    def effect_4(self, af):
+        self.colors[self.kick % 3] = self.get_col()[1]
+        self.colors[self.kick % 3 + 3] = self.get_col()[1]
 
-            self.light_engine.shader_buffer[18] = self.colors[6].x
-            self.light_engine.shader_buffer[19] = self.colors[6].y
-            self.light_engine.shader_buffer[20] = self.colors[6].z
+    def effect_5(self, af):
+        indirect = [2, 1, 5, 3, 4, 0]
+        self.colors[indirect[self.kick % 6]] = self.get_col()[0]
 
-            self.light_engine.shader_buffer[21] = self.colors[7].x
-            self.light_engine.shader_buffer[22] = self.colors[7].y
-            self.light_engine.shader_buffer[23] = self.colors[7].z
+    def effect_6(self, af):
+        self.colors[0 + (self.kick % 2) * 3] = self.get_col()[1]
+        self.colors[1 + (self.kick % 2) * 3] = self.get_col()[1]
+        self.colors[2 + (self.kick % 2) * 3] = self.get_col()[1]
 
-            self.light_engine.shader_buffer[24] = self.colors[8].x
-            self.light_engine.shader_buffer[25] = self.colors[8].y
-            self.light_engine.shader_buffer[26] = self.colors[8].z
+    def strobe(self, af):
+        self.set_all(glm.vec3(1.))
+        for i in range(len(self.strobes)):
+            self.strobes[i] = 0.4
+
+    def upp(self, b):
+        self.effect_index = (self.effect_index + 1) % len(self.effects)
+
+    def down(self, b):
+        self.effect_index = (self.effect_index - 1) % len(self.effects)
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
@@ -304,6 +238,19 @@ class Triforce(ProgramBase):
     def bindUniform(self, af):
         super().bindUniform(af)
         self.programs_uniforms.bindUniformToProgram(af, program_name="")
+        self.programs_uniforms.programs[""]["l1"] = self.l1
+        self.programs_uniforms.programs[""]["l2"] = self.l2
+        self.programs_uniforms.programs[""]["l3"] = self.l3
+        self.programs_uniforms.programs[""]["l4"] = self.l4
+        self.programs_uniforms.programs[""]["l5"] = self.l5
+        self.programs_uniforms.programs[""]["l6"] = self.l6
+
+        self.programs_uniforms.programs[""]["strobe1"] = self.strobe1
+        self.programs_uniforms.programs[""]["strobe2"] = self.strobe2
+        self.programs_uniforms.programs[""]["strobe3"] = self.strobe3
+        self.programs_uniforms.programs[""]["strobe4"] = self.strobe4
+        self.programs_uniforms.programs[""]["strobe5"] = self.strobe5
+        self.programs_uniforms.programs[""]["strobe6"] = self.strobe6
 
     def render(self, af=None):
         self.updateParams(af)
@@ -336,3 +283,30 @@ class TriforceNode(ShaderNode, Scene):
             output_Triforce = self.program.render(audio_features)
 
         return output_Triforce
+
+
+
+# 4 lights effects
+
+    def effect_41(self, af):
+        self.colors[(self.kick) % 4] = self.get_col()[(self.kick // 2) % len(self.get_col())]
+
+    def effect_42(self, af):
+        for i in range(len(self.colors) - 1):
+            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
+
+    def effect_43(self, af):
+        self.colors[self.kick % 2] = self.get_col()[0]
+        self.colors[self.kick % 2 + 2] = self.get_col()[0]
+
+    def effect_44(self, af):
+        self.colors[self.kick % 2] = self.get_col()[1]
+        self.colors[self.kick % 2 + 2] = self.get_col()[1]
+
+    def effect_45(self, af):
+        indirect = [3, 2, 0, 1]
+        self.colors[indirect[self.kick % 4]] = self.get_col()[0]
+
+    def effect_46(self, af):
+        self.colors[0 + (self.kick % 2) * 2] = self.get_col()[1]
+        self.colors[1 + (self.kick % 2) * 2] = self.get_col()[1]
