@@ -3,6 +3,7 @@ import copy
 
 from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject, QTimer
 
+from server.server import PataServer
 from audio.audio_conf import list_audio_features
 from audio.audio_pipeline import AudioEngine
 from light.core import LightEngine
@@ -33,10 +34,12 @@ class PataShadeApp(PataNode):
     def __init__(self, args):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine(args)
+        self.server = PataServer(args)
         super().__init__()
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
+        self.start_server_job()
         self.initAudioTimer()
         self.initLightTimer()
         self.initShaderQTimer()
@@ -67,6 +70,9 @@ class PataShadeApp(PataNode):
 
     def setShaderWidget(self, shader_widget):
         self.shader_widget = shader_widget
+
+    def start_server_job(self):
+        self.server.start()
 
     def initAudioTimer(self):
         self.audio_engine.start_recording()
