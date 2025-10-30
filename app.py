@@ -39,11 +39,11 @@ class PataShadeApp(PataNode):
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
-        self.start_server_job()
         self.initAudioTimer()
         self.initLightTimer()
         self.initShaderQTimer()
-
+        self.initPataserverQTimer()
+        self.start_server()
         # Features for light new engine
         self._last_main_colors = np.zeros(3)
         self._last_audio_features = {feature: 0 for feature in list_audio_features}
@@ -71,7 +71,7 @@ class PataShadeApp(PataNode):
     def setShaderWidget(self, shader_widget):
         self.shader_widget = shader_widget
 
-    def start_server_job(self):
+    def start_server(self):
         self.server.start()
 
     def initAudioTimer(self):
@@ -86,6 +86,10 @@ class PataShadeApp(PataNode):
     def initShaderQTimer(self):
         self.shader_timer = QTimer()
         self.shader_timer.timeout.connect(self.start_shader_jobs)
+
+    def initPataserverQTimer(self):
+        self.server_timer = QTimer()
+        self.server_timer.timeout.connect(self.start_pataserver_jobs)
 
     # Audio thread
     def start_audio_jobs(self):
@@ -137,6 +141,12 @@ class PataShadeApp(PataNode):
         worker.signals.finished.connect(self.on_shader_job_finished)
         self.threadpool.start(worker)
 
+    def start_pataserver_jobs(self):
+        job = self.server.update
+        worker = Worker(job)
+        worker.signals.finished.connect(self.on_shader_job_finished)
+        self.threadpool.start(worker)
+
     def on_shader_job_finished(self):
         pass
 
@@ -145,6 +155,7 @@ class PataShadeApp(PataNode):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
         self.shader_timer.start(int(1 / 60 * 1000))
+        self.server_timer.start(int(1 / 60 * 1000))
 
     def closeEvent(self, event):
         self.audio_timer.stop()
