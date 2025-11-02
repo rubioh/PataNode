@@ -8,6 +8,6 @@ uniform vec2 iResolution;
 void main()
 {
     vec2 uv = gl_FragCoord.xy/iResolution.xy;
-    fragColor = texture(tex, uv);
+    fragColor = vec4(texture(tex, uv).rgb, 1.0);
 }
 
