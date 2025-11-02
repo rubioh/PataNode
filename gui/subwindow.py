@@ -63,10 +63,12 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def clean_preview(self):
         for node in self.scene.nodes:
-                node.should_update_preview = False
+            node.should_update_preview = False
 
-    def render(self, audio_features=None, should_update_preview = False):
+    def render(self, audio_features=None, should_update_preview=False):
         for node in self.scene.nodes:
+            if isinstance(node, GraphContainerNode):
+                continue
             if node.should_update_preview:
                 should_update_preview = True
         if self.screen_node is None:
@@ -76,10 +78,10 @@ class PataNodeSubWindow(NodeEditorWidget):
             self.searchScreenNodes()
         else:
             preview = self.screen_node.render(audio_features, should_update_preview)
-            self.preview = preview
-
-        self.clean_preview()
-
+            if should_update_preview:
+                self.preview = preview
+        if self.preview:
+            self.clean_preview()
 
     def getLastMainColors(self):
         if self.screen_node is not None:

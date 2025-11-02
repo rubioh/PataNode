@@ -47,7 +47,7 @@ class Screen(ProgramBase):
         self.bindUniform(af)
         new_size = (256, 144)
         self.program["iResolution"] = new_size
-        downscaled = self.ctx.texture((new_size[0], new_size[1] ), 4, dtype="f1")
+        downscaled = self.ctx.texture((new_size[0], new_size[1]), 4, dtype="f1")
         fbo = self.ctx.framebuffer(downscaled)
         texture.use(0)
         fbo.use()
@@ -114,7 +114,7 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self, audio_features=None, with_preview = False):
+    def render(self, audio_features=None, with_preview=False):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.already_called = False

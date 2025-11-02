@@ -324,6 +324,7 @@ class ProgramBase:
         uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
         uniform_parameters[name] = {
             "name": name,
+            "type": type,
             #           "minimum": minimum,
             #           "maximum": maximum,
             #           "type":  type,
@@ -359,6 +360,7 @@ class ProgramBase:
             "eval_function": {
                 "name": name,
                 "value": value,
+                "type": "str",
                 "connect": lambda v: self.setCpuAdaptableParameters(
                     self.name + "program", name, v
                 ),
