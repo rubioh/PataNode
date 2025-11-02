@@ -45,8 +45,8 @@ class Random(ProgramBase):
         self.kick_index = 0
         self.iChannel0 = 1
         self.last_idx = 0
-        self.range_start = 5
-        self.range_end = 10
+        self.range_start = 30
+        self.range_end = 60
         self.is_transi = False
         self.time_for_next = 0
 
@@ -78,7 +78,7 @@ class Random(ProgramBase):
             self.on_kick = True
             self.kick_index = self.kick_index + 1
             if self.kick_index > 10:
-                self.is_transi == False
+                self.is_transi = False
                 self.kick_index = 0
                 self.on_kick = False
         else:

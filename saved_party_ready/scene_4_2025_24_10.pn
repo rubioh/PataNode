@@ -1,0 +1,5400 @@
+{
+    "id": 140706363834224,
+    "scene_width": 64000,
+    "scene_height": 64000,
+    "nodes": [
+        {
+            "id": 140706364074656,
+            "title": "Screen",
+            "pos_x": 736.7968749999998,
+            "pos_y": -200.01562499999994,
+            "inputs": [
+                {
+                    "id": 140706364360400,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [],
+            "content": {},
+            "op_code": 0,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "tex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit"
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "tex": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140706364361360,
+            "title": "Abstract SQRT",
+            "pos_x": -369.17187499999955,
+            "pos_y": -774.6718749999993,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140706364362512,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1405,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_h": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "count_beat": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "thresh": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_rot": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "nrj_fast"
+                    },
+                    "t_h": {
+                        "type": null,
+                        "param_name": "t_h"
+                    },
+                    "count_beat": {
+                        "type": null,
+                        "param_name": "count_beat"
+                    },
+                    "thresh": {
+                        "type": null,
+                        "param_name": "thresh"
+                    },
+                    "t_rot": {
+                        "type": null,
+                        "param_name": "t_rot"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140706365505344,
+            "title": "HSV Pow",
+            "pos_x": 380.5624999999999,
+            "pos_y": -312.2187500000001,
+            "inputs": [
+                {
+                    "id": 140706364365056,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140706364364288,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1353,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "hue_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "saturation_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "3.",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "value_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".5",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_pow_factor": {
+                        "type": null,
+                        "param_name": "hue_pow_factor"
+                    },
+                    "saturation_pow_factor": {
+                        "type": null,
+                        "param_name": "saturation_pow_factor"
+                    },
+                    "value_pow_factor": {
+                        "type": null,
+                        "param_name": "value_pow_factor"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140706364366880,
+            "title": "Identity",
+            "pos_x": -816.1249999999997,
+            "pos_y": -632.8749999999997,
+            "inputs": [
+                {
+                    "id": 140706364366976,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140706364366352,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 874,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140706364368512,
+            "title": "Sobel",
+            "pos_x": -371.6406249999998,
+            "pos_y": -895.4218749999994,
+            "inputs": [
+                {
+                    "id": 140706364367840,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140706364368608,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 533,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "nrj": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    },
+                    "nrj": {
+                        "type": null,
+                        "param_name": "nrj"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705550120848,
+            "title": "Fluid",
+            "pos_x": -369.1874999999996,
+            "pos_y": -619.9375000000001,
+            "inputs": [
+                {
+                    "id": 140705550797984,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705550797936,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705550798080,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".9",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "2",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705996982160,
+            "title": "Gradient Map",
+            "pos_x": -618.6875000000001,
+            "pos_y": -735.4375,
+            "inputs": [
+                {
+                    "id": 140705996982448,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705996982208,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1259,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705993775984,
+            "title": "Fluid",
+            "pos_x": -372.75,
+            "pos_y": -520.8125,
+            "inputs": [
+                {
+                    "id": 140705993775120,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705993775072,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705993775216,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*.75",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".93",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "0",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705991175632,
+            "title": "Fluid",
+            "pos_x": -368.43749999999994,
+            "pos_y": -307.43750000000006,
+            "inputs": [
+                {
+                    "id": 140705991109472,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705991109328,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705991109136,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*20",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".99",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "0",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705990092176,
+            "title": "BumpMapping",
+            "pos_x": 147.3749999999998,
+            "pos_y": -312.3125000000001,
+            "inputs": [
+                {
+                    "id": 140705990149744,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705990150176,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1184,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705988905520,
+            "title": "Sobel",
+            "pos_x": -374.87499999999994,
+            "pos_y": -421.5625,
+            "inputs": [
+                {
+                    "id": 140705989290560,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989290752,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 533,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "nrj": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    },
+                    "nrj": {
+                        "type": null,
+                        "param_name": "nrj"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705989575440,
+            "title": "Sobel",
+            "pos_x": -818.4374999999999,
+            "pos_y": -328.74999999999994,
+            "inputs": [
+                {
+                    "id": 140705971476544,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705971476736,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 533,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "nrj": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    },
+                    "nrj": {
+                        "type": null,
+                        "param_name": "nrj"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705989296032,
+            "title": "Eye",
+            "pos_x": -1683.9687500000005,
+            "pos_y": -15.562500000000107,
+            "inputs": [],
+            "outputs": [
+                {
+                    "id": 140705989295360,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 323,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "energy_fast": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "energy_mid": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "energy_slow": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "bpm": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tf": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*.25",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "scale": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*10.",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": "time"
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "energy_fast": {
+                        "type": null,
+                        "param_name": "smooth_fast_final"
+                    },
+                    "energy_mid": {
+                        "type": null,
+                        "param_name": "emid"
+                    },
+                    "energy_slow": {
+                        "type": null,
+                        "param_name": "eslow"
+                    },
+                    "bpm": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "intensity": {
+                        "type": null,
+                        "param_name": "intensity"
+                    },
+                    "tf": {
+                        "type": null,
+                        "param_name": "tf"
+                    },
+                    "scale": {
+                        "type": null,
+                        "param_name": "scale_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705989280576,
+            "title": "Gradient Map",
+            "pos_x": -835.375,
+            "pos_y": -160.4375,
+            "inputs": [
+                {
+                    "id": 140705989283504,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989295840,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1259,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705988903840,
+            "title": "Fluid",
+            "pos_x": -574.5625,
+            "pos_y": -196.015625,
+            "inputs": [
+                {
+                    "id": 140705988905760,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705988904272,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705988907152,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*20",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".99",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "0",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705971485280,
+            "title": "Sobel",
+            "pos_x": -366.87499999999994,
+            "pos_y": -194.68750000000003,
+            "inputs": [
+                {
+                    "id": 140706030575552,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140706030581840,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 533,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "nrj": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    },
+                    "nrj": {
+                        "type": null,
+                        "param_name": "nrj"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140706365206352,
+            "title": "Fluid",
+            "pos_x": -580.5,
+            "pos_y": -84.75,
+            "inputs": [
+                {
+                    "id": 140705991243136,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705991242848,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705991242992,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*20",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".99",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "0",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705550183984,
+            "title": "BumpMapping",
+            "pos_x": -366.75000000000006,
+            "pos_y": -79.25,
+            "inputs": [
+                {
+                    "id": 140706030576704,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140706030570848,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1184,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705993769552,
+            "title": "Fluid",
+            "pos_x": -591.25,
+            "pos_y": 9.6875,
+            "inputs": [
+                {
+                    "id": 140705995713424,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705995715344,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705995715104,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 532,
+            "cpu_adaptable_parameters": {
+                "adf_program": {},
+                "ink_program": {},
+                "jacd_program": {},
+                "jacp_program": {},
+                "subpressure_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "adf_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "VelocityState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "ink_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "advect_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*2",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "gate_open": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "decay_rate": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": ".999",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "passthrough": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "0",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iFrame": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacd_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dt": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "kappa": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "jacp_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "subpressure_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "FieldStateSP": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "vort_amount": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "InkState": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "adf_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "VelocityState": {
+                        "type": null,
+                        "param_name": "VelocityInput"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "input_vel_intensity": {
+                        "type": null,
+                        "param_name": "input_vel_intensity"
+                    },
+                    "input_vel_intensity_passthrough": {
+                        "type": null,
+                        "param_name": "input_vel_intensity_passthrough"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    }
+                },
+                "ink_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "advect_amount": {
+                        "type": null,
+                        "param_name": "advect_amount"
+                    },
+                    "gate_open": {
+                        "type": null,
+                        "param_name": "on_kick"
+                    },
+                    "decay_rate": {
+                        "type": null,
+                        "param_name": "decay_rate"
+                    },
+                    "passthrough": {
+                        "type": null,
+                        "param_name": "passthrough"
+                    },
+                    "iFrame": {
+                        "type": null,
+                        "param_name": "iFrame"
+                    }
+                },
+                "jacd_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    },
+                    "dt": {
+                        "type": null,
+                        "param_name": "dt"
+                    },
+                    "kappa": {
+                        "type": null,
+                        "param_name": "kappa"
+                    }
+                },
+                "jacp_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldState": {
+                        "type": null,
+                        "param_name": "FieldState"
+                    }
+                },
+                "subpressure_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "FieldStateSP": {
+                        "type": null,
+                        "param_name": "FieldStateSP"
+                    },
+                    "vort_amount": {
+                        "type": null,
+                        "param_name": "vort_amount"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "InkState": {
+                        "type": null,
+                        "param_name": "InkState"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705994006848,
+            "title": "BumpMapping",
+            "pos_x": -364.25000000000006,
+            "pos_y": 22.25,
+            "inputs": [
+                {
+                    "id": 140705993999888,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705993998784,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1184,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705990159248,
+            "title": "DoG",
+            "pos_x": -854.2187500000001,
+            "pos_y": 180.25390625,
+            "inputs": [
+                {
+                    "id": 140705991105632,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                },
+                {
+                    "id": 140705991105488,
+                    "index": 1,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705991104624,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 500,
+            "cpu_adaptable_parameters": {
+                "vblur_program": {},
+                "hblur_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "vblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "SST": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "sigmaE": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "k": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "hblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "SST": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "sigma": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "k": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "BaseTex": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "DoG": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "Hatch": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "tau": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "eps": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "phi": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "vblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "SST": {
+                        "type": null,
+                        "param_name": "SST"
+                    },
+                    "sigmaE": {
+                        "type": null,
+                        "param_name": "sigmaE"
+                    },
+                    "k": {
+                        "type": null,
+                        "param_name": "k"
+                    }
+                },
+                "hblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "SST": {
+                        "type": null,
+                        "param_name": "SST"
+                    },
+                    "sigma": {
+                        "type": null,
+                        "param_name": "sigma"
+                    },
+                    "k": {
+                        "type": null,
+                        "param_name": "k"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "BaseTex": {
+                        "type": null,
+                        "param_name": "BaseTex"
+                    },
+                    "DoG": {
+                        "type": null,
+                        "param_name": "DoG"
+                    },
+                    "Hatch": {
+                        "type": null,
+                        "param_name": "Hatch"
+                    },
+                    "tau": {
+                        "type": null,
+                        "param_name": "tau"
+                    },
+                    "eps": {
+                        "type": null,
+                        "param_name": "epsilon"
+                    },
+                    "phi": {
+                        "type": null,
+                        "param_name": "phi"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "mode"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705991101216,
+            "title": "SST",
+            "pos_x": -1067.6953125,
+            "pos_y": 88.36328125,
+            "inputs": [
+                {
+                    "id": 140705600784704,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705600784464,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 2364,
+            "cpu_adaptable_parameters": {
+                "rgb2lab_program": {},
+                "sst_program": {},
+                "vblur_program": {},
+                "hblur_program": {},
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "rgb2lab_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "sst_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "vblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "sigmaC": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "hblur_program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "sigmaC": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                },
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "rgb2lab_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                },
+                "sst_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                },
+                "vblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "sigmaC": {
+                        "type": null,
+                        "param_name": "sigmaC"
+                    }
+                },
+                "hblur_": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "sigmaC": {
+                        "type": null,
+                        "param_name": "sigmaC"
+                    }
+                },
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705590685616,
+            "title": "BumpMapping",
+            "pos_x": -367.3125000000002,
+            "pos_y": 131.56250000000006,
+            "inputs": [
+                {
+                    "id": 140705589537728,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705589537584,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1184,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705993772192,
+            "title": "Median Filter",
+            "pos_x": -570.4687499999999,
+            "pos_y": 141.2499999999999,
+            "inputs": [
+                {
+                    "id": 140705971485856,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705971472752,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 622,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "dry_wet": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "dry_wet": {
+                        "type": null,
+                        "param_name": "dry_wet"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705967597760,
+            "title": "HSV Offset",
+            "pos_x": -719.9119262695312,
+            "pos_y": 311.0037841796875,
+            "inputs": [
+                {
+                    "id": 140705967602320,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705967591376,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1658,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "hue_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "saturation_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "value_offset": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_offset": {
+                        "type": null,
+                        "param_name": "hue_offset"
+                    },
+                    "saturation_offset": {
+                        "type": null,
+                        "param_name": "saturation_offset"
+                    },
+                    "value_offset": {
+                        "type": null,
+                        "param_name": "value_offset"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705600792096,
+            "title": "HSV Pow",
+            "pos_x": -364.9999999999998,
+            "pos_y": 234.99999999999994,
+            "inputs": [
+                {
+                    "id": 140705600796608,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705600789408,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1353,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "hue_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "saturation_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "value_pow_factor": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "16.",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "hue_pow_factor": {
+                        "type": null,
+                        "param_name": "hue_pow_factor"
+                    },
+                    "saturation_pow_factor": {
+                        "type": null,
+                        "param_name": "saturation_pow_factor"
+                    },
+                    "value_pow_factor": {
+                        "type": null,
+                        "param_name": "value_pow_factor"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705994099008,
+            "title": "Identity",
+            "pos_x": -1354.5507812499998,
+            "pos_y": 301.1914062499993,
+            "inputs": [
+                {
+                    "id": 140705989021648,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 2
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989031872,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 874,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705989895856,
+            "title": "Symetry",
+            "pos_x": -1568.4960937499982,
+            "pos_y": 472.16796874999966,
+            "inputs": [
+                {
+                    "id": 140705989889184,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989896384,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705989056480,
+            "title": "Symetry",
+            "pos_x": -1565.9179687499973,
+            "pos_y": 577.6367187499994,
+            "inputs": [
+                {
+                    "id": 140705989057776,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989055232,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*.95",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*-.97",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705990498320,
+            "title": "Symetry",
+            "pos_x": -1557.02734375,
+            "pos_y": 677.5585937499999,
+            "inputs": [
+                {
+                    "id": 140705989892640,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705989892592,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 797,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "smooth_low": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "mode": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "-x*1.175",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "t_angle": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x*2.1",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    },
+                    "smooth_low": {
+                        "type": null,
+                        "param_name": "smlow"
+                    },
+                    "mode": {
+                        "type": null,
+                        "param_name": "symetry_mode"
+                    },
+                    "t": {
+                        "type": null,
+                        "param_name": "t_final"
+                    },
+                    "t_angle": {
+                        "type": null,
+                        "param_name": "t_angle_final"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        },
+        {
+            "id": 140705994309152,
+            "title": "BumpMapping",
+            "pos_x": -365.79296875,
+            "pos_y": 340.00000000000006,
+            "inputs": [
+                {
+                    "id": 140705996412032,
+                    "index": 0,
+                    "multi_edges": false,
+                    "position": 2,
+                    "socket_type": 1
+                }
+            ],
+            "outputs": [
+                {
+                    "id": 140705996411312,
+                    "index": 0,
+                    "multi_edges": true,
+                    "position": 5,
+                    "socket_type": 3
+                }
+            ],
+            "content": {},
+            "op_code": 1184,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
+            "gpu_adaptable_parameters": {
+                "program": {
+                    "iTime": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    },
+                    "iChannel0": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
+                        }
+                    }
+                }
+            },
+            "uniforms_binding": {
+                "": {
+                    "iTime": {
+                        "type": null,
+                        "param_name": null
+                    },
+                    "iResolution": {
+                        "type": null,
+                        "param_name": "win_size"
+                    },
+                    "iChannel0": {
+                        "type": null,
+                        "param_name": "iChannel0"
+                    }
+                }
+            },
+            "win_size": [
+                1920,
+                1080
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "id": 140706030576032,
+            "edge_type": 2,
+            "start": 140706364362512,
+            "end": 140706364367840
+        },
+        {
+            "id": 140705550758720,
+            "edge_type": 2,
+            "start": 140706364362512,
+            "end": 140706364366976
+        },
+        {
+            "id": 140705550796592,
+            "edge_type": 2,
+            "start": 140706364366352,
+            "end": 140705550797984
+        },
+        {
+            "id": 140705550809696,
+            "edge_type": 2,
+            "start": 140706364366352,
+            "end": 140705996982448
+        },
+        {
+            "id": 140705550335328,
+            "edge_type": 2,
+            "start": 140705996982208,
+            "end": 140705550797936
+        },
+        {
+            "id": 140705550796304,
+            "edge_type": 2,
+            "start": 140706364366352,
+            "end": 140705993775120
+        },
+        {
+            "id": 140705550797648,
+            "edge_type": 2,
+            "start": 140705996982208,
+            "end": 140705993775072
+        },
+        {
+            "id": 140705992356960,
+            "edge_type": 2,
+            "start": 140705990150176,
+            "end": 140706364365056
+        },
+        {
+            "id": 140705992371040,
+            "edge_type": 2,
+            "start": 140705993775216,
+            "end": 140705989290560
+        },
+        {
+            "id": 140705989293776,
+            "edge_type": 2,
+            "start": 140706364366352,
+            "end": 140705971476544
+        },
+        {
+            "id": 140705994098336,
+            "edge_type": 2,
+            "start": 140705971476736,
+            "end": 140705991109472
+        },
+        {
+            "id": 140705989587920,
+            "edge_type": 2,
+            "start": 140706364366352,
+            "end": 140705991109328
+        },
+        {
+            "id": 140706030575456,
+            "edge_type": 2,
+            "start": 140705989295840,
+            "end": 140705988904272
+        },
+        {
+            "id": 140706030583664,
+            "edge_type": 2,
+            "start": 140705988907152,
+            "end": 140706030575552
+        },
+        {
+            "id": 140705994003056,
+            "edge_type": 2,
+            "start": 140705989295840,
+            "end": 140705991242848
+        },
+        {
+            "id": 140706030576944,
+            "edge_type": 2,
+            "start": 140705991242992,
+            "end": 140706030576704
+        },
+        {
+            "id": 140705988913248,
+            "edge_type": 2,
+            "start": 140705995715104,
+            "end": 140705993999888
+        },
+        {
+            "id": 140705971707504,
+            "edge_type": 2,
+            "start": 140705989295840,
+            "end": 140705995715344
+        },
+        {
+            "id": 140705590686864,
+            "edge_type": 2,
+            "start": 140705600784464,
+            "end": 140705991105488
+        },
+        {
+            "id": 140705990162992,
+            "edge_type": 2,
+            "start": 140705995715104,
+            "end": 140705600784704
+        },
+        {
+            "id": 140705600789024,
+            "edge_type": 2,
+            "start": 140705995715104,
+            "end": 140705991105632
+        },
+        {
+            "id": 140705994107360,
+            "edge_type": 2,
+            "start": 140705991104624,
+            "end": 140705971485856
+        },
+        {
+            "id": 140705994102560,
+            "edge_type": 2,
+            "start": 140705971472752,
+            "end": 140705589537728
+        },
+        {
+            "id": 140705550430944,
+            "edge_type": 2,
+            "start": 140705967591376,
+            "end": 140705600796608
+        },
+        {
+            "id": 140705992374496,
+            "edge_type": 2,
+            "start": 140705989031872,
+            "end": 140705988905760
+        },
+        {
+            "id": 140705992374400,
+            "edge_type": 2,
+            "start": 140705989031872,
+            "end": 140705989283504
+        },
+        {
+            "id": 140705994097568,
+            "edge_type": 2,
+            "start": 140705989031872,
+            "end": 140705991243136
+        },
+        {
+            "id": 140705992365616,
+            "edge_type": 2,
+            "start": 140705989031872,
+            "end": 140705995713424
+        },
+        {
+            "id": 140705994308912,
+            "edge_type": 2,
+            "start": 140705600789408,
+            "end": 140705996412032
+        },
+        {
+            "id": 140705550750944,
+            "edge_type": 2,
+            "start": 140705989896384,
+            "end": 140705989057776
+        },
+        {
+            "id": 140705991232624,
+            "edge_type": 2,
+            "start": 140705989055232,
+            "end": 140705989892640
+        },
+        {
+            "id": 140706364373216,
+            "edge_type": 2,
+            "start": 140705989295360,
+            "end": 140705989889184
+        },
+        {
+            "id": 140705990497408,
+            "edge_type": 2,
+            "start": 140705989295360,
+            "end": 140705989021648
+        },
+        {
+            "id": 140705990496688,
+            "edge_type": 2,
+            "start": 140705589537584,
+            "end": 140705967602320
+        },
+        {
+            "id": 140705990500864,
+            "edge_type": 2,
+            "start": 140706364368608,
+            "end": 140705990149744
+        },
+        {
+            "id": 140705992383824,
+            "edge_type": 2,
+            "start": 140706364364288,
+            "end": 140706364360400
+        }
+    ]
+}

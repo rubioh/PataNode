@@ -24,13 +24,14 @@ from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
 
-
 DEBUG = False
 
 
 class PataNode(NodeEditorWindow):
     def __init__(self):
         # Calls initUI
+        self.graphs = []
+        self.next_unique_session_id = 0
         super().__init__()
 
     def initUI(self):
@@ -112,6 +113,10 @@ class PataNode(NodeEditorWindow):
         self.audioDock.setVisible(False)
 
     def render(self, audio_features=None):
+        for graph in self.graphs:
+            if graph.should_update_preview():
+                graph.render(audio_features, True)
+
         # TODO: logic for choosing the rendering program
         if self.current_node_editor_widget is None:
             self.current_node_editor_widget = self.getCurrentNodeEditorWidget()
@@ -187,7 +192,6 @@ class PataNode(NodeEditorWindow):
             statusTip="Show mapping window",
             triggered=self.openMapWindow,
         )
-
         self.actSeparator = QAction(self)
         self.actSeparator.setSeparator(True)
 
@@ -429,7 +433,11 @@ class PataNode(NodeEditorWindow):
     def createMdiChild(self, child_widget=None):
         nodeeditor = (
             child_widget if child_widget is not None else PataNodeSubWindow(self)
-        )
+        )        
+        self.graphs.append(nodeeditor)
+        if nodeeditor.__class__ == PataNodeSubWindow:
+            nodeeditor.set_unique_session_id(self.next_unique_session_id)
+            self.next_unique_session_id = self.next_unique_session_id + 1
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
         #       nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
@@ -440,6 +448,9 @@ class PataNode(NodeEditorWindow):
 
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
+        for x in self.graphs:
+                if x.mark_dead:
+                    self.graphs.remove(x)
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():

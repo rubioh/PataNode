@@ -11,7 +11,8 @@ if __name__ == "__main__":
     )
     parser.add_argument("-o", "--open", metavar="filename")
     parser.add_argument("--debug", metavar="module_to_debug", nargs="+")
-
+    parser.add_argument("--no-usb", metavar="no_usb")
+    parser.add_argument("--use-shader-buffer", metavar="use_shader_buffer")
     args = parser.parse_args()
 
     if args.debug:
@@ -30,7 +31,7 @@ if __name__ == "__main__":
     the_app = QApplication(sys.argv)
     the_app.setStyle("Fusion")
 
-    patanode = app.PataShadeApp()
+    patanode = app.PataShadeApp(args)
     patanode.show()
 
     if args.open:

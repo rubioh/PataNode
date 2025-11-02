@@ -24,10 +24,10 @@ vec4 getCells(vec2 uv){
     //float go_x = dot(col.rgb, vec3(.599, .127, .287));
     float go_x = cos(uv.y*20. + 2.*3.14159*uvs.x*x_phase_amp + go_x_phase)*.5 + .5;
     coord_x = coord_x - .5;
-    
+
     float amp = (.25 + pow(nrj_low, .5)*2.);
-    col *= 1.-smoothstep(0., .1, abs(coord_x)-go_x*.5*amp);
-    
+    col *= 1.-smoothstep(0., .025, abs(coord_x)-go_x*.5*amp);
+
     //col = mix(col, col2, smoothstep(.0, .05, length(coord_x)-go_x*.5*amp));
 
     //col = col*
@@ -43,7 +43,7 @@ void main()
     vec2 uv = gl_FragCoord.xy/R;
 
 
-   
+
     vec4 col = getCells(uv);
 
 

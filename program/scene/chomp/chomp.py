@@ -82,7 +82,7 @@ class Chomp(ProgramBase):
     def updateParams(self, af=None):
         self.vitesse = np.clip(self.vitesse, 0, 2)
         self.intensity = np.clip(self.intensity, 2, 10)
-        self.time += 1 / 60 * (1 + self.vitesse)
+        self.time += 1 / 15
         self.tf += 0.01
 
         if af is None:

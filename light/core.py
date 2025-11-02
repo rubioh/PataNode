@@ -32,40 +32,15 @@ class TimedEvent:
 
 
 class LightEngine:
-    def __init__(self, sceno_path: str = None):
+    def __init__(self, args, sceno_path: str = None):
         self.shader_buffer = [
             0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-            0.0,
-        ]
+        ] * 512
+        self.use_shader_buffer = args.use_shader_buffer
         self.USB_VID = 0xCAFE
         self.DMX_CHANNELS_NUM = 512
 
-        self.light_device = LightDevice()
+        self.light_device = LightDevice(args)
         self.force_strobe = TimedEvent()
         self.lights = list()
 
@@ -96,29 +71,20 @@ class LightEngine:
     def __call__(self, color=(0, 0, 0), audio_features=None):
         af = audio_features
         output_buffer = list(np.zeros((512)))
+        
+    def __call__(self, color=(0, 0, 0), audio_features=None):
+        af = audio_features
+        output_buffer = list(np.zeros((512)))
         for light in self.lights:
-            #            if self.force_strobe():
-            #                if "strobe" in light.attrib:
-            #                    light.attrib["strobe"] = 84./255.
-            #                    light.attrib["white"] = 1
-            #                    light.attrib["red"] = 1
-            #                    light.attrib["green"] = 1
-            #                    light.attrib["blue"] = 1
-            #            else:
-            #                if "strobe" in light.attrib:
-            #                    light.attrib["strobe"] = 1
-            #                    light.attrib["white"] = 0
-            #                    light.attrib["red"] = 0
-            #                    light.attrib["green"] = 0
-            #                    light.attrib["blue"] = 0
-
             light_buffer = light.get_dmx_buffer()
-
-            if self.wait > 1000:
-                print(light, light.color, light_buffer)
             output_buffer[light.dmx_address : light.dmx_address + len(light_buffer)] = (
                 light_buffer
             )
+        if self.use_shader_buffer:
+            for i, x in enumerate(self.shader_buffer):
+                output_buffer[i] = x
         self.wait += 1
-        self.wait %= 1002
+        self.wait %= 102
+#        if self.wait == 30:
+ #           print(output_buffer)
         self.light_device.write(output_buffer)
