@@ -59,7 +59,6 @@ class Node(Serializable):
         super().__init__()
         self._title = title
         self.scene = scene
-
         # just to be sure, init these variables
         self.content = None
         self.grNode = None
