@@ -1,3 +1,4 @@
+import glm
 from os.path import dirname, join
 
 from node.node_conf import register_node
@@ -45,6 +46,8 @@ class Screen(ProgramBase):
     def make_preview(self, texture: Texture, af):
         self.updateParams(af)
         self.bindUniform(af)
+
+        self.program["flip_y"] = glm.vec2(1.0, 1.0)
         new_size = (256, 144)
         self.program["iResolution"] = new_size
         downscaled = self.ctx.texture((new_size[0], new_size[1]), 4, dtype="f1")
@@ -58,7 +61,7 @@ class Screen(ProgramBase):
     def render(self, textures, af=None):
         self.updateParams(af)
         self.bindUniform(af)
-
+        self.program["flip_y"] = glm.vec2(-1.0, -1.0)
         textures[0].use(0)
 
         self.ctx.screen.use()

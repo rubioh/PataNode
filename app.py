@@ -34,8 +34,8 @@ class PataShadeApp(PataNode):
     def __init__(self, args):
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine(args)
-        self.server = PataServer(args)
         super().__init__()
+        self.server = PataServer(args, self)
         # Thread Pool
         self.threadpool = QThreadPool(maxThreadCount=5)  # number thread in Pool
 
@@ -155,7 +155,7 @@ class PataShadeApp(PataNode):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
         self.shader_timer.start(int(1 / 60 * 1000))
-        self.server_timer.start(int(1 / 60 * 1000))
+        self.server_timer.start(int(120 / 60 * 1000))
 
     def closeEvent(self, event):
         self.audio_timer.stop()
