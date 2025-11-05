@@ -17,7 +17,9 @@ from PyQt5.QtWidgets import (
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 from nodeeditor.utils import loadStylesheets
-
+import numpy as np
+from PIL import Image
+import io
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.mappingwindow import PataNodeMappingWindow
 from gui.subwindow import PataNodeSubWindow
@@ -48,6 +50,7 @@ class PataNode(NodeEditorWindow):
     def __init__(self):
         # Calls initUI
         self.graphs = []
+        self.previews  = {}
         self.next_unique_session_id = 0
         super().__init__()
 
@@ -140,17 +143,20 @@ class PataNode(NodeEditorWindow):
             ret["graphs_name"].append(graph_name)
             ret["graphs"][graph_name] = {
                 "is_active": False,
+                "version": graph.version,
                 "nodes": {},
                 "nodes_name": [],
                 "name": graph.getUserFriendlyFilename(),
                 "id": graph_name,
             }
-            if graph.preview:
-                ret["graphs"][graph_name]["preview"] = {
-                    "data": base64.b64encode(graph.preview[1]).decode(),
-                    "preview_size_x": graph.preview[0][0],
-                    "preview_size_y": graph.preview[0][1],
-                }
+                   # {
+#                    "data": base64.b64encode(graph.preview[1]).decode(),
+                    #"data": graph.preview[1]).decode(),
+                    #"preview_size_x": graph.preview[0][0],
+                    #"preview_size_y": graph.preview[0][1],
+                #}
+
+            ret["graphs"][graph_name]["has_preview"] = graph.preview is not None
             for node in graph.scene.nodes:
                 node_name = node.op_title
                 if node_name not in counter:
@@ -201,10 +207,26 @@ class PataNode(NodeEditorWindow):
                         )
         return ret
 
+    def create_bmp_in_memory(self, width, height, bytes):
+        img = img = Image.frombytes("RGBA", (width, height), bytes)
+
+        bmp_io = io.BytesIO()
+        img.save(bmp_io, format='BMP')
+        bmp_data = bmp_io.getvalue()
+        
+        return bmp_data
+
     def render(self, audio_features=None):
         for graph in self.graphs:
             if graph.should_update_preview():
                 graph.render(audio_features, True)
+            if graph.preview:
+                image = self.create_bmp_in_memory(graph.preview[0][0], graph.preview[0][1], graph.preview[1])
+                if graph.unique_session_id not in self.previews:
+                    self.previews[str(graph.unique_session_id)] = (graph.version, image)
+                elif self.previews[str(graph.unique_session_id)][0] != graph.version:
+                    self.previews[str(graph.unique_session_id)] = (graph.version, image)
+
 
         # TODO: logic for choosing the rendering program
         if self.current_node_editor_widget is None:
