@@ -49,9 +49,11 @@ DEBUG = False
 class PataNode(NodeEditorWindow):
     def __init__(self):
         # Calls initUI
-        self.graphs = []
+        self.active_graph = None
+        self.graphs = {}
         self.previews  = {}
         self.next_unique_session_id = 0
+        self.queue = []
         super().__init__()
 
     def initUI(self):
@@ -136,34 +138,30 @@ class PataNode(NodeEditorWindow):
 
     # @timing
     def poll_graphs(self):
-        counter = {}
         ret = {"graphs": {}, "graphs_name": []}
-        for graph in self.graphs:
+        for graph in self.graphs.values():
+            counter = {}
             graph_name = str(graph.unique_session_id)
             ret["graphs_name"].append(graph_name)
             ret["graphs"][graph_name] = {
-                "is_active": False,
+                "is_active": self.active_graph == graph.subwnd,
                 "version": graph.version,
                 "nodes": {},
                 "nodes_name": [],
                 "name": graph.getUserFriendlyFilename(),
                 "id": graph_name,
             }
-                   # {
-#                    "data": base64.b64encode(graph.preview[1]).decode(),
-                    #"data": graph.preview[1]).decode(),
-                    #"preview_size_x": graph.preview[0][0],
-                    #"preview_size_y": graph.preview[0][1],
-                #}
-
-            ret["graphs"][graph_name]["has_preview"] = graph.preview is not None
+            ret["graphs"][graph_name]["has_preview"] = False
+            if graph.preview is not None and graph.preview is not False:
+                ret["graphs"][graph_name]["has_preview"] = True
             for node in graph.scene.nodes:
-                node_name = node.op_title
+                node_name = node.op_title.replace(" ", "")
                 if node_name not in counter:
                     counter[node_name] = 0
                 else:
                     counter[node_name] = counter[node_name] + 1
                 node_name = node_name + str(counter[node_name])
+                node.unique_name = node_name
                 ret["graphs"][graph_name]["nodes_name"].append(node_name)
                 ret["graphs"][graph_name]["nodes"][node_name] = {}
                 if node.program:
@@ -196,15 +194,17 @@ class PataNode(NodeEditorWindow):
                             "type": str(param_values["type"]),  # .item()
                             "is_default_value": False,
                         }
-                        if value is not None and param_values["value"] == "x":
+                        if value is not None and "x" in param_values["value"]:
                             entry = {
                                 "values": str(value),
-                                "type": "float",
+                                "type": str(type(value)),
                                 "is_default_value": True,
                             }
-                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                            entry
-                        )
+                            
+                        if "x" not in entry["values"]:
+                            ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
+                                entry
+                            )
         return ret
 
     def create_bmp_in_memory(self, width, height, bytes):
@@ -216,8 +216,34 @@ class PataNode(NodeEditorWindow):
         
         return bmp_data
 
+    def set_active_graph(self, id):
+        self.queue.append((0, id))
+
+    def change_parameter(self, graph_name, node_name, attribute_name, value):
+        if graph_name in self.graphs:
+            graph = self.graphs[graph_name]
+            for node in graph.scene.nodes:
+                print(node.unique_name, node_name)
+                if node.unique_name == node_name:
+                    if "program" in node.program.getGpuAdaptableParameters():
+                        params = node.program.getGpuAdaptableParameters()["program"]
+                        print(attribute_name, params)
+                        if attribute_name in params:
+                            print("Changed")
+                            t = type(params[attribute_name]["eval_function"]["value"])
+                            params[attribute_name]["eval_function"]["value"] = t(value)
+                            return
+
     def render(self, audio_features=None):
-        for graph in self.graphs:
+        while len(self.queue) > 0:
+            command = self.queue.pop(0)
+            id = command[1]
+            if command[0] == 0:
+                if id in self.graphs.keys():
+                    self.setActiveSubWindow(self.graphs[id].subwnd)
+                    self.showShaderWindowFromPhone()
+
+        for graph in self.graphs.values():
             if graph.should_update_preview():
                 graph.render(audio_features, True)
             if graph.preview:
@@ -334,8 +360,16 @@ class PataNode(NodeEditorWindow):
     def hideShaderWindow(self):
         self.gl_widget.hide()
 
+    def showShaderWindowFromPhone(self):
+        self.current_node_editor_widget = None
+        self.active_graph = self.mdiArea.activeSubWindow()
+        self.gl_widget.showFullScreen()
+
     def showShaderWindow(self):
         self.current_node_editor_widget = None
+        for k in self.graphs:
+            self.graphs[k].version = self.graphs[k].version + 1
+        self.active_graph = self.mdiArea.activeSubWindow()
         self.gl_widget.showFullScreen()
 
     def hideAudioLogWindow(self):
@@ -389,9 +423,8 @@ class PataNode(NodeEditorWindow):
 
     def openFile(self, filename, graph=False):
         existing = self.findMdiChild(filename)
-
         if existing:
-            self.mdiArea.setActiveSubWindow(existing)
+            self.setActiveSubWindow(existing)
         else:
             # We need to create a new subWindow and open the file
             if graph:
@@ -404,6 +437,7 @@ class PataNode(NodeEditorWindow):
                 nodeeditor.setTitle()
                 subwnd = self.createMdiChild(nodeeditor)
                 subwnd.show()
+
 
                 if graph:
                     nodeeditor.initGraphScene()
@@ -545,7 +579,6 @@ class PataNode(NodeEditorWindow):
         nodeeditor = (
             child_widget if child_widget is not None else PataNodeSubWindow(self)
         )
-        self.graphs.append(nodeeditor)
         if nodeeditor.__class__ == PataNodeSubWindow:
             nodeeditor.set_unique_session_id(self.next_unique_session_id)
             self.next_unique_session_id = self.next_unique_session_id + 1
@@ -555,13 +588,13 @@ class PataNode(NodeEditorWindow):
         #       nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
         nodeeditor.addCloseEventListener(self.onSubWndClose)
+        nodeeditor.subwnd = subwnd
+        self.graphs[str(nodeeditor.unique_session_id)] = nodeeditor
         return subwnd
 
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
-        for x in self.graphs:
-            if x.mark_dead:
-                self.graphs.remove(x)
+        self.graphs = {k: v for k, v in self.graphs.items() if not v.mark_dead}
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():
