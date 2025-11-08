@@ -42,6 +42,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.wfile.write(ret)
 
     def do_POST(self):
+        print(self.path)
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length) if content_length > 0 else b""
         response = b"Received POST: " + post_data
@@ -49,6 +50,20 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/plain")
         self.end_headers()
         self.wfile.write(response)
+        if "/set_active_graph" in self.path:
+            path = self.path[len("/set_active_graph?graph="):]
+            self.server.app.set_active_graph(path)
+            return
+        if "/change_parameter" in self.path:
+            path = self.path[len("/change_parameter?"):]
+            args = path.split("&")
+            graph_name = args[0].split("=")[1]
+            node_name = args[1].split("=")[1]
+            attribute_name = args[2].split("=")[1]
+            value = args[3].split("=")[1]
+            self.server.app.change_parameter(graph_name, node_name, attribute_name, value)
+            return
+
 
 
 class PataServer:
