@@ -7,22 +7,22 @@ from PyQt5.QtCore import (
     QSize,
     Qt,
 )
-from PyQt5.QtGui import QPixmap, QIcon, QDrag, QColor
+from PyQt5.QtGui import QColor, QDrag, QIcon, QPixmap
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QTreeWidget,
     QTreeWidgetItem,
 )
 
-from nodeeditor.utils import dumpException
-
+from node.graph_container_node import GraphContainerNode
 from node.node_conf import (
     AUDIO_NODES,
+    LIGHT_NODES,
     LISTBOX_MIMETYPE,
     SHADER_NODES,
     get_class_from_opcode,
 )
-from node.graph_container_node import GraphContainerNode
+from nodeeditor.utils import dumpException
 
 
 class QDMDragListbox(QTreeWidget):
@@ -39,6 +39,7 @@ class QDMDragListbox(QTreeWidget):
 
         self.addShaderNodes()
         #       self.addAudioNodes()
+        self.addLightNodes()
         self.addContainerNodes()
 
     def addShaderNodes(self):
@@ -74,12 +75,28 @@ class QDMDragListbox(QTreeWidget):
 
         self.sortItems(0, Qt.AscendingOrder)
 
+    def addLightNodes(self):
+        keys = list(LIGHT_NODES.keys())
+        keys.sort()
+        light_type_item = QTreeWidgetItem(self)
+        light_type_item.setText(0, "Light")
+        light_type_item.setForeground(0, QColor("#73C625"))
+
+        for key in keys:
+            node = get_class_from_opcode(key)
+            self.addMyItem(node.op_title, node.icon, node.op_code, light_type_item)
+
+        light_type_item.setChildIndicatorPolicy(0)
+        light_type_item.sortChildren(1, Qt.AscendingOrder)
+
+        # self.sortItems(0, Qt.AscendingOrder)
+
     def addAudioNodes(self):
         keys = list(AUDIO_NODES.keys())
         keys.sort()
         audio_type_item = QTreeWidgetItem(self)
         audio_type_item.setText(0, "Audio Features Transform")
-        audio_type_item.setForeground(0, QColor("#E39600"))
+        audio_type_item.setForeground(0, QColor("#E34600"))
 
         for key in keys:
             node = get_class_from_opcode(key)
@@ -88,7 +105,7 @@ class QDMDragListbox(QTreeWidget):
         audio_type_item.setChildIndicatorPolicy(0)
         audio_type_item.sortChildren(1, Qt.AscendingOrder)
 
-        self.sortItems(0, Qt.AscendingOrder)
+        # self.sortItems(0, Qt.AscendingOrder)
 
     def addContainerNodes(self):
         container_type_item = QTreeWidgetItem(self)

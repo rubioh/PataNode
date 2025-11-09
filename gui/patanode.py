@@ -1,6 +1,6 @@
 import os
 
-from PyQt5.QtCore import Qt, QSignalMapper
+from PyQt5.QtCore import QSignalMapper, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
@@ -11,10 +11,6 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-from nodeeditor.node_editor_window import NodeEditorWindow
-from nodeeditor.utils import dumpException, pp
-from nodeeditor.utils import loadStylesheets
-
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.mappingwindow import PataNodeMappingWindow
 from gui.subwindow import PataNodeSubWindow
@@ -23,6 +19,8 @@ from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
+from nodeeditor.node_editor_window import NodeEditorWindow
+from nodeeditor.utils import dumpException, loadStylesheets, pp
 
 DEBUG = False
 
@@ -433,15 +431,13 @@ class PataNode(NodeEditorWindow):
     def createMdiChild(self, child_widget=None):
         nodeeditor = (
             child_widget if child_widget is not None else PataNodeSubWindow(self)
-        )        
+        )
         self.graphs.append(nodeeditor)
         if nodeeditor.__class__ == PataNodeSubWindow:
             nodeeditor.set_unique_session_id(self.next_unique_session_id)
             self.next_unique_session_id = self.next_unique_session_id + 1
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
-        #       nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
-        #       nodeeditor.scene.addItemsDeselectedListener(self.updateEditMenu)
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
         nodeeditor.addCloseEventListener(self.onSubWndClose)
         return subwnd
@@ -449,8 +445,8 @@ class PataNode(NodeEditorWindow):
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
         for x in self.graphs:
-                if x.mark_dead:
-                    self.graphs.remove(x)
+            if x.mark_dead:
+                self.graphs.remove(x)
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():

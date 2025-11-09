@@ -24,9 +24,9 @@ if __name__ == "__main__":
             importlib.import_module(module_to_debug).DEBUG = True
 
     # Note: This import is here to avoid a circular import
-    import program.program_conf  # noqa: F401
-
     import app
+    import light_node.light_conf
+    import program.program_conf  # noqa: F401
 
     the_app = QApplication(sys.argv)
     the_app.setStyle("Fusion")

@@ -1,13 +1,17 @@
 from node.audio_node_base import AudioNode
 from node.graph_container_node import GraphContainerNode
+from node.light_node_base import LightNode
 from node.shader_node_base import ShaderNode
-
 
 LISTBOX_MIMETYPE = "application/x-item"
 
 SHADER_NODES = {}  # type: ignore[var-annotated] # FIXME: add type annotation
 
 AUDIO_NODES = {}  # type: ignore[var-annotated] # FIXME: add type annotation
+
+LIGHT_NODES = {}
+
+ALL_OPCODES = []
 
 GRAPH_CONTAINER_OPCODE = 666
 
@@ -25,6 +29,12 @@ class OpCodeNotRegistered(ConfException):
 
 
 def register_node_now(op_code, class_reference):
+    if op_code in ALL_OPCODES:
+        raise InvalidNodeRegistration(
+            "Duplicate node registration of '%s'. There is already %s"
+            % (op_code, SHADER_NODES[op_code])
+        )
+
     if op_code in SHADER_NODES:
         raise InvalidNodeRegistration(
             "Duplicate node registration of '%s'. There is already %s"
@@ -43,10 +53,15 @@ def register_node_now(op_code, class_reference):
     if AudioNode in class_reference.__mro__:
         AUDIO_NODES[op_code] = class_reference
 
+    if LightNode in class_reference.__mro__:
+        LIGHT_NODES[op_code] = class_reference
+
     if GraphContainerNode in class_reference.__mro__:
         GRAPH_CONTAINER_NODES[op_code] = (
             class_reference  # FIXME: Undefined name `GRAPH_CONTAINER_NODES`
         )
+
+    ALL_OPCODES.append(op_code)
 
 
 def register_node(op_code):
@@ -64,16 +79,20 @@ def get_class_from_opcode(op_code):
     if op_code in AUDIO_NODES:
         return AUDIO_NODES[op_code]
 
+    if op_code in LIGHT_NODES:
+        return LIGHT_NODES[op_code]
+
     if op_code == GRAPH_CONTAINER_OPCODE:
         return GraphContainerNode
 
     raise OpCodeNotRegistered("OpCode %d is not registered" % op_code)
 
 
+import audio.transforms  # noqa: F401, E402
+import program.output  # noqa: F401, E402
+
 # Import all nodes and register them
 import program.scene  # noqa: F401, E402
-import program.output  # noqa: F401, E402
 import program.utils  # noqa: F401E402
-import audio.transforms  # noqa: F401, E402
 
 # print(SHADER_NODES)

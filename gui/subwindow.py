@@ -2,15 +2,19 @@ from PyQt5.QtCore import QDataStream, QIODevice, Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
 
-from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
+from node.graph_container_node import GraphContainerNode
+from node.node_conf import (
+    LIGHT_NODES,
+    LISTBOX_MIMETYPE,
+    SHADER_NODES,
+    get_class_from_opcode,
+)
+from node.shader_node_base import Map, ShaderNode
+from nodeeditor.node_edge import EDGE_TYPE_BEZIER, EDGE_TYPE_DIRECT, EDGE_TYPE_SQUARE
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
-
-from node.graph_container_node import GraphContainerNode
-from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.shader_node_base import ShaderNode, Map
 from program.output.screen.screen import ScreenNode
 
 DEBUG = False
@@ -63,9 +67,9 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def clean_preview(self):
         for node in self.scene.nodes:
-                node.should_update_preview = False
+            node.should_update_preview = False
 
-    def render(self, audio_features=None, should_update_preview = False):
+    def render(self, audio_features=None, should_update_preview=False):
         for node in self.scene.nodes:
             if node.should_update_preview:
                 should_update_preview = True
@@ -79,7 +83,6 @@ class PataNodeSubWindow(NodeEditorWidget):
             self.preview = preview
 
         self.clean_preview()
-
 
     def getLastMainColors(self):
         if self.screen_node is not None:

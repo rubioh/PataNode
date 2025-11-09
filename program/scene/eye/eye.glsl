@@ -23,7 +23,7 @@ vec2 hash( vec2 p )
     return fract(sin(p+455.)*18.5453);
 }
 
-vec2 hash2( vec2 p ) 
+vec2 hash2( vec2 p )
 {
     const vec2 k = vec2( 0.3183099, 0.3678794 );
     float n = 111.0*p.x + 113.0*p.y;
@@ -43,7 +43,7 @@ float noise_perso(in vec2 st) {
 }
 
 float fbm( in vec2 x)
-{    
+{
     float t = 0.0;
     float amp = 0.;
     for( int i=1; i<7; i++ )
@@ -76,19 +76,19 @@ void main()
     vec2 uv = ( 2.*gl_FragCoord.xy - iResolution.xy ) / iResolution.y;
 
     uv *= 1.8;
-    //uv *= .7;
+    uv *= .3;
 
-    float angle = iTime*.1 + energy_mid; 
+    float angle = iTime*.1 + energy_mid;
     angle = 0.;
     mat2 rot = mat2(cos(angle), sin(angle), -sin(angle), cos(angle));
     uv *= rot;
     // Time varying pixel color
     vec2 center = vec2(0., 0.);
     float radius = .05+energy_fast/2.;
-    
+
     vec2 pupille = make_pupil(uv, center, radius);
     vec2 eye = make_eye(uv);
-    
+
     vec2 st = (uv-center)*(3.);
     float N = 2;
     float length_st = pow(pow(abs(uv.x), N) + pow(abs(uv.y), N), 1/N);
@@ -98,7 +98,7 @@ void main()
     vec3 c = vec3(1., 1., 1.);
     vec3 d = vec3(0.0, 0.1, 0.2);
     vec3 iris = palette(n*.7, a,b,c,d)*eye.y* (1. - pupille.y);
-    
+
     vec3 col = iris + eye.x*vec3(.5)+pupille.x*vec3(.5);
     // Output to screen
     //col *= 0.;
@@ -106,4 +106,3 @@ void main()
     //
     fragColor = vec4(col,1.0);
 }
-
