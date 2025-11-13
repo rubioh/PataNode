@@ -50,6 +50,32 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.send_header("Content-type", "text/plain")
         self.end_headers()
         self.wfile.write(response)
+        if "/update_mapping" in self.path:
+            path = self.path[len("/update_mapping?wireframe="):]
+            args = path.split("&")
+            args = args[:-1]
+            wireframe = False
+            a = args.pop(0)
+            print(a)
+            if a == "true":
+                wireframe = True
+            num_poly = len(args)
+            polygons = []
+            poly_idx = 0
+            while num_poly > 0:
+                poly = args.pop(0).split(";")
+                polygons.append([])
+                while len(poly):
+                    while len(poly):
+                        point = poly.pop(0).split(",")
+                        if point != ['']:
+                            polygons[poly_idx].append(float(point[0]))
+                            polygons[poly_idx].append(float(point[1]))
+                poly_idx += 1
+
+                num_poly = num_poly - 1
+            self.server.app.update_global_mapping(wireframe, polygons)
+            return
         if "/set_active_graph" in self.path:
             path = self.path[len("/set_active_graph?graph="):]
             self.server.app.set_active_graph(path)

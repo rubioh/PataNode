@@ -11,6 +11,7 @@ from nodeeditor.utils import dumpException
 from node.graph_container_node import GraphContainerNode
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from node.shader_node_base import ShaderNode, Map
+from program.map.mapping.mapping import Mapping
 from program.output.screen.screen import ScreenNode
 
 DEBUG = False
@@ -77,7 +78,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            preview = self.screen_node.render(audio_features, should_update_preview)
+            preview = self.screen_node.render(audio_features, should_update_preview, self.mapping)
             if should_update_preview:
                 self.preview = preview
                 self.version = self.version + 1
