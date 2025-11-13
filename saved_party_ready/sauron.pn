@@ -28,77 +28,102 @@
             ],
             "content": {},
             "op_code": 598,
+            "cpu_adaptable_parameters": {
+                "draw_program": {},
+                "transform_program": {},
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "draw_program": {},
                 "transform_program": {
                     "Trail": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "SeedTex": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iFrame": {
                         "eval_function": {
                             "name": "eval_function",
-                            "value": "-1",
-                            "widget": "TextEdit"
+                            "type": "f4",
+                            "value": "x",
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "part_size": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "1/10",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sensor_direction": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "trail_thresh": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "2500",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "velocity_rate": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "0.05+20*x**2",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "sensor_length": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "5+50*x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "update_direction": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "0.5",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "to_center_amount": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "30*x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -191,41 +216,54 @@
             ],
             "content": {},
             "op_code": 1536,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "1",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "AddTexture": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "BaseTexture": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "decay_rate": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "0.85",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "diffuse_amount": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "1",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -295,34 +333,45 @@
             ],
             "content": {},
             "op_code": 1596,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "SubTexture": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "BaseTexture": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "substract_amount": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "-1*np.sin((2*3.13159/128)*(x%128))",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -373,12 +422,24 @@
             "outputs": [],
             "content": {},
             "op_code": 0,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "tex": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
+                            "widget": "TextEdit"
+                        }
+                    },
+                    "flip_y": {
+                        "eval_function": {
+                            "name": "eval_function",
+                            "type": "f4",
+                            "value": "x",
                             "widget": "TextEdit"
                         }
                     }
@@ -426,41 +487,54 @@
             ],
             "content": {},
             "op_code": 1353,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "hue_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "saturation_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "value_pow_factor": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x*2.",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -523,41 +597,54 @@
             ],
             "content": {},
             "op_code": 1658,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "hue_offset": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "0.0425",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "saturation_offset": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "0.8",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "value_offset": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -620,41 +707,56 @@
             ],
             "content": {},
             "op_code": 537,
+            "cpu_adaptable_parameters": {
+                "program": {},
+                "vblur_program": {},
+                "hblur_program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Bloom": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "compression": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x*.5",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bloom_rate": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "5+x/4",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -662,29 +764,37 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "level": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "Prev": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 },
@@ -692,15 +802,19 @@
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "iChannel0": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "input_data",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
@@ -791,62 +905,81 @@
             ],
             "content": {},
             "op_code": 323,
+            "cpu_adaptable_parameters": {
+                "program": {}
+            },
             "gpu_adaptable_parameters": {
                 "program": {
                     "iTime": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_fast": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_mid": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "energy_slow": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "bpm": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "intensity": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "tf": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     },
                     "scale": {
                         "eval_function": {
                             "name": "eval_function",
+                            "type": "f4",
                             "value": "x",
-                            "widget": "TextEdit"
+                            "widget": "TextEdit",
+                            "protected": false
                         }
                     }
                 }
