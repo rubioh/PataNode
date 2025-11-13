@@ -32,6 +32,7 @@ class Worker(QRunnable):
 
 class PataShadeApp(PataNode):
     def __init__(self, args):
+        self.args = args
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine(args)
         super().__init__()
@@ -42,8 +43,9 @@ class PataShadeApp(PataNode):
         self.initAudioTimer()
         self.initLightTimer()
         self.initShaderQTimer()
-        self.initPataserverQTimer()
-        self.start_server()
+        if args.server:
+            self.initPataserverQTimer()
+            self.start_server()
         # Features for light new engine
         self._last_main_colors = np.zeros(3)
         self._last_audio_features = {feature: 0 for feature in list_audio_features}
@@ -155,7 +157,8 @@ class PataShadeApp(PataNode):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
         self.shader_timer.start(int(1 / 60 * 1000))
-        self.server_timer.start(int(1 / 60 * 1000))
+        if self.args.server:
+            self.server_timer.start(int(1 / 60 * 1000))
 
     def closeEvent(self, event):
         self.audio_timer.stop()
