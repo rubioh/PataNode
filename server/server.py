@@ -41,7 +41,6 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.wfile.write(ret)
 
     def do_POST(self):
-        print(self.path)
         content_length = int(self.headers.get("Content-Length", 0))
         post_data = self.rfile.read(content_length) if content_length > 0 else b""
         response = b"Received POST: " + post_data
@@ -54,9 +53,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
             args = path.split("&")
             args = args[:-1]
             wireframe = False
-            a = args.pop(0)
-            print(a)
-            if a == "true":
+            if args.pop(0) == "true":
                 wireframe = True
             num_poly = len(args)
             polygons = []
