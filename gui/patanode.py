@@ -51,7 +51,7 @@ class PataNode(NodeEditorWindow):
         # Calls initUI
         self.active_graph = None
         self.graphs = {}
-        self.previews  = {}
+        self.previews = {}
         self.next_unique_session_id = 0
         self.queue = []
         super().__init__()
@@ -168,9 +168,11 @@ class PataNode(NodeEditorWindow):
                 if node.program:
                     entry = {}
                     params = node.program.getGpuAdaptableParameters()
+                    cpu_params = node.program.getCpuAdaptableParameters()
                     bindings = node.program.programs_uniforms.init_binding
                     if "program" not in params:
                         continue
+                    # gpu parameters
                     params = params["program"]
                     for param_name, param_values in params.items():
                         param_values = param_values["eval_function"]
@@ -194,12 +196,14 @@ class PataNode(NodeEditorWindow):
                             "values": str(param_values["value"]),
                             "type": str(param_values["type"]),  # .item()
                             "is_default_value": False,
+                            "is_cpu_param": False,
                         }
                         if value is not None and "x" in param_values["value"]:
                             entry = {
                                 "values": str(value),
                                 "type": str(type(value)),
                                 "is_default_value": True,
+                                "is_cpu_param": False,
                             }
                         if "default_value" not in param_values:
                             param_values["default_value"] = entry["values"]
@@ -207,18 +211,36 @@ class PataNode(NodeEditorWindow):
                                 param_values["default_value"] = "x"
                         entry["default_value"] = param_values["default_value"]
                         if "x" not in entry["values"]:
-                            ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                                entry
-                            )
+                            ret["graphs"][graph_name]["nodes"][node_name][
+                                param_name
+                            ] = entry
+                    # cpu params
+                    for param_name, param_values in cpu_params["program"].items():
+                        print(param_name, param_values)
+                        param_values = param_values
+                        value = param_values["eval_function"]["value"]
+                        if "default_value" not in param_values:
+                            param_values["default_value"] = value
+                        default_value = param_values["default_value"]
+                        entry = {
+                            "default_value": str(default_value),
+                            "values": str(value),
+                            "type": str(type(value)),
+                            "is_cpu_param": True,
+                            "is_default_value": value == default_value,
+                        }
+                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
+                            entry
+                        )
         return ret
 
     def create_bmp_in_memory(self, width, height, bytes):
         img = img = Image.frombytes("RGBA", (width, height), bytes)
 
         bmp_io = io.BytesIO()
-        img.save(bmp_io, format='BMP')
+        img.save(bmp_io, format="BMP")
         bmp_data = bmp_io.getvalue()
-        
+
         return bmp_data
 
     def set_active_graph(self, id):
@@ -242,17 +264,33 @@ class PataNode(NodeEditorWindow):
             polygons = new_polys
             self.mapping.updatePolygons(polygons)
 
-    def change_parameter(self, graph_name, node_name, attribute_name, value):
+    def change_parameter(self, graph_name, node_name, attribute_name, value, is_cpu):
         if graph_name in self.graphs:
             graph = self.graphs[graph_name]
             for node in graph.scene.nodes:
-                if node.unique_name == node_name:
-                    if "program" in node.program.getGpuAdaptableParameters():
-                        params = node.program.getGpuAdaptableParameters()["program"]
-                        if attribute_name in params:
-                            t = type(params[attribute_name]["eval_function"]["value"])
-                            params[attribute_name]["eval_function"]["value"] = t(value)
-                            return
+                if not is_cpu:
+                    if node.unique_name == node_name:
+                        if "program" in node.program.getGpuAdaptableParameters():
+                            params = node.program.getGpuAdaptableParameters()["program"]
+                            if attribute_name in params:
+                                t = type(
+                                    params[attribute_name]["eval_function"]["value"]
+                                )
+                                params[attribute_name]["eval_function"]["value"] = t(
+                                    value
+                                )
+                                return
+                else:
+                    if node.unique_name == node_name:
+                        if "program" in node.program.getCpuAdaptableParameters():
+                            params = node.program.getCpuAdaptableParameters()["program"]
+                            if attribute_name in params:
+                                t = type(
+                                    params[attribute_name]["eval_function"]["value"]
+                                )
+                                params[attribute_name]["eval_function"]["value"] = t(
+                                    value
+                                )
 
     def render(self, audio_features=None):
         while len(self.queue) > 0:
@@ -268,12 +306,13 @@ class PataNode(NodeEditorWindow):
             if graph.should_update_preview():
                 graph.render(audio_features, True)
             if graph.preview:
-                image = self.create_bmp_in_memory(graph.preview[0][0], graph.preview[0][1], graph.preview[1])
+                image = self.create_bmp_in_memory(
+                    graph.preview[0][0], graph.preview[0][1], graph.preview[1]
+                )
                 if graph.unique_session_id not in self.previews:
                     self.previews[str(graph.unique_session_id)] = (graph.version, image)
                 elif self.previews[str(graph.unique_session_id)][0] != graph.version:
                     self.previews[str(graph.unique_session_id)] = (graph.version, image)
-
 
         # TODO: logic for choosing the rendering program
         if self.current_node_editor_widget is None:
@@ -459,7 +498,6 @@ class PataNode(NodeEditorWindow):
                 subwnd = self.createMdiChild(nodeeditor)
                 subwnd.show()
 
-
                 if graph:
                     nodeeditor.initGraphScene()
             else:
@@ -488,7 +526,6 @@ class PataNode(NodeEditorWindow):
         self.editMenu.aboutToShow.connect(self.updateEditMenu)
 
     def updateMenus(self):
-        #       print("update Menus")
         active = self.getCurrentNodeEditorWidget()
         hasMdiChild = active is not None
 
@@ -506,7 +543,6 @@ class PataNode(NodeEditorWindow):
 
     def updateEditMenu(self):
         try:
-            #           print("update Edit Menu")
             active = self.getCurrentNodeEditorWidget()
             hasMdiChild = active is not None
 
