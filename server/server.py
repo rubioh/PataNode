@@ -38,6 +38,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Length", str(len(ret)))
         self.end_headers()
         self.server.graphs_data = self.server.app.poll_graphs()
+        # print(type(), self.server.graphs_data)
         self.wfile.write(ret)
 
     def do_POST(self):
@@ -105,6 +106,7 @@ class PataServer:
         self.thread.daemon = True  # Allows program to exit even if thread is running
 
     def update(self):
+        #self.server.graphs_data = self.app.poll_graphs()
         time.sleep(1.0 / 60.0)
         pass
 
