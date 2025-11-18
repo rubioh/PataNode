@@ -1,9 +1,11 @@
+import io
 import os
-
 from functools import wraps
 from time import time
 
-from PyQt5.QtCore import Qt, QSignalMapper
+import numpy as np
+from PIL import Image
+from PyQt5.QtCore import QSignalMapper, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
@@ -13,13 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-from program.map.mapping.mapping import Mapping
-from nodeeditor.node_editor_window import NodeEditorWindow
-from nodeeditor.utils import dumpException, pp
-from nodeeditor.utils import loadStylesheets
-import numpy as np
-from PIL import Image
-import io
+
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.mappingwindow import PataNodeMappingWindow
 from gui.subwindow import PataNodeSubWindow
@@ -28,7 +24,9 @@ from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
-import base64
+from nodeeditor.node_editor_window import NodeEditorWindow
+from nodeeditor.utils import dumpException, loadStylesheets, pp
+from program.map.mapping.mapping import Mapping
 
 
 def timing(f):
@@ -229,9 +227,9 @@ class PataNode(NodeEditorWindow):
                             "is_cpu_param": True,
                             "is_default_value": value == default_value,
                         }
-                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                            entry
-                        )
+                        ret["graphs"][graph_name]["nodes"][node_name][
+                            param_name
+                        ] = entry
         return ret
 
     def create_bmp_in_memory(self, width, height, bytes):
