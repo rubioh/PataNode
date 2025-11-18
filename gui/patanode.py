@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-from program.map.mapping.mapping import Mapping
+
 from nodeeditor.node_editor_window import NodeEditorWindow
 from nodeeditor.utils import dumpException, pp
 from nodeeditor.utils import loadStylesheets
@@ -108,7 +108,6 @@ class PataNode(NodeEditorWindow):
         self.setWindowTitle("PataNode")
         self.initMapWindow()
         self.current_node_editor_widget = None
-        self.mapping = Mapping(self.ctx)
 
     def initMapWindow(self):
         self.mapsubwnd = PataNodeMappingWindow(self)
@@ -201,11 +200,7 @@ class PataNode(NodeEditorWindow):
                                 "type": str(type(value)),
                                 "is_default_value": True,
                             }
-                        if "default_value" not in param_values:
-                            param_values["default_value"] = entry["values"]
-                            if "x" in entry["values"]:
-                                param_values["default_value"] = "x"
-                        entry["default_value"] = param_values["default_value"]
+                            
                         if "x" not in entry["values"]:
                             ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
                                 entry
@@ -223,24 +218,6 @@ class PataNode(NodeEditorWindow):
 
     def set_active_graph(self, id):
         self.queue.append((0, id))
-
-    def update_global_mapping(self, wireframe: bool, polygons: list):
-        new_polys = [0] * len(polygons) * 2
-        if self.mapping:
-            for i in range(len(polygons) // 2):
-                new_polys[i * 2] = polygons[i]
-                new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
-            self.mapping.wireframe = wireframe
-            for i in range(len(polygons)):
-                new_poly = []
-                for j in range(len(polygons[i]) // 2):
-                    new_poly.append(polygons[i][j * 2])
-                    new_poly.append(polygons[i][j * 2 + 1])
-                    new_poly.append(self.mapping.base_polygons[0][j * 4 + 2])
-                    new_poly.append(self.mapping.base_polygons[0][j * 4 + 3])
-
-                polygons[i] = new_poly
-            self.mapping.updatePolygons(polygons)
 
     def change_parameter(self, graph_name, node_name, attribute_name, value):
         if graph_name in self.graphs:
@@ -267,7 +244,6 @@ class PataNode(NodeEditorWindow):
                     self.showShaderWindowFromPhone()
 
         for graph in self.graphs.values():
-            graph.mapping = self.mapping
             if graph.should_update_preview():
                 graph.render(audio_features, True)
             if graph.preview:
