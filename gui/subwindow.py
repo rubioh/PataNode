@@ -11,6 +11,7 @@ from nodeeditor.utils import dumpException
 from node.graph_container_node import GraphContainerNode
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from node.shader_node_base import ShaderNode, Map
+from program.map.mapping.mapping import Mapping
 from program.output.screen.screen import ScreenNode
 
 DEBUG = False
@@ -22,11 +23,11 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.app = app
         self.mark_dead = False
         self.preview = None
+        self.version = 0
         self.light_engine = app.light_engine
         self.unique_session_id = -1
         super().__init__()
         #       self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setTitle()
 
         self.map_scene = app.map_scene
@@ -63,10 +64,12 @@ class PataNodeSubWindow(NodeEditorWidget):
 
     def clean_preview(self):
         for node in self.scene.nodes:
-                node.should_update_preview = False
+            node.should_update_preview = False
 
-    def render(self, audio_features=None, should_update_preview = False):
+    def render(self, audio_features=None, should_update_preview=False):
         for node in self.scene.nodes:
+            if isinstance(node, GraphContainerNode):
+                continue
             if node.should_update_preview:
                 should_update_preview = True
         if self.screen_node is None:
@@ -75,11 +78,12 @@ class PataNodeSubWindow(NodeEditorWidget):
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            preview = self.screen_node.render(audio_features, should_update_preview)
-            self.preview = preview
-
-        self.clean_preview()
-
+            preview = self.screen_node.render(audio_features, should_update_preview, self.mapping)
+            if should_update_preview:
+                self.preview = preview
+                self.version = self.version + 1
+        if self.preview:
+            self.clean_preview()
 
     def getLastMainColors(self):
         if self.screen_node is not None:

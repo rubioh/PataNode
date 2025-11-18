@@ -324,6 +324,7 @@ class ProgramBase:
         uniform_parameters = self.adaptable_parameters_dict[program_name][uniform_name]
         uniform_parameters[name] = {
             "name": name,
+            "type": type,
             #           "minimum": minimum,
             #           "maximum": maximum,
             #           "type":  type,
@@ -359,6 +360,22 @@ class ProgramBase:
             "eval_function": {
                 "name": name,
                 "value": value,
+                "type": "str",
+                "connect": lambda v: self.setCpuAdaptableParameters(
+                    self.name + "program", name, v
+                ),
+                #               "callback": callback,
+                "widget": "TextEdit",
+            }
+        }
+
+    def add_float_cpu_adaptable_parameter(self, name, value, callback=None):
+        uniform_parameters = self.cpu_adaptable_parameters_dict[self.name + "program"]
+        uniform_parameters[name] = {
+            "eval_function": {
+                "name": name,
+                "value": value,
+                "type": "float",
                 "connect": lambda v: self.setCpuAdaptableParameters(
                     self.name + "program", name, v
                 ),
@@ -402,6 +419,11 @@ class ProgramBase:
             modified_data = x
 
         return modified_data
+
+    def getSingleCpuParameters(self, name):
+        return self.getCpuAdaptableParameters()["program"][name]["eval_function"][
+            "value"
+        ]
 
     def getCpuAdaptableParameters(self):
         return self.cpu_adaptable_parameters_dict

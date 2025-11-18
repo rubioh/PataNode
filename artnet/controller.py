@@ -241,7 +241,11 @@ if __name__ == "__main__":
 
     while True:
         red = bytes([int((sin(monotonic()) + 1) / 2 * 255), 0, 0] * 170 + [0, 0])
-        artnet_ctrl.show(red,
-            Universe(IPv4Address("10.2.0.2"), PortAddr(0),)
+        artnet_ctrl.show(
+            red,
+            Universe(
+                IPv4Address("10.2.0.2"),
+                PortAddr(0),
+            ),
         )
         time.sleep(1 / 60)

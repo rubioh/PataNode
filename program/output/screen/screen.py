@@ -1,3 +1,4 @@
+import glm
 from os.path import dirname, join
 
 from node.node_conf import register_node
@@ -15,7 +16,6 @@ class Screen(ProgramBase):
     def __init__(self, ctx=None, major_version=3, minor_version=3, win_size=(960, 540)):
         super().__init__(ctx, major_version, minor_version, win_size)
         self.title = "Screen"
-
         self.initProgram()
         self.initParams()
 
@@ -45,9 +45,11 @@ class Screen(ProgramBase):
     def make_preview(self, texture: Texture, af):
         self.updateParams(af)
         self.bindUniform(af)
+
+        self.program["flip_y"] = glm.vec2(1.0, 1.0)
         new_size = (256, 144)
         self.program["iResolution"] = new_size
-        downscaled = self.ctx.texture((new_size[0], new_size[1] ), 4, dtype="f1")
+        downscaled = self.ctx.texture((new_size[0], new_size[1]), 4, dtype="f1")
         fbo = self.ctx.framebuffer(downscaled)
         texture.use(0)
         fbo.use()
@@ -55,11 +57,15 @@ class Screen(ProgramBase):
         preview = fbo.color_attachments[0].read()
         return (new_size, preview)
 
-    def render(self, textures, af=None):
+    def render(self, textures, af=None, mapping = None):
+        texture = textures[0]
+        if mapping:
+            mapping.updateParams()
+            texture = mapping.render([texture])
         self.updateParams(af)
         self.bindUniform(af)
-
-        textures[0].use(0)
+        self.program["flip_y"] = glm.vec2(-1.0, -1.0)
+        texture.use(0)
 
         self.ctx.screen.use()
         self.vao.render()
@@ -114,7 +120,7 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self, audio_features=None, with_preview = False):
+    def render(self, audio_features=None, with_preview=False, mapping = None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.already_called = False
@@ -132,7 +138,8 @@ class ScreenNode(ShaderNode, Output):
         if self.plreturn is not None:
             self.buffer_col = self.plreturn.render(texture)
 
-        self.program.render([texture], audio_features)
+       
+        self.program.render([texture], audio_features, mapping)
         if with_preview:
             return self.program.make_preview(texture, audio_features)
         return True

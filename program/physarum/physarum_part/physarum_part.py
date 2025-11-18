@@ -88,10 +88,9 @@ class PhysarumPart(ProgramBase):
         self.seed_texture.write(random)
 
     def updateParams(self, af):
-        self.iFrame += 1
-
         if af is None:
             return
+        self.iFrame += 1
 
         return
 
