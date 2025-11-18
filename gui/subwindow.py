@@ -22,7 +22,6 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.app = app
         self.mark_dead = False
         self.preview = None
-        self.version = 0
         self.light_engine = app.light_engine
         self.unique_session_id = -1
         super().__init__()
@@ -81,7 +80,6 @@ class PataNodeSubWindow(NodeEditorWidget):
             preview = self.screen_node.render(audio_features, should_update_preview)
             if should_update_preview:
                 self.preview = preview
-                self.version = self.version + 1
         if self.preview:
             self.clean_preview()
 

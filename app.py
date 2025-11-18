@@ -155,7 +155,7 @@ class PataShadeApp(PataNode):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
         self.shader_timer.start(int(1 / 60 * 1000))
-        self.server_timer.start(int(1 / 60 * 1000))
+        self.server_timer.start(int(120 / 60 * 1000))
 
     def closeEvent(self, event):
         self.audio_timer.stop()
