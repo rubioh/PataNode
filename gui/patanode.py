@@ -225,8 +225,11 @@ class PataNode(NodeEditorWindow):
         self.queue.append((0, id))
 
     def update_global_mapping(self, wireframe: bool, polygons: list):
-        new_polys = [0] * len(polygons)
+        new_polys = [0] * len(polygons) * 2
         if self.mapping:
+            for i in range(len(polygons) // 2):
+                new_polys[i * 2] = polygons[i]
+                new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
             self.mapping.wireframe = wireframe
             for i in range(len(polygons)):
                 new_poly = []
@@ -235,11 +238,8 @@ class PataNode(NodeEditorWindow):
                     new_poly.append(polygons[i][j * 2 + 1])
                     new_poly.append(self.mapping.base_polygons[0][j * 4 + 2])
                     new_poly.append(self.mapping.base_polygons[0][j * 4 + 3])
+
                 polygons[i] = new_poly
-            for i in range(len(polygons) // 2):
-                new_polys[i * 2] = polygons[i]
-                new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
-            polygons = new_polys
             self.mapping.updatePolygons(polygons)
 
     def change_parameter(self, graph_name, node_name, attribute_name, value):
