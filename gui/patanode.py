@@ -23,7 +23,6 @@ from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
-import json
 
 DEBUG = False
 
@@ -112,68 +111,6 @@ class PataNode(NodeEditorWindow):
         self.resizeDocks((self.audioDock,), (200,), Qt.Vertical)
         # Hide the audio features when starting the app
         self.audioDock.setVisible(False)
-
-    # Collect infos about graphs and serialize them into json for pataphone
-    def poll_graphs(self):
-        counter = {}
-        ret = {"graphs": {}, "graph_name": []}
-        for graph in self.graphs:
-            graph_name = str(graph.unique_session_id)
-            ret["graph_name"].append(graph_name)
-            ret["graphs"][graph_name] = {
-                "preview": graph.preview,
-                "is_active": False,
-                "nodes": {},
-                "nodes_name": [],
-                "name": graph.getUserFriendlyFilename(),
-                "id": graph_name,
-            }
-            for node in graph.scene.nodes:
-                node_name = node.op_title
-                if node_name not in counter:
-                    counter[node_name] = 0
-                else:
-                    counter[node_name] = counter[node_name] + 1
-                node_name = node_name + str(counter[node_name])
-                ret["graphs"][graph_name]["nodes_name"] = node_name
-                ret["graphs"][graph_name]["nodes"][node_name] = {}
-                if node.program:
-                    entry = {}
-                    params = node.program.getGpuAdaptableParameters()
-                    bindings = node.program.programs_uniforms.init_binding
-                    if "program" not in params:
-                        continue
-                    params = params["program"]
-                    for param_name, param_values in params.items():
-                        param_values = param_values["eval_function"]
-                        if "iChannel" in param_name:
-                            continue
-                        if param_name == "protected":
-                            if param_values:
-                                continue
-                        value = None
-                        if "" in bindings:
-                            if param_name in bindings[""]:
-                                binding = bindings[""][param_name]["param_name"]
-                                if binding:
-                                    value = getattr(node.program, binding)
-
-                        entry = {
-                            param_name: {
-                                "values": param_values["value"],
-                                "type": param_values["type"],
-                                "is_default_value": False,
-                            }
-                        }
-                        if value is not None and param_values["value"] == "x":
-                            entry = {
-                                "values": value,
-                                "type": float,
-                                "is_default_value": True,
-                            }
-                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                            entry
-                        )
 
     def render(self, audio_features=None):
         for graph in self.graphs:
@@ -496,7 +433,7 @@ class PataNode(NodeEditorWindow):
     def createMdiChild(self, child_widget=None):
         nodeeditor = (
             child_widget if child_widget is not None else PataNodeSubWindow(self)
-        )
+        )        
         self.graphs.append(nodeeditor)
         if nodeeditor.__class__ == PataNodeSubWindow:
             nodeeditor.set_unique_session_id(self.next_unique_session_id)
@@ -512,8 +449,8 @@ class PataNode(NodeEditorWindow):
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
         for x in self.graphs:
-            if x.mark_dead:
-                self.graphs.remove(x)
+                if x.mark_dead:
+                    self.graphs.remove(x)
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():

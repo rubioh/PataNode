@@ -71,7 +71,7 @@ class LightEngine:
     def __call__(self, color=(0, 0, 0), audio_features=None):
         af = audio_features
         output_buffer = list(np.zeros((512)))
-
+        
     def __call__(self, color=(0, 0, 0), audio_features=None):
         af = audio_features
         output_buffer = list(np.zeros((512)))
@@ -85,6 +85,6 @@ class LightEngine:
                 output_buffer[i] = x
         self.wait += 1
         self.wait %= 102
-        #        if self.wait == 30:
-        #           print(output_buffer)
+#        if self.wait == 30:
+ #           print(output_buffer)
         self.light_device.write(output_buffer)

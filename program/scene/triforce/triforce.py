@@ -135,9 +135,9 @@ class Triforce(ProgramBase):
             self.strobe,
         ]
 
-    #        self.effects = [
-    #            self.effect_0
-    #        ]
+#        self.effects = [
+#            self.effect_0
+#        ]
 
     def initUniformsBinding(self):
         binding = {
@@ -160,7 +160,7 @@ class Triforce(ProgramBase):
             self.strobes[i] = value
 
     def updateParams(self, af=None):
-        self.set_all(glm.vec3(0.0))
+        self.set_all(glm.vec3(0.))
         self.set_all_strobe(1.0)
         if af is None:
             return
@@ -184,12 +184,11 @@ class Triforce(ProgramBase):
                 self.light_engine.shader_buffer[offset + 2] = self.colors[indirect[i]].z
                 self.light_engine.shader_buffer[offset + 6] = 1.0
 
-                #                self.light_engine.shader_buffer[offset + 7] = 1.0
-                #            self.light_engine.shader_buffer[offset + 4] = 1.#self.colors[indirect[i]].x
-                #            self.light_engine.shader_buffer[offset + 5] = 1.#self.colors[indirect[i]].x
-                #            self.light_engine.shader_buffer[offset + strobe_offset[i]] = self.strobes[indirect[i]]
+#                self.light_engine.shader_buffer[offset + 7] = 1.0
+    #            self.light_engine.shader_buffer[offset + 4] = 1.#self.colors[indirect[i]].x
+    #            self.light_engine.shader_buffer[offset + 5] = 1.#self.colors[indirect[i]].x
+    #            self.light_engine.shader_buffer[offset + strobe_offset[i]] = self.strobes[indirect[i]]
                 offset = offset + 15
-
     def effect_0(self, af):
         self.colors[0] = glm.vec3(1.0, 0.0, 0.0)
         self.colors[1] = glm.vec3(0.0, 1.0, 0.0)
@@ -199,15 +198,11 @@ class Triforce(ProgramBase):
         self.colors[5] = glm.vec3(1.0, 1.0, 0.0)
 
     def effect_1(self, af):
-        self.colors[(self.kick) % 6] = self.get_col()[
-            (self.kick // 2) % len(self.get_col())
-        ]
+        self.colors[(self.kick) % 6] = self.get_col()[(self.kick // 2) % len(self.get_col())]
 
     def effect_2(self, af):
         for i in range(len(self.colors)):
-            self.colors[i] = (
-                self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
-            )
+            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
 
     def effect_3(self, af):
         self.colors[self.kick % 3] = self.get_col()[0]
@@ -227,7 +222,7 @@ class Triforce(ProgramBase):
         self.colors[2 + (self.kick % 2) * 3] = self.get_col()[1]
 
     def strobe(self, af):
-        self.set_all(glm.vec3(1.0))
+        self.set_all(glm.vec3(1.))
         for i in range(len(self.strobes)):
             self.strobes[i] = 0.4
 
@@ -289,18 +284,16 @@ class TriforceNode(ShaderNode, Scene):
 
         return output_Triforce
 
-    # 4 lights effects
+
+
+# 4 lights effects
 
     def effect_41(self, af):
-        self.colors[(self.kick) % 4] = self.get_col()[
-            (self.kick // 2) % len(self.get_col())
-        ]
+        self.colors[(self.kick) % 4] = self.get_col()[(self.kick // 2) % len(self.get_col())]
 
     def effect_42(self, af):
         for i in range(len(self.colors) - 1):
-            self.colors[i] = (
-                self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
-            )
+            self.colors[i] = self.get_col()[(self.kick + i) % len(self.get_col())] * af["on_kick"]
 
     def effect_43(self, af):
         self.colors[self.kick % 2] = self.get_col()[0]
