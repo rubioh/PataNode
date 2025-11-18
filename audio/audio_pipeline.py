@@ -30,7 +30,7 @@ class AudioEngine:
         self.current_wav_frame = np.zeros(self.chunk)
         self.wav_std = 0.25
         self.queue_callback = True
-        device_index = os.environ.get("PATASHADE_INPUT_DEVICE", 7)
+        device_index = os.environ.get("PATASHADE_INPUT_DEVICE", 1)
         print(sd.query_devices())
 
         try:
@@ -130,10 +130,7 @@ class AudioEngine:
             self.features[key] = np.array(value, dtype=np.float32)
 
     def get_shared_features(self):
-        if "bpm" in self.features:
-            self.bpm = self.features["bpm"]
-        else:
-            self.bpm = 100
+        self.bpm = self.features["bpm"]
         self.mini_chill = self.features["mini_chill"]
 
     def __call__(self):
@@ -164,10 +161,9 @@ class AudioEngine:
             self.ET(np.abs(self.fft), self.features, audio=self.buffer)
         )  # Energy things
         self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
-        if "on_chill" in self.features:
-            self.add_to_features(
-                self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
-            )  # BPM, tempo
+        self.add_to_features(
+            self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
+        )  # BPM, tempo
         #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0
 

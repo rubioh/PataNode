@@ -27,6 +27,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         self.unique_session_id = -1
         super().__init__()
         #       self.setAttribute(Qt.WA_DeleteOnClose)
+
         self.setTitle()
 
         self.map_scene = app.map_scene
