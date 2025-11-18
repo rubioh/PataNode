@@ -1,8 +1,5 @@
 import os
 
-from functools import wraps
-from time import time
-
 from PyQt5.QtCore import Qt, QSignalMapper
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
@@ -26,20 +23,7 @@ from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
-import base64
-
-
-def timing(f):
-    @wraps(f)
-    def wrap(*args, **kw):
-        ts = time()
-        result = f(*args, **kw)
-        te = time()
-        print("func:%r args:[%r, %r] took: %2.4f sec" % (f.__name__, args, kw, te - ts))
-        return result
-
-    return wrap
-
+import json
 
 DEBUG = False
 
@@ -130,27 +114,20 @@ class PataNode(NodeEditorWindow):
         self.audioDock.setVisible(False)
 
     # Collect infos about graphs and serialize them into json for pataphone
-
-    # @timing
     def poll_graphs(self):
         counter = {}
-        ret = {"graphs": {}, "graphs_name": []}
+        ret = {"graphs": {}, "graph_name": []}
         for graph in self.graphs:
             graph_name = str(graph.unique_session_id)
-            ret["graphs_name"].append(graph_name)
+            ret["graph_name"].append(graph_name)
             ret["graphs"][graph_name] = {
+                "preview": graph.preview,
                 "is_active": False,
                 "nodes": {},
                 "nodes_name": [],
                 "name": graph.getUserFriendlyFilename(),
                 "id": graph_name,
             }
-            if graph.preview:
-                ret["graphs"][graph_name]["preview"] = {
-                    "data": base64.b64encode(graph.preview[1]).decode(),
-                    "preview_size_x": graph.preview[0][0],
-                    "preview_size_y": graph.preview[0][1],
-                }
             for node in graph.scene.nodes:
                 node_name = node.op_title
                 if node_name not in counter:
@@ -158,7 +135,7 @@ class PataNode(NodeEditorWindow):
                 else:
                     counter[node_name] = counter[node_name] + 1
                 node_name = node_name + str(counter[node_name])
-                ret["graphs"][graph_name]["nodes_name"].append(node_name)
+                ret["graphs"][graph_name]["nodes_name"] = node_name
                 ret["graphs"][graph_name]["nodes"][node_name] = {}
                 if node.program:
                     entry = {}
@@ -169,11 +146,7 @@ class PataNode(NodeEditorWindow):
                     params = params["program"]
                     for param_name, param_values in params.items():
                         param_values = param_values["eval_function"]
-                        if (
-                            "iChannel" in param_name
-                            or "bpm" in param_name
-                            or "iTime" in param_name
-                        ):
+                        if "iChannel" in param_name:
                             continue
                         if param_name == "protected":
                             if param_values:
@@ -186,20 +159,21 @@ class PataNode(NodeEditorWindow):
                                     value = getattr(node.program, binding)
 
                         entry = {
-                            "values": str(param_values["value"]),
-                            "type": str(param_values["type"]),  # .item()
-                            "is_default_value": False,
+                            param_name: {
+                                "values": param_values["value"],
+                                "type": param_values["type"],
+                                "is_default_value": False,
+                            }
                         }
                         if value is not None and param_values["value"] == "x":
                             entry = {
-                                "values": str(value),
-                                "type": "float",
+                                "values": value,
+                                "type": float,
                                 "is_default_value": True,
                             }
                         ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
                             entry
                         )
-        return ret
 
     def render(self, audio_features=None):
         for graph in self.graphs:
