@@ -83,8 +83,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
             node_name = args[1].split("=")[1]
             attribute_name = args[2].split("=")[1]
             value = args[3].split("=")[1]
-            is_cpu = args[4].split("=")[1] == "true"
-            self.server.app.change_parameter(graph_name, node_name, attribute_name, value, is_cpu)
+            self.server.app.change_parameter(graph_name, node_name, attribute_name, value)
             return
 
 
