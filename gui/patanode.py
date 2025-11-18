@@ -246,10 +246,13 @@ class PataNode(NodeEditorWindow):
         if graph_name in self.graphs:
             graph = self.graphs[graph_name]
             for node in graph.scene.nodes:
+                print(node.unique_name, node_name)
                 if node.unique_name == node_name:
                     if "program" in node.program.getGpuAdaptableParameters():
                         params = node.program.getGpuAdaptableParameters()["program"]
+                        print(attribute_name, params)
                         if attribute_name in params:
+                            print("Changed")
                             t = type(params[attribute_name]["eval_function"]["value"])
                             params[attribute_name]["eval_function"]["value"] = t(value)
                             return
