@@ -11,8 +11,8 @@ from nodeeditor.utils import dumpException
 from node.graph_container_node import GraphContainerNode
 from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 from node.shader_node_base import ShaderNode, Map
+from program.map.mapping.mapping import Mapping
 from program.output.screen.screen import ScreenNode
-
 
 DEBUG = False
 DEBUG_CONTEXT = False
@@ -21,10 +21,13 @@ DEBUG_CONTEXT = False
 class PataNodeSubWindow(NodeEditorWidget):
     def __init__(self, app=None):
         self.app = app
+        self.mark_dead = False
+        self.preview = None
+        self.version = 0
         self.light_engine = app.light_engine
+        self.unique_session_id = -1
         super().__init__()
         #       self.setAttribute(Qt.WA_DeleteOnClose)
-
         self.setTitle()
 
         self.map_scene = app.map_scene
@@ -44,6 +47,9 @@ class PataNodeSubWindow(NodeEditorWidget):
 
         self.screen_node = None
 
+    def set_unique_session_id(self, id):
+        self.unique_session_id = id
+
     def searchScreenNodes(self):
         # TODO: better logic if multiple screen or output nodes
         for node in self.scene.nodes:
@@ -51,14 +57,33 @@ class PataNodeSubWindow(NodeEditorWidget):
                 self.screen_node = node
                 break
 
-    def render(self, audio_features=None):
+    def should_update_preview(self):
+        for node in self.scene.nodes:
+            if node.should_update_preview:
+                return True
+
+    def clean_preview(self):
+        for node in self.scene.nodes:
+            node.should_update_preview = False
+
+    def render(self, audio_features=None, should_update_preview=False):
+        for node in self.scene.nodes:
+            if isinstance(node, GraphContainerNode):
+                continue
+            if node.should_update_preview:
+                should_update_preview = True
         if self.screen_node is None:
             self.searchScreenNodes()
         # Logic when the screen node is removed (it is not destroyed...)
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            self.screen_node.render(audio_features)
+            preview = self.screen_node.render(audio_features, should_update_preview, self.mapping)
+            if should_update_preview:
+                self.preview = preview
+                self.version = self.version + 1
+        if self.preview:
+            self.clean_preview()
 
     def getLastMainColors(self):
         if self.screen_node is not None:
@@ -140,6 +165,7 @@ class PataNodeSubWindow(NodeEditorWidget):
         self._close_event_listeners.append(callback)
 
     def closeEvent(self, event):
+        self.mark_dead = True
         for callback in self._close_event_listeners:
             callback(self, event)
 
@@ -231,7 +257,6 @@ class PataNodeSubWindow(NodeEditorWidget):
             selected = item.node
         if hasattr(item, "socket"):
             selected = item.socket.node
-
         context_menu = QMenu(self)
         markDirtyAct = context_menu.addAction("Mark Dirty")
         markDirtyDescendantsAct = context_menu.addAction("Mark Descendant Dirty")

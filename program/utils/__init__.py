@@ -6,6 +6,7 @@ from program.utils.mask import mask
 from program.utils.medianfilter import medianfilter
 from program.utils.offset import offset
 from program.utils.random import random
+from program.utils.selector import selector
 from program.utils.reconstruct import reconstruct
 from program.utils.sobel import sobel
 from program.utils.structure_space_tensor import sst
@@ -26,4 +27,5 @@ __all__ = [
     "sst",
     "symetry",
     "upscale_nearest",
+    "selector",
 ]

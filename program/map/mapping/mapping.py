@@ -26,9 +26,9 @@ class Mapping(ProgramBase):
         self.title = "Mapping"
         self.initParams()
         self.initProgram()
-        self.initFBOSpecifications()
+        self.initFBOS()
         #       self.initUniformsBinding()
-        self.polygons = [
+        self.base_polygons = [
             [
                 0.0,
                 0.0,
@@ -66,20 +66,17 @@ class Mapping(ProgramBase):
                 0.0,
             ],
         ]
+        self.polygons = self.base_polygons
         self.vaos = []
 
     def updatePolygons(self, new_polygons):
         self.needsEarcut = True
         self.polygons = new_polygons
 
-    def initFBOSpecifications(self):
-        self.required_fbos = 2
-        fbos_specification = [[self.win_size, 4, "f4"], [self.win_size, 4, "f4"]]
-
-        for specification in fbos_specification:
-            self.fbos_win_size.append(specification[0])
-            self.fbos_components.append(specification[1])
-            self.fbos_dtypes.append(specification[2])
+    def initFBOS(self):
+        texture1 = self.ctx.texture((self.win_size[0], self.win_size[0]), 4, dtype="f1")
+        texture2 = self.ctx.texture((self.win_size[0], self.win_size[0]), 4, dtype="f1")
+        self.fbos = [self.ctx.framebuffer(texture1), self.ctx.framebuffer(texture2)]
 
     def initProgram(self, reload=False):
         vert_path = join(dirname(__file__), "mapping_vertex.glsl")

@@ -130,7 +130,10 @@ class AudioEngine:
             self.features[key] = np.array(value, dtype=np.float32)
 
     def get_shared_features(self):
-        self.bpm = self.features["bpm"]
+        if "bpm" in self.features:
+            self.bpm = self.features["bpm"]
+        else:
+            self.bpm = 100
         self.mini_chill = self.features["mini_chill"]
 
     def __call__(self):
@@ -161,9 +164,10 @@ class AudioEngine:
             self.ET(np.abs(self.fft), self.features, audio=self.buffer)
         )  # Energy things
         self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
-        self.add_to_features(
-            self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
-        )  # BPM, tempo
+        if "on_chill" in self.features:
+            self.add_to_features(
+                self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
+            )  # BPM, tempo
         #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0
 

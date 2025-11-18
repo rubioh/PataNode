@@ -168,3 +168,5 @@ cython_debug/
 #.idea/
 
 uv.lock
+.vscode
+.python-version

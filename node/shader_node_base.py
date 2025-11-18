@@ -86,7 +86,7 @@ class ShaderNode(Node):
     def __init__(self, scene, inputs=[2, 2], outputs=[1]):
         #       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
-
+        self.should_update_preview = True
         self.value = None  # Using to store output texture reference
         self.program = None
         self._container = None  # GraphContainer reference
@@ -403,6 +403,7 @@ class ShaderNode(Node):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__)
 
+        self.should_update_preview = True
         self.markDirty()
         self.eval()
 
