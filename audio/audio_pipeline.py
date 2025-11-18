@@ -1,16 +1,15 @@
 import os
 import time
+from collections import deque
 
 import numpy as np
 import scipy.fft
 import sounddevice as sd  # type: ignore[import-untyped]
 
-from collections import deque
-
-from audio.audio_utils import EnergyTracker
-from audio.audio_logger import AudioLogger
-from audio.audio_event import AudioEventTracker
 from audio.audio_bpm import BPM_estimator
+from audio.audio_event import AudioEventTracker
+from audio.audio_logger import AudioLogger
+from audio.audio_utils import EnergyTracker
 
 
 class AudioEngine:
@@ -57,15 +56,17 @@ class AudioEngine:
             exit(1)
 
         self.log_buffer_size = 250
-        # Tracker, estimator and ML models
+
         self.logger = AudioLogger(log_buffer_size=self.log_buffer_size, active=get_log)
-        self.tracker = AudioEventTracker()
+        # Tracker, estimator and ML models
+        self.audio_event_tracker = AudioEventTracker()
         self.bpm_estimator = BPM_estimator(0.5, 16, 110, 15)
-        self.ET = EnergyTracker(sr=self.sr)
+        self.energy_tracker = EnergyTracker(sr=self.sr)
         #       self.pesto = Pesto.PESTO()
 
         self.true_bpm = None
         self.previous_length = 0
+        self.previous_is_kick = False
 
         self.bpm = 140
         self.mini_chill = 0
@@ -73,9 +74,10 @@ class AudioEngine:
         self.tic = 0
 
         self.features = {}
-        self.initFeatures()
 
-    def initFeatures(self):
+        self.initialize_audio_states()
+
+    def initialize_audio_states(self):
         self.buffer = np.zeros(2000)
         self.current_chunk = np.zeros(self.chunk)
         self.__call__()
@@ -130,11 +132,28 @@ class AudioEngine:
             self.features[key] = np.array(value, dtype=np.float32)
 
     def get_shared_features(self):
-        if "bpm" in self.features:
-            self.bpm = self.features["bpm"]
-        else:
-            self.bpm = 100
+        self.bpm = self.features["bpm"]
         self.mini_chill = self.features["mini_chill"]
+
+    def init_features_for_current_pass(self):
+        # Compute discrete Fourier transform from the current chunk and normalize it
+
+        dft = scipy.fft.rfft(self.buffer[-self.n_fft :])
+        dft = self.normalize_dft(dft)
+        self.fft = dft
+
+        self.features = {}
+        self.features["_on_kick"] = self.previous_is_kick
+        self.features["fft"] = np.abs(self.fft)  # First get dft
+        self.features["mini_chill"] = self.mini_chill
+        self.features["on_chill"] = True
+        self.bpm = 100
+
+        # Computing audio features
+        if "_on_kick" in self.features.keys():
+            self.features["_on_kick"]
+        else:
+            pass
 
     def __call__(self):
         # Sleep a bit when recording start
@@ -145,29 +164,18 @@ class AudioEngine:
         # Remove usless part of the audio buffer (desature RAM)
         self.update_buffer()
 
-        # Compute discrete Fourier transform from the current chunk and normalize it
-        dft = scipy.fft.rfft(self.buffer[-self.n_fft :])
-        dft = self.normalize_dft(dft)
-        self.fft = dft
+        self.init_features_for_current_pass()
 
-        # Computing audio features
-        if "_on_kick" in self.features.keys():
-            _on_kick = self.features["_on_kick"]
-        else:
-            _on_kick = 0
-
-        self.features = {}
-        self.features["_on_kick"] = _on_kick
-        self.features["fft"] = np.abs(self.fft)  # First get dft
-        self.features["mini_chill"] = self.mini_chill
         self.add_to_features(
-            self.ET(np.abs(self.fft), self.features, audio=self.buffer)
+            self.energy_tracker(np.abs(self.fft), self.features, audio=self.buffer)
         )  # Energy things
-        self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
-        if "on_chill" in self.features:
-            self.add_to_features(
-                self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
-            )  # BPM, tempo
+        self.add_to_features(
+            self.audio_event_tracker(self.features, self.bpm)
+        )  # Kick, Hat, Snare
+        self.add_to_features(
+            self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
+        )  # BPM, tempo
+
         #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0
 
@@ -180,6 +188,7 @@ class AudioEngine:
         else:
             self.logger.update_info(self.buffer[self.previous_length :], self.features)
 
+        self.previous_is_kick = self.features["_on_kick"]
         self.previous_length = self.buffer.shape[0]
 
         return self.features
