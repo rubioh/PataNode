@@ -5,7 +5,7 @@ from node.shader_node_base import ShaderNode, Output
 from program.colors.predominant_color.predominant_color import PredominantColorNode
 from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, register_program
-from moderngl import Texture
+
 
 OP_CODE_SCREEN = 0
 
@@ -27,7 +27,7 @@ class Screen(ProgramBase):
         frag_path = join(dirname(__file__), "screen.glsl")
         self.loadProgramToCtx(vert_path, frag_path, reload)
 
-    def initUniformsBinding(self, binding):
+    def initUniformsBinding(self):
         super().initUniformsBinding(binding, program_name="")
 
     def initParams(self):
@@ -41,19 +41,6 @@ class Screen(ProgramBase):
         _, _, w, h = self.ctx.screen.viewport
         self.program["iResolution"] = (w, h)
         self.program["tex"] = 0
-
-    def make_preview(self, texture: Texture, af):
-        self.updateParams(af)
-        self.bindUniform(af)
-        new_size = (256, 144)
-        self.program["iResolution"] = new_size
-        downscaled = self.ctx.texture((new_size[0], new_size[1] ), 4, dtype="f1")
-        fbo = self.ctx.framebuffer(downscaled)
-        texture.use(0)
-        fbo.use()
-        self.vao.render()
-        preview = fbo.color_attachments[0].read()
-        return (new_size, preview)
 
     def render(self, textures, af=None):
         self.updateParams(af)
@@ -84,6 +71,7 @@ class ScreenNode(ShaderNode, Output):
 
     def restoreFBODependencies(self):
         self.scene.fbo_manager.restoreFBOUsability()
+
         for node in self.scene.nodes:
             node.markDirty()
 
@@ -114,7 +102,7 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self, audio_features=None, with_preview = False):
+    def render(self, audio_features=None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.already_called = False
@@ -133,6 +121,4 @@ class ScreenNode(ShaderNode, Output):
             self.buffer_col = self.plreturn.render(texture)
 
         self.program.render([texture], audio_features)
-        if with_preview:
-            return self.program.make_preview(texture, audio_features)
         return True
