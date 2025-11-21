@@ -1,9 +1,9 @@
+import io
 import os
 
-from functools import wraps
-from time import time
-
-from PyQt5.QtCore import Qt, QSignalMapper
+import numpy as np
+from PIL import Image
+from PyQt5.QtCore import QSignalMapper, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
@@ -13,35 +13,18 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-from program.map.mapping.mapping import Mapping
-from nodeeditor.node_editor_window import NodeEditorWindow
-from nodeeditor.utils import dumpException, pp
-from nodeeditor.utils import loadStylesheets
-import numpy as np
-from PIL import Image
-import io
+
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.mappingwindow import PataNodeMappingWindow
-from gui.subwindow import PataNodeSubWindow
+from gui.subwindow import PataNodeGraphWindow
 from gui.widgets.audio_widget import AudioLogWidget
 from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
-import base64
-
-
-def timing(f):
-    @wraps(f)
-    def wrap(*args, **kw):
-        ts = time()
-        result = f(*args, **kw)
-        te = time()
-        print("func:%r args:[%r, %r] took: %2.4f sec" % (f.__name__, args, kw, te - ts))
-        return result
-
-    return wrap
-
+from nodeeditor.node_editor_window import NodeEditorWindow
+from nodeeditor.utils import dumpException, loadStylesheets, pp
+from program.map.mapping.mapping import Mapping
 
 DEBUG = False
 
@@ -50,7 +33,7 @@ class PataNode(NodeEditorWindow):
     def __init__(self):
         # Calls initUI
         self.active_graph = None
-        self.graphs = {}
+        self.graph_windows = {}
         self.previews = {}
         self.next_unique_session_id = 0
         self.queue = []
@@ -136,103 +119,21 @@ class PataNode(NodeEditorWindow):
         self.audioDock.setVisible(False)
 
     # Collect infos about graphs and serialize them into json for pataphone
-
-    # @timing
     def poll_graphs(self):
-        ret = {"graphs": {}, "graphs_name": []}
-        for graph in self.graphs.values():
-            counter = {}
-            graph_name = str(graph.unique_session_id)
-            ret["graphs_name"].append(graph_name)
-            ret["graphs"][graph_name] = {
-                "is_active": self.active_graph == graph.subwnd,
-                "version": graph.version,
-                "nodes": {},
-                "nodes_name": [],
-                "name": graph.getUserFriendlyFilename(),
-                "id": graph_name,
-            }
-            ret["graphs"][graph_name]["has_preview"] = False
-            if graph.preview is not None and graph.preview is not False:
-                ret["graphs"][graph_name]["has_preview"] = True
-            for node in graph.scene.nodes:
-                node_name = node.op_title.replace(" ", "")
-                if node_name not in counter:
-                    counter[node_name] = 0
-                else:
-                    counter[node_name] = counter[node_name] + 1
-                node_name = node_name + str(counter[node_name])
-                node.unique_name = node_name
-                ret["graphs"][graph_name]["nodes_name"].append(node_name)
-                ret["graphs"][graph_name]["nodes"][node_name] = {}
-                if node.program:
-                    entry = {}
-                    params = node.program.getGpuAdaptableParameters()
-                    cpu_params = node.program.getCpuAdaptableParameters()
-                    bindings = node.program.programs_uniforms.init_binding
-                    if "program" not in params:
-                        continue
-                    # gpu parameters
-                    params = params["program"]
-                    for param_name, param_values in params.items():
-                        param_values = param_values["eval_function"]
-                        if (
-                            "iChannel" in param_name
-                            or "bpm" in param_name
-                            or "iTime" in param_name
-                        ):
-                            continue
-                        if param_name == "protected":
-                            if param_values:
-                                continue
-                        value = None
-                        if "" in bindings:
-                            if param_name in bindings[""]:
-                                binding = bindings[""][param_name]["param_name"]
-                                if binding:
-                                    value = getattr(node.program, binding)
 
-                        entry = {
-                            "values": str(param_values["value"]),
-                            "type": str(param_values["type"]),  # .item()
-                            "is_default_value": False,
-                            "is_cpu_param": False,
-                        }
-                        if value is not None and "x" in param_values["value"]:
-                            entry = {
-                                "values": str(value),
-                                "type": str(type(value)),
-                                "is_default_value": True,
-                                "is_cpu_param": False,
-                            }
-                        if "default_value" not in param_values:
-                            param_values["default_value"] = entry["values"]
-                            if "x" in entry["values"]:
-                                param_values["default_value"] = "x"
-                        entry["default_value"] = param_values["default_value"]
-                        if "x" not in entry["values"]:
-                            ret["graphs"][graph_name]["nodes"][node_name][
-                                param_name
-                            ] = entry
-                    # cpu params
-                    for param_name, param_values in cpu_params["program"].items():
-                        print(param_name, param_values)
-                        param_values = param_values
-                        value = param_values["eval_function"]["value"]
-                        if "default_value" not in param_values:
-                            param_values["default_value"] = value
-                        default_value = param_values["default_value"]
-                        entry = {
-                            "default_value": str(default_value),
-                            "values": str(value),
-                            "type": str(type(value)),
-                            "is_cpu_param": True,
-                            "is_default_value": value == default_value,
-                        }
-                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                            entry
-                        )
-        return ret
+        graphs_data = {"graphs": {}, "graphs_name": []}
+
+        for graph_window in self.graph_windows.values():
+
+            graph_data = graph_window.poll_graph(
+                is_active=self.active_graph == graph_window
+            )
+            graph_name = graph_data["id"]
+
+            graphs_data["graphs_name"].append(graph_name)
+            graphs_data["graphs"][graph_name] = graph_data
+
+        return graphs_data
 
     def create_bmp_in_memory(self, width, height, bytes):
         img = img = Image.frombytes("RGBA", (width, height), bytes)
@@ -265,8 +166,8 @@ class PataNode(NodeEditorWindow):
             self.mapping.updatePolygons(polygons)
 
     def change_parameter(self, graph_name, node_name, attribute_name, value, is_cpu):
-        if graph_name in self.graphs:
-            graph = self.graphs[graph_name]
+        if graph_name in self.graph_windows:
+            graph = self.graph_windows[graph_name]
             for node in graph.scene.nodes:
                 if not is_cpu:
                     if node.unique_name == node_name:
@@ -297,11 +198,11 @@ class PataNode(NodeEditorWindow):
             command = self.queue.pop(0)
             id = command[1]
             if command[0] == 0:
-                if id in self.graphs.keys():
-                    self.setActiveSubWindow(self.graphs[id].subwnd)
+                if id in self.graph_windows.keys():
+                    self.setActiveSubWindow(self.graph_windows[id].subwnd)
                     self.showShaderWindowFromPhone()
 
-        for graph in self.graphs.values():
+        for graph in self.graph_windows.values():
             graph.mapping = self.mapping
             if graph.should_update_preview():
                 graph.render(audio_features, True)
@@ -427,8 +328,8 @@ class PataNode(NodeEditorWindow):
 
     def showShaderWindow(self):
         self.current_node_editor_widget = None
-        for k in self.graphs:
-            self.graphs[k].version = self.graphs[k].version + 1
+        for k in self.graph_windows:
+            self.graph_windows[k].version = self.graph_windows[k].version + 1
         self.active_graph = self.mdiArea.activeSubWindow()
         self.gl_widget.showFullScreen()
 
@@ -490,7 +391,7 @@ class PataNode(NodeEditorWindow):
             if graph:
                 nodeeditor = GraphContainerSubWindow(self)
             else:
-                nodeeditor = PataNodeSubWindow(self)
+                nodeeditor = PataNodeGraphWindow(self)
 
             if nodeeditor.fileLoad(filename):
                 self.statusBar().showMessage("File %s loaded" % filename, 5000)
@@ -634,9 +535,9 @@ class PataNode(NodeEditorWindow):
 
     def createMdiChild(self, child_widget=None):
         nodeeditor = (
-            child_widget if child_widget is not None else PataNodeSubWindow(self)
+            child_widget if child_widget is not None else PataNodeGraphWindow(self)
         )
-        if nodeeditor.__class__ == PataNodeSubWindow:
+        if nodeeditor.__class__ == PataNodeGraphWindow:
             nodeeditor.set_unique_session_id(self.next_unique_session_id)
             self.next_unique_session_id = self.next_unique_session_id + 1
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
@@ -646,12 +547,16 @@ class PataNode(NodeEditorWindow):
         nodeeditor.scene.history.addHistoryModifiedListener(self.updateEditMenu)
         nodeeditor.addCloseEventListener(self.onSubWndClose)
         nodeeditor.subwnd = subwnd
-        self.graphs[str(nodeeditor.unique_session_id)] = nodeeditor
+        self.graph_windows[str(nodeeditor.unique_session_id)] = nodeeditor
         return subwnd
 
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
-        self.graphs = {k: v for k, v in self.graphs.items() if not v.mark_dead}
+
+        self.graph_windows = {
+            k: v for k, v in self.graph_windows.items() if not v.mark_dead
+        }
+
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():
