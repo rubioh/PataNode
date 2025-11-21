@@ -5,6 +5,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
+import program.program_conf  # noqa: F401
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="PataNode", description="The node-oriented shader manager"
@@ -26,7 +28,6 @@ if __name__ == "__main__":
 
     # Note: This import is here to avoid a circular import
     import app
-    import program.program_conf  # noqa: F401
 
     the_app = QApplication(sys.argv)
     the_app.setStyle("Fusion")
