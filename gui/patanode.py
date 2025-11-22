@@ -35,8 +35,7 @@ class PataNode(NodeEditorWindow):
         self.active_graph = None
         self.graph_windows = {}
         self.previews = {}
-        self.next_unique_session_id = 0
-        self.queue = []
+        self.change_graph_window_queue = []
         super().__init__()
 
     def initUI(self):
@@ -91,10 +90,10 @@ class PataNode(NodeEditorWindow):
         self.setWindowTitle("PataNode")
         self.initMapWindow()
         self.current_node_editor_widget = None
-        self.mapping = Mapping(self.ctx)
 
     def initMapWindow(self):
-        self.mapsubwnd = PataNodeMappingWindow(self)
+        self.mapping_program = Mapping(self.ctx)
+        self.mapsubwnd = PataNodeMappingWindow(self, self.mapping_program)
         self.map_scene = self.mapsubwnd.scene
         self.mapsubwnd.hide()
 
@@ -145,42 +144,23 @@ class PataNode(NodeEditorWindow):
         return bmp_data
 
     def set_active_graph(self, id):
-        self.queue.append((0, id))
+        self.change_graph_window_queue.append((0, id))
 
-    def update_global_mapping(self, wireframe: bool, polygons: list):
-        new_polys = [0] * len(polygons)
-        if self.mapping:
-            self.mapping.wireframe = wireframe
-            for i in range(len(polygons)):
-                new_poly = []
-                for j in range(len(polygons[i]) // 2):
-                    new_poly.append(polygons[i][j * 2])
-                    new_poly.append(polygons[i][j * 2 + 1])
-                    new_poly.append(self.mapping.base_polygons[0][j * 4 + 2])
-                    new_poly.append(self.mapping.base_polygons[0][j * 4 + 3])
-                polygons[i] = new_poly
-            for i in range(len(polygons) // 2):
-                new_polys[i * 2] = polygons[i]
-                new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
-            polygons = new_polys
-            self.mapping.updatePolygons(polygons)
+    def updateGlobalMapping(self, wireframe: bool, polygons: list):
+        self.mapsubwnd.updateMapping(wireframe, polygons)
 
-    def change_parameter(self, graph_name, node_name, attribute_name, value, is_cpu):
+    def change_parameter(self, graph_name, node_name, attribute_name, value):
+        self.updateGlobalMapping(True, [[0, 1, 1, 0], [0, 1, 1, 0]])
         if graph_name in self.graph_windows:
             graph = self.graph_windows[graph_name]
             for node in graph.scene.nodes:
-                if not is_cpu:
-                    if node.unique_name == node_name:
-                        if "program" in node.program.getGpuAdaptableParameters():
-                            params = node.program.getGpuAdaptableParameters()["program"]
-                            if attribute_name in params:
-                                t = type(
-                                    params[attribute_name]["eval_function"]["value"]
-                                )
-                                params[attribute_name]["eval_function"]["value"] = t(
-                                    value
-                                )
-                                return
+                if node.unique_name == node_name:
+                    if "program" in node.program.getGpuAdaptableParameters():
+                        params = node.program.getGpuAdaptableParameters()["program"]
+                        if attribute_name in params:
+                            t = type(params[attribute_name]["eval_function"]["value"])
+                            params[attribute_name]["eval_function"]["value"] = t(value)
+                            return
                 else:
                     if node.unique_name == node_name:
                         if "program" in node.program.getCpuAdaptableParameters():
@@ -194,8 +174,9 @@ class PataNode(NodeEditorWindow):
                                 )
 
     def render(self, audio_features=None):
-        while len(self.queue) > 0:
-            command = self.queue.pop(0)
+
+        if len(self.change_graph_window_queue) > 0:
+            command = self.change_graph_window_queue.pop(0)
             id = command[1]
             if command[0] == 0:
                 if id in self.graph_windows.keys():
@@ -203,7 +184,7 @@ class PataNode(NodeEditorWindow):
                     self.showShaderWindowFromPhone()
 
         for graph in self.graph_windows.values():
-            graph.mapping = self.mapping
+            graph.mapping_program = self.mapping_program
             if graph.should_update_preview():
                 graph.render(audio_features, True)
             if graph.preview:
@@ -537,9 +518,7 @@ class PataNode(NodeEditorWindow):
         nodeeditor = (
             child_widget if child_widget is not None else PataNodeGraphWindow(self)
         )
-        if nodeeditor.__class__ == PataNodeGraphWindow:
-            nodeeditor.set_unique_session_id(self.next_unique_session_id)
-            self.next_unique_session_id = self.next_unique_session_id + 1
+
         subwnd = self.mdiArea.addSubWindow(nodeeditor)
         subwnd.setWindowIcon(self.empty_icon)
         #       nodeeditor.scene.addItemSelectedListener(self.updateEditMenu)
@@ -548,6 +527,7 @@ class PataNode(NodeEditorWindow):
         nodeeditor.addCloseEventListener(self.onSubWndClose)
         nodeeditor.subwnd = subwnd
         self.graph_windows[str(nodeeditor.unique_session_id)] = nodeeditor
+
         return subwnd
 
     def onSubWndClose(self, widget, event):

@@ -1,14 +1,14 @@
-import threading
-from http.server import HTTPServer, BaseHTTPRequestHandler
 import json
+import threading
 import time
+from http.server import BaseHTTPRequestHandler, HTTPServer
 
 
 class SimpleHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         if "/get_image/" in self.path:
-            return self.get_image(self.path[len("/get_image/"):])
+            return self.get_image(self.path[len("/get_image/") :])
         elif self.path == "/get_graphs":
             self.get_graphs()
         else:
@@ -18,10 +18,10 @@ class SimpleHandler(BaseHTTPRequestHandler):
             self.wfile.write(b"Available routes are: /get_graphs")
 
     def get_image(self, name):
-        img  = self.server.app.previews[name][1]
+        img = self.server.app.previews[name][1]
         self.send_response(200)
-        self.send_header('Content-type', 'image/bmp')
-        self.send_header('Connection', 'keep-alive')
+        self.send_header("Content-type", "image/bmp")
+        self.send_header("Connection", "keep-alive")
         self.send_header("Content-Length", str(len(img)))
         self.end_headers()
         # Send the BMP data
@@ -34,7 +34,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
 
         self.send_response(200)
         self.send_header("Content-type", "application/json")
-        self.send_header('Connection', 'keep-alive')
+        self.send_header("Connection", "keep-alive")
         self.send_header("Content-Length", str(len(ret)))
         self.end_headers()
         self.server.graphs_data = self.server.app.poll_graphs()
@@ -49,7 +49,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(response)
         if "/update_mapping" in self.path:
-            path = self.path[len("/update_mapping?wireframe="):]
+            path = self.path[len("/update_mapping?wireframe=") :]
             args = path.split("&")
             args = args[:-1]
             wireframe = False
@@ -62,31 +62,33 @@ class SimpleHandler(BaseHTTPRequestHandler):
                 poly = args.pop(0).split(";")
                 polygons.append([])
                 while len(poly):
-                    while len(poly):
-                        point = poly.pop(0).split(",")
-                        if point != ['']:
-                            polygons[poly_idx].append(float(point[0]))
-                            polygons[poly_idx].append(float(point[1]))
+                    point = poly.pop(0).split(",")
+                    if point != [""]:
+                        polygons[poly_idx].append(float(point[0]))
+                        polygons[poly_idx].append(float(point[1]))
                 poly_idx += 1
 
                 num_poly = num_poly - 1
-            self.server.app.update_global_mapping(wireframe, polygons)
+            self.server.app.updateGlobalMapping(wireframe, polygons)
             return
         if "/set_active_graph" in self.path:
-            path = self.path[len("/set_active_graph?graph="):]
+            path = self.path[len("/set_active_graph?graph=") :]
             self.server.app.set_active_graph(path)
             return
         if "/change_parameter" in self.path:
-            path = self.path[len("/change_parameter?"):]
+
+            path = self.path[len("/change_parameter?") :]
             args = path.split("&")
             graph_name = args[0].split("=")[1]
             node_name = args[1].split("=")[1]
             attribute_name = args[2].split("=")[1]
             value = args[3].split("=")[1]
             is_cpu = args[4].split("=")[1] == "true"
-            self.server.app.change_parameter(graph_name, node_name, attribute_name, value, is_cpu)
-            return
 
+            self.server.app.change_parameter(
+                graph_name, node_name, attribute_name, value
+            )
+            return
 
 
 class PataServer:
@@ -104,7 +106,6 @@ class PataServer:
 
     def update(self):
         time.sleep(1.0 / 60.0)
-        pass
 
     def start(self):
         print("Starting http server...")

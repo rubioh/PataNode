@@ -1,24 +1,24 @@
 from qtpy.QtCore import Qt
-from qtpy.QtWidgets import (
+from qtpy.QtWidgets import (  # , QDMGraphicsNode
     QAction,
     QDockWidget,
     QMainWindow,
     QVBoxLayout,
-)  # , QDMGraphicsNode
+)
 
 from gui.map.polydockwidget import PolyDockWidget
 from gui.map.polygraphicscene import PolyGraphicScene
 from gui.map.polygraphicview import PolyGraphicView
 from node.node_conf import LISTBOX_MIMETYPE
 
-
 DEBUG = False
 DEBUG_CONTEXT = False
 
 
 class PataNodeMappingWindow(QMainWindow):
-    def __init__(self, app=None):
+    def __init__(self, app=None, mapping_program=None):
         self.app = app
+        self.mapping_program = mapping_program
         super().__init__()
         self.setTitle()
         self.setOpenGLSharedObject()
@@ -80,13 +80,6 @@ class PataNodeMappingWindow(QMainWindow):
     def onSelected(self):
         pass
 
-    #       items = self.getSelectedItems()
-    #       item = items[0]
-    #
-    #       if isinstance(item, QDMGraphicsNode):
-    #           node = item.node
-    #           self.updateInspector(node)
-
     def updateInspector(self, node):
         self.app.updateInspector(node)
 
@@ -109,3 +102,24 @@ class PataNodeMappingWindow(QMainWindow):
 
     def contextMenuEvent(self, event):
         pass
+
+    def updateMapping(self, wireframe: bool, polygons: list):
+        new_polys = [0] * len(polygons)
+
+        for i in range(len(polygons)):
+            new_poly = []
+            for j in range(len(polygons[i]) // 2):
+                new_poly.append(polygons[i][j * 2])
+                new_poly.append(polygons[i][j * 2 + 1])
+                new_poly.append(self.mapping.base_polygons[0][j * 4 + 2])
+                new_poly.append(self.mapping.base_polygons[0][j * 4 + 3])
+            polygons[i] = new_poly
+
+        for i in range(len(polygons) // 2):
+            new_polys[i * 2] = polygons[i]
+            new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
+        polygons = new_polys
+
+        self.mapping_program.wireframe = wireframe
+        self.mapping_program.updatePolygons(polygons)
+        self.mapping_program.updateMapping(wireframe, polygons)

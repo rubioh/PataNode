@@ -18,6 +18,8 @@ from program.output.screen.screen import ScreenNode
 DEBUG = False
 DEBUG_CONTEXT = False
 
+ID_COUNTER = itertools.count()
+
 
 class PataNodeGraphWindow(NodeEditorWidget):
     def __init__(self, app=None):
@@ -26,7 +28,7 @@ class PataNodeGraphWindow(NodeEditorWidget):
         self.preview = None
         self.version = 0
         self.light_engine = app.light_engine
-        self.unique_session_id = -1
+        self.unique_session_id = next(ID_COUNTER)
         super().__init__()
         #       self.setAttribute(Qt.WA_DeleteOnClose)
         self.setTitle()
