@@ -1,31 +1,34 @@
+import itertools
+
 from PyQt5.QtCore import QDataStream, QIODevice, Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
 
-from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
+from node.graph_container_node import GraphContainerNode
+from node.node_conf import LISTBOX_MIMETYPE, SHADER_NODES, get_class_from_opcode
+from node.shader_node_base import Map, ShaderNode
+from nodeeditor.node_edge import EDGE_TYPE_BEZIER, EDGE_TYPE_DIRECT, EDGE_TYPE_SQUARE
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
-
-from node.graph_container_node import GraphContainerNode
-from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.shader_node_base import ShaderNode, Map
 from program.map.mapping.mapping import Mapping
 from program.output.screen.screen import ScreenNode
 
 DEBUG = False
 DEBUG_CONTEXT = False
 
+ID_COUNTER = itertools.count()
 
-class PataNodeSubWindow(NodeEditorWidget):
+
+class PataNodeGraphWindow(NodeEditorWidget):
     def __init__(self, app=None):
         self.app = app
         self.mark_dead = False
         self.preview = None
         self.version = 0
         self.light_engine = app.light_engine
-        self.unique_session_id = -1
+        self.unique_session_id = next(ID_COUNTER)
         super().__init__()
         #       self.setAttribute(Qt.WA_DeleteOnClose)
         self.setTitle()
@@ -57,9 +60,9 @@ class PataNodeSubWindow(NodeEditorWidget):
                 self.screen_node = node
                 break
 
-    def should_update_preview(self):
+    def shouldUpdatePreview(self):
         for node in self.scene.nodes:
-            if node.should_update_preview:
+            if isinstance(node, ShaderNode) and node.shouldUpdatePreview:
                 return True
 
     def clean_preview(self):
@@ -78,7 +81,9 @@ class PataNodeSubWindow(NodeEditorWidget):
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            preview = self.screen_node.render(audio_features, should_update_preview, self.mapping)
+            preview = self.screen_node.render(
+                audio_features, should_update_preview, self.mapping
+            )
             if should_update_preview:
                 self.preview = preview
                 self.version = self.version + 1
@@ -397,3 +402,43 @@ class PataNodeSubWindow(NodeEditorWidget):
                 self.scene.history.storeHistory(
                     "Created %s" % new_calc_node.__class__.__name__
                 )
+
+    def poll_graph(self, is_active=False):
+
+        graph_data = {
+            "is_active": is_active,
+            "version": self.version,
+            "nodes": {},
+            "nodes_name": [],
+            "name": self.getUserFriendlyFilename(),
+            "id": str(self.unique_session_id),
+            "has_preview": False,
+        }
+
+        if self.preview is not None and self.preview is not False:
+            graph_data["has_preview"] = True
+
+        for node in self.scene.nodes:
+
+            if not isinstance(node, ShaderNode):
+                continue
+
+            node_name = node.op_unique_name
+
+            graph_data["nodes_name"].append(node_name)
+            graph_data["nodes"][node_name] = node.get_program_parameters_metadata()
+
+        return graph_data
+
+    def updateParametersMetadata(
+        self, node_name, subprogram_name, attribute_name, value
+    ):
+
+        for node in self.scene.nodes:
+            if node.unique_name == node_name:
+                node.updateProgramParameterMetadata(
+                    subprogram_name, attribute_name, value
+                )
+            return
+
+        raise ValueError(f"Node {node_name} is not a valid node in the current graph")

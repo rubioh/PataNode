@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import traceback
+import uuid
 
 from PyQt5.QtCore import QRectF
 from PyQt5.QtGui import QImage
@@ -13,13 +14,11 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_node import Node
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
-
 from program.program_conf import (
     GLSLImplementationError,
     UnuseUniformError,
     name_to_opcode,
 )
-
 
 DEBUG = False
 OP_CODE_MAPPING = name_to_opcode("Mapping")
@@ -77,6 +76,7 @@ class ShaderNode(Node):
     icon = ""
     op_code = 0
     op_title = "Undefined"
+    unique_id = None
     content_label = ""
     content_label_objname = "shader_node_bg"
 
@@ -86,7 +86,7 @@ class ShaderNode(Node):
     def __init__(self, scene, inputs=[2, 2], outputs=[1]):
         #       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
-        self.should_update_preview = True
+        self.shouldUpdatePreview = True
         self.value = None  # Using to store output texture reference
         self.program = None
         self._container = None  # GraphContainer reference
@@ -102,6 +102,12 @@ class ShaderNode(Node):
         self._evaluate = False
         self._in_evaluation = False
         self.previous_evaluation_time = time.time()
+
+    @property
+    def op_unique_name(self):
+        if self.unique_id is None:
+            self.unique_id = uuid.uuid4().hex
+        return self.op_title + self.unique_id[:8]
 
     @property
     def container(self):
@@ -402,8 +408,7 @@ class ShaderNode(Node):
     def onInputChanged(self, socket=None):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__)
-
-        self.should_update_preview = True
+        self.shouldUpdatePreview = True
         self.markDirty()
         self.eval()
 
@@ -463,6 +468,12 @@ class ShaderNode(Node):
     def render(self, audio_features=None):
         pass
 
+    def get_program_parameters_metadata(self):
+        return self.program.getParametersMetadata()
+
+    def updateProgramParameterMetadata(self, subprogram_name, attribute_name, value):
+        self.program.updateParameterMetadata(subprogram_name, attribute_name, value)
+
     def serialize(self):
         res = super().serialize()
         res["op_code"] = self.__class__.op_code
@@ -510,9 +521,9 @@ class ShaderNode(Node):
 
                 for uniform in program_params.keys():
                     eval_func = program_params[uniform]["eval_function"]["value"]
-                    cpu_node_params[program][uniform]["eval_function"]["value"] = (
-                        eval_func
-                    )
+                    cpu_node_params[program][uniform]["eval_function"][
+                        "value"
+                    ] = eval_func
 
         if "gpu_adaptable_parameters" in data:
             adapt_params = data["gpu_adaptable_parameters"]

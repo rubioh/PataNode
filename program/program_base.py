@@ -3,13 +3,12 @@ import copy
 import numpy as np
 
 from program.program_conf import (
+    SQUARE_VERT_PATH,
     CTXError,
     GLSLImplementationError,
-    SQUARE_VERT_PATH,
     UnuseUniformError,
     get_square_vertex_data,
 )
-
 
 DEBUG = False
 DEBUG_EVAL = False
@@ -316,7 +315,7 @@ class ProgramBase:
         minimum=0,
         maximum=1,
         type="f4",
-        widget_type="Slider",
+        widget_type="Slider",  # deprecated
     ):
         if uniform_name not in self.adaptable_parameters_dict[program_name].keys():
             self.adaptable_parameters_dict[program_name][uniform_name] = {}
@@ -333,6 +332,7 @@ class ProgramBase:
                 program_name, uniform_name, name, v
             ),
             "widget": widget_type,
+            "default_value": value,
         }
 
     def protectAdaptableParameters(self, protected):
@@ -431,6 +431,30 @@ class ProgramBase:
     def getGpuAdaptableParameters(self):
         return self.adaptable_parameters_dict
 
+    def getParametersMetadata(self):
+        parameters_metadata = {}
+
+        for program_name, parameters in self.adaptable_parameters_dict.items():
+            parameters_metadata[program_name] = dict()
+
+            for name, metadata in parameters.items():
+                if name in self.programs_uniforms.protected:
+                    continue
+
+                parameters_metadata[program_name][name] = {
+                    "type": metadata["eval_function"]["type"],
+                    "value": metadata["eval_function"]["value"],
+                    "default_value": metadata["eval_function"]["default_value"],
+                }
+
+        return parameters_metadata
+        # TODO add CPU parameters metadata
+
+    def updateParameterMetadata(self, program_name, attribute_name, value):
+        self.adaptable_parameters_dict[program_name][attribute_name]["eval_function"][
+            "value"
+        ] = value
+
     def setAdaptableParameters(self, program_name, uniform_name, params, value):
         """
         params : Parameters name (str)
@@ -439,9 +463,9 @@ class ProgramBase:
         if DEBUG:
             print("Params", params, "set to value", value, "for programs", program_name)
 
-        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = (
-            value
-        )
+        self.adaptable_parameters_dict[program_name][uniform_name][params][
+            "value"
+        ] = value
 
     ###########################################
 

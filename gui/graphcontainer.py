@@ -1,13 +1,12 @@
-from gui.subwindow import PataNodeSubWindow
+from gui.subwindow import PataNodeGraphWindow
+from program.input.std_input.std_input import StdInputNode
 from program.output.screen.screen import ScreenNode
 from program.output.std_output.std_output import StdOutputNode
-from program.input.std_input.std_input import StdInputNode
-
 
 DEBUG = False
 
 
-class GraphContainerSubWindow(PataNodeSubWindow):
+class GraphContainerSubWindow(PataNodeGraphWindow):
     def __init__(self, app=None):
         super().__init__(app)
         self.graph_container_node = None
