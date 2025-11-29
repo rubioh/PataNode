@@ -60,9 +60,9 @@ class PataNodeGraphWindow(NodeEditorWidget):
                 self.screen_node = node
                 break
 
-    def should_update_preview(self):
+    def shouldUpdatePreview(self):
         for node in self.scene.nodes:
-            if node.should_update_preview:
+            if isinstance(node, ShaderNode) and node.shouldUpdatePreview:
                 return True
 
     def clean_preview(self):
@@ -429,3 +429,16 @@ class PataNodeGraphWindow(NodeEditorWidget):
             graph_data["nodes"][node_name] = node.get_program_parameters_metadata()
 
         return graph_data
+
+    def updateParametersMetadata(
+        self, node_name, subprogram_name, attribute_name, value
+    ):
+
+        for node in self.scene.nodes:
+            if node.unique_name == node_name:
+                node.updateProgramParameterMetadata(
+                    subprogram_name, attribute_name, value
+                )
+            return
+
+        raise ValueError(f"Node {node_name} is not a valid node in the current graph")

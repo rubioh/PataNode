@@ -149,29 +149,13 @@ class PataNode(NodeEditorWindow):
     def updateGlobalMapping(self, wireframe: bool, polygons: list):
         self.mapsubwnd.updateMapping(wireframe, polygons)
 
-    def change_parameter(self, graph_name, node_name, attribute_name, value):
-        self.updateGlobalMapping(True, [[0, 1, 1, 0], [0, 1, 1, 0]])
-        if graph_name in self.graph_windows:
-            graph = self.graph_windows[graph_name]
-            for node in graph.scene.nodes:
-                if node.unique_name == node_name:
-                    if "program" in node.program.getGpuAdaptableParameters():
-                        params = node.program.getGpuAdaptableParameters()["program"]
-                        if attribute_name in params:
-                            t = type(params[attribute_name]["eval_function"]["value"])
-                            params[attribute_name]["eval_function"]["value"] = t(value)
-                            return
-                else:
-                    if node.unique_name == node_name:
-                        if "program" in node.program.getCpuAdaptableParameters():
-                            params = node.program.getCpuAdaptableParameters()["program"]
-                            if attribute_name in params:
-                                t = type(
-                                    params[attribute_name]["eval_function"]["value"]
-                                )
-                                params[attribute_name]["eval_function"]["value"] = t(
-                                    value
-                                )
+    def updateParametersMetadata(self, graph_name, node_name, attribute_name, value):
+        if graph_name not in self.graph_windows:
+            raise ValueError(f"{graph_name} is not a valid graph window")
+
+        self.graph_windows[graph_name].updateParametersMetadata(
+            node_name, attribute_name, value
+        )
 
     def render(self, audio_features=None):
 
@@ -185,7 +169,7 @@ class PataNode(NodeEditorWindow):
 
         for graph in self.graph_windows.values():
             graph.mapping_program = self.mapping_program
-            if graph.should_update_preview():
+            if graph.shouldUpdatePreview():
                 graph.render(audio_features, True)
             if graph.preview:
                 image = self.create_bmp_in_memory(

@@ -104,6 +104,7 @@ class PataNodeMappingWindow(QMainWindow):
         pass
 
     def updateMapping(self, wireframe: bool, polygons: list):
+        # TODO
         new_polys = [0] * len(polygons)
 
         for i in range(len(polygons)):
@@ -118,6 +119,7 @@ class PataNodeMappingWindow(QMainWindow):
         for i in range(len(polygons) // 2):
             new_polys[i * 2] = polygons[i]
             new_polys[i * 2 + 1] = polygons[i + len(polygons) // 2]
+
         polygons = new_polys
 
         self.mapping_program.wireframe = wireframe

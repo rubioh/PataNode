@@ -448,8 +448,12 @@ class ProgramBase:
                 }
 
         return parameters_metadata
-
         # TODO add CPU parameters metadata
+
+    def updateParameterMetadata(self, program_name, attribute_name, value):
+        self.adaptable_parameters_dict[program_name][attribute_name]["eval_function"][
+            "value"
+        ] = value
 
     def setAdaptableParameters(self, program_name, uniform_name, params, value):
         """

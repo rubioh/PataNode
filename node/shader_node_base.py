@@ -86,7 +86,7 @@ class ShaderNode(Node):
     def __init__(self, scene, inputs=[2, 2], outputs=[1]):
         #       inputs = [0] + inputs
         super().__init__(scene, self.__class__.op_title, inputs, outputs)
-        self.should_update_preview = True
+        self.shouldUpdatePreview = True
         self.value = None  # Using to store output texture reference
         self.program = None
         self._container = None  # GraphContainer reference
@@ -408,8 +408,7 @@ class ShaderNode(Node):
     def onInputChanged(self, socket=None):
         if DEBUG:
             print("%s::__onInputChanged" % self.__class__.__name__)
-
-        self.should_update_preview = True
+        self.shouldUpdatePreview = True
         self.markDirty()
         self.eval()
 
@@ -471,6 +470,9 @@ class ShaderNode(Node):
 
     def get_program_parameters_metadata(self):
         return self.program.getParametersMetadata()
+
+    def updateProgramParameterMetadata(self, subprogram_name, attribute_name, value):
+        self.program.updateParameterMetadata(subprogram_name, attribute_name, value)
 
     def serialize(self):
         res = super().serialize()
