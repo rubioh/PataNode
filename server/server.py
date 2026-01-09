@@ -90,7 +90,7 @@ class SimpleHandler(BaseHTTPRequestHandler):
 
 
 class PataServer:
-    def __init__(self, args, app, host="localhost", port=4242):
+    def __init__(self, args, app, host="0.0.0.0", port=4242):
         #        with open("./server/example.json") as f:
         #            self.example = json.load(f)
         # self.server.example = self.example

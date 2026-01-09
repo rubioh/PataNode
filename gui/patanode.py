@@ -194,7 +194,7 @@ class PataNode(NodeEditorWindow):
 
                         entry = {
                             "values": str(param_values["value"]),
-                            "type": str(param_values["type"]),  # .item()
+                            "type": str(param_values["type"]),
                             "is_default_value": False,
                             "is_cpu_param": False,
                         }
@@ -216,7 +216,6 @@ class PataNode(NodeEditorWindow):
                             ] = entry
                     # cpu params
                     for param_name, param_values in cpu_params["program"].items():
-                        print(param_name, param_values)
                         param_values = param_values
                         value = param_values["eval_function"]["value"]
                         if "default_value" not in param_values:

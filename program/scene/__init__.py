@@ -1,4 +1,5 @@
 from program.scene.abstractsqrt import abstractsqrt
+from program.scene.jellyfish import jellyfish
 from program.scene.cube import cube
 from program.scene.dome import dome
 from program.scene.eye import eye
@@ -42,4 +43,5 @@ __all__ = [
     "template",
     "texture",
     "truchet",
+    "jellyfish"
 ]
