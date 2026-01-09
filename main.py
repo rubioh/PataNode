@@ -5,6 +5,8 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
+import program.program_conf  # noqa: F401
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         prog="PataNode", description="The node-oriented shader manager"
@@ -13,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", metavar="module_to_debug", nargs="+")
     parser.add_argument("--no-usb", metavar="no_usb")
     parser.add_argument("--use-shader-buffer", metavar="use_shader_buffer")
-    parser.add_argument("--server", metavar="server")
+    parser.add_argument("--server", action="store_true")
     args = parser.parse_args()
 
     if args.debug:
@@ -25,8 +27,6 @@ if __name__ == "__main__":
             importlib.import_module(module_to_debug).DEBUG = True
 
     # Note: This import is here to avoid a circular import
-    import program.program_conf  # noqa: F401
-
     import app
 
     the_app = QApplication(sys.argv)
