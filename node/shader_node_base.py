@@ -29,7 +29,6 @@ class ShaderGraphicsNode(QDMGraphicsNode):
     def initSizes(self):
         super().initSizes()
         self.width = 160
-        self.height = 74
         self.edge_roundness = 6
         self.edge_padding = 0
         self.title_horizontal_padding = 8
@@ -235,7 +234,7 @@ class ShaderNode(Node):
 
         # TODO: test with several textures
         input_nodes = self.getShaderInputs()
-
+      #  self.grNode.height = 74 + 28 * self.getNumSocket()
         if not input_nodes:
             self.grNode.setToolTip("Input is not connected")
             self.markInvalid()
@@ -272,6 +271,9 @@ class ShaderNode(Node):
             return None
 
         return textures
+
+    def getNumSocket(self):
+        return len(self.inputs)
 
     def getShaderInputs(self):
         sockets = self.inputs
@@ -545,6 +547,8 @@ class ShaderNode(Node):
 class Utils:
     node_type_reference = "Utils"
 
+class Light:
+    node_type_reference = "Light"
 
 class Scene:
     node_type_reference = "Scenes"

@@ -59,6 +59,7 @@ def name_to_opcode(name):
 
 import program.output
 import program.scene
+import program.lights
 import program.utils
 import program.textures
 import program.effects

@@ -11,7 +11,7 @@ from qtpy.QtCore import Qt, QRectF
 class QDMGraphicsNode(QGraphicsItem):
     """Class describing Graphics representation of :class:`~nodeeditor.node_node.Node`"""
 
-    def __init__(self, node: "Node", parent: QWidget = None):
+    def __init__(self, node: "Node", height = 74, parent: QWidget = None):
         """
         :param node: reference to :class:`~nodeeditor.node_node.Node`
         :type node: :class:`~nodeeditor.node_node.Node`
@@ -24,7 +24,7 @@ class QDMGraphicsNode(QGraphicsItem):
         """
         super().__init__(parent)
         self.node = node
-
+        self.height = height
         # init our flags
         self.hovered = False
         self._was_moved = False
@@ -69,7 +69,6 @@ class QDMGraphicsNode(QGraphicsItem):
     def initSizes(self):
         """Set up internal attributes like `width`, `height`, etc."""
         self.width = 180
-        self.height = 240
         self.edge_roundness = 10
         self.edge_padding = 10
         self.title_height = 24

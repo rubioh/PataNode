@@ -57,14 +57,15 @@ class Node(Serializable):
 
         """
         super().__init__()
+        self.num_inputs = len(inputs)
         self._title = title
         self.scene = scene
         # just to be sure, init these variables
         self.content = None
         self.grNode = None
 
-        self.initInnerClasses()
         self.initSettings()
+        self.initInnerClasses()
 
         self.title = title
 
@@ -130,7 +131,7 @@ class Node(Serializable):
         if node_content_class is not None:
             self.content = node_content_class(self)
         if graphics_node_class is not None:
-            self.grNode = graphics_node_class(self)
+            self.grNode = graphics_node_class(self, max(74, ( self.socket_spacing + 2 ) * self.num_inputs))
 
     def getNodeContentClass(self):
         """Returns class representing nodeeditor content"""
@@ -141,7 +142,7 @@ class Node(Serializable):
 
     def initSettings(self):
         """Initialize properties and socket information"""
-        self.socket_spacing = 22
+        self.socket_spacing = 30
 
         self.input_socket_position = LEFT_BOTTOM
         self.output_socket_position = RIGHT_TOP
