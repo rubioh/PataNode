@@ -2,6 +2,11 @@
 """
 A module containing Graphics representation of a :class:`~nodeeditor.node_socket.Socket`
 """
+from enum import Enum
+
+class InputType(Enum):
+    SCALAR = 1
+    TEXTURE = 2
 
 from qtpy.QtWidgets import QGraphicsItem
 from qtpy.QtGui import QColor, QBrush, QPen
@@ -21,7 +26,7 @@ SOCKET_COLORS = [
 class QDMGraphicsSocket(QGraphicsItem):
     """Class representing Graphic `Socket` in ``QGraphicsScene``"""
 
-    def __init__(self, socket: "Socket"):
+    def __init__(self, socket: "Socket", type, name):
         """
         :param socket: reference to :class:`~nodeeditor.node_socket.Socket`
         :type socket: :class:`~nodeeditor.node_socket.Socket`
@@ -31,7 +36,8 @@ class QDMGraphicsSocket(QGraphicsItem):
         self.socket = socket
 
         self.isHighlighted = False
-
+        self.name = name
+        self.type = type
         self.radius = 6
         self.outline_width = 1
         self.initAssets()
@@ -73,9 +79,23 @@ class QDMGraphicsSocket(QGraphicsItem):
         """Painting a circle"""
         painter.setBrush(self._brush)
         painter.setPen(self._pen if not self.isHighlighted else self._pen_highlight)
-        painter.drawEllipse(
-            -self.radius, -self.radius, 2 * self.radius, 2 * self.radius
-        )
+
+        if self.type == InputType.TEXTURE:
+            painter.drawEllipse(
+                -self.radius, -self.radius, 2 * self.radius, 2 * self.radius
+            )
+        else:
+            painter.drawRect(
+                -self.radius, -self.radius, 2 * self.radius, 2 * self.radius
+            )
+        if self.name:
+            painter.setPen(Qt.white)
+            rect = QRectF(
+            2.* self.radius, -7,
+            100, 20
+            )
+            painter.drawText(rect, Qt.AlignLeft, self.name)
+            painter.setPen(self._pen)
 
     def boundingRect(self) -> QRectF:
         """Defining Qt' bounding rectangle"""

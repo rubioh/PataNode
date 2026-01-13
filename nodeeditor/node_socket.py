@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 """
 A module containing NodeEditor's class for representing Socket and Socket Position Constants.
@@ -5,8 +6,7 @@ A module containing NodeEditor's class for representing Socket and Socket Positi
 
 from collections import OrderedDict
 from nodeeditor.node_serializable import Serializable
-from nodeeditor.node_graphics_socket import QDMGraphicsSocket
-
+from nodeeditor.node_graphics_socket import QDMGraphicsSocket, InputType
 
 LEFT_TOP = 1  #:
 LEFT_CENTER = 2  #:
@@ -19,7 +19,6 @@ MID_TOP = 7  #: AUDIO NODE INPUT
 
 DEBUG = False
 DEBUG_REMOVE_WARNINGS = False
-
 
 class Socket(Serializable):
     Socket_GR_Class = QDMGraphicsSocket
@@ -35,6 +34,8 @@ class Socket(Serializable):
         multi_edges: bool = True,
         count_on_this_node_side: int = 1,
         is_input: bool = False,
+        name = None,
+        type = InputType.SCALAR,
     ):
         """
         :param node: reference to the :class:`~nodeeditor.node_node.Node` containing this `Socket`
@@ -73,6 +74,8 @@ class Socket(Serializable):
         self.is_multi_edges = multi_edges
         self.is_input = is_input
         self.is_output = not self.is_input
+        self.name = name
+        self.type = type
 
         if DEBUG:
             print(
@@ -83,7 +86,7 @@ class Socket(Serializable):
                 self.node,
             )
 
-        self.grSocket = self.__class__.Socket_GR_Class(self)
+        self.grSocket = self.__class__.Socket_GR_Class(self, self.type, self.name)
 
         self.setSocketPosition()
 

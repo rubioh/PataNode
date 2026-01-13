@@ -17,6 +17,7 @@ from nodeeditor.node_socket import (
     RIGHT_TOP,
     MID_TOP,
 )
+from nodeeditor.node_graphics_socket import InputType
 from nodeeditor.utils import dumpException, pp
 
 DEBUG = False
@@ -169,6 +170,14 @@ class Node(Serializable):
         :type reset: ``bool``
         """
 
+        # CUSTOM CHANGES
+        # If input is not a tuple, set defaults values for input name and type
+        for index, item in enumerate(inputs):
+            if not isinstance(item, tuple):
+                inputs[index] = (item, None, InputType.TEXTURE)
+        for index, item in enumerate(outputs):
+            if not isinstance(item, tuple):
+                outputs[index] = (item, None, InputType.TEXTURE)
         if reset:
             # clear old sockets
             if hasattr(self, "inputs") and hasattr(self, "outputs"):
@@ -201,10 +210,12 @@ class Node(Serializable):
                 node=self,
                 index=counter,
                 position=self.input_socket_position,
-                socket_type=item,
+                socket_type=item[0],
                 multi_edges=self.input_multi_edged,
                 count_on_this_node_side=len(inputs),
                 is_input=True,
+                name = item[1],
+                type = item[2],
             )
             counter += 1
             self.inputs.append(socket)
@@ -215,10 +226,12 @@ class Node(Serializable):
                 node=self,
                 index=counter,
                 position=self.output_socket_position,
-                socket_type=item,
+                socket_type=item[0],
                 multi_edges=self.output_multi_edged,
                 count_on_this_node_side=len(outputs),
                 is_input=False,
+                name = item[1],
+                type = item[2],
             )
             counter += 1
             self.outputs.append(socket)

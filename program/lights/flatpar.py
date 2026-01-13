@@ -5,7 +5,7 @@ from node.node_conf import register_node
 from node.shader_node_base import ShaderNode, Light, Scene
 from program.program_conf import  name_to_opcode, register_program
 from program.program_base import ProgramBase
-
+from nodeeditor.node_graphics_socket import InputType
 
 OP_CODE_FLATPAR = name_to_opcode("flatpar")
 
@@ -38,7 +38,14 @@ class FlatparNode(ShaderNode, Light):
     content_label_objname = "shader_flatpar"
 
     def __init__(self, scene):
-        super().__init__(scene, inputs=[1, 1, 1 ,1, 1, 1, 1, 1], outputs=[])
+        super().__init__(scene, inputs=[(1, "Red", InputType.SCALAR),
+                                        (1, "Green", InputType.SCALAR),
+                                        (1, "Blue", InputType.SCALAR),
+                                        (1, "White", InputType.SCALAR),
+                                        (1, "Amber", InputType.SCALAR),
+                                        (1, "UV", InputType.SCALAR),
+                                        (1, "Dimmer", InputType.SCALAR),
+                                        (1, "Strobe", InputType.SCALAR), ], outputs=[])
         self.light_engine = scene.app.light_engine
         self.program = FlatPar(ctx=self.scene.ctx, win_size=(1920, 1080))
         self.eval()
