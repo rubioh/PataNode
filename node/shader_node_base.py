@@ -234,7 +234,6 @@ class ShaderNode(Node):
 
         # TODO: test with several textures
         input_nodes = self.getShaderInputs()
-      #  self.grNode.height = 74 + 28 * self.getNumSocket()
         if not input_nodes:
             self.grNode.setToolTip("Input is not connected")
             self.markInvalid()
@@ -589,6 +588,8 @@ class Map:
 class Physarum:
     node_type_reference = "Physarum"
 
-
 class LED:
     node_type_reference = "LED"
+
+class LightScene:
+    node_type_reference = "LightScene"

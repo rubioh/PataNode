@@ -20,6 +20,7 @@ from node.node_conf import (
     AUDIO_NODES,
     LISTBOX_MIMETYPE,
     SHADER_NODES,
+    LIGHT_NODES,
     get_class_from_opcode,
 )
 from node.graph_container_node import GraphContainerNode
@@ -38,6 +39,7 @@ class QDMDragListbox(QTreeWidget):
         self.setDragEnabled(True)
 
         self.addShaderNodes()
+        self.addLightNodes()
         #       self.addAudioNodes()
         self.addContainerNodes()
 
@@ -89,6 +91,20 @@ class QDMDragListbox(QTreeWidget):
         audio_type_item.sortChildren(1, Qt.AscendingOrder)
 
         self.sortItems(0, Qt.AscendingOrder)
+
+    def addLightNodes(self):
+        keys = list(LIGHT_NODES.keys())
+        keys.sort()
+        light_type_item = QTreeWidgetItem(self)
+        light_type_item.setText(0, "Lightu")
+        light_type_item.setForeground(0, QColor("#DBFD00"))
+
+        for key in keys:
+            node = get_class_from_opcode(key)
+            self.addMyItem(node.op_title, node.icon, node.op_code, light_type_item)
+
+        light_type_item.setChildIndicatorPolicy(0)
+        light_type_item.sortChildren(1, Qt.AscendingOrder)
 
     def addContainerNodes(self):
         container_type_item = QTreeWidgetItem(self)

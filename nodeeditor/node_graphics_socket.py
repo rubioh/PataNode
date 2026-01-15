@@ -4,7 +4,7 @@ A module containing Graphics representation of a :class:`~nodeeditor.node_socket
 """
 from enum import Enum
 
-class InputType(Enum):
+class SocketType(Enum):
     SCALAR = 1
     TEXTURE = 2
 
@@ -80,7 +80,7 @@ class QDMGraphicsSocket(QGraphicsItem):
         painter.setBrush(self._brush)
         painter.setPen(self._pen if not self.isHighlighted else self._pen_highlight)
 
-        if self.type == InputType.TEXTURE:
+        if self.type == SocketType.TEXTURE:
             painter.drawEllipse(
                 -self.radius, -self.radius, 2 * self.radius, 2 * self.radius
             )

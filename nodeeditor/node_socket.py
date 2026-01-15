@@ -6,7 +6,7 @@ A module containing NodeEditor's class for representing Socket and Socket Positi
 
 from collections import OrderedDict
 from nodeeditor.node_serializable import Serializable
-from nodeeditor.node_graphics_socket import QDMGraphicsSocket, InputType
+from nodeeditor.node_graphics_socket import QDMGraphicsSocket, SocketType
 
 LEFT_TOP = 1  #:
 LEFT_CENTER = 2  #:
@@ -35,7 +35,7 @@ class Socket(Serializable):
         count_on_this_node_side: int = 1,
         is_input: bool = False,
         name = None,
-        type = InputType.SCALAR,
+        type = SocketType.SCALAR,
     ):
         """
         :param node: reference to the :class:`~nodeeditor.node_node.Node` containing this `Socket`

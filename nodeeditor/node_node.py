@@ -17,7 +17,7 @@ from nodeeditor.node_socket import (
     RIGHT_TOP,
     MID_TOP,
 )
-from nodeeditor.node_graphics_socket import InputType
+from nodeeditor.node_graphics_socket import SocketType
 from nodeeditor.utils import dumpException, pp
 
 DEBUG = False
@@ -174,10 +174,10 @@ class Node(Serializable):
         # If input is not a tuple, set defaults values for input name and type
         for index, item in enumerate(inputs):
             if not isinstance(item, tuple):
-                inputs[index] = (item, None, InputType.TEXTURE)
+                inputs[index] = (item, None, SocketType.TEXTURE)
         for index, item in enumerate(outputs):
             if not isinstance(item, tuple):
-                outputs[index] = (item, None, InputType.TEXTURE)
+                outputs[index] = (item, None, SocketType.TEXTURE)
         if reset:
             # clear old sockets
             if hasattr(self, "inputs") and hasattr(self, "outputs"):
