@@ -12,6 +12,7 @@ from program.utils.sobel import sobel
 from program.utils.structure_space_tensor import sst
 from program.utils.symetry import symetry
 from program.utils.upscale_nearest import upscale_nearest
+from program.utils.arch import arch
 
 __all__ = [
     "blend",

@@ -695,7 +695,6 @@ class ProgramsUniforms:
                             " for node ",
                             self.parent.__class__.__name__,
                         )
-
                     program[uniform_name] = modified_data
                 else:
                     data = getattr(self.parent, info["param_name"])

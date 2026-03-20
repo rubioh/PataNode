@@ -23,7 +23,7 @@ from program.scene.fractal import fractal
 from program.scene.particles import particles
 from program.scene.maze import maze
 from program.scene.chomp import chomp
-
+from program.scene.flames import flames
 __all__ = [
     "abstractsqrt",
     "cube",
