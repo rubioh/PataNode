@@ -61,14 +61,15 @@ float sdEllipse( vec2 p, in vec2 ab )
 void main()
 {
     // Normalized pixel coordinates (from 0 to 1)
+    vec2 uvtext = gl_FragCoord.xy/ iResolution.xy;
     vec2 uv = ( 2.*gl_FragCoord.xy - iResolution.xy ) / iResolution.y;
     uv += vec2(offset_x, offset_y);
     uv *= scale;
     float c = sdEllipse(uv, vec2(input_x, input_y));
-    vec3 col = texture(iChannel0, uv).rgb;
+    vec3 col = texture(iChannel0, uvtext).rgb;
     //c = step(0, c);
 //    col *= step(c, 0.);
-if (uv.y > pan_y) {
+if (uvtext.y > pan_y) {
 col *= step(c, 0);
 }
     fragColor = vec4(col,c);
