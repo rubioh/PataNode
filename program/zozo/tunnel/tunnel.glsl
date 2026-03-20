@@ -69,8 +69,8 @@ float arch(vec2 uv){
     vec2 b = vec2(ra-rb, height_rec);
     d = min(d, sdBox(p, b));
 
-    d *= -1;
-    return d;
+   // d *= -1;
+    return d * 100.;
 }
 
 float fbm(in vec2 p)
@@ -114,24 +114,22 @@ void main()
 
     uv.y += y_offset;
     uv.x += x_offset;
+    float ttt = arch(uv);
 
-    float arc = arch(uv);
-    float tmparc = arc;
-    arc = smoothstep(0.01, 0., arc)*smoothstep(1.25, .3, -arc);
+
 
     
     vec2 p = uv;
-    float L = arc;
     p *= 4.;
 
-    float rz = dualfbm(p*min(-tmparc, .5));
-    float artifacts_radious_fade = pow(max(1., 6.5*L), 0.2) ;
+    float rz = dualfbm(p);
+    float artifacts_radious_fade = pow(max(1., 6.5), 0.2) ;
     rz = artifacts_radious_fade*rz + (1.-artifacts_radious_fade)*dualfbm(p+5.0*sin(time)); // Add flaoting things around portal
     float my_time = time + 0.08*rz;
     
 	//rings
 	p /= exp(mod((my_time*10. + rz),3.38159)); // offset from PI to make the ripple effect at the start  
-	rz *= pow(abs((0.1-circ(p))), .9)*tmparc;
+	rz *= pow(abs((0.1-circ(p))), .9);
 	
 	//final color
 	vec3 col = 0.4*vec3(.2 ,0.1,0.4)/rz;
@@ -141,6 +139,6 @@ void main()
 
     vec4 color = vec4(col, 1.);
 
-
-    fragColor = arc*color;
+    color.r += ttt / 100000. + iTime / 100000.;
+    fragColor = color;
 }
