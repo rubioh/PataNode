@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", metavar="module_to_debug", nargs="+")
     parser.add_argument("--no-usb", metavar="no_usb")
     parser.add_argument("--use-shader-buffer", metavar="use_shader_buffer")
-    parser.add_argument("--server", action="store_true")
+    parser.add_argument("--server", metavar="server")
     args = parser.parse_args()
 
     if args.debug:

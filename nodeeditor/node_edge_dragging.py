@@ -89,6 +89,8 @@ class EdgeDragging:
             self.drag_edge = None
 
             try:
+                if item.socket.type != self.drag_start_socket.type:
+                    return False
                 if item.socket != self.drag_start_socket:
                     # if we released dragging on a socket (other then the beginning socket)
 

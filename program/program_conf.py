@@ -59,6 +59,7 @@ def name_to_opcode(name):
 
 import program.output
 import program.scene
+import program.lights
 import program.utils
 import program.textures
 import program.effects
@@ -67,5 +68,6 @@ import program.gate
 import program.particles
 import program.zozo
 import program.physarum
+import program.light_scene
 import program.led_mapping
 import program.map

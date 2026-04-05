@@ -1,12 +1,12 @@
 from node.audio_node_base import AudioNode
 from node.graph_container_node import GraphContainerNode
 from node.shader_node_base import ShaderNode
-
+from node.light_node_base import LightNode
 
 LISTBOX_MIMETYPE = "application/x-item"
 
 SHADER_NODES = {}  # type: ignore[var-annotated] # FIXME: add type annotation
-
+LIGHT_NODES = {}
 AUDIO_NODES = {}  # type: ignore[var-annotated] # FIXME: add type annotation
 
 GRAPH_CONTAINER_OPCODE = 666
@@ -30,6 +30,11 @@ def register_node_now(op_code, class_reference):
             "Duplicate node registration of '%s'. There is already %s"
             % (op_code, SHADER_NODES[op_code])
         )
+    if op_code in LIGHT_NODES:
+        raise InvalidNodeRegistration(
+            "Duplicate node registration of '%s'. There is already %s"
+            % (op_code, LIGHT_NODES[op_code])
+        )
 
     if op_code in AUDIO_NODES:
         raise InvalidNodeRegistration(
@@ -39,7 +44,10 @@ def register_node_now(op_code, class_reference):
 
     if ShaderNode in class_reference.__mro__:
         SHADER_NODES[op_code] = class_reference
-
+    
+    if LightNode in class_reference.__mro__:
+        LIGHT_NODES[op_code] = class_reference
+    
     if AudioNode in class_reference.__mro__:
         AUDIO_NODES[op_code] = class_reference
 
@@ -60,6 +68,9 @@ def register_node(op_code):
 def get_class_from_opcode(op_code):
     if op_code in SHADER_NODES:
         return SHADER_NODES[op_code]
+
+    if op_code in LIGHT_NODES:
+        return LIGHT_NODES[op_code]
 
     if op_code in AUDIO_NODES:
         return AUDIO_NODES[op_code]

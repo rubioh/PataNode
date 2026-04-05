@@ -17,6 +17,7 @@ from nodeeditor.node_socket import (
     RIGHT_TOP,
     MID_TOP,
 )
+from nodeeditor.node_graphics_socket import SocketType
 from nodeeditor.utils import dumpException, pp
 
 DEBUG = False
@@ -57,14 +58,15 @@ class Node(Serializable):
 
         """
         super().__init__()
+        self.num_inputs = len(inputs)
         self._title = title
         self.scene = scene
         # just to be sure, init these variables
         self.content = None
         self.grNode = None
 
-        self.initInnerClasses()
         self.initSettings()
+        self.initInnerClasses()
 
         self.title = title
 
@@ -130,7 +132,7 @@ class Node(Serializable):
         if node_content_class is not None:
             self.content = node_content_class(self)
         if graphics_node_class is not None:
-            self.grNode = graphics_node_class(self)
+            self.grNode = graphics_node_class(self, max(74, ( self.socket_spacing + 2 ) * self.num_inputs))
 
     def getNodeContentClass(self):
         """Returns class representing nodeeditor content"""
@@ -141,7 +143,7 @@ class Node(Serializable):
 
     def initSettings(self):
         """Initialize properties and socket information"""
-        self.socket_spacing = 22
+        self.socket_spacing = 30
 
         self.input_socket_position = LEFT_BOTTOM
         self.output_socket_position = RIGHT_TOP
@@ -168,6 +170,14 @@ class Node(Serializable):
         :type reset: ``bool``
         """
 
+        # CUSTOM CHANGES
+        # If input is not a tuple, set defaults values for input name and type
+        for index, item in enumerate(inputs):
+            if not isinstance(item, tuple):
+                inputs[index] = (item, None, SocketType.TEXTURE)
+        for index, item in enumerate(outputs):
+            if not isinstance(item, tuple):
+                outputs[index] = (item, None, SocketType.TEXTURE)
         if reset:
             # clear old sockets
             if hasattr(self, "inputs") and hasattr(self, "outputs"):
@@ -200,10 +210,12 @@ class Node(Serializable):
                 node=self,
                 index=counter,
                 position=self.input_socket_position,
-                socket_type=item,
+                socket_type=item[0],
                 multi_edges=self.input_multi_edged,
                 count_on_this_node_side=len(inputs),
                 is_input=True,
+                name = item[1],
+                type = item[2],
             )
             counter += 1
             self.inputs.append(socket)
@@ -214,10 +226,12 @@ class Node(Serializable):
                 node=self,
                 index=counter,
                 position=self.output_socket_position,
-                socket_type=item,
+                socket_type=item[0],
                 multi_edges=self.output_multi_edged,
                 count_on_this_node_side=len(outputs),
                 is_input=False,
+                name = item[1],
+                type = item[2],
             )
             counter += 1
             self.outputs.append(socket)
