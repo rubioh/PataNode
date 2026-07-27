@@ -2,17 +2,19 @@
 layout (location=0) out vec4 fragColor;
 
 uniform vec2 iResolution;
-
-// R16UI: an integer sampler, NEAREST filtering only. This is deliberate --
-// linear filtering across a depth discontinuity interpolates foreground into
-// background and invents surfaces that were never measured. Do not "fix" this
-// to a sampler2D.
 uniform usampler2D depth_map;
-
 uniform float near_mm;
 uniform float far_mm;
-uniform float depth_scale;   // raw sensor units -> millimetres
-uniform vec2 flip;           // 0 or 1 per axis
+uniform float depth_scale;
+uniform vec2 flip;
+
+// depth_map is R16UI: an integer sampler, NEAREST filtering only. This is
+// deliberate -- linear filtering across a depth discontinuity interpolates
+// foreground into background and invents surfaces that were never measured.
+// Do not "fix" this to a sampler2D.
+//
+// depth_scale converts raw sensor units to millimetres.
+// flip is 0 or 1 per axis.
 
 void main()
 {

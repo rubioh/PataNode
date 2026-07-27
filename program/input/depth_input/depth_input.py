@@ -148,13 +148,39 @@ class DepthInputNode(ShaderNode, Texture):
 
         app = getattr(scene, "app", None)
         self.engine = getattr(app, "depth_engine", None)
+        self._last_tooltip = None
+
+        # Construct before acquiring: if GLSL compilation or FBO allocation
+        # raises here, __init__ never completes and remove() never runs, so
+        # an acquire() taken beforehand would never be matched by a
+        # release() -- the camera would stay open for the process lifetime.
+        self.program = DepthInput(
+            ctx=self.scene.ctx, win_size=(1920, 1080), engine=self.engine
+        )
 
         if self.engine is not None:
             self.engine.acquire()
 
-        self.program = DepthInput(
-            ctx=self.scene.ctx, win_size=(1920, 1080), engine=self.engine
+        self.eval()
+
+    def reload_program(self):
+        # ShaderNode.reload_program rebuilds self.program via
+        # self.program.__class__(ctx=..., win_size=...), which drops the
+        # engine kwarg entirely -- DepthInput would come back with
+        # engine=None and render a permanently transparent 1x1 texture with
+        # no error. Override with the same shape as the base implementation,
+        # re-injecting the engine this node already holds.
+        state = self.serialize()
+
+        program = self.program.__class__(
+            ctx=self.scene.ctx, win_size=self.win_size, engine=self.engine
         )
+
+        del self.program
+        self.program = program
+
+        self.deserialize(state, restore_window_size=False)
+        self.markDirty()
         self.eval()
 
     def remove(self):
@@ -168,7 +194,10 @@ class DepthInputNode(ShaderNode, Texture):
 
     def render(self, audio_features=None):
         if self.engine is not None:
-            self.grNode.setToolTip(self.engine.status_reason)
+            tooltip = self.engine.status_reason
+            if tooltip != self._last_tooltip:
+                self.grNode.setToolTip(tooltip)
+                self._last_tooltip = tooltip
 
         if self.program is not None and self.program.already_called:
             return self.program.norender()
