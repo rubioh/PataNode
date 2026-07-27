@@ -16,6 +16,12 @@ if __name__ == "__main__":
     parser.add_argument("--no-usb", metavar="no_usb")
     parser.add_argument("--use-shader-buffer", metavar="use_shader_buffer")
     parser.add_argument("--server", action="store_true")
+    parser.add_argument(
+        "--depth-source",
+        choices=["orbbec", "synthetic"],
+        default="orbbec",
+        help="depth camera backend; 'synthetic' fakes a camera for development",
+    )
     args = parser.parse_args()
 
     if args.debug:

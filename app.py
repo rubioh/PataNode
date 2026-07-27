@@ -1,14 +1,16 @@
-import numpy as np
 import copy
 
-from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject, QTimer
+import numpy as np
+from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal, pyqtSlot
 
-from server.server import PataServer
 from audio.audio_conf import list_audio_features
 from audio.audio_pipeline import AudioEngine
-from light.core import LightEngine
-from PyQt5.QtCore import QRunnable, QThreadPool, pyqtSlot, pyqtSignal, QObject
+from depth.depth_engine import DepthEngine
+from depth.depth_source import make_source_factory
 from gui.patanode import PataNode
+from light.core import LightEngine
+from server.server import PataServer
+
 # from light_new import LightEngine
 
 
@@ -35,6 +37,11 @@ class PataShadeApp(PataNode):
         self.args = args
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine(args)
+        # Idle until a Depth Input node acquires it -- no USB traffic for users
+        # who never touch depth.
+        self.depth_engine = DepthEngine(
+            make_source_factory(getattr(args, "depth_source", "orbbec"))
+        )
         super().__init__()
         self.server = PataServer(args, self)
         # Thread Pool
@@ -164,4 +171,6 @@ class PataShadeApp(PataNode):
         self.audio_timer.stop()
         self.light_timer.stop()
         self.shader_timer.stop()
+        # Must come first: the base implementation calls sys.exit(0).
+        self.depth_engine.close()
         super().closeEvent(event)
