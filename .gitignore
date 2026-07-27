@@ -170,3 +170,5 @@ cython_debug/
 uv.lock
 .vscode
 .python-version
+# Subagent-driven development scratch workspace
+.superpowers/
