@@ -47,7 +47,13 @@ class DepthEngine:
 
         self._refcount = 0
         self._thread = None
-        self._running = False
+        # Each capture thread gets its own stop token (see _start/_run) rather
+        # than sharing one instance-wide flag. A thread that is still
+        # unwinding -- e.g. blocked in a slow read() past the join timeout --
+        # keeps its own token set forever, so it cannot be resurrected by a
+        # later acquire() installing a new one, and it never mistakes a fresh
+        # session's token for its own.
+        self._stop_event = None
 
     @property
     def status(self):
@@ -94,42 +100,83 @@ class DepthEngine:
         return slot
 
     def close(self):
-        self._running = False
-        thread = self._thread
-        self._thread = None
+        """Stop capture and release the device.
+
+        The refcount, thread/stop-token references, and status are all reset
+        in one critical section: from the engine's point of view a session
+        ends the moment this method has taken the lock, regardless of how
+        long the underlying thread takes to actually unwind. That keeps a
+        slow-to-exit thread from leaving the engine permanently bricked (a
+        later acquire() always sees refcount 0 and starts a genuinely new
+        session) and keeps this method from clobbering that new session's
+        status if it happens to still be joining the old thread when the new
+        one reaches STREAMING.
+        """
+        with self._lock:
+            stop_event = self._stop_event
+            thread = self._thread
+            self._thread = None
+            self._stop_event = None
+            self._refcount = 0
+            self._status = DepthStatus.IDLE
+            self._status_reason = "not started"
+
+        if stop_event is not None:
+            stop_event.set()
 
         if thread is not None:
             thread.join(timeout=JOIN_TIMEOUT_S)
-
-        self._set_status(DepthStatus.IDLE, "not started")
+            # A thread that is still blocked past the timeout (e.g. stuck in
+            # source.read()) is left to exit on its own, daemonised, and will
+            # close its own source when it eventually notices its stop_event.
+            # Its identity was already detached from self._thread/_stop_event
+            # above, so it cannot be mistaken for -- or clobber the status of
+            # -- whatever session a later acquire() has since started.
 
     def _start(self):
-        self._running = True
-        self._set_status(DepthStatus.CONNECTING, "opening device")
-        self._thread = threading.Thread(
-            target=self._run, name="depth-capture", daemon=True
+        stop_event = threading.Event()
+        thread = threading.Thread(
+            target=self._run, args=(stop_event,), name="depth-capture", daemon=True
         )
-        self._thread.start()
-
-    def _set_status(self, status, reason):
         with self._lock:
-            self._status = status
-            self._status_reason = reason
+            self._stop_event = stop_event
+            self._thread = thread
+            self._status = DepthStatus.CONNECTING
+            self._status_reason = "opening device"
+
+        thread.start()
+
+    def _set_status_if_current(self, stop_event, status, reason):
+        """Apply a status transition only if `stop_event` is still live.
+
+        Guards against a thread that has already been told to stop (or that a
+        newer _start() has already superseded) clobbering the status of
+        whatever session is current by the time it gets around to running.
+        """
+        with self._lock:
+            if self._stop_event is stop_event:
+                self._status = status
+                self._status_reason = reason
 
     def _publish(self, data, width, height, depth_scale):
         with self._lock:
             self._frame_id += 1
             self._slot = Frame(self._frame_id, data, width, height, depth_scale)
 
-    def _run(self):
+    def _run(self, stop_event):
         source = self._source_factory()
         width, height, depth_scale = source.open()
-        self._set_status(DepthStatus.STREAMING, "%dx%d depth stream" % (width, height))
+        self._set_status_if_current(
+            stop_event, DepthStatus.STREAMING, "%dx%d depth stream" % (width, height)
+        )
 
-        while self._running:
-            frame = source.read()
-            if frame is None:
-                continue
-            self._publish(frame, width, height, depth_scale)
-
-        source.close()
+        try:
+            while not stop_event.is_set():
+                frame = source.read()
+                if frame is None:
+                    continue
+                if stop_event.is_set():
+                    break
+                self._publish(frame, width, height, depth_scale)
+        finally:
+            source.close()
