@@ -19,7 +19,7 @@
 - **`pyorbbecsdk` must never be imported at module scope.** It is an optional, manually installed dependency; a module-scope import turns its absence into an app-wide startup crash.
 - **Opcode is 1029** (`name_to_opcode("DepthInput")`), verified free in `SHADER_NODES`, `AUDIO_NODES`, and `SHADER_PROGRAMS`.
 - **Depth profile on this hardware:** 1280×800 @ 10 fps. Frame period 100 ms.
-- **ruff** runs via pre-commit on commit. Let it reformat; re-stage if it does.
+- **isort, black, and autoflake** run via pre-commit on commit — not ruff, despite ruff being the declared dev dependency. Let them reformat; re-stage and commit again if they do.
 - **Never use bare `git stash`** — the stash stack is shared across worktrees.
 
 ## File Structure
