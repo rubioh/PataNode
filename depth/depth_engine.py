@@ -191,7 +191,6 @@ class DepthEngine:
                         backoff = min(backoff * 2, MAX_BACKOFF_S)
                         continue
 
-                    backoff = INITIAL_BACKOFF_S
                     self._set_status_if_current(
                         stop_event,
                         DepthStatus.STREAMING,
@@ -201,10 +200,16 @@ class DepthEngine:
                 try:
                     frame = source.read()
                 except Exception as error:
+                    # A handle that opened but then failed to read is still a
+                    # disconnect (flaky cable, wedged device): throttle it the
+                    # same way a failed open is throttled, so a device that
+                    # opens fine but never yields a frame cannot spin hot.
                     source = self._safe_close(source)
                     self._set_status_if_current(
                         stop_event, DepthStatus.UNAVAILABLE, str(error)
                     )
+                    self._sleep_fn(backoff)
+                    backoff = min(backoff * 2, MAX_BACKOFF_S)
                     continue
 
                 if frame is None:
@@ -213,6 +218,10 @@ class DepthEngine:
                 if stop_event.is_set():
                     break
 
+                # Backoff means "time since the stream last actually produced
+                # a frame", not "time since we last got a handle" -- reset it
+                # here, not on a bare successful open.
+                backoff = INITIAL_BACKOFF_S
                 self._publish(frame, width, height, depth_scale)
         finally:
             self._safe_close(source)

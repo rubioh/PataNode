@@ -5,7 +5,14 @@ import numpy as np
 import pytest
 
 import depth.depth_engine as depth_engine
-from depth.depth_engine import NO_FRAME_ID, DepthEngine, DepthStatus
+from depth.depth_engine import (
+    INITIAL_BACKOFF_S,
+    MAX_BACKOFF_S,
+    NO_FRAME_ID,
+    DepthEngine,
+    DepthStatus,
+)
+from depth.depth_source import DepthSourceError
 
 
 class FakeSource:
@@ -252,10 +259,6 @@ def test_slow_shutdown_does_not_orphan_a_resurrecting_thread(monkeypatch):
         engine.close()
 
 
-from depth.depth_engine import INITIAL_BACKOFF_S, MAX_BACKOFF_S
-from depth.depth_source import DepthSourceError
-
-
 class FailingSource(FakeSource):
     """Fails to open until `fail_opens` attempts have been made."""
 
@@ -348,17 +351,26 @@ def test_the_engine_recovers_when_the_device_appears():
         engine.close()
 
 
-def test_backoff_resets_after_a_successful_open():
+def test_backoff_resets_after_a_successful_read():
+    # Renamed from "...after_a_successful_open": backoff means "time since the
+    # stream last actually produced a frame", so the reset happens on the
+    # first successful read/publish, not on a bare successful open. This
+    # FailingSource only ever fails open(), never read(), so the two
+    # behaviours aren't distinguishable by this test alone -- see
+    # test_read_errors_back_off_before_reconnecting for a case where a handle
+    # opens fine but reads keep failing, which only the new contract handles.
     delays = []
     source = FailingSource(fail_opens=2)
     engine = DepthEngine(lambda: source, sleep_fn=recording_sleep(delays))
     try:
         engine.acquire()
         assert wait_until(lambda: engine.status is DepthStatus.STREAMING)
+        assert wait_until(lambda: engine.get_frame() is not None)
     finally:
         engine.close()
 
-    # Two failures: 1s then 2s. Nothing longer, because the third open worked.
+    # Two failures: 1s then 2s. Nothing longer, because the third open worked
+    # and its first read succeeded.
     assert delays == [INITIAL_BACKOFF_S, INITIAL_BACKOFF_S * 2]
 
 
@@ -372,6 +384,26 @@ def test_a_read_error_closes_the_device_and_reconnects():
         assert wait_until(lambda: source.open_count >= 2)
     finally:
         engine.close()
+
+
+def test_read_errors_back_off_before_reconnecting():
+    # Regression: a device that opens fine but fails every read (a wedged
+    # device, a flaky cable) must be throttled exactly like a failed open --
+    # not spin open/read-fail/close hot with backoff never engaging.
+    delays = []
+    source = DyingSource(frames_before_death=3)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep(delays))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: len(delays) >= 3)
+    finally:
+        engine.close()
+
+    assert delays[0] == INITIAL_BACKOFF_S
+    assert delays[1] == INITIAL_BACKOFF_S * 2
+    assert delays[2] == INITIAL_BACKOFF_S * 4
+    assert all(delay <= MAX_BACKOFF_S for delay in delays)
 
 
 def test_an_unplugged_camera_leaves_the_last_frame_readable():
