@@ -178,7 +178,7 @@ def test_read_owns_its_buffer_so_the_sdk_may_reuse_its_own(monkeypatch):
     assert frame.flags.owndata or frame.flags.writeable
 
 
-def test_read_before_open_raises():
+def test_orbbec_read_before_open_raises():
     with pytest.raises(DepthSourceError):
         OrbbecSource().read()
 
