@@ -73,4 +73,31 @@ uv run main.py
 - `light/` - Light control system
 - `server/` - Network server functionality
 
+## Depth camera (optional)
 
+The Depth Input node streams from an Orbbec Gemini 2. The camera is optional —
+without it the node renders transparent black and the app runs normally.
+
+`pyorbbecsdk` is **not** in `pyproject.toml`. It is not on PyPI, and building
+from source is broken (the upstream git-LFS remote is missing objects). Install
+the prebuilt wheel instead. For Python 3.11 on linux x86_64, download
+`pyorbbecsdk2-2.1.1-cp311-cp311-linux_x86_64.whl` from
+https://github.com/orbbec/pyorbbecsdk/releases and:
+
+```bash
+.venv/bin/python -m pip install pyorbbecsdk2-2.1.1-cp311-cp311-linux_x86_64.whl
+sudo sh .venv/lib/python3.11/site-packages/pyorbbecsdk/shared/install_udev_rules.sh
+```
+
+The package is named `pyorbbecsdk2` but imports as `pyorbbecsdk`. Replug the
+camera after installing the udev rules.
+
+**The Gemini 2 must be on a USB 3.0 port.** On a 480M link it drops off the bus
+mid-enumeration with `Input/Output Error`. Check with `lsusb -t` — the Orbbec
+line must read 5000M or 10000M. A USB-2 or charge-only cable also forces 480M.
+
+To develop without hardware, run with a fake camera:
+
+```bash
+.venv/bin/python main.py --depth-source synthetic
+```
