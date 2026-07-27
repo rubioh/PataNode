@@ -1682,7 +1682,11 @@ print('class:', nc.SHADER_NODES.get(1029))
 "
 ```
 
-Expected: `shader nodes: 84`, both registrations `True`, class `DepthInputNode`. A traceback about a partially initialised `node.node_conf` means the new import broke the cycle order — move `import program.input` after `import program.output` and try again.
+Expected: `shader nodes: 85`, both registrations `True`, class `DepthInputNode`.
+
+The count goes 83 → 85, not 84. `program.input` is not imported anywhere today, so `StdInputNode` (opcode 2) is currently unregistered and absent from the palette. Importing the package registers it alongside the depth node. This is expected and accepted — mention it in the commit message.
+
+A traceback about a partially initialised `node.node_conf` means the new import broke the cycle order — move `import program.input` after `import program.output` and try again.
 
 - [ ] **Step 8: Run the whole suite**
 
