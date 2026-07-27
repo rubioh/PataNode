@@ -1778,6 +1778,8 @@ Install the SDK per the README, plug the Gemini 2 into a USB 3.0 port, then:
 
 Confirm the stream appears, and that a hand held at a known distance lands where `near_mm` and `far_mm` predict.
 
+Also confirm the **pixel format assumption**. `OrbbecSource.read()` assumes the default depth profile is 16-bit and reshapes with `dtype=np.uint16`. If the device's default profile is not 16-bit, `reshape` raises `ValueError` and the symptom is a permanent reconnect loop whose tooltip reads "cannot reshape array". Check the reported profile is 1280×800 and that frames arrive without that error. This cannot be verified without hardware — it is the one assumption in the SDK wrapper that no test can reach.
+
 - [ ] **Step 4: Reconnect**
 
 With the real camera streaming, unplug it. Confirm:
