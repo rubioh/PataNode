@@ -1800,11 +1800,33 @@ override that closes the engine before the base class calls `sys.exit(0)`.
 
 Add a second Depth Input node. Confirm both render. Delete one; confirm the other keeps streaming. Delete both; confirm the camera LED turns off, or the log shows the capture thread stopping.
 
-- [ ] **Step 6: Record the outcomes**
+- [ ] **Step 7: Resolution change while streaming**
+
+With the camera (or the synthetic source) streaming, change the node's Resolution from the inspector. Confirm the image keeps updating.
+
+This is the only manual step that exercises `DepthInputNode.reload_program`'s engine re-injection. `ShaderNode.reload_program` rebuilds the program as `self.program.__class__(ctx=..., win_size=...)`, dropping every other constructor argument — without the override the rebuilt program gets `engine=None` and renders permanently transparent with no error. Permanent transparency here means that fix regressed.
+
+- [ ] **Step 8: Serialization round-trip**
+
+Save a scene with non-default `near_mm`, `far_mm`, `flip_x`, and `flip_y`. Reload it. Confirm all four values came back and the node still renders.
+
+This is the only check on the serialization seam. `serialize`/`deserialize` walk both the cpu- and gpu-adaptable parameter dicts and raise `KeyError` on any mismatch, and a node that raises during deserialization is silently dropped by the `except: dumpException()` in `nodeeditor/node_scene.py`.
+
+- [ ] **Step 9: Subwindow close and cancelled close**
+
+Close a graph subwindow containing a Depth Input node while the app keeps running. Confirm the camera LED goes out — `onSubWndClose` releases node resources only after the close commits.
+
+Then reopen the scene, make an edit, close the window, and click **Cancel** at the save prompt. Confirm the graph is intact: every node still present, edges still connected, and the depth node still streaming. Releasing before the save gate would tear the graph apart in a window you chose to keep.
+
+- [ ] **Step 10: Undo a deletion**
+
+Delete a Depth Input node, then undo. Confirm the stream resumes. Delete the restored node again and confirm the camera stops — that proves the undo path took exactly one acquire, not zero or two.
+
+- [ ] **Step 11: Record the outcomes**
 
 Add a "Verification results" section to the spec noting the date, which scenarios passed, and anything that did not. If a scenario failed, stop and fix it before continuing.
 
-- [ ] **Step 7: Commit**
+- [ ] **Step 12: Commit**
 
 ```bash
 git add docs/superpowers/specs/2026-07-27-depth-camera-input-node-design.md
