@@ -674,10 +674,14 @@ class PataNode(NodeEditorWindow):
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
         self.graphs = {k: v for k, v in self.graphs.items() if not v.mark_dead}
-        self.releaseNodeResources(widget)
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():
+            # Only release once the close is actually going through: doing
+            # this before the gate would tear down the graph (detach every
+            # edge, drop every grNode, empty scene.nodes) of a window the
+            # user just chose to keep open by cancelling the save prompt.
+            self.releaseNodeResources(widget)
             event.accept()
         else:
             event.ignore()
