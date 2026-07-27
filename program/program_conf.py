@@ -1,7 +1,6 @@
-import numpy as np
-
 from os.path import dirname, join
 
+import numpy as np
 
 SHADER_PROGRAMS = {}  # type: ignore[var-annotated] # FIXME: add type annotation
 SQUARE_VERT_PATH = join(dirname(__file__), "base/vertex_base.glsl")
@@ -57,15 +56,16 @@ def name_to_opcode(name):
     return sum(lst)
 
 
-import program.output
-import program.scene
-import program.utils
-import program.textures
-import program.effects
 import program.colors
+import program.effects
 import program.gate
-import program.particles
-import program.zozo
-import program.physarum
+import program.input
 import program.led_mapping
 import program.map
+import program.output
+import program.particles
+import program.physarum
+import program.scene
+import program.textures
+import program.utils
+import program.zozo
