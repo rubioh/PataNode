@@ -31,6 +31,8 @@ Frame = namedtuple("Frame", "frame_id data width height depth_scale")
 
 NO_FRAME_ID = 0
 JOIN_TIMEOUT_S = 2.0
+INITIAL_BACKOFF_S = 1.0
+MAX_BACKOFF_S = 5.0
 
 
 class DepthEngine:
@@ -164,19 +166,62 @@ class DepthEngine:
             self._slot = Frame(self._frame_id, data, width, height, depth_scale)
 
     def _run(self, stop_event):
-        source = self._source_factory()
-        width, height, depth_scale = source.open()
-        self._set_status_if_current(
-            stop_event, DepthStatus.STREAMING, "%dx%d depth stream" % (width, height)
-        )
+        source = None
+        width = height = 0
+        depth_scale = 1.0
+        backoff = INITIAL_BACKOFF_S
 
         try:
             while not stop_event.is_set():
-                frame = source.read()
-                if frame is None:
+                if source is None:
+                    self._set_status_if_current(
+                        stop_event, DepthStatus.CONNECTING, "opening device"
+                    )
+                    try:
+                        source = self._source_factory()
+                        width, height, depth_scale = source.open()
+                    except Exception as error:
+                        # Any failure is a disconnect: no device, no SDK, no
+                        # permission. Report it and try again later, never crash.
+                        source = self._safe_close(source)
+                        self._set_status_if_current(
+                            stop_event, DepthStatus.UNAVAILABLE, str(error)
+                        )
+                        self._sleep_fn(backoff)
+                        backoff = min(backoff * 2, MAX_BACKOFF_S)
+                        continue
+
+                    backoff = INITIAL_BACKOFF_S
+                    self._set_status_if_current(
+                        stop_event,
+                        DepthStatus.STREAMING,
+                        "%dx%d depth stream" % (width, height),
+                    )
+
+                try:
+                    frame = source.read()
+                except Exception as error:
+                    source = self._safe_close(source)
+                    self._set_status_if_current(
+                        stop_event, DepthStatus.UNAVAILABLE, str(error)
+                    )
                     continue
+
+                if frame is None:
+                    continue  # timeout, not an error
+
                 if stop_event.is_set():
                     break
+
                 self._publish(frame, width, height, depth_scale)
         finally:
-            source.close()
+            self._safe_close(source)
+
+    def _safe_close(self, source):
+        """Close a source, swallowing errors. Returns None for reassignment."""
+        if source is not None:
+            try:
+                source.close()
+            except Exception:
+                pass
+        return None

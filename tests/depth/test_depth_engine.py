@@ -250,3 +250,141 @@ def test_slow_shutdown_does_not_orphan_a_resurrecting_thread(monkeypatch):
     finally:
         stuck.release_first_read()
         engine.close()
+
+
+from depth.depth_engine import INITIAL_BACKOFF_S, MAX_BACKOFF_S
+from depth.depth_source import DepthSourceError
+
+
+class FailingSource(FakeSource):
+    """Fails to open until `fail_opens` attempts have been made."""
+
+    def __init__(self, fail_opens=1, **kwargs):
+        super().__init__(**kwargs)
+        self.fail_opens = fail_opens
+        self.attempts = 0
+
+    def open(self):
+        self.attempts += 1
+        if self.attempts <= self.fail_opens:
+            raise DepthSourceError("device not found")
+        return super().open()
+
+
+class DyingSource(FakeSource):
+    """Streams a few frames, then loses the device on every later read."""
+
+    def __init__(self, frames_before_death=3, **kwargs):
+        super().__init__(**kwargs)
+        self.frames_before_death = frames_before_death
+
+    def read(self):
+        if self._counter >= self.frames_before_death:
+            raise DepthSourceError("device disconnected")
+        return super().read()
+
+
+def recording_sleep(delays):
+    def sleep(seconds):
+        delays.append(seconds)
+        time.sleep(0.001)  # keep the reconnect loop from spinning hot
+
+    return sleep
+
+
+def test_failure_to_open_reports_unavailable_with_a_reason():
+    source = FailingSource(fail_opens=99)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep([]))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: engine.status is DepthStatus.UNAVAILABLE)
+        assert "device not found" in engine.status_reason
+    finally:
+        engine.close()
+
+
+def test_a_missing_sdk_is_reported_not_raised():
+    def factory():
+        raise ImportError("No module named 'pyorbbecsdk'")
+
+    engine = DepthEngine(factory, sleep_fn=recording_sleep([]))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: engine.status is DepthStatus.UNAVAILABLE)
+        assert "pyorbbecsdk" in engine.status_reason
+    finally:
+        engine.close()
+
+
+def test_open_failures_back_off_exponentially_up_to_the_cap():
+    delays = []
+    source = FailingSource(fail_opens=99)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep(delays))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: len(delays) >= 6)
+    finally:
+        engine.close()
+
+    assert delays[0] == INITIAL_BACKOFF_S
+    assert delays[1] == INITIAL_BACKOFF_S * 2
+    assert delays[2] == INITIAL_BACKOFF_S * 4
+    assert all(delay <= MAX_BACKOFF_S for delay in delays)
+    assert delays[-1] == MAX_BACKOFF_S
+
+
+def test_the_engine_recovers_when_the_device_appears():
+    source = FailingSource(fail_opens=2)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep([]))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: engine.status is DepthStatus.STREAMING)
+        assert wait_until(lambda: engine.get_frame() is not None)
+    finally:
+        engine.close()
+
+
+def test_backoff_resets_after_a_successful_open():
+    delays = []
+    source = FailingSource(fail_opens=2)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep(delays))
+    try:
+        engine.acquire()
+        assert wait_until(lambda: engine.status is DepthStatus.STREAMING)
+    finally:
+        engine.close()
+
+    # Two failures: 1s then 2s. Nothing longer, because the third open worked.
+    assert delays == [INITIAL_BACKOFF_S, INITIAL_BACKOFF_S * 2]
+
+
+def test_a_read_error_closes_the_device_and_reconnects():
+    source = DyingSource(frames_before_death=3)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep([]))
+    try:
+        engine.acquire()
+
+        assert wait_until(lambda: source.close_count >= 1)
+        assert wait_until(lambda: source.open_count >= 2)
+    finally:
+        engine.close()
+
+
+def test_an_unplugged_camera_leaves_the_last_frame_readable():
+    # The node keeps rendering the last good frame rather than going black the
+    # instant the cable is pulled.
+    source = DyingSource(frames_before_death=3)
+    engine = DepthEngine(lambda: source, sleep_fn=recording_sleep([]))
+    try:
+        engine.acquire()
+        assert wait_until(lambda: engine.get_frame() is not None)
+
+        assert wait_until(lambda: source.close_count >= 1)
+
+        assert engine.get_frame() is not None
+    finally:
+        engine.close()
