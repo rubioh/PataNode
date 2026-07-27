@@ -783,48 +783,67 @@ MAX_BACKOFF_S = 5.0
 
 - [ ] **Step 4: Replace `_run` with the reconnecting state machine**
 
+Task 2's review replaced the instance-wide `self._running` flag with a
+per-thread `threading.Event` stop token, so `_run` already takes `stop_event`
+and reports status through `_set_status_if_current`. Keep both — they are what
+stop a superseded thread from resurrecting and from clobbering a newer
+session's status. Do NOT reintroduce `self._running` or call `_set_status`
+directly from `_run`.
+
 Replace the whole `_run` method from Task 2 and add `_safe_close`:
 
 ```python
-    def _run(self):
+    def _run(self, stop_event):
         source = None
         width = height = 0
         depth_scale = 1.0
         backoff = INITIAL_BACKOFF_S
 
-        while self._running:
-            if source is None:
-                self._set_status(DepthStatus.CONNECTING, "opening device")
+        try:
+            while not stop_event.is_set():
+                if source is None:
+                    self._set_status_if_current(
+                        stop_event, DepthStatus.CONNECTING, "opening device"
+                    )
+                    try:
+                        source = self._source_factory()
+                        width, height, depth_scale = source.open()
+                    except Exception as error:
+                        # Any failure is a disconnect: no device, no SDK, no
+                        # permission. Report it and try again later, never crash.
+                        source = self._safe_close(source)
+                        self._set_status_if_current(
+                            stop_event, DepthStatus.UNAVAILABLE, str(error)
+                        )
+                        self._sleep_fn(backoff)
+                        backoff = min(backoff * 2, MAX_BACKOFF_S)
+                        continue
+
+                    backoff = INITIAL_BACKOFF_S
+                    self._set_status_if_current(
+                        stop_event,
+                        DepthStatus.STREAMING,
+                        "%dx%d depth stream" % (width, height),
+                    )
+
                 try:
-                    source = self._source_factory()
-                    width, height, depth_scale = source.open()
+                    frame = source.read()
                 except Exception as error:
-                    # Any failure is a disconnect: no device, no SDK, no
-                    # permission. Report it and try again later, never crash.
                     source = self._safe_close(source)
-                    self._set_status(DepthStatus.UNAVAILABLE, str(error))
-                    self._sleep_fn(backoff)
-                    backoff = min(backoff * 2, MAX_BACKOFF_S)
+                    self._set_status_if_current(
+                        stop_event, DepthStatus.UNAVAILABLE, str(error)
+                    )
                     continue
 
-                backoff = INITIAL_BACKOFF_S
-                self._set_status(
-                    DepthStatus.STREAMING, "%dx%d depth stream" % (width, height)
-                )
+                if frame is None:
+                    continue  # timeout, not an error
 
-            try:
-                frame = source.read()
-            except Exception as error:
-                source = self._safe_close(source)
-                self._set_status(DepthStatus.UNAVAILABLE, str(error))
-                continue
+                if stop_event.is_set():
+                    break
 
-            if frame is None:
-                continue  # timeout, not an error
-
-            self._publish(frame, width, height, depth_scale)
-
-        self._safe_close(source)
+                self._publish(frame, width, height, depth_scale)
+        finally:
+            self._safe_close(source)
 
     def _safe_close(self, source):
         """Close a source, swallowing errors. Returns None for reassignment."""
@@ -836,7 +855,18 @@ Replace the whole `_run` method from Task 2 and add `_safe_close`:
         return None
 ```
 
-Note the last published frame is deliberately left in the slot on disconnect, so consumers keep rendering it.
+Three properties to preserve:
+
+- The last published frame is deliberately left in the slot on disconnect, so
+  consumers keep rendering it rather than going black the instant a cable is
+  pulled.
+- `_safe_close` runs in a `finally`, so a stopped or superseded thread always
+  releases its device.
+- The backoff sleep goes through `self._sleep_fn`, which the tests replace to
+  avoid real waiting. It is not interruptible, so a `close()` during a backoff
+  waits out at most one period (5 s worst case). That bound is accepted here;
+  it is the same class as the deferred `JOIN_TIMEOUT_S` blocking noted in Task
+  2's review.
 
 - [ ] **Step 5: Run the whole depth suite to verify it passes**
 
