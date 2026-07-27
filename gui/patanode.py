@@ -1,9 +1,11 @@
+import io
 import os
-
 from functools import wraps
 from time import time
 
-from PyQt5.QtCore import Qt, QSignalMapper
+import numpy as np
+from PIL import Image
+from PyQt5.QtCore import QSignalMapper, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
@@ -13,13 +15,7 @@ from PyQt5.QtWidgets import (
     QMessageBox,
     QWidget,
 )
-from program.map.mapping.mapping import Mapping
-from nodeeditor.node_editor_window import NodeEditorWindow
-from nodeeditor.utils import dumpException, pp
-from nodeeditor.utils import loadStylesheets
-import numpy as np
-from PIL import Image
-import io
+
 from gui.graphcontainer import GraphContainerSubWindow
 from gui.mappingwindow import PataNodeMappingWindow
 from gui.subwindow import PataNodeSubWindow
@@ -28,7 +24,9 @@ from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
-import base64
+from nodeeditor.node_editor_window import NodeEditorWindow
+from nodeeditor.utils import dumpException, loadStylesheets, pp
+from program.map.mapping.mapping import Mapping
 
 
 def timing(f):
@@ -228,9 +226,9 @@ class PataNode(NodeEditorWindow):
                             "is_cpu_param": True,
                             "is_default_value": value == default_value,
                         }
-                        ret["graphs"][graph_name]["nodes"][node_name][param_name] = (
-                            entry
-                        )
+                        ret["graphs"][graph_name]["nodes"][node_name][
+                            param_name
+                        ] = entry
         return ret
 
     def create_bmp_in_memory(self, width, height, bytes):
@@ -648,9 +646,35 @@ class PataNode(NodeEditorWindow):
         self.graphs[str(nodeeditor.unique_session_id)] = nodeeditor
         return subwnd
 
+    def releaseNodeResources(self, widget):
+        # Closing a graph subwindow does not clear its scene or call
+        # node.remove() -- neither closeEvent nor onSubWndClose ever did, and
+        # WA_DeleteOnClose is disabled on PataNodeSubWindow. Nodes that hold
+        # external resources beyond the scene (the depth camera's acquire()
+        # refcount is the current example) would otherwise stay held for the
+        # rest of the session, or leak further on every repeated open/close
+        # of the same file. This is a narrow, targeted release -- NOT a
+        # scene.clear() -- so it must never raise out of closeEvent: guard
+        # every attribute access and isolate each node's failure from the
+        # rest.
+        scene = getattr(widget, "scene", None)
+        nodes = getattr(scene, "nodes", None)
+        if not nodes:
+            return
+
+        for node in list(nodes):
+            remove = getattr(node, "remove", None)
+            if remove is None:
+                continue
+            try:
+                remove()
+            except Exception as e:
+                dumpException(e)
+
     def onSubWndClose(self, widget, event):
         existing = self.findMdiChild(widget.filename)
         self.graphs = {k: v for k, v in self.graphs.items() if not v.mark_dead}
+        self.releaseNodeResources(widget)
         self.mdiArea.setActiveSubWindow(existing)
 
         if self.maybeSave():

@@ -148,7 +148,6 @@ class DepthInputNode(ShaderNode, Texture):
 
         app = getattr(scene, "app", None)
         self.engine = getattr(app, "depth_engine", None)
-        self._last_tooltip = None
 
         # Construct before acquiring: if GLSL compilation or FBO allocation
         # raises here, __init__ never completes and remove() never runs, so
@@ -176,6 +175,7 @@ class DepthInputNode(ShaderNode, Texture):
             ctx=self.scene.ctx, win_size=self.win_size, engine=self.engine
         )
 
+        self._releaseDepthTexture()
         del self.program
         self.program = program
 
@@ -190,14 +190,41 @@ class DepthInputNode(ShaderNode, Texture):
             self.engine.release()
             self.engine = None
 
+        self._releaseDepthTexture()
+
         super().remove()
+
+    def _releaseDepthTexture(self):
+        # moderngl's context here is created without gc_mode, so
+        # Texture.__del__ never releases GL memory on its own -- without an
+        # explicit release() every reload_program (Resolution menu, or any
+        # deserialize with restore_window_size=True) strands the old
+        # program's depth_texture (up to 1280x800x2 bytes once streaming).
+        # Guarded because construction may have failed part-way (no
+        # self.program / no depth_texture yet), and because release() on an
+        # already-released texture must not raise out of teardown.
+        program = getattr(self, "program", None)
+        texture = getattr(program, "depth_texture", None)
+        if texture is None:
+            return
+        try:
+            texture.release()
+        except Exception:
+            pass
 
     def render(self, audio_features=None):
         if self.engine is not None:
+            # Compare against Qt's own state rather than a private cache:
+            # ShaderNode.evalImplementation unconditionally clears the
+            # tooltip to "" on every successful eval (construction,
+            # onInputChanged, markDirty, reload_program), which would
+            # silently defeat a private "last written" cache -- the cache
+            # would never see that change and would skip restoring it.
+            # Comparing against toolTip() self-heals from that while still
+            # avoiding a Qt call on every frame when nothing changed.
             tooltip = self.engine.status_reason
-            if tooltip != self._last_tooltip:
+            if self.grNode.toolTip() != tooltip:
                 self.grNode.setToolTip(tooltip)
-                self._last_tooltip = tooltip
 
         if self.program is not None and self.program.already_called:
             return self.program.norender()

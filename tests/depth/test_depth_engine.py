@@ -166,7 +166,13 @@ def test_last_release_stops_the_thread_and_closes_the_device(engine, source):
 
     assert wait_until(lambda: source.close_count == 1)
     assert engine.status is DepthStatus.IDLE
-    assert not any(t.name == "depth-capture" for t in threading.enumerate())
+    # Assert on the engine's own thread reference, not on process-wide thread
+    # scanning: test_slow_shutdown_does_not_orphan_a_resurrecting_thread
+    # deliberately leaves a "depth-capture" thread alive elsewhere in this
+    # process, so a global scan is only kept honest by source-definition
+    # ordering -- any reordering (a new test, pytest-randomly, pytest-xdist)
+    # would turn this into a flake that reads like a real refcount regression.
+    assert engine._thread is None
 
 
 def test_release_below_zero_is_harmless(engine):
