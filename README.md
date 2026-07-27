@@ -72,6 +72,7 @@ uv run main.py
 - `audio/` - Audio processing pipeline
 - `light/` - Light control system
 - `server/` - Network server functionality
+- `depth/` - Depth camera input pipeline
 
 ## Depth camera (optional)
 

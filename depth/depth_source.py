@@ -93,9 +93,9 @@ class OrbbecSource(DepthSource):
     crash for the whole application.
     """
 
-    # The working profile is 10fps, so a frame arrives every 100ms. The 100ms
-    # used in TODO/gemini_sdk_test.py sits right on the frame period and times
-    # out constantly.
+    # The working profile is 1280x800 at 10fps, so a frame arrives every
+    # 100ms. A 100ms read timeout sits right on that period and times out
+    # constantly; 200ms gives headroom without adding noticeable latency.
     READ_TIMEOUT_MS = 200
 
     # How long open() will wait for the first frame before giving up. The frame
