@@ -1787,7 +1787,16 @@ With the real camera streaming, unplug it. Confirm:
 - The tooltip changes to a disconnect message.
 - Replugging resumes streaming without restarting the app.
 
-- [ ] **Step 5: Refcount**
+- [ ] **Step 5: Clean shutdown**
+
+Close the app window normally (with and without a Depth Input node in the
+graph). Confirm no traceback on exit and no lingering capture thread. Two lines
+in `app.py` are reachable only this way and are covered by no automated test,
+because `PataShadeApp` cannot be constructed headlessly: the
+`getattr(args, "depth_source", "orbbec")` fallback and the `closeEvent`
+override that closes the engine before the base class calls `sys.exit(0)`.
+
+- [ ] **Step 6: Refcount**
 
 Add a second Depth Input node. Confirm both render. Delete one; confirm the other keeps streaming. Delete both; confirm the camera LED turns off, or the log shows the capture thread stopping.
 
