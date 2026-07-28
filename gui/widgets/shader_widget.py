@@ -1,7 +1,8 @@
-import moderngl
-
-from PyQt5 import QtCore, QtOpenGL, QtWidgets
 import time
+
+import moderngl
+from PyQt5 import QtCore, QtOpenGL, QtWidgets
+
 from program.program_manager import FBOManager
 
 
@@ -69,9 +70,10 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.resize(self.width, self.height)
 
         # Center the window on the screen if in window mode
+        screen = QtWidgets.QApplication.primaryScreen().geometry()
         center_window_position = (
-            int(self.geometry().x() - self.width / 2),
-            int(self.geometry().y() - self.height / 2),
+            screen.x() + (screen.width() - self.width) // 2,
+            screen.y() + (screen.height() - self.height) // 2,
         )
         self.move(*center_window_position)
         self._buffer_width = self._width
@@ -110,7 +112,7 @@ class ShaderWidget(QtOpenGL.QGLWidget):
     def paintGL(self):
         self.makeCurrent()
         self._ctx.clear(color=(0.0, 0.0, 0.0))
-        p = time.perf_counter()
+        time.perf_counter()
         self.app.render(self.app._last_audio_features)
 
     #  self.ctx.finish()

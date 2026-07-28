@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt, QSignalMapper
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
+    QApplication,
     QDockWidget,
     QFileDialog,
     QMdiArea,
@@ -118,7 +119,36 @@ class PataNode(NodeEditorWindow):
     def initShaderWidget(self):
         self.gl_widget = ShaderWidget(self)
         self.ctx = self.gl_widget.ctx
+        self.waitForShaderWindowExposure()
         self.gl_widget.hide()
+
+    def waitForShaderWindowExposure(self, timeout_s=1.0):
+        """Let the shader window finish mapping before it is hidden.
+
+        ShaderWidget.initUI() calls show() so the GL context can be created, and
+        the caller hides it again immediately. That races the X server: if the
+        hide wins, the window is unmapped before it was ever exposed, and every
+        later show()/showFullScreen() then yields a mapped-but-never-exposed
+        window. Qt delivers no paint events to an unexposed window, so paintGL
+        never runs and the shader output stays blank -- intermittently,
+        depending on who wins the race.
+
+        Pumping the event loop until the platform window reports itself exposed
+        removes the race. Bounded, so a compositor that never exposes the window
+        cannot hang startup.
+        """
+        deadline = time() + timeout_s
+
+        while time() < deadline:
+            handle = self.gl_widget.windowHandle()
+
+            if handle is not None and handle.isExposed():
+                return True
+
+            QApplication.processEvents()
+
+        print("PataNode::initShaderWidget shader window was never exposed")
+        return False
 
     def onHideAudioDock(self, value):
         self.audio_log_widget.setHidden(not value)
