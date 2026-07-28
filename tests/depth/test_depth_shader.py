@@ -58,7 +58,7 @@ def render_depth_frame(
     program["near_mm"] = near_mm
     program["far_mm"] = far_mm
     program["depth_scale"] = depth_scale
-    program["flip"] = flip
+    program["flip_x"], program["flip_y"] = flip
     program["iResolution"] = (float(width), 1.0)
 
     quad = ctx.buffer(np.array([-1, -1, 3, -1, -1, 3], dtype="f4").tobytes())

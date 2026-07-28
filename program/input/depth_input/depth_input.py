@@ -36,16 +36,34 @@ class DepthInput(ProgramBase):
         self.engine = engine
 
         self._last_frame_id = NO_FRAME_ID
-        self._depth_scale = 1.0
 
-        # Order matters: initProgram sets self.name, which initUniformsBinding
-        # needs to key its parameter dict. Matches program/scene/texture.
-        self.initParams()
+        # Must precede initProgram: uniforms already protected when the shader
+        # is parsed get no inspector entry at all. depth_map is the sampler unit
+        # and depth_scale is reported by the sensor -- neither is meaningful to
+        # drive from an expression. (Protecting them afterwards would not hide
+        # them: ProgramBase.protectAdaptableParameters matches on the parameter
+        # name, which is always the literal "eval_function", so it never marks
+        # anything.)
+        self.addProtectedUniforms(["depth_map", "depth_scale"])
+
+        # initUniformsBinding needs the program loaded, since the binding keys
+        # are the uniforms parsed out of the shader.
         self.initProgram()
         self.initFBOSpecifications()
         self.initUniformsBinding()
+        self.initParams()
 
     def initParams(self):
+        # Bound to shader uniforms in initUniformsBinding, so these are the
+        # values the inspector's expressions are evaluated against.
+        self.near_mm = DEFAULT_NEAR_MM
+        self.far_mm = DEFAULT_FAR_MM
+        self.flip_x = 0.0
+        self.flip_y = 0.0
+
+        # Reported by the sensor, not a user control -- protected below.
+        self.depth_scale = 1.0
+
         # A 1x1 zero texture so the shader always has something bindable, even
         # before the first frame -- or forever, if no camera ever appears. Raw 0
         # already means "unmeasured", so "no camera" and "hole" collapse into
@@ -69,20 +87,15 @@ class DepthInput(ProgramBase):
             self.fbos_dtypes.append(specification[2])
 
     def initUniformsBinding(self):
-        binding = {}
-        self.add_float_cpu_adaptable_parameter("near_mm", DEFAULT_NEAR_MM)
-        self.add_float_cpu_adaptable_parameter("far_mm", DEFAULT_FAR_MM)
-        self.add_float_cpu_adaptable_parameter("flip_x", 0.0)
-        self.add_float_cpu_adaptable_parameter("flip_y", 0.0)
+        binding = {
+            "iResolution": "win_size",
+            "near_mm": "near_mm",
+            "far_mm": "far_mm",
+            "flip_x": "flip_x",
+            "flip_y": "flip_y",
+            "depth_scale": "depth_scale",
+        }
         super().initUniformsBinding(binding, program_name="")
-        super().addProtectedUniforms([])
-
-    def _parameter(self, name, fallback):
-        parameters = self.getCpuAdaptableParameters()["program"]
-        try:
-            return float(parameters[name]["eval_function"]["value"])
-        except (KeyError, TypeError, ValueError):
-            return fallback
 
     def updateParams(self, af=None):
         """Pull the newest frame from the engine, if there is one."""
@@ -102,26 +115,12 @@ class DepthInput(ProgramBase):
             self.depth_texture.filter = (moderngl.NEAREST, moderngl.NEAREST)
 
         self.depth_texture.write(frame.data)
-        self._depth_scale = frame.depth_scale
+        self.depth_scale = frame.depth_scale
         self._last_frame_id = frame.frame_id
 
     def bindUniform(self, af=None):
         super().bindUniform(af)
-
-        near_mm = self._parameter("near_mm", DEFAULT_NEAR_MM)
-        far_mm = self._parameter("far_mm", DEFAULT_FAR_MM)
-
-        # Equal near and far would divide by zero in the shader.
-        if far_mm == near_mm:
-            far_mm = near_mm + 1.0
-
-        self.program["near_mm"] = near_mm
-        self.program["far_mm"] = far_mm
-        self.program["depth_scale"] = self._depth_scale
-        self.program["flip"] = (
-            1.0 if self._parameter("flip_x", 0.0) else 0.0,
-            1.0 if self._parameter("flip_y", 0.0) else 0.0,
-        )
+        self.programs_uniforms.bindUniformToProgram(af, program_name="")
 
     def norender(self):
         return self.fbos[0].color_attachments[0]
