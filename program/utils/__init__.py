@@ -4,10 +4,11 @@ from program.utils.fluid import fluid
 from program.utils.gradientmap import gradientmap
 from program.utils.mask import mask
 from program.utils.medianfilter import medianfilter
+from program.utils.motion_flow import motion_flow
 from program.utils.offset import offset
 from program.utils.random import random
-from program.utils.selector import selector
 from program.utils.reconstruct import reconstruct
+from program.utils.selector import selector
 from program.utils.sobel import sobel
 from program.utils.structure_space_tensor import sst
 from program.utils.symetry import symetry
@@ -20,6 +21,7 @@ __all__ = [
     "gradientmap",
     "mask",
     "medianfilter",
+    "motion_flow",
     "offset",
     "random",
     "reconstruct",
