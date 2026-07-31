@@ -1,9 +1,8 @@
 import os
-
 from functools import partial
 
-from PyQt5.QtCore import Qt, QSize
-from PyQt5.QtGui import QPalette, QColor
+from PyQt5.QtCore import QSize, Qt
+from PyQt5.QtGui import QColor, QPalette
 from PyQt5.QtWidgets import (
     QCheckBox,
     QGroupBox,
@@ -23,6 +22,14 @@ from PyQt5.QtWidgets import (
 )
 
 from audio.audio_conf import dict_audio_features
+
+# The field beside each parameter holds an expression, not a value -- the single
+# thing people misread about this panel, so it is repeated on every tooltip.
+EXPRESSION_HELP = (
+    "<i>The field holds an expression evaluated with <b>x</b> as the incoming "
+    "value: <b>x</b> passes it through, <b>x*2</b> doubles it, a bare number "
+    "pins it to a constant.</i>"
+)
 # from nodeeditor.utils import dumpException
 # from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
 
@@ -265,6 +272,11 @@ class ParametersWidget(QTabWidget):
                 parameters[uniform_name], program_name, uniform_name
             )
             button_widget = QPushButton(uniform_name)
+            button_widget.setToolTip(
+                self.buildParameterTooltip(
+                    uniform_name, parameters[uniform_name]["eval_function"]
+                )
+            )
             self._all_buttons[program_name].append(button_widget)
             self._all_line_edit_widgets[program_name].append(line_edit_widget)
 
@@ -282,6 +294,42 @@ class ParametersWidget(QTabWidget):
 
         return list_widget
 
+    def buildParameterTooltip(self, uniform_name, parameter):
+        """
+        Assemble the hover text for one parameter. Formatting lives here so every
+        node reads the same way; programs only supply the wording and the values
+        through ProgramBase.initParameterDoc.
+        """
+        title = uniform_name.replace("_", " ").capitalize()
+        doc = parameter.get("doc")
+
+        if doc is None:
+            # Undocumented parameter: still say what the field next to it expects,
+            # which is the part that surprises people.
+            return f"<b>{title}</b><br/><br/>{EXPRESSION_HELP}"
+
+        parts = [f"<b>{title}</b>", doc["description"]]
+
+        values = [
+            (label, value)
+            for label, value in (
+                ("default", doc["default"]),
+                ("min", doc["minimum"]),
+                ("huge", doc["maximum"]),
+            )
+            if value is not None
+        ]
+
+        if values:
+            parts.append(
+                "&nbsp;&nbsp;&nbsp;".join(
+                    f"<b>{label}</b> {value}" for label, value in values
+                )
+            )
+
+        parts.append(EXPRESSION_HELP)
+        return "<br/><br/>".join(parts)
+
     def hide_unhide(self, widget_index, program_name):
         widget = self._all_line_edit_widgets[program_name][widget_index]
 
@@ -293,6 +341,9 @@ class ParametersWidget(QTabWidget):
     def getLineEdit(self, parameter, program_name, uniform_name):
         textfield = QLineEdit(self)
         textfield.setText(str(parameter["eval_function"]["value"]))
+        textfield.setToolTip(
+            self.buildParameterTooltip(uniform_name, parameter["eval_function"])
+        )
 
         callback = parameter["eval_function"]["connect"]
 

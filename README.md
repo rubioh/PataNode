@@ -102,5 +102,3 @@ To develop without hardware, run with a fake camera:
 ```bash
 .venv/bin/python main.py --depth-source synthetic
 ```
-
-claude --worktree depth-input-node --resume d6b8abf6-59c7-4819-b956-74b785172642

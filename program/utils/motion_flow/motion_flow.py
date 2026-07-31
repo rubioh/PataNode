@@ -88,6 +88,69 @@ class MotionFlow(ProgramBase):
         self.noise_threshold = 0.002
         self.lambda_reg = 0.05
         self.magnitude_scale = 8.0
+        self.drift = 1.0
+
+        self.initParameterDoc(
+            "flow_gain",
+            "How strongly movement registers. Multiplies the length of every "
+            "motion vector, so it scales how hard this node pushes whatever it "
+            "drives. At 0 the field is always empty and nothing downstream moves.",
+            default=1.0,
+            minimum=0.0,
+            maximum=8.0,
+        )
+        self.initParameterDoc(
+            "persistence",
+            "How long movement lingers once it stops. At 0 the field dies the "
+            "instant something stops moving, which is sharp but flickery. Near 1 a "
+            "single gesture leaves a trail that keeps driving effects for seconds "
+            "afterwards. This is the main feel control.",
+            default=0.85,
+            minimum=0.0,
+            maximum=0.98,
+        )
+        self.initParameterDoc(
+            "noise_threshold",
+            "Movement fainter than this is thrown away. Raise it when a grainy or "
+            "low-light camera makes the whole frame shimmer with motion that is "
+            "not there. Too high and genuine slow movement disappears along with "
+            "the noise.",
+            default=0.002,
+            minimum=0.0,
+            maximum=0.02,
+        )
+        self.initParameterDoc(
+            "lambda_reg",
+            "Steadiness of the estimate, as a fraction of how much detail the "
+            "image has locally. Higher is calmer and copes better with noisy or "
+            "flat footage, at the cost of understating how fast things really "
+            "move. Lower is more responsive and more jittery.",
+            default=0.05,
+            minimum=0.001,
+            maximum=1.0,
+        )
+        self.initParameterDoc(
+            "drift",
+            "Whether trails travel or fade where they were made. At 0 a trail sits "
+            "still and dims in place. At 1 it keeps sliding in the direction the "
+            "movement was going after that movement has stopped, stretching and "
+            "curling as it goes, like smoke coming off a gesture. Above 1 it races "
+            "away faster than the motion that made it. Turn persistence up "
+            "alongside this, or the trail fades before it has gone anywhere.",
+            default=1.0,
+            minimum=0.0,
+            maximum=8.0,
+        )
+        self.initParameterDoc(
+            "magnitude_scale",
+            "Affects the blue channel only, where this node reports movement as a "
+            "0-1 mask. Sets how much movement counts as fully lit. Raise it if the "
+            "mask stays dim, lower it if the slightest twitch blows it out to solid "
+            "white. The flow vectors themselves are untouched.",
+            default=8.0,
+            minimum=1.0,
+            maximum=50.0,
+        )
 
     def initUniformsBinding(self):
         # The compute passes run into reduced-size FBOs, so their iResolution is
@@ -120,6 +183,7 @@ class MotionFlow(ProgramBase):
             "persistence": "persistence",
             "noise_threshold": "noise_threshold",
             "flow_valid": "flow_valid",
+            "drift": "drift",
         }
         super().initUniformsBinding(binding, program_name="accum_")
 

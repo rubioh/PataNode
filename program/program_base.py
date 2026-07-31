@@ -3,13 +3,12 @@ import copy
 import numpy as np
 
 from program.program_conf import (
+    SQUARE_VERT_PATH,
     CTXError,
     GLSLImplementationError,
-    SQUARE_VERT_PATH,
     UnuseUniformError,
     get_square_vertex_data,
 )
-
 
 DEBUG = False
 DEBUG_EVAL = False
@@ -335,15 +334,56 @@ class ProgramBase:
             "widget": widget_type,
         }
 
+    def initParameterDoc(
+        self,
+        uniform_name,
+        description,
+        default=None,
+        minimum=None,
+        maximum=None,
+        program_name=None,
+    ):
+        """
+        Attach a human explanation to a uniform, surfaced as a tooltip in the Gpu
+        parameters panel. Uniforms are discovered by parsing the shader source, so
+        without this there is nothing to show beyond the name.
+
+        description : what the parameter does, in plain language
+        default     : the value shipped in initParams
+        minimum     : lowest useful setting
+        maximum     : an exaggerated setting, to show the effect at full strength
+
+        Call from initParams. program_name defaults to every program declaring the
+        uniform, so authors do not have to track which pass owns which name.
+        """
+        apd = self.adaptable_parameters_dict
+        targets = [program_name] if program_name is not None else list(apd.keys())
+
+        for pname in targets:
+            uniform_parameters = apd.get(pname, {}).get(uniform_name)
+
+            if uniform_parameters is None:
+                continue
+
+            if "eval_function" not in uniform_parameters:
+                continue
+
+            uniform_parameters["eval_function"]["doc"] = {
+                "description": description,
+                "default": default,
+                "minimum": minimum,
+                "maximum": maximum,
+            }
+
     def protectAdaptableParameters(self, protected):
         apd = self.adaptable_parameters_dict
         for program_name in apd.keys():
             for uniform_name in apd[program_name].keys():
                 gui_uni = apd[program_name][uniform_name]["eval_function"]
-                if gui_uni["name"] in protected:
-                    gui_uni["protected"] = True
-                else:
-                    gui_uni["protected"] = False
+                # Match on the uniform itself. This used to compare gui_uni["name"],
+                # which is always the literal "eval_function", so nothing was ever
+                # protected and every panel listed its texture samplers.
+                gui_uni["protected"] = uniform_name in protected
 
     def setCpuAdaptableParameters(self, progam_name, name, value):
         self.cpu_adaptable_parameters_dict[progam_name][name]["eval_function"][
@@ -439,9 +479,9 @@ class ProgramBase:
         if DEBUG:
             print("Params", params, "set to value", value, "for programs", program_name)
 
-        self.adaptable_parameters_dict[program_name][uniform_name][params]["value"] = (
-            value
-        )
+        self.adaptable_parameters_dict[program_name][uniform_name][params][
+            "value"
+        ] = value
 
     ###########################################
 
@@ -477,7 +517,9 @@ class ProgramBase:
 
     def addProtectedUniforms(self, uniforms_name):
         self.programs_uniforms.addProtectedUniforms(uniforms_name)
-        self.protectAdaptableParameters(uniforms_name)
+        # Re-apply against the accumulated list, not just this batch: a second call
+        # would otherwise clear the protection granted by the first.
+        self.protectAdaptableParameters(self.programs_uniforms.protected)
 
     def bindUniform(self, af):
         self.already_called = True

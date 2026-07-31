@@ -1,3 +1,4 @@
+from program.utils.advect import advect
 from program.utils.blend import blend
 from program.utils.downscale import downscale
 from program.utils.fluid import fluid
@@ -15,6 +16,7 @@ from program.utils.symetry import symetry
 from program.utils.upscale_nearest import upscale_nearest
 
 __all__ = [
+    "advect",
     "blend",
     "downscale",
     "fluid",

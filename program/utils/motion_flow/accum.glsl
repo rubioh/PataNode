@@ -8,6 +8,7 @@ uniform float flow_gain;
 uniform float persistence;
 uniform float noise_threshold;
 uniform float flow_valid;
+uniform float drift;
 
 void main()
 {
@@ -23,7 +24,17 @@ void main()
     }
 
     vec4 f = texture(FlowTex, uv);
-    vec4 prev = texture(AccumTex, uv);
+
+    // Semi-Lagrangian backtrace: whatever arrives here was carried in from
+    // upstream by the field's own velocity, so read the previous field at where
+    // it came from rather than at this pixel. That is what makes a trail keep
+    // travelling once the movement that created it has stopped, instead of
+    // fading in place. Unconditionally stable at any drift.
+    //
+    // Clamped rather than wrapped: without this a trail leaving one edge
+    // reappears on the opposite side.
+    vec2 src = clamp(uv - texture(AccumTex, uv).xy*drift, vec2(0.), vec2(1.));
+    vec4 prev = texture(AccumTex, src);
 
     vec2 flow = f.xy*flow_gain;
 
