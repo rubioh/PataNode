@@ -426,3 +426,25 @@ def test_an_unplugged_camera_leaves_the_last_frame_readable():
         assert engine.get_frame() is not None
     finally:
         engine.close()
+
+
+def test_close_does_not_wait_out_a_long_backoff():
+    # With no sleep_fn injected the engine waits on its stop token, so close()
+    # interrupts the backoff instead of blocking for MAX_BACKOFF_S. Uses the
+    # real production path deliberately: injecting a sleep stub here would
+    # test the stub, not the shutdown behaviour that matters.
+    source = FailingSource(fail_opens=99)
+    engine = DepthEngine(lambda: source)
+    engine.acquire()
+
+    # Let it fail once and enter the backoff.
+    assert wait_until(lambda: source.attempts >= 1)
+
+    started = time.time()
+    engine.close()
+    elapsed = time.time() - started
+
+    # INITIAL_BACKOFF_S is 1.0 and the cap is 30.0; a blocking sleep would
+    # show up as at least a second here.
+    assert elapsed < INITIAL_BACKOFF_S, f"close() blocked for {elapsed:.2f}s"
+    assert engine.status is DepthStatus.IDLE

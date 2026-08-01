@@ -5,7 +5,7 @@ from time import time
 
 import numpy as np
 from PIL import Image
-from PyQt5.QtCore import QSignalMapper, Qt
+from PyQt5.QtCore import QEventLoop, QSignalMapper, Qt
 from PyQt5.QtGui import QIcon, QKeySequence
 from PyQt5.QtWidgets import (
     QAction,
@@ -143,7 +143,10 @@ class PataNode(NodeEditorWindow):
             if handle is not None and handle.isExposed():
                 return True
 
-            QApplication.processEvents()
+            # Waits for events rather than returning immediately, so a window
+            # that is never exposed costs an idle second instead of a second
+            # of one core at 100%.
+            QApplication.processEvents(QEventLoop.AllEvents, 10)
 
         print("PataNode::initShaderWidget shader window was never exposed")
         return False
@@ -358,14 +361,28 @@ class PataNode(NodeEditorWindow):
         self.mdiArea.closeAllSubWindows()
 
         if self.mdiArea.currentSubWindow():
+            # A subwindow refused to close, so the quit is cancelled and the
+            # application must keep running. Nothing may have been torn down
+            # before this point.
             event.ignore()
         else:
             self.writeSettings()
+            self.releaseAppResources()
             event.accept()
             # Hacky fix for PyQt 5.14.x
             import sys
 
             sys.exit(0)
+
+    def releaseAppResources(self):
+        """Release process-wide resources. Called only once a quit is certain.
+
+        Subclasses override this rather than doing teardown in closeEvent:
+        the accept path ends in sys.exit(0), so anything after
+        super().closeEvent() never runs, and anything before it also runs on
+        the cancelled path -- which would leave a live application with its
+        timers stopped and its devices closed.
+        """
 
     def createActions(self):
         super().createActions()

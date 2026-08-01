@@ -35,6 +35,9 @@ class Worker(QRunnable):
 class PataShadeApp(PataNode):
     def __init__(self, args):
         self.args = args
+        # Set before super().__init__() builds the shader widget: paintGL
+        # consults it to refuse painting a half-constructed application.
+        self.render_ready = False
         self.audio_engine = AudioEngine()
         self.light_engine = LightEngine(args)
         # Idle until a Depth Input node acquires it -- no USB traffic for users
@@ -59,6 +62,12 @@ class PataShadeApp(PataNode):
 
         # Audio features parameters
         self.last_kick_count = self.last_hat_count = self.last_snare_count = 0
+
+        # Last: everything paintGL touches now exists, so the shader widget
+        # may render. Before this, a paint dispatched during startup (the
+        # exposure wait in initShaderWidget pumps the event loop) would abort
+        # the process on a missing attribute.
+        self.render_ready = True
 
         self.start_jobs()
 
@@ -167,10 +176,11 @@ class PataShadeApp(PataNode):
         if self.args.server:
             self.server_timer.start(int(1 / 60 * 1000))
 
-    def closeEvent(self, event):
+    def releaseAppResources(self):
+        # Runs only on a committed quit. Doing this in closeEvent instead
+        # would also run it when a subwindow cancels the quit, leaving a live
+        # application with dead timers and a closed camera.
         self.audio_timer.stop()
         self.light_timer.stop()
         self.shader_timer.stop()
-        # Must come first: the base implementation calls sys.exit(0).
         self.depth_engine.close()
-        super().closeEvent(event)

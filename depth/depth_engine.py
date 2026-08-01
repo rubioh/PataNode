@@ -15,7 +15,6 @@ services in artnet/controller.py and server/server.py.
 """
 
 import threading
-import time
 from collections import namedtuple
 from enum import Enum
 
@@ -43,8 +42,11 @@ MAX_BACKOFF_S = 30.0
 
 
 class DepthEngine:
-    def __init__(self, source_factory, sleep_fn=time.sleep):
+    def __init__(self, source_factory, sleep_fn=None):
         self._source_factory = source_factory
+        # None means "wait on the stop token", which is what production wants:
+        # a backoff must not outlive close(). Tests inject a recording stub
+        # instead, so they can assert the delay schedule without real waiting.
         self._sleep_fn = sleep_fn
 
         self._lock = threading.Lock()
@@ -172,6 +174,21 @@ class DepthEngine:
             self._frame_id += 1
             self._slot = Frame(self._frame_id, data, width, height, depth_scale)
 
+    def _waitBeforeRetry(self, stop_event, seconds):
+        """Pause between reconnect attempts. True if the engine is stopping.
+
+        Waiting on the stop token rather than sleeping matters now that the
+        cap is 30s: an uninterruptible sleep would keep the capture thread
+        alive long after close() returned, and a daemon thread killed
+        mid-SDK-call at interpreter exit is a classic source of a segfault on
+        shutdown.
+        """
+        if self._sleep_fn is not None:
+            self._sleep_fn(seconds)
+            return stop_event.is_set()
+
+        return stop_event.wait(seconds)
+
     def _run(self, stop_event):
         source = None
         width = height = 0
@@ -194,7 +211,8 @@ class DepthEngine:
                         self._set_status_if_current(
                             stop_event, DepthStatus.UNAVAILABLE, str(error)
                         )
-                        self._sleep_fn(backoff)
+                        if self._waitBeforeRetry(stop_event, backoff):
+                            break
                         backoff = min(backoff * 2, MAX_BACKOFF_S)
                         continue
 
@@ -215,7 +233,8 @@ class DepthEngine:
                     self._set_status_if_current(
                         stop_event, DepthStatus.UNAVAILABLE, str(error)
                     )
-                    self._sleep_fn(backoff)
+                    if self._waitBeforeRetry(stop_event, backoff):
+                        break
                     backoff = min(backoff * 2, MAX_BACKOFF_S)
                     continue
 

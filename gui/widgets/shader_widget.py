@@ -113,6 +113,15 @@ class ShaderWidget(QtOpenGL.QGLWidget):
         self.makeCurrent()
         self._ctx.clear(color=(0.0, 0.0, 0.0))
         time.perf_counter()
+
+        # This widget is built from PataNode.__init__, so paints can be
+        # dispatched before the app has the state render() needs
+        # (_last_audio_features, mapping, current_node_editor_widget). PyQt
+        # aborts the process on an exception raised inside a virtual, so an
+        # unguarded paint here is a hard startup crash rather than a warning.
+        if not getattr(self.app, "render_ready", False):
+            return
+
         self.app.render(self.app._last_audio_features)
 
     #  self.ctx.finish()

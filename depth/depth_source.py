@@ -16,6 +16,8 @@ import time
 
 import numpy as np
 
+from numeric_locale import restoreCNumericLocale
+
 
 class DepthSourceError(Exception):
     """A source could not open, or lost its device."""
@@ -35,8 +37,12 @@ class DepthSource:
 class SyntheticSource(DepthSource):
     """A fake depth camera: a distance ramp with a moving near blob and a hole.
 
-    Defaults deliberately match the Gemini 2's working profile (1280x800 at
-    10fps) so that timing behaviour during development matches the real device.
+    Matches the Gemini 2's resolution (1280x800) so texture allocation and
+    upload cost behave as they do with the real device. The 10fps default is
+    deliberately slower than the camera's 30fps on a USB 3 link: development
+    without hardware benefits from a rate that makes individual frames visible,
+    and anything depending on the exact frame rate would be depending on the
+    link speed anyway.
 
     sleep_fn is injectable purely so tests can run without real-time pacing.
     """
@@ -93,9 +99,10 @@ class OrbbecSource(DepthSource):
     crash for the whole application.
     """
 
-    # The working profile is 1280x800 at 10fps, so a frame arrives every
-    # 100ms. A 100ms read timeout sits right on that period and times out
-    # constantly; 200ms gives headroom without adding noticeable latency.
+    # A frame arrives every ~33ms at the 30fps profile this selects, and every
+    # 100ms at the slowest one it will fall back to. 200ms clears both with
+    # headroom, so a timeout means something is actually wrong rather than
+    # that the deadline sat on the frame period.
     READ_TIMEOUT_MS = 200
 
     # How long open() will wait for the first frame before giving up. The frame
@@ -135,6 +142,15 @@ class OrbbecSource(DepthSource):
             raise DepthSourceError(
                 "pyorbbecsdk is not installed: %s" % error
             ) from error
+
+        # main.py pins this at startup, but LC_NUMERIC is process-global and
+        # anything that calls setlocale can undo it later -- notably GTK
+        # initialising when Qt opens a native file dialog. The SDK parses its
+        # own config with locale-dependent C float parsing, so a comma decimal
+        # separator makes it read "1.0" as 1 and refuse to open the camera.
+        # Re-pinning here costs nothing and makes reconnects independent of
+        # whatever the rest of the process did in the meantime.
+        restoreCNumericLocale()
 
         try:
             pipeline = Pipeline()
@@ -215,7 +231,17 @@ class OrbbecSource(DepthSource):
         deadline = time.monotonic() + self.OPEN_TIMEOUT_S
 
         while time.monotonic() < deadline:
-            frames = self._pipeline.wait_for_frames(self.READ_TIMEOUT_MS)
+            # Wrapped so open() honours the module contract and raises only
+            # DepthSourceError: an SDK exception escaping raw would reach the
+            # engine as an opaque string with no indication of what failed.
+            try:
+                frames = self._pipeline.wait_for_frames(self.READ_TIMEOUT_MS)
+            except Exception as error:
+                self.close()
+                raise DepthSourceError(
+                    "the device stopped responding while opening: %s" % error
+                ) from error
+
             if frames is None:
                 continue
             depth_frame = frames.get_depth_frame()
