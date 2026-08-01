@@ -121,11 +121,18 @@ the current implementation.
 - **A `--depth-profile` flag.** The fallback policy removes the need to choose
   at launch, and adds no user-facing surface or argument validation.
 - **Frame-rate throttling.** 30fps means roughly 61 MB/s of texture upload on
-  the render thread. This cost has *not* been measured with the real camera —
-  the orbbec path never completed a single upload, so the in-app diagnostic only
-  ever timed the synthetic source. Manual verification is the first opportunity
-  to observe it. If it does bite, lowering the first preference entry to
-  `(1280, 800, 15)` is a one-line change.
+  the render thread. Now measured in the running application (RTX 2080 SUPER,
+  Depth Input → Screen, 26 samples of 3s):
+
+      render gap  median 16.0-16.5ms   -- a steady vsync-locked 60fps
+      uploads     30.7-31.3/s          -- the full camera rate, none dropped
+      upload cost median ~0.8ms, worst 2-7.7ms
+      gaps >40ms  3 in ~4800 frames (0.06%), worst 72.8ms
+
+  The upload costs about 2.5% of a 16.6ms frame, so 30fps stands and no staging
+  buffer or throttling is warranted. The rare >40ms gaps do not line up with the
+  upload worst-cases and look unrelated to depth. If this ever does bite,
+  lowering the first preference entry to `(1280, 800, 15)` is a one-line change.
 
 ## Documentation
 
