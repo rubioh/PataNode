@@ -4,6 +4,10 @@ pyglm
 moderngl
 pygame
 gif2numpy
+# numpy 2.3 removed implicit size-1-array -> scalar conversion, which
+# program_base.py relies on when binding uniforms (struct.error:
+# 'required argument is not a float'). Unpin once that is fixed.
+numpy<2.3
 scipy
 sounddevice
 pyqt5
