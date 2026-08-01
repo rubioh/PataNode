@@ -6,6 +6,7 @@ import sys
 from PyQt5.QtWidgets import QApplication
 
 import program.program_conf  # noqa: F401
+from numeric_locale import restoreCNumericLocale
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -36,6 +37,13 @@ if __name__ == "__main__":
     import app
 
     the_app = QApplication(sys.argv)
+
+    # Must follow QApplication: constructing it calls setlocale(LC_ALL, ""),
+    # which hands every native library in the process a comma decimal
+    # separator on a locale like fr_FR. The Orbbec SDK then misparses its own
+    # config and refuses to open the camera. See numeric_locale.
+    restoreCNumericLocale()
+
     the_app.setStyle("Fusion")
 
     patanode = app.PataShadeApp(args)
