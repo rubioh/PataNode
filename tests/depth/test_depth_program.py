@@ -11,6 +11,8 @@ Skips rather than fails without a usable GL context, so the suite still runs on
 a headless machine with no GPU.
 """
 
+from types import SimpleNamespace
+
 import moderngl
 import numpy as np
 import pytest
@@ -21,6 +23,7 @@ from program.input.depth_input.depth_input import (
     DEFAULT_FAR_MM,
     DEFAULT_NEAR_MM,
     DepthInput,
+    DepthInputNode,
 )
 
 WIN_SIZE = (320, 180)
@@ -180,12 +183,32 @@ def test_the_texture_follows_a_profile_change_on_reconnect(ctx):
         bigger.close()
 
 
-def test_the_engine_survives_construction(ctx):
-    # reload_program rebuilds the program via self.program.__class__(...) and
-    # once dropped the engine kwarg, which made the node come back permanently
-    # transparent from any saved scene, with no error.
+def test_reload_program_reinjects_the_engine(ctx):
+    """The node must not come back engine-less from the Resolution menu.
+
+    ShaderNode.reload_program rebuilds the program via
+    self.program.__class__(ctx=..., win_size=...), dropping the engine kwarg
+    entirely, which made the node render a permanently transparent 1x1 texture
+    with no error from any saved scene. DepthInputNode overrides it.
+
+    Driving the real method needs a node, and constructing one needs a Qt
+    scene, so the instance is built without __init__ and given only what
+    reload_program touches. That is enough for this to fail if the override is
+    removed -- which asserting on a constructor kwarg was not.
+    """
     engine = make_engine()
+    node = DepthInputNode.__new__(DepthInputNode)
+    node.engine = engine
+    node.scene = SimpleNamespace(ctx=ctx)
+    node.win_size = WIN_SIZE
+    node.program = make_program(ctx, engine=engine)
 
-    program = make_program(ctx, engine=engine)
+    # Everything reload_program calls that belongs to the graph, not to us.
+    node.serialize = lambda: {}
+    node.deserialize = lambda state, restore_window_size=False: None
+    node.markDirty = lambda: None
+    node.eval = lambda: None
 
-    assert program.engine is engine
+    node.reload_program()
+
+    assert node.program.engine is engine

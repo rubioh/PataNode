@@ -10,7 +10,10 @@ OP_CODE_DEPTH_SMOOTH = name_to_opcode("DepthSmooth")
 # 1.0 is passthrough; lower is smoother and trails more.
 DEFAULT_SMOOTH_RATE = 0.25
 
-# Roughly half a second at the camera's 30fps.
+# Counted in *render* frames, not camera frames: this shader runs once per
+# shader-timer tick (60Hz), regardless of the camera's 30fps. So 15 is about a
+# quarter of a second, and the effective hold time follows the render rate --
+# it stretches if the graph gets heavy enough to slow the timer down.
 DEFAULT_HOLD_FRAMES = 15.0
 
 
@@ -84,10 +87,12 @@ class DepthSmooth(ProgramBase):
     def connectFbos(self, fbos=None):
         connected = super().connectFbos(fbos)
 
-        # These come from a shared pool and hold whatever the previous owner
-        # left in them. Treat them as empty history rather than blending the
-        # first frames against a stale image -- and reset the swap, since
-        # restoreFBODependencies hands out buffers again from scratch.
+        # Arm the clear rather than clearing here: these framebuffers may not
+        # be current yet, and render() is the first point where using them is
+        # certainly safe. They come from a shared pool and hold whatever the
+        # previous owner left, so the first render must not blend against a
+        # stale image -- and the swap resets too, since restoreFBODependencies
+        # hands out buffers again from scratch.
         self._write_index = 0
         self._last_output = None
         self._history_cleared = False

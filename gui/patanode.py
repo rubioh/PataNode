@@ -358,12 +358,20 @@ class PataNode(NodeEditorWindow):
             )
 
     def closeEvent(self, event):
+        # Stop the render loop before dismantling anything. closeAllSubWindows
+        # removes every node in every closing graph, and the timers fire at
+        # 45-60Hz, so leaving them running renders scenes mid-teardown.
+        # Reversible, unlike releaseAppResources, so it is safe before the
+        # cancel gate below.
+        self.pauseJobs()
+
         self.mdiArea.closeAllSubWindows()
 
         if self.mdiArea.currentSubWindow():
             # A subwindow refused to close, so the quit is cancelled and the
-            # application must keep running. Nothing may have been torn down
-            # before this point.
+            # application must keep running. Nothing irreversible may have
+            # happened before this point.
+            self.resumeJobs()
             event.ignore()
         else:
             self.writeSettings()
@@ -373,6 +381,12 @@ class PataNode(NodeEditorWindow):
             import sys
 
             sys.exit(0)
+
+    def pauseJobs(self):
+        """Stop the periodic timers. Must be reversible: see closeEvent."""
+
+    def resumeJobs(self):
+        """Restart what pauseJobs stopped, when a quit is cancelled."""
 
     def releaseAppResources(self):
         """Release process-wide resources. Called only once a quit is certain.

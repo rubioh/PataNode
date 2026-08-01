@@ -53,5 +53,14 @@ void main()
         freshness = max(prev.a - decay, 0.0);
     }
 
+    // NaN would be absorbing: mix() propagates it and the hold branch above
+    // preserves it, so one bad input frame would poison the pixel for the
+    // lifetime of the buffers. Depth Input cannot produce one (its divide is
+    // guarded and its result clamped), but this program accepts any
+    // depth-shaped image, so recover instead of latching.
+    if (any(isnan(depth))) {
+        depth = cur.rgb;
+    }
+
     fragColor = vec4(depth, freshness);
 }

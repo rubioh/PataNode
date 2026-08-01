@@ -176,11 +176,20 @@ class PataShadeApp(PataNode):
         if self.args.server:
             self.server_timer.start(int(1 / 60 * 1000))
 
-    def releaseAppResources(self):
-        # Runs only on a committed quit. Doing this in closeEvent instead
-        # would also run it when a subwindow cancels the quit, leaving a live
-        # application with dead timers and a closed camera.
+    def pauseJobs(self):
         self.audio_timer.stop()
         self.light_timer.stop()
         self.shader_timer.stop()
+        if self.args.server:
+            self.server_timer.stop()
+
+    def resumeJobs(self):
+        self.start_jobs()
+
+    def releaseAppResources(self):
+        # Runs only on a committed quit, so this is the place for anything not
+        # reversible. Closing the engine in closeEvent instead would also run
+        # on a cancelled quit, leaving a live application with a closed camera
+        # and a refcount desynchronised from its holders. The timers are
+        # stopped earlier, by pauseJobs, because that part must be undoable.
         self.depth_engine.close()

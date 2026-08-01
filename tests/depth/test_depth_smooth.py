@@ -86,12 +86,29 @@ def test_sampler_uniforms_get_no_inspector_entry(ctx):
 def test_a_rate_of_one_passes_the_input_straight_through(ctx):
     program = make_program(ctx)
     program.smooth_rate = 1.0
-    source = depth_image(ctx, 0.8)
 
-    program.render([source])
-    program.render([source])
+    # Changing the input between renders is what makes this meaningful: with a
+    # constant image it would pass even if rate were ignored entirely and the
+    # shader always adopted the current frame.
+    program.render([depth_image(ctx, 0.2)])
+    program.render([depth_image(ctx, 0.8)])
 
     assert read(program)[0] == pytest.approx(0.8, abs=1e-5)
+
+
+def test_one_nan_frame_does_not_poison_the_pixel_forever(ctx):
+    # NaN is absorbing without a guard: mix() propagates it and the hold branch
+    # preserves it, so the pixel would stay NaN until the buffers were cleared.
+    program = make_program(ctx)
+    program.smooth_rate = 0.5
+
+    program.render([depth_image(ctx, float("nan"))])
+    for _ in range(3):
+        program.render([depth_image(ctx, 0.5)])
+
+    recovered = read(program)[0]
+    assert not np.isnan(recovered)
+    assert recovered == pytest.approx(0.5, abs=1e-5)
 
 
 def test_the_first_valid_frame_is_adopted_outright(ctx):

@@ -1749,7 +1749,7 @@ Automated tests cover `depth/` and the shader in isolation. This task covers wha
 .venv/bin/python main.py
 ```
 
-Add a Depth Input node from the Textures category. Confirm:
+Add a Depth Input node from the DepthTextures category. Confirm:
 - The app does not crash and stays responsive.
 - The node renders transparent black.
 - Hovering the node shows a tooltip naming the problem (`pyorbbecsdk is not installed`, or a device error).
@@ -1767,6 +1767,7 @@ Add a Depth Input node and connect it to an output. Confirm:
 - Raising `near_mm` toward 4000 visibly darkens the image.
 - Setting `far_mm` below `near_mm` inverts it, near objects going bright.
 - `flip_x` and `flip_y` set to 1 mirror the image on each axis.
+
 
 - [ ] **Step 3: Real camera**
 
