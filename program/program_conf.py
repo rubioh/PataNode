@@ -57,6 +57,7 @@ def name_to_opcode(name):
 
 
 import program.colors
+import program.depth
 import program.effects
 import program.gate
 import program.input

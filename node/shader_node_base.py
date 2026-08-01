@@ -13,13 +13,11 @@ from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_node import Node
 from nodeeditor.node_socket import LEFT_CENTER, RIGHT_CENTER
 from nodeeditor.utils import dumpException
-
 from program.program_conf import (
     GLSLImplementationError,
     UnuseUniformError,
     name_to_opcode,
 )
-
 
 DEBUG = False
 OP_CODE_MAPPING = name_to_opcode("Mapping")
@@ -510,9 +508,9 @@ class ShaderNode(Node):
 
                 for uniform in program_params.keys():
                     eval_func = program_params[uniform]["eval_function"]["value"]
-                    cpu_node_params[program][uniform]["eval_function"]["value"] = (
-                        eval_func
-                    )
+                    cpu_node_params[program][uniform]["eval_function"][
+                        "value"
+                    ] = eval_func
 
         if "gpu_adaptable_parameters" in data:
             adapt_params = data["gpu_adaptable_parameters"]
@@ -560,6 +558,10 @@ class Input:
 
 class Texture:
     node_type_reference = "Textures"
+
+
+class DepthTexture:
+    node_type_reference = "DepthTextures"
 
 
 class Effects:

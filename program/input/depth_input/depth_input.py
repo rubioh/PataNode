@@ -6,7 +6,7 @@ from PyQt5.QtCore import QTimer
 
 from depth.depth_engine import NO_FRAME_ID
 from node.node_conf import register_node
-from node.shader_node_base import ShaderNode, Texture
+from node.shader_node_base import DepthTexture, ShaderNode
 from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, name_to_opcode, register_program
 
@@ -145,7 +145,7 @@ class DepthInput(ProgramBase):
 
 
 @register_node(OP_CODE_DEPTH_INPUT)
-class DepthInputNode(ShaderNode, Texture):
+class DepthInputNode(ShaderNode, DepthTexture):
     op_title = "Depth Input"
     op_code = OP_CODE_DEPTH_INPUT
     content_label = ""
