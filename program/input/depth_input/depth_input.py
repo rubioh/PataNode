@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 import moderngl
 import numpy as np
+from PyQt5.QtCore import QTimer
 
 from depth.depth_engine import NO_FRAME_ID
 from node.node_conf import register_node
@@ -13,6 +14,10 @@ OP_CODE_DEPTH_INPUT = name_to_opcode("DepthInput")
 
 DEFAULT_NEAR_MM = 500.0
 DEFAULT_FAR_MM = 4000.0
+
+# Slow enough to be free, fast enough that a disconnect shows up while the user
+# is still looking at the node.
+TOOLTIP_REFRESH_MS = 500
 
 
 @register_program(OP_CODE_DEPTH_INPUT)
@@ -165,6 +170,12 @@ class DepthInputNode(ShaderNode, Texture):
 
         self.eval()
 
+        # After eval(): evalImplementation clears the tooltip on success, so
+        # starting the timer earlier would just have its first tick wiped.
+        self._status_timer = QTimer()
+        self._status_timer.timeout.connect(self.refreshStatusTooltip)
+        self._status_timer.start(TOOLTIP_REFRESH_MS)
+
     def reload_program(self):
         # ShaderNode.reload_program rebuilds self.program via
         # self.program.__class__(ctx=..., win_size=...), which drops the
@@ -187,6 +198,10 @@ class DepthInputNode(ShaderNode, Texture):
         self.eval()
 
     def remove(self):
+        # Stop first: a tick after grNode is torn down would touch a deleted
+        # C++ object.
+        self._status_timer.stop()
+
         # Release before the node goes away, so the last node closing the graph
         # also closes the camera.
         if self.engine is not None:
@@ -215,19 +230,31 @@ class DepthInputNode(ShaderNode, Texture):
         except Exception:
             pass
 
+    def refreshStatusTooltip(self):
+        """Show the engine's status on the node.
+
+        Driven by a timer rather than only from render(), because render() is
+        reached only through a Screen node's input chain: an unconnected node
+        would never report "no camera", which is exactly the case the status
+        exists for. The timer also covers status changing while nothing in the
+        graph re-evaluates -- a camera unplugged mid-session, or a reconnect
+        succeeding.
+
+        Compares against Qt's own state rather than a private cache:
+        ShaderNode.evalImplementation unconditionally clears the tooltip to ""
+        on every successful eval (construction, onInputChanged, markDirty,
+        reload_program), which would silently defeat a "last written" cache --
+        the cache would never see that change and would skip restoring it.
+        """
+        if self.engine is None or self.grNode is None:
+            return
+
+        tooltip = self.engine.status_reason
+        if self.grNode.toolTip() != tooltip:
+            self.grNode.setToolTip(tooltip)
+
     def render(self, audio_features=None):
-        if self.engine is not None:
-            # Compare against Qt's own state rather than a private cache:
-            # ShaderNode.evalImplementation unconditionally clears the
-            # tooltip to "" on every successful eval (construction,
-            # onInputChanged, markDirty, reload_program), which would
-            # silently defeat a private "last written" cache -- the cache
-            # would never see that change and would skip restoring it.
-            # Comparing against toolTip() self-heals from that while still
-            # avoiding a Qt call on every frame when nothing changed.
-            tooltip = self.engine.status_reason
-            if self.grNode.toolTip() != tooltip:
-                self.grNode.setToolTip(tooltip)
+        self.refreshStatusTooltip()
 
         if self.program is not None and self.program.already_called:
             return self.program.norender()
