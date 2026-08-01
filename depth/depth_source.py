@@ -102,14 +102,35 @@ class OrbbecSource(DepthSource):
     # is needed because only a frame knows the sensor's raw-units-to-mm scale.
     OPEN_TIMEOUT_S = 3.0
 
+    # The only format this source can decode. read() reinterprets the frame
+    # buffer as flat uint16 and reshapes it, which holds for Y16 alone: Y14 is
+    # bit-packed and RLE is run-length compressed, so both carry a pixel count
+    # that does not match the profile's dimensions.
+    DEPTH_FORMAT = "Y16"
+
+    # Tried in order, first advertised match wins. Full resolution is worth
+    # more than frame rate here (depth feeds a texture, not a control loop),
+    # so the resolution steps down only after every frame rate is exhausted.
+    PREFERRED_PROFILES = (
+        (1280, 800, 30),
+        (1280, 800, 15),
+        (1280, 800, 10),
+        (640, 400, 30),
+        (640, 400, 15),
+    )
+
     def __init__(self):
         self._pipeline = None
         self._width = 0
         self._height = 0
+        # Recorded for diagnostics: which profile actually got selected is the
+        # first thing worth knowing when frames look wrong.
+        self.profile_format = None
+        self.profile_fps = 0
 
     def open(self):
         try:
-            from pyorbbecsdk import Config, OBSensorType, Pipeline
+            from pyorbbecsdk import Config, OBFormat, OBSensorType, Pipeline
         except ImportError as error:
             raise DepthSourceError(
                 "pyorbbecsdk is not installed: %s" % error
@@ -117,9 +138,19 @@ class OrbbecSource(DepthSource):
 
         try:
             pipeline = Pipeline()
-            config = Config()
             profiles = pipeline.get_stream_profile_list(OBSensorType.DEPTH_SENSOR)
-            profile = profiles.get_default_video_stream_profile()
+        except Exception as error:
+            raise DepthSourceError(
+                "could not list the depth stream profiles: %s" % error
+            ) from error
+
+        # Deliberately not get_default_video_stream_profile(): the default's
+        # format varies with link speed and firmware, and on a USB 3 link this
+        # device defaults to RLE, which read() cannot decode.
+        profile = self._select_profile(profiles, getattr(OBFormat, self.DEPTH_FORMAT))
+
+        try:
+            config = Config()
             config.enable_stream(profile)
             pipeline.start(config)
         except Exception as error:
@@ -130,9 +161,49 @@ class OrbbecSource(DepthSource):
         self._pipeline = pipeline
         self._width = profile.get_width()
         self._height = profile.get_height()
+        self.profile_format = self.DEPTH_FORMAT
+        self.profile_fps = profile.get_fps()
 
         depth_scale = self._read_depth_scale()
         return self._width, self._height, depth_scale
+
+    def _select_profile(self, profiles, wanted_format):
+        """Pick the best profile this source can actually decode.
+
+        Filtering by format first is the point: a profile in any other format
+        would start streaming happily and then fail on every read().
+        """
+        candidates = []
+        advertised = []
+
+        for index in range(profiles.get_count()):
+            profile = profiles[index]
+            profile_format = profile.get_format()
+            advertised.append(str(profile_format))
+            if profile_format == wanted_format:
+                candidates.append(profile)
+
+        if not candidates:
+            raise DepthSourceError(
+                "the camera advertises no %s depth profile (offered: %s)"
+                % (self.DEPTH_FORMAT, ", ".join(sorted(set(advertised))) or "nothing")
+            )
+
+        for width, height, fps in self.PREFERRED_PROFILES:
+            for profile in candidates:
+                if (
+                    profile.get_width() == width
+                    and profile.get_height() == height
+                    and profile.get_fps() == fps
+                ):
+                    return profile
+
+        # No preference matched, so this is a device the list never anticipated.
+        # Streaming at an unplanned resolution beats reporting no camera.
+        return max(
+            candidates,
+            key=lambda p: (p.get_width() * p.get_height(), p.get_fps()),
+        )
 
     def _read_depth_scale(self):
         """Pull frames until one reports its depth scale.
@@ -173,6 +244,19 @@ class OrbbecSource(DepthSource):
         # Copy so the engine can publish it and the main thread can read it
         # long after this iteration.
         data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
+
+        # A pixel count that contradicts the profile means the stream is not
+        # really the format we asked for. Reshaping would raise a bare
+        # ValueError about array shapes; the engine catches that and reports it
+        # verbatim, which explains nothing. Say what actually happened instead.
+        expected = self._width * self._height
+        if data.size != expected:
+            raise DepthSourceError(
+                "expected %d pixels for %dx%d but the frame carried %d -- "
+                "the stream is probably not %s"
+                % (expected, self._width, self._height, data.size, self.DEPTH_FORMAT)
+            )
+
         return data.reshape((self._height, self._width)).copy()
 
     def close(self):
