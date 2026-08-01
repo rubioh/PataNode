@@ -32,7 +32,14 @@ Frame = namedtuple("Frame", "frame_id data width height depth_scale")
 NO_FRAME_ID = 0
 JOIN_TIMEOUT_S = 2.0
 INITIAL_BACKOFF_S = 1.0
-MAX_BACKOFF_S = 5.0
+
+# A failed open() blocks in the SDK for a couple of seconds holding the GIL,
+# which stalls the render thread. With no camera attached that cost is paid
+# once per retry forever, so the cap is set by how often a visible hitch is
+# tolerable rather than by how fast we want to notice a replug: 30s means a
+# stall every 30s instead of every 5s. Reconnect latency after plugging the
+# camera back in is bounded by this, which is the deliberate trade.
+MAX_BACKOFF_S = 30.0
 
 
 class DepthEngine:
