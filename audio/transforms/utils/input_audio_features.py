@@ -1,11 +1,10 @@
 from node.audio_node_base import AudioNode
 from node.node_conf import register_node
+from program.program_conf import name_to_opcode
 
-
-def name_to_opcode(name):
-    return hash(name)
-
-
+# Must stay deterministic across processes: this op_code is written into saved
+# scene files. hash() is randomized per interpreter (PYTHONHASHSEED), so a node
+# saved with it could never be resolved again on the next launch.
 OP_CODE_INPUTAF = name_to_opcode("input_af")
 
 

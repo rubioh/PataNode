@@ -3,16 +3,19 @@
 A module containing the Main Window class
 """
 
-import os, json
-from qtpy.QtCore import QSize, QSettings, QPoint
+import json
+import os
+
+from qtpy.QtCore import QPoint, QSettings, QSize
 from qtpy.QtWidgets import (
-    QMainWindow,
-    QLabel,
     QAction,
-    QMessageBox,
-    QFileDialog,
     QApplication,
+    QFileDialog,
+    QLabel,
+    QMainWindow,
+    QMessageBox,
 )
+
 from nodeeditor.node_editor_widget import NodeEditorWidget
 
 
@@ -270,7 +273,11 @@ class NodeEditorWindow(QMainWindow):
             if not current_nodeeditor.isFilenameSet():
                 return self.onFileSaveAs()
 
-            current_nodeeditor.fileSave()
+            if not current_nodeeditor.fileSave():
+                # fileSave() already told the user what went wrong. Returning
+                # False keeps maybeSave() from closing over unsaved work.
+                return False
+
             self.statusBar().showMessage(
                 "Successfully saved %s" % current_nodeeditor.filename, 5000
             )
@@ -296,7 +303,9 @@ class NodeEditorWindow(QMainWindow):
                 return False
 
             self.onBeforeSaveAs(current_nodeeditor, fname)
-            current_nodeeditor.fileSave(fname)
+            if not current_nodeeditor.fileSave(fname):
+                return False
+
             self.statusBar().showMessage(
                 "Successfully saved as %s" % current_nodeeditor.filename, 5000
             )
@@ -313,7 +322,6 @@ class NodeEditorWindow(QMainWindow):
         Event triggered after choosing filename and before actual fileSave(). We are passing current_nodeeditor because
         we will loose focus after asking with QFileDialog and therefore getCurrentNodeEditorWidget will return None
         """
-        pass
 
     def onEditUndo(self):
         """Handle Edit Undo operation"""

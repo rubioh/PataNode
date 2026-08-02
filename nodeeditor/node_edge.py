@@ -4,10 +4,10 @@ A module containing NodeEditor's class for representing Edge and Edge Type Const
 """
 
 from collections import OrderedDict
+
 from nodeeditor.node_graphics_edge import QDMGraphicsEdge
 from nodeeditor.node_serializable import Serializable
 from nodeeditor.utils import dumpException
-
 
 EDGE_TYPE_DIRECT = 1  #:
 EDGE_TYPE_BEZIER = 2  #:
@@ -22,7 +22,9 @@ class Edge(Serializable):
     Class for representing Edge in NodeEditor.
     """
 
-    edge_validators = []  #: class variable containing list of registered edge validators
+    edge_validators = (
+        []
+    )  #: class variable containing list of registered edge validators
 
     def __init__(
         self,
@@ -319,11 +321,22 @@ class Edge(Serializable):
     def deserialize(
         self, data: dict, hashmap: dict = {}, restore_id: bool = True, *args, **kwargs
     ) -> bool:
+        """Restore this `Edge` from serialized data.
+
+        Returns ``True`` on success and ``False`` when either endpoint is
+        missing from ``hashmap`` -- which happens when the node owning that
+        socket failed to deserialize. Reporting it lets the caller skip just
+        this edge instead of aborting the whole edge pass.
+        """
+        if data["start"] not in hashmap or data["end"] not in hashmap:
+            return False
+
         if restore_id:
             self.id = data["id"]
         self.start_socket = hashmap[data["start"]]
         self.end_socket = hashmap[data["end"]]
         self.edge_type = data["edge_type"]
+        return True
 
 
 # Example: using validators for Edge

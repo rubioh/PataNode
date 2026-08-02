@@ -4,9 +4,9 @@ A module containing all code for working with Clipboard
 """
 
 from collections import OrderedDict
-from nodeeditor.node_graphics_edge import QDMGraphicsEdge
-from nodeeditor.node_edge import Edge
 
+from nodeeditor.node_edge import Edge
+from nodeeditor.node_graphics_edge import QDMGraphicsEdge
 
 DEBUG = False
 DEBUG_PASTING = False
@@ -171,9 +171,11 @@ class SceneClipboard:
         if "edges" in data:
             for edge_data in data["edges"]:
                 new_edge = Edge(self.scene)
-                new_edge.deserialize(
+                if not new_edge.deserialize(
                     edge_data, hashmap, restore_id=False, *args, **kwargs
-                )
+                ):
+                    # An endpoint wasn't part of the pasted selection
+                    new_edge.remove()
 
         self.scene.setSilentSelectionEvents(False)
 

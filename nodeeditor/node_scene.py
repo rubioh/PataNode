@@ -3,16 +3,17 @@
 A module containing the representation of the NodeEditor's Scene
 """
 
-import os, json
+import json
+import os
 from collections import OrderedDict
-from nodeeditor.utils import dumpException, pp
-from nodeeditor.node_serializable import Serializable
+
+from nodeeditor.node_edge import Edge
 from nodeeditor.node_graphics_scene import QDMGraphicsScene
 from nodeeditor.node_node import Node
-from nodeeditor.node_edge import Edge
-from nodeeditor.node_scene_history import SceneHistory
 from nodeeditor.node_scene_clipboard import SceneClipboard
-
+from nodeeditor.node_scene_history import SceneHistory
+from nodeeditor.node_serializable import Serializable
+from nodeeditor.utils import dumpException, pp
 
 DEBUG_REMOVE_WARNINGS = False
 
@@ -41,6 +42,9 @@ class Scene(Serializable):
 
         # current filename assigned to this scene
         self.filename = None
+
+        # non-fatal problems collected by the last deserialize() call
+        self.deserialization_errors = []
 
         self.scene_width = 64000
         self.scene_height = 64000
@@ -314,15 +318,37 @@ class Scene(Serializable):
         """
         Save this `Scene` to the file on disk.
 
+        The write is atomic: we serialize first, then write to a sibling temp
+        file and ``os.replace`` it onto the target. That way a failure to
+        serialize -- or a crash mid-write -- can never leave the user with a
+        truncated scene where their working one used to be.
+
         :param filename: where to save this scene
         :type filename: ``str``
         """
-        with open(filename, "w") as file:
-            file.write(json.dumps(self.serialize(), indent=4))
-            print("saving to", filename, "was successfull.")
+        # Serialize before touching the target file, so a failure here leaves
+        # the existing scene on disk untouched.
+        payload = json.dumps(self.serialize(), indent=4)
 
-            self.has_been_modified = False
-            self.filename = filename
+        tmp_filename = filename + ".tmp"
+        try:
+            with open(tmp_filename, "w", encoding="utf-8") as file:
+                file.write(payload)
+                file.flush()
+                os.fsync(file.fileno())
+            os.replace(tmp_filename, filename)
+        except BaseException:
+            # Don't leave the temp file behind on a failed save
+            try:
+                os.remove(tmp_filename)
+            except OSError:
+                pass
+            raise
+
+        print("saving to", filename, "was successfull.")
+
+        self.has_been_modified = False
+        self.filename = filename
 
     def loadFromFile(self, filename: str):
         """
@@ -333,19 +359,23 @@ class Scene(Serializable):
         :raises: :class:`~nodeeditor.node_scene.InvalidFile` if there was an error decoding JSON file
         """
 
-        with open(filename, "r") as file:
+        with open(filename, "r", encoding="utf-8") as file:
             raw_data = file.read()
-            try:
-                data = json.loads(raw_data)
-                self.filename = filename
-                self.deserialize(data)
-                self.has_been_modified = False
-            except json.JSONDecodeError:
-                raise InvalidFile(
-                    "%s is not a valid JSON file" % os.path.basename(filename)
-                )
-            except Exception as e:
-                dumpException(e)
+
+        try:
+            data = json.loads(raw_data)
+        except json.JSONDecodeError:
+            raise InvalidFile(
+                "%s is not a valid JSON file" % os.path.basename(filename)
+            )
+
+        # Anything raised below is a real failure and must reach the caller.
+        # Swallowing it here used to leave a half-loaded scene that reported
+        # success -- which the user could then save over their good file.
+        self.deserialize(data)
+
+        self.filename = filename
+        self.has_been_modified = False
 
     def getEdgeClass(self):
         """Return the class representing Edge. Override me if needed"""
@@ -407,6 +437,11 @@ class Scene(Serializable):
     ) -> bool:
         hashmap = {}
 
+        # Non-fatal problems found while restoring individual nodes/edges.
+        # Reset per call; the caller reports them to the user rather than
+        # letting a partially restored scene pass as a clean load.
+        self.deserialization_errors = []
+
         if restore_id:
             self.id = data["id"]
 
@@ -434,16 +469,24 @@ class Scene(Serializable):
                     )
                     new_node.onDeserialized(node_data)
                     # print("New node for", node_data['title'])
-                except:
-                    dumpException()
+                except Exception as e:
+                    dumpException(e)
+                    self.deserialization_errors.append(
+                        "Node '%s' could not be loaded: %s"
+                        % (node_data.get("title", "<untitled>"), e)
+                    )
             else:
                 try:
                     found.deserialize(node_data, hashmap, restore_id, *args, **kwargs)
                     found.onDeserialized(node_data)
                     all_nodes.remove(found)
                     # print("Reused", node_data['title'])
-                except:
-                    dumpException()
+                except Exception as e:
+                    dumpException(e)
+                    self.deserialization_errors.append(
+                        "Node '%s' could not be restored: %s"
+                        % (node_data.get("title", "<untitled>"), e)
+                    )
 
         # remove nodes which are left in the scene and were NOT in the serialized data!
         # that means they were not in the graph before...
@@ -467,13 +510,26 @@ class Scene(Serializable):
                     break
 
             if not found:
-                new_edge = Edge(self).deserialize(
+                new_edge = Edge(self)
+                if not new_edge.deserialize(
                     edge_data, hashmap, restore_id, *args, **kwargs
-                )
+                ):
+                    # One of its sockets belongs to a node that failed above.
+                    # Drop just this edge and keep loading the rest.
+                    new_edge.remove()
+                    self.deserialization_errors.append(
+                        "Edge %s was dropped: one of its nodes is missing"
+                        % edge_data.get("id", "<unknown>")
+                    )
                 # print("New edge for", edge_data)
             else:
-                found.deserialize(edge_data, hashmap, restore_id, *args, **kwargs)
-                all_edges.remove(found)
+                if found.deserialize(edge_data, hashmap, restore_id, *args, **kwargs):
+                    all_edges.remove(found)
+                else:
+                    self.deserialization_errors.append(
+                        "Edge %s was dropped: one of its nodes is missing"
+                        % edge_data.get("id", "<unknown>")
+                    )
 
         # remove nodes which are left in the scene and were NOT in the serialized data!
         # that means they were not in the graph before...

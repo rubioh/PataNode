@@ -4,23 +4,24 @@ A module containing ``NodeEditorWidget`` class
 """
 
 import os
+
 from qtpy.QtCore import Qt
-from qtpy.QtGui import QBrush, QPen, QFont, QColor
+from qtpy.QtGui import QBrush, QColor, QFont, QPen
 from qtpy.QtWidgets import (
-    QWidget,
-    QVBoxLayout,
     QApplication,
-    QMessageBox,
-    QLabel,
     QGraphicsItem,
-    QTextEdit,
+    QLabel,
+    QMessageBox,
     QPushButton,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
 
-from nodeeditor.node_scene import Scene, InvalidFile
-from nodeeditor.node_node import Node
-from nodeeditor.node_edge import Edge, EDGE_TYPE_BEZIER
+from nodeeditor.node_edge import EDGE_TYPE_BEZIER, Edge
 from nodeeditor.node_graphics_view import QDMGraphicsView
+from nodeeditor.node_node import Node
+from nodeeditor.node_scene import InvalidFile, Scene
 from nodeeditor.utils import dumpException
 
 
@@ -132,10 +133,6 @@ class NodeEditorWidget(QWidget):
         QApplication.setOverrideCursor(Qt.WaitCursor)
         try:
             self.scene.loadFromFile(filename)
-            self.filename = filename
-            self.scene.history.clear()
-            self.scene.history.storeInitialHistoryStamp()
-            return True
         except FileNotFoundError as e:
             dumpException(e)
             QMessageBox.warning(
@@ -146,13 +143,41 @@ class NodeEditorWidget(QWidget):
             return False
         except InvalidFile as e:
             dumpException(e)
-            # QApplication.restoreOverrideCursor()
             QMessageBox.warning(
                 self, "Error loading %s" % os.path.basename(filename), str(e)
             )
             return False
+        except Exception as e:
+            dumpException(e)
+            QMessageBox.warning(
+                self,
+                "Error loading %s" % os.path.basename(filename),
+                "This graph could not be loaded:\n\n%s: %s" % (type(e).__name__, e),
+            )
+            return False
         finally:
             QApplication.restoreOverrideCursor()
+
+        # The file parsed, but individual nodes or edges may still have been
+        # dropped. Say so before this becomes the undo baseline -- otherwise a
+        # later Ctrl+S writes the damaged graph over the good one.
+        errors = self.scene.deserialization_errors
+        if errors:
+            shown = "\n".join("• %s" % err for err in errors[:10])
+            if len(errors) > 10:
+                shown += "\n… and %d more" % (len(errors) - 10)
+            QMessageBox.warning(
+                self,
+                "Partially loaded %s" % os.path.basename(filename),
+                "%d item(s) could not be restored:\n\n%s\n\n"
+                "Saving now would overwrite the file with this incomplete "
+                "graph." % (len(errors), shown),
+            )
+
+        self.filename = filename
+        self.scene.history.clear()
+        self.scene.history.storeInitialHistoryStamp()
+        return True
 
     def fileSave(self, filename: str = None):
         """Save serialized graph to JSON file. When called with an empty parameter, we won't store/remember the filename.
@@ -163,9 +188,20 @@ class NodeEditorWidget(QWidget):
         if filename is not None:
             self.filename = filename
         QApplication.setOverrideCursor(Qt.WaitCursor)
-        self.scene.saveToFile(self.filename)
-        QApplication.restoreOverrideCursor()
-        return True
+        try:
+            self.scene.saveToFile(self.filename)
+            return True
+        except Exception as e:
+            dumpException(e)
+            QMessageBox.warning(
+                self,
+                "Error saving %s" % os.path.basename(self.filename or "<unnamed>"),
+                "The scene could not be saved:\n\n%s\n\n"
+                "Your previously saved file has not been modified." % str(e),
+            )
+            return False
+        finally:
+            QApplication.restoreOverrideCursor()
 
     def addNodes(self):
         """Testing method to create 3 `Nodes` with 3 `Edges` connecting them"""
