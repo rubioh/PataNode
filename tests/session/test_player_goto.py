@@ -1,3 +1,5 @@
+import copy
+
 import pytest
 
 from session.model import LiveSession, SessionState
@@ -141,10 +143,29 @@ def test_failed_transition_leaves_scene_on_current_state(loaded):
     assert len(loaded.scene.edges) == 1
 
 
-def test_goto_does_not_mutate_the_stored_session(loaded):
-    before = [dict(n) for n in loaded.session.states[1].scene["nodes"]]
-    loaded.goTo(1)
-    assert loaded.session.states[1].scene["nodes"] == before
+def test_goto_does_not_mutate_the_stored_session(scene):
+    """Node.deserialize sorts data['inputs'] in place -- deepcopy guards it.
+
+    Two input sockets with descending index values, so an in-place sort has
+    something real to reorder (a single-socket list is a sort no-op and
+    would prove nothing regardless of the deepcopy). The "before" snapshot
+    is a deep copy too: a shallow dict copy shares the inputs list object
+    and would still compare equal to itself after an in-place sort.
+    """
+    n1 = node(1, outputs=[10])
+    n2 = node(2, inputs=[21, 20])
+    n2["inputs"][0]["index"] = 1
+    n2["inputs"][1]["index"] = 0
+    state_scene = make_scene(
+        [n1, n2], [{"id": 5, "start": 10, "end": 20, "edge_type": 2}]
+    )
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, state_scene)])
+    player = SessionPlayer(scene)
+    player.load(session, OPCODES, FEATURES)
+
+    before = copy.deepcopy(session.states[0].scene["nodes"])
+    player.goTo(0)
+    assert session.states[0].scene["nodes"] == before
 
 
 def test_goto_pulls_exactly_one_render(scene):
