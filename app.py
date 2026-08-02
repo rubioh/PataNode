@@ -1,4 +1,5 @@
 import copy
+import time
 
 import numpy as np
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal, pyqtSlot
@@ -117,6 +118,8 @@ class PataShadeApp(PataNode):
 
     def on_audio_job_finished(self):
         self.set_audio_features()
+        if self.session_player is not None:
+            self.session_player.tick(self.last_audio_features, time.monotonic())
 
     def update_audio(self):
         self.audio_engine()

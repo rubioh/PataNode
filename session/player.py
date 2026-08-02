@@ -8,6 +8,7 @@ parameter values -- no construction, no compilation, no hitch mid-set.
 import copy
 
 from nodeeditor.node_edge import Edge
+from session.trigger import evaluate_trigger, make_entry_snapshot
 from session.validation import Finding, validate_session
 
 
@@ -22,6 +23,11 @@ class SessionPlayer:
         self.session = None
         self.current_index = -1
         self.findings = []
+
+        self.is_playing = False
+        self._entry = {}
+        self._last_features = {}
+        self._now = 0.0
 
     def load(self, session, known_opcodes: set, known_features: set) -> list:
         """Instantiate the union and return every problem found.
@@ -93,6 +99,7 @@ class SessionPlayer:
             return False
 
         self.current_index = index
+        self._entry = make_entry_snapshot(state.trigger, self._last_features, self._now)
         self._evaluate_once()
         return True
 
@@ -157,3 +164,28 @@ class SessionPlayer:
         avoids that.
         """
         self.on_evaluate()
+
+    # -- playback -----------------------------------------------------------
+
+    def play(self) -> None:
+        self.is_playing = True
+
+    def pause(self) -> None:
+        self.is_playing = False
+
+    def tick(self, features: dict, now: float) -> None:
+        """Called from the audio timer. Advances if the trigger fires."""
+        self._last_features = features
+        self._now = now
+
+        if not self.is_playing or self.session is None:
+            return
+        if not (0 <= self.current_index < len(self.session.states)):
+            return
+
+        trigger = self.session.states[self.current_index].trigger
+        result = evaluate_trigger(trigger, features, self._entry, now)
+        self._entry = result.entry
+
+        if result.should_advance:
+            self.next()

@@ -49,6 +49,8 @@ class PataNode(NodeEditorWindow):
     def __init__(self):
         # Calls initUI
         self.active_graph = None
+        self.session_player = None
+        self.session_filename = None
         self.graphs = {}
         self.previews = {}
         self.next_unique_session_id = 0
