@@ -7,6 +7,7 @@ parameter values -- no construction, no compilation, no hitch mid-set.
 
 import copy
 
+from nodeeditor.node_edge import Edge
 from session.validation import Finding, validate_session
 
 
@@ -48,3 +49,96 @@ class SessionPlayer:
             self.findings.append(Finding(-1, "node", message))
 
         return self.findings
+
+    # -- transport --------------------------------------------------------
+
+    def goTo(self, index: int) -> bool:
+        """Switch to state `index`. All-or-nothing.
+
+        Resolves everything against a staging structure first, so a failure
+        leaves the scene untouched on the state it was already showing.
+        """
+        if self.session is None or not (0 <= index < len(self.session.states)):
+            return False
+
+        state = self.session.states[index]
+
+        # deepcopy: Node.deserialize sorts data["inputs"] in place
+        # (nodeeditor/node_node.py:628).
+        scene_data = copy.deepcopy(state.scene)
+
+        try:
+            staged_edges = self._stage_edges(scene_data)
+        except KeyError as exc:
+            self.on_status(
+                "Could not switch to state '%s': missing socket %s" % (state.name, exc)
+            )
+            return False
+
+        self._apply_parameters(scene_data)
+        self._rewire(staged_edges)
+
+        self.current_index = index
+        self._evaluate_once()
+        return True
+
+    def next(self) -> bool:
+        return self.goTo(self.current_index + 1)
+
+    def prev(self) -> bool:
+        if self.current_index <= 0:
+            return False
+        return self.goTo(self.current_index - 1)
+
+    # -- internals --------------------------------------------------------
+
+    def _socket_index(self) -> dict:
+        index = {}
+        for node in self.scene.nodes:
+            for socket in node.inputs + node.outputs:
+                index[socket.id] = socket
+        return index
+
+    def _stage_edges(self, scene_data: dict) -> list:
+        """Resolve every edge to real sockets before touching the scene.
+
+        Raises KeyError if any endpoint is missing -- which is why a failed
+        transition cannot half-apply.
+        """
+        sockets = self._socket_index()
+        staged = []
+        for edge_data in scene_data.get("edges", []):
+            staged.append(
+                (
+                    sockets[edge_data["start"]],
+                    sockets[edge_data["end"]],
+                    edge_data.get("edge_type", 2),
+                )
+            )
+        return staged
+
+    def _apply_parameters(self, scene_data: dict) -> None:
+        by_id = {node.id: node for node in self.scene.nodes}
+        for node_data in scene_data.get("nodes", []):
+            node = by_id.get(node_data["id"])
+            if node is None:
+                continue
+            # restore_window_size=False: otherwise changeWindowSize fires
+            # reload_program() and recompiles the shader mid-set.
+            node.deserialize(node_data, {}, True, restore_window_size=False)
+
+    def _rewire(self, staged_edges: list) -> None:
+        for edge in list(self.scene.edges):
+            edge.remove()
+
+        for start_socket, end_socket, edge_type in staged_edges:
+            Edge(self.scene, start_socket, end_socket, edge_type)
+
+    def _evaluate_once(self) -> None:
+        """One render pull after the graph has settled.
+
+        Edge assignment fires onInputChanged per socket
+        (nodeeditor/node_edge.py:300), so evaluating during the rewire would
+        cascade. Doing it once at the end avoids that.
+        """
+        self.on_evaluate()
