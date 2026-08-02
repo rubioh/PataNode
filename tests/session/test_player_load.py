@@ -1,16 +1,36 @@
+import copy
+
 from session.model import LiveSession, SessionState
 from session.player import SessionPlayer
 
 
-def node(nid, op_code=100, outputs=()):
+def node(nid, op_code=100, inputs=(), outputs=()):
     return {
         "id": nid,
         "title": "N%d" % nid,
         "pos_x": 0,
         "pos_y": 0,
         "op_code": op_code,
-        "inputs": [],
-        "outputs": [{"id": sid, "index": i} for i, sid in enumerate(outputs)],
+        "inputs": [
+            {
+                "id": sid,
+                "index": i,
+                "multi_edges": False,
+                "position": 2,
+                "socket_type": 1,
+            }
+            for i, sid in enumerate(inputs)
+        ],
+        "outputs": [
+            {
+                "id": sid,
+                "index": i,
+                "multi_edges": True,
+                "position": 5,
+                "socket_type": 1,
+            }
+            for i, sid in enumerate(outputs)
+        ],
         "content": {},
     }
 
@@ -92,10 +112,17 @@ def test_load_reports_instantiation_failure_as_finding(scene):
 
 
 def test_load_does_not_mutate_the_stored_session(scene):
-    """Node.deserialize sorts data['inputs'] in place -- deepcopy guards it."""
-    state_scene = make_scene([node(1)])
+    """Node.deserialize sorts data['inputs'] in place -- deepcopy guards it.
+
+    Two input sockets with descending index values, so an in-place sort has
+    something real to reorder (an empty or single-element list is a sort
+    no-op and would prove nothing).
+    """
+    state_scene = make_scene([node(1, inputs=[20, 10])])
+    state_scene["nodes"][0]["inputs"][0]["index"] = 1
+    state_scene["nodes"][0]["inputs"][1]["index"] = 0
     session = LiveSession(states=[SessionState("a", {"type": "manual"}, state_scene)])
-    before = state_scene["nodes"][0].copy()
+    before = copy.deepcopy(state_scene["nodes"][0])
 
     player = SessionPlayer(scene)
     player.load(session, OPCODES, FEATURES)
