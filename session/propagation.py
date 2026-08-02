@@ -137,6 +137,7 @@ class StructuralDiff:
         added_edges,
         removed_edge_ids,
         removed_node_baseline_edges=None,
+        removed_edge_baseline_edges=None,
     ):
         self.added_nodes = added_nodes
         self.removed_node_ids = removed_node_ids
@@ -145,6 +146,11 @@ class StructuralDiff:
         self.removed_node_baseline_edges = (
             removed_node_baseline_edges
             if removed_node_baseline_edges is not None
+            else {}
+        )
+        self.removed_edge_baseline_edges = (
+            removed_edge_baseline_edges
+            if removed_edge_baseline_edges is not None
             else {}
         )
 
@@ -169,6 +175,7 @@ def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
     current_edges = {e["id"]: e for e in current.get("edges", [])}
 
     removed_node_ids = set(baseline_nodes) - set(current_nodes)
+    removed_edge_ids = set(baseline_edges) - set(current_edges)
 
     # For each removed node, track which baseline edges touched it
     removed_node_baseline_edges = {}
@@ -181,6 +188,11 @@ def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
                 touching_edges.add(edge_id)
         removed_node_baseline_edges[node_id] = touching_edges
 
+    # For each removed edge, store its baseline dict for comparison
+    removed_edge_baseline_edges = {}
+    for edge_id in removed_edge_ids:
+        removed_edge_baseline_edges[edge_id] = baseline_edges[edge_id]
+
     return StructuralDiff(
         added_nodes=[
             node for nid, node in current_nodes.items() if nid not in baseline_nodes
@@ -189,8 +201,9 @@ def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
         added_edges=[
             edge for eid, edge in current_edges.items() if eid not in baseline_edges
         ],
-        removed_edge_ids=set(baseline_edges) - set(current_edges),
+        removed_edge_ids=removed_edge_ids,
         removed_node_baseline_edges=removed_node_baseline_edges,
+        removed_edge_baseline_edges=removed_edge_baseline_edges,
     )
 
 
@@ -265,6 +278,34 @@ def propagate_structure(
         for edge_id in diff.removed_edge_ids:
             if edge_id not in edge_ids:
                 continue
+
+            # Check if this state rewired the edge (different endpoints or type)
+            state_edge = edges_in_scene[edge_id]
+            baseline_edge = diff.removed_edge_baseline_edges.get(edge_id, {})
+
+            state_start = state_edge.get("start")
+            state_end = state_edge.get("end")
+            state_type = state_edge.get("edge_type")
+
+            baseline_start = baseline_edge.get("start")
+            baseline_end = baseline_edge.get("end")
+            baseline_type = baseline_edge.get("edge_type")
+
+            if (
+                state_start != baseline_start
+                or state_end != baseline_end
+                or state_type != baseline_type
+            ):
+                # State rewired this edge, skip removal
+                outcome.skipped.append(
+                    (
+                        state_index,
+                        "removed edge %s" % edge_id,
+                        "state rewired this edge",
+                    )
+                )
+                continue
+
             if apply:
                 scene["edges"] = [e for e in scene["edges"] if e["id"] != edge_id]
             outcome.applied.append((state_index, "removed edge %s" % edge_id))

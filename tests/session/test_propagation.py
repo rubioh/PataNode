@@ -496,3 +496,212 @@ def test_propagate_structure_skipped_removal_in_preview():
     assert [n["id"] for n in session.states[1].scene["nodes"]] == [1, 2]
     assert len(outcome.skipped) == 1
     assert outcome.skipped[0][0] == 1  # state_index
+
+
+def test_propagate_structure_skips_edge_removal_if_state_rewired():
+    """If a later state rewired an edge (changed endpoints), keep it and skip."""
+    session = LiveSession(
+        states=[
+            # State 0: edge 10 connects socket 100->200
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100, 101]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            # State 1: inherited edge 10 as-is
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100, 101]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            # State 2: rewired edge 10 to use different sockets (101->201)
+            SessionState(
+                "c",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100, 101]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 101, 201)],  # Different from baseline
+                },
+            ),
+        ]
+    )
+
+    # Remove edge 10 from state 0 (which had it as 100->200)
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100, 101]),
+                    node_with_sockets(2, input_ids=[200, 201]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100, 101]),
+                    node_with_sockets(2, input_ids=[200, 201]),
+                ]
+            ),
+            "edges": [],
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff)
+
+    # State 1 should lose edge 10 (inherited unchanged)
+    assert [e["id"] for e in session.states[1].scene["edges"]] == []
+    assert len([a for a in outcome.applied if "edge 10" in str(a)]) == 1
+
+    # State 2 should keep edge 10 (rewired it)
+    assert len(session.states[2].scene["edges"]) == 1
+    assert session.states[2].scene["edges"][0]["id"] == 10
+    assert session.states[2].scene["edges"][0]["start"] == 101  # Rewired
+    assert len([s for s in outcome.skipped if s[0] == 2]) == 1
+
+
+def test_propagate_structure_removes_unchanged_edge():
+    """If a later state has an unchanged edge, it should still be removed."""
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],  # Identical to baseline
+                },
+            ),
+        ]
+    )
+
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100]),
+                    node_with_sockets(2, input_ids=[200]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100]),
+                    node_with_sockets(2, input_ids=[200]),
+                ]
+            ),
+            "edges": [],
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff)
+
+    # State 1 should lose edge 10
+    assert [e["id"] for e in session.states[1].scene["edges"]] == []
+    assert len(outcome.applied) == 1
+    assert len(outcome.skipped) == 0
+
+
+def test_propagate_structure_skipped_edge_removal_in_preview():
+    """Preview mode should report edge rewiring skip without mutating."""
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100, 101]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100, 101]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 101, 201)],  # Rewired
+                },
+            ),
+        ]
+    )
+
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100, 101]),
+                    node_with_sockets(2, input_ids=[200, 201]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100, 101]),
+                    node_with_sockets(2, input_ids=[200, 201]),
+                ]
+            ),
+            "edges": [],
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff, apply=False)
+
+    # State 1 should keep edge 10 (rewired)
+    assert len(session.states[1].scene["edges"]) == 1
+    assert session.states[1].scene["edges"][0]["id"] == 10
+    assert len(outcome.skipped) == 1
+    assert outcome.skipped[0][0] == 1  # state_index
