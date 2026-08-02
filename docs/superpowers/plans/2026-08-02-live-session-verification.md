@@ -10,14 +10,23 @@ The design rests on one claim that no unit test can prove: **a state transition 
 
 ## Automated results
 
-Harness: `.superpowers/sdd/2026-08-02-live-session/measure_session_cost.py`
+Harness: `tools/measure_session_cost.py`
 
 Run with:
 
 ```bash
-QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv/bin/python \
-    .superpowers/sdd/2026-08-02-live-session/measure_session_cost.py
+QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv/bin/python tools/measure_session_cost.py
 ```
+
+> **These numbers are not yet trustworthy.** They were taken before the final
+> whole-branch review found that `_rewire` called `edge.remove()` without
+> `silent=True`, so every removed edge fired `onInputChanged` and, on a real
+> `ShaderNode`, a full upstream render pull — N cascading evaluations per
+> transition rather than one. The harness could not see it because it uses plain
+> `Node`, whose `onInputChanged` only marks dirty. That is now fixed
+> (`session/player.py`), but the figures below were measured on the old path and
+> on plain nodes either way. **Step 3 of the manual checklist is what actually
+> settles this.**
 
 ### Transition cost — 40 nodes, 30 states, plain `Node`, no GL
 
@@ -120,3 +129,28 @@ Append observations to this file under "Manual results" and commit.
 ## Manual results
 
 _Not yet run._
+
+---
+
+## Known limitations shipped deliberately
+
+Triaged during the final whole-branch review and judged acceptable to ship. Recorded here so they are discoverable later rather than rediscovered.
+
+### Missing UI — the biggest gap
+
+**There is no way to set a trigger from the application.** Every captured state is written as `{"type": "manual"}`, and making a state wait on audio requires hand-editing the `.pnlive` JSON. The engine fully supports counter and threshold triggers, and validation covers them — only the control is missing. This is a scoping miss in the implementation plan, not a defect in the code.
+
+Also specified in the design but not built: Save As, Delete State, drag-to-reorder, rename, and key/MIDI-bound transport. The dock currently offers Play/Pause/Prev/Next and click-to-jump.
+
+### Propagation
+
+- `diff_scene_params` walks only the current scene's parameters, so a uniform **added to** or **removed from** a shader is not propagated — `ParamChange` has no way to express either. Later states keep whatever they had.
+- `PropagationOutcome.applied` holds `(int, ParamChange)` from `propagate_params` but `(int, str)` from `propagate_structure`. Deliberate; each is consumed separately.
+- `propagate_structure` snapshots `node_ids`/`edge_ids` once per state, then adds before removing. Safe only because `diff_scene_structure` guarantees the added and removed sets are disjoint — true for every path through the public API.
+
+### Minor
+
+- `Finding` defines `__eq__` without `__hash__`, so findings are unhashable. Nothing puts them in a set.
+- `session/player.py`'s `except KeyError` around `make_entry_snapshot` is dead code — that function uses `.get()` throughout.
+- The bad-trigger warning dedups on `current_index` alone, so re-entering a state that already warned stays silent for the rest of the session.
+- `test_fix_and_reload_clears_the_owning_windows_session_player` proves `onFixAndReload` invokes its callback, but not that `createSessionDock` wires `_clearSessionPlayer`. Deleting that wiring line leaves the suite green.
