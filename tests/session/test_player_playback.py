@@ -105,6 +105,56 @@ def test_playback_stops_at_the_last_state(player):
     assert player.current_index == 2
 
 
+def test_malformed_trigger_degrades_instead_of_crashing_tick(scene):
+    """IMPORTANT: session/validation.py should reject a threshold trigger
+    missing 'hold' at load time, but tick() must not trust that as its only
+    line of defense -- a hand-edited session file could still carry one
+    past load. trigger.py:evaluate_trigger does trigger["hold"]
+    unconditionally once "above" is present; unguarded, that KeyError would
+    propagate out of tick() into app.py's on_audio_job_finished, a Qt slot
+    called 60 times a second mid-performance.
+
+    A trigger missing 'hold' bypasses validate_session's check by being
+    constructed directly on the SessionState, simulating a file saved by an
+    older build or hand-edited around the validator.
+    """
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {"type": "audio", "feature": "kick_count", "above": 0.5},
+                make_scene([node(1)]),
+            ),
+            SessionState("b", {"type": "manual"}, make_scene([node(1), node(2)])),
+        ]
+    )
+    built = SessionPlayer(scene)
+    built.load(session, {100}, {"kick_count"})
+    built.goTo(0)
+    built.play()
+
+    messages = []
+    built.on_status = messages.append
+
+    # Tick 1: anchors the entry snapshot (make_entry_snapshot only sets
+    # above_since=None for this shape -- no "hold" access yet).
+    built.tick({"kick_count": 0.1}, 1.0)
+    assert built.current_index == 0
+
+    # Tick 2: value crosses "above" for the first time. evaluate_trigger
+    # sets above_since=now and returns early -- still no "hold" access.
+    built.tick({"kick_count": 0.9}, 2.0)
+    assert built.current_index == 0
+
+    # Tick 3: value is still above threshold, so above_since is no longer
+    # None -- evaluate_trigger now does `now - since >= trigger["hold"]`,
+    # which raises KeyError without the guard. It must not escape tick(),
+    # and the state must never auto-advance.
+    built.tick({"kick_count": 0.9}, 3.0)
+    assert built.current_index == 0
+    assert messages
+
+
 def test_cold_start_does_not_advance_on_stale_baseline(scene):
     """The real-world scenario: the app has been running, kick_count is
     already high, and the session is loaded/goTo'd for the first time --

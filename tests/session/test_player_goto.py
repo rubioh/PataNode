@@ -73,6 +73,38 @@ def loaded(scene):
     return player
 
 
+def test_rewire_does_not_fire_onInputChanged(loaded):
+    """CRITICAL: evaluation must be suppressed during the rewire.
+
+    Edge.remove() without silent=True notifies both endpoint nodes
+    (nodeeditor/node_edge.py:290-303) -- onEdgeConnectionChanged, and
+    onInputChanged on the input-socket side. For a real ShaderNode,
+    onInputChanged calls self.eval() (node/shader_node_base.py:400-406): a
+    full upstream render pull. Firing this per removed edge while the graph
+    is half torn down cascades N evaluations into a single transition,
+    exactly the mid-set hitch the union model exists to prevent. Plain
+    nodeeditor.Node.onInputChanged only marks dirty and never evaluates, so
+    a naive test using the un-suppressed call count on plain Node would
+    still pass -- the count itself, not its side effect, is what must be
+    zero.
+    """
+    loaded.goTo(1)  # wires edge 10->20; nothing to remove yet, so no calls
+
+    calls = {"n": 0}
+    for live_node in loaded.scene.nodes:
+        original = live_node.onInputChanged
+
+        def counting_onInputChanged(socket=None, _orig=original):
+            calls["n"] += 1
+            return _orig(socket)
+
+        live_node.onInputChanged = counting_onInputChanged
+
+    assert loaded.goTo(0) is True  # removes the edge wired above
+
+    assert calls["n"] == 0
+
+
 def test_goto_wires_the_states_edges(loaded):
     assert loaded.goTo(1) is True
 
@@ -88,12 +120,53 @@ def test_goto_back_removes_edges(loaded):
     assert loaded.scene.edges == []
 
 
-def test_goto_never_destroys_union_nodes(loaded):
-    loaded.goTo(0)
-    assert len(loaded.scene.nodes) == 2
+def test_goto_never_destroys_union_nodes(scene):
+    """The union invariant: a node absent from state i's node list is not
+    destroyed by goTo(i) -- it just sits disconnected, keeping its current
+    parameters, until some later state wires it back in.
 
-    loaded.goTo(1)
-    assert len(loaded.scene.nodes) == 2
+    State 0 mentions only node 1; node 2 is only in state 1. If goTo(0)
+    behaved like Scene.deserialize's normal reuse-and-remove semantics (or
+    any destroy-and-rebuild implementation of _apply_parameters), node 2
+    would be deleted on goTo(0) and rebuilt from scratch on goTo(1), losing
+    whatever live parameter values it held. A fixture where every state
+    lists every node (as the `loaded` fixture above does) cannot catch
+    this -- a destroy-and-rebuild implementation passes it identically.
+    """
+    n1 = node(1, outputs=[10])
+    n2 = node(2, inputs=[20])
+    n2["title"] = "N2-live"
+    n2["pos_x"] = 42
+
+    session = LiveSession(
+        states=[
+            SessionState("a", {"type": "manual"}, make_scene([n1])),
+            SessionState(
+                "b",
+                {"type": "manual"},
+                make_scene(
+                    [n1, n2], [{"id": 5, "start": 10, "end": 20, "edge_type": 2}]
+                ),
+            ),
+        ]
+    )
+    player = SessionPlayer(scene)
+    player.load(session, OPCODES, FEATURES)
+
+    live_node_2 = next(n for n in player.scene.nodes if n.id == 2)
+    live_node_2.title = "N2-mutated-in-editor"
+    live_node_2.setPos(999, 999)
+
+    assert player.goTo(0) is True
+    # node 2 is absent from state 0's node list, but the union model must
+    # not destroy it -- just leave it disconnected with its own values.
+    assert len(player.scene.nodes) == 2
+    still_alive = next(n for n in player.scene.nodes if n.id == 2)
+    assert still_alive.title == "N2-mutated-in-editor"
+    assert still_alive.pos.x() == 999
+
+    assert player.goTo(1) is True
+    assert len(player.scene.nodes) == 2
 
 
 def test_goto_is_idempotent(loaded):

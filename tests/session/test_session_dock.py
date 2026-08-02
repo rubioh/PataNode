@@ -29,6 +29,24 @@ def make_scene(edges=None, nodes=None):
     }
 
 
+def _allow_message_box_with_stub_parent(monkeypatch):
+    """onSessionOverwrite's dialog now constructs a real QMessageBox(self).
+
+    `node` in these tests is a PataNode built via __new__ (see
+    make_patanode below), which skips QMainWindow.__init__ entirely -- it
+    is not a real QWidget, so passing it as a Qt parent raises. Production
+    code always has a real, fully-initialized PataNode here; only the test
+    stub needs this, so the parent is dropped rather than the real
+    onSessionOverwrite code being changed to accommodate the test.
+    """
+    real_init = QMessageBox.__init__
+
+    def fake_init(self, *args, **kwargs):
+        real_init(self)
+
+    monkeypatch.setattr(QMessageBox, "__init__", fake_init)
+
+
 class StubScene:
     """Stands in for Scene: onSessionOverwrite only calls .serialize()."""
 
@@ -75,7 +93,9 @@ def make_patanode(editor, player, dock):
     return instance
 
 
-def test_overwrite_reports_structural_skip_even_with_no_applied_changes(monkeypatch):
+def test_overwrite_reports_structural_skip_even_with_no_applied_changes(
+    monkeypatch, qapp
+):
     """Finding 1.
 
     State 0's edge e1 is deleted while editing. State 1 already rewired
@@ -84,6 +104,12 @@ def test_overwrite_reports_structural_skip_even_with_no_applied_changes(monkeypa
     counts are all zero -- so the old code's `total == 0 and not
     preview_params.skipped` early return would have suppressed the dialog
     entirely, silently dropping the one thing the performer needed to see.
+
+    onSessionOverwrite now builds the confirmation dialog by hand (a plain
+    QMessageBox with addButton()) instead of the QMessageBox.question()
+    one-liner, so the exec_()/clickedButton() pair is stubbed instead of
+    the static convenience method -- addButton, setText, etc. all run for
+    real against a live QApplication (the `qapp` fixture).
     """
     baseline_scene = make_scene(
         edges=[{"id": "e1", "start": "s1", "end": "s2", "edge_type": 1}]
@@ -104,13 +130,18 @@ def test_overwrite_reports_structural_skip_even_with_no_applied_changes(monkeypa
     dock = StubDock()
     node = make_patanode(editor, player, dock)
 
+    _allow_message_box_with_stub_parent(monkeypatch)
+
     captured = {}
 
-    def fake_question(parent, title, text, buttons):
-        captured["text"] = text
-        return QMessageBox.Cancel
+    def fake_exec(self):
+        captured["text"] = self.text()
 
-    monkeypatch.setattr(QMessageBox, "question", staticmethod(fake_question))
+    monkeypatch.setattr(QMessageBox, "exec_", fake_exec)
+    # Simulate the user clicking the standard Cancel button.
+    monkeypatch.setattr(
+        QMessageBox, "clickedButton", lambda self: self.button(QMessageBox.Cancel)
+    )
 
     node.onSessionOverwrite()
 
@@ -120,6 +151,47 @@ def test_overwrite_reports_structural_skip_even_with_no_applied_changes(monkeypa
     )
     assert "removed edge e1" in captured["text"]
     assert "state rewired this edge" in captured["text"]
+
+
+def test_overwrite_cancel_does_not_commit_the_overwrite(monkeypatch, qapp):
+    """Finding (Important 6): Cancel must be honest.
+
+    The previous implementation called player.session.overwrite(index,
+    current) *before* the dialog was shown, so clicking Cancel only ever
+    skipped propagation -- the state had already been replaced, with no
+    session-level undo to recover it (spec: "No session-level undo").
+
+    This asserts the state itself is untouched after Cancel -- not just
+    that the dialog appeared.
+    """
+    baseline_scene = make_scene(nodes=[{"id": 1, "op_code": 100}])
+    edited_scene = make_scene(nodes=[{"id": 1, "op_code": 100}, {"id": 2}])
+    # A later state that would make propagation non-trivial (so the dialog
+    # actually appears rather than taking the "nothing to propagate" path).
+    later_scene = make_scene(nodes=[{"id": 1, "op_code": 100}])
+
+    session = LiveSession(
+        states=[
+            SessionState("state 0", {"type": "manual"}, baseline_scene),
+            SessionState("state 1", {"type": "manual"}, later_scene),
+        ]
+    )
+    player = StubPlayer(session, current_index=0)
+    editor = StubEditor(edited_scene)
+    dock = StubDock()
+    node = make_patanode(editor, player, dock)
+
+    _allow_message_box_with_stub_parent(monkeypatch)
+    monkeypatch.setattr(QMessageBox, "exec_", lambda self: None)
+    monkeypatch.setattr(
+        QMessageBox, "clickedButton", lambda self: self.button(QMessageBox.Cancel)
+    )
+
+    node.onSessionOverwrite()
+
+    assert (
+        session.states[0].scene == baseline_scene
+    ), "Cancel must not commit the overwrite of the current state"
 
 
 def test_warning_marker_survives_a_capture_inserted_before_it(qapp):
@@ -157,3 +229,80 @@ def test_warning_marker_survives_a_capture_inserted_before_it(qapp):
         "the state that only inherited the old numeric index must not "
         "inherit the marker too"
     )
+
+
+def test_known_opcodes_includes_graph_container():
+    """IMPORTANT 3: get_class_from_opcode (node/node_conf.py:60-70) accepts
+    GRAPH_CONTAINER_OPCODE alongside SHADER_NODES/AUDIO_NODES, but
+    _knownOpcodes previously only unioned the latter two. Any session
+    containing a graph-container node would raise a spurious "unregistered
+    op_code" finding, showing the blocking banner on a perfectly valid
+    session.
+    """
+    from node.node_conf import GRAPH_CONTAINER_OPCODE
+
+    assert GRAPH_CONTAINER_OPCODE in PataNode._knownOpcodes()
+
+
+def test_fix_and_reload_clears_the_owning_windows_session_player(qapp):
+    """Minor: onFixAndReload dropped the dock's own `.player` but left
+    PataNode.session_player pointing at the same (now-orphaned) player, so
+    app.py's 60 Hz audio tick kept driving a session with no visible
+    transport. QDMSessionDock has no reference to its owning PataNode, so
+    the owner wires a callback (on_player_dropped) at dock-creation time;
+    this test stands in for that owner.
+    """
+    dock = QDMSessionDock()
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, make_scene())])
+    player = StubPlayer(session, current_index=0)
+    dock.setPlayer(player)
+
+    main_window = {"session_player": player}
+    dock.on_player_dropped = lambda: main_window.__setitem__("session_player", None)
+
+    dock.onFixAndReload()
+
+    assert dock.player is None
+    assert main_window["session_player"] is None
+
+
+def test_capture_names_state_with_its_zero_based_index():
+    """Minor: the captured state's name must match the 0-based index the
+    dock actually displays it at. The old code named it "state %d" %
+    (len(states) + 1) -- computed *before* insertion and 1-based -- which
+    is both off by one against the dock's numbering and wrong whenever
+    after_index inserts the state anywhere but the very end.
+    """
+    session = LiveSession(
+        states=[SessionState("existing", {"type": "manual"}, make_scene())]
+    )
+    player = StubPlayer(session, current_index=0)
+    player._entry = {"count_at_entry": 5}
+    editor = StubEditor(make_scene(nodes=[{"id": 1}]))
+    dock = StubDock()
+    node = make_patanode(editor, player, dock)
+
+    node.onSessionCapture()
+
+    # Captured right after state 0 -> lands at index 1.
+    assert player.current_index == 1
+    assert session.states[1].name == "state 1"
+
+
+def test_capture_resets_the_trigger_entry_baseline():
+    """Minor: onSessionCapture set player.current_index directly without
+    resetting player._entry, leaking a counter baseline computed for the
+    previous state into the freshly captured one.
+    """
+    session = LiveSession(
+        states=[SessionState("existing", {"type": "manual"}, make_scene())]
+    )
+    player = StubPlayer(session, current_index=0)
+    player._entry = {"count_at_entry": 999}
+    editor = StubEditor(make_scene(nodes=[{"id": 1}]))
+    dock = StubDock()
+    node = make_patanode(editor, player, dock)
+
+    node.onSessionCapture()
+
+    assert player._entry is None

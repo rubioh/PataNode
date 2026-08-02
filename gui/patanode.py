@@ -697,10 +697,18 @@ class PataNode(NodeEditorWindow):
 
     def createSessionDock(self):
         self.session_widget = QDMSessionDock()
+        # onFixAndReload drops the dock's own player reference; without
+        # this callback self.session_player would keep pointing at the
+        # dropped player and app.py's 60 Hz audio tick would keep driving a
+        # session with no visible transport.
+        self.session_widget.on_player_dropped = self._clearSessionPlayer
         self.sessionDock = QDockWidget("Live Session")
         self.sessionDock.setWidget(self.session_widget)
         self.sessionDock.setFloating(False)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.sessionDock)
+
+    def _clearSessionPlayer(self):
+        self.session_player = None
 
     def onSessionNew(self):
         from session.model import LiveSession
@@ -795,12 +803,21 @@ class PataNode(NodeEditorWindow):
         if editor is None or player is None or player.session is None:
             return
 
+        # capture() needs a name before it knows the final index (which
+        # depends on where after_index inserts it), so name with a
+        # placeholder and rename using the real, 0-based index afterwards --
+        # matching what the dock actually displays for this state.
         index = player.session.capture(
             editor.scene.serialize(),
-            "state %d" % (len(player.session.states) + 1),
+            "state",
             after_index=player.current_index if player.current_index >= 0 else None,
         )
+        player.session.rename(index, "state %d" % index)
         player.current_index = index
+        # Reset the trigger baseline: leaving the old state's _entry in
+        # place would let a counter baseline computed for the previous
+        # state leak into the freshly captured one.
+        player._entry = None
         self.session_widget.refresh()
 
     def onSessionOverwrite(self):
@@ -832,10 +849,11 @@ class PataNode(NodeEditorWindow):
             player.session, index, structure, apply=False
         )
 
-        player.session.overwrite(index, current)
-
         total = len(preview_params.applied) + len(preview_structure.applied)
         if total == 0 and not preview_params.skipped and not preview_structure.skipped:
+            # Nothing could propagate either way -- no dialog needed, just
+            # commit the overwrite of state `index` and move on.
+            player.session.overwrite(index, current)
             self.session_widget.refresh()
             return
 
@@ -855,13 +873,35 @@ class PataNode(NodeEditorWindow):
                 "  • skipped — %s in state %d: %s" % (description, state_index, reason)
             )
 
-        answer = QMessageBox.question(
-            self,
-            "Propagate to following states?",
-            "\n".join(lines),
-            QMessageBox.Apply | QMessageBox.Cancel,
+        # Built by hand rather than the QMessageBox.question() one-liner so
+        # Cancel can mean exactly what it looks like it means: do nothing.
+        # The previous version called player.session.overwrite(index,
+        # current) before this dialog even appeared, so Cancel only ever
+        # skipped propagation while the state had already been replaced --
+        # dishonest, and there is no session-level undo to fall back on
+        # (spec: "No session-level undo"). Overwriting state `index` is now
+        # part of the choice this dialog makes, not a fait accompli before it.
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Question)
+        box.setWindowTitle("Overwrite state %d?" % index)
+        box.setText("\n".join(lines))
+        propagate_button = box.addButton(
+            "Overwrite && Propagate", QMessageBox.AcceptRole
         )
-        if answer == QMessageBox.Apply:
+        overwrite_only_button = box.addButton(
+            "Overwrite Only (Don't Propagate)", QMessageBox.DestructiveRole
+        )
+        box.addButton(QMessageBox.Cancel)
+        box.setDefaultButton(propagate_button)
+        box.exec_()
+        clicked = box.clickedButton()
+
+        if clicked not in (propagate_button, overwrite_only_button):
+            # Cancel: neither the overwrite nor the propagation happens.
+            return
+
+        player.session.overwrite(index, current)
+        if clicked is propagate_button:
             propagate_params(player.session, index, param_changes)
             propagate_structure(player.session, index, structure)
 
@@ -872,9 +912,9 @@ class PataNode(NodeEditorWindow):
 
     @staticmethod
     def _knownOpcodes():
-        from node.node_conf import AUDIO_NODES, SHADER_NODES
+        from node.node_conf import AUDIO_NODES, GRAPH_CONTAINER_OPCODE, SHADER_NODES
 
-        return set(SHADER_NODES) | set(AUDIO_NODES)
+        return set(SHADER_NODES) | set(AUDIO_NODES) | {GRAPH_CONTAINER_OPCODE}
 
     @staticmethod
     def _knownFeatures():

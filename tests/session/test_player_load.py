@@ -138,3 +138,23 @@ def test_current_index_is_minus_one_before_goto(scene):
     player.load(session, OPCODES, FEATURES)
 
     assert player.current_index == -1
+
+
+def test_loading_an_empty_session_does_not_destroy_the_open_graph(scene):
+    """CRITICAL: Session -> New Session must never nuke the graph you had
+    open. LiveSession() with no states computes an empty union ([]); naively
+    feeding {"nodes": [], "edges": []} to Scene.deserialize would delete
+    every node already in the scene (its normal reuse-and-remove semantics --
+    nodeeditor/node_scene.py:491-495). A session with no states yet simply
+    has nothing to instantiate, so load() must leave the scene untouched.
+    """
+    scene.deserialize(make_scene([node(1), node(2)]))
+    assert len(scene.nodes) == 2
+
+    player = SessionPlayer(scene)
+    findings = player.load(LiveSession(), OPCODES, FEATURES)
+
+    assert len(scene.nodes) == 2
+    assert sorted(n.id for n in scene.nodes) == [1, 2]
+    assert findings == []
+    assert player.current_index == -1

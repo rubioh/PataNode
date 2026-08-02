@@ -123,6 +123,60 @@ def test_counter_trigger_on_real_counter_is_accepted():
     assert validate_session(session, OPCODES, FEATURES) == []
 
 
+def test_threshold_trigger_missing_hold_is_reported():
+    """trigger.py:62 does trigger["hold"] unconditionally once "above" is
+    present -- a KeyError straight into the 60 Hz audio timer if this ever
+    reaches SessionPlayer.tick unguarded.
+    """
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {"type": "audio", "feature": "kick_count", "above": 0.5},
+                scene([node(1)]),
+            )
+        ]
+    )
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert len(findings) == 1
+    assert findings[0].category == "trigger"
+    assert "hold" in findings[0].message
+
+
+def test_audio_trigger_with_neither_count_nor_above_is_reported():
+    """Without count or above, evaluate_trigger's fallthrough always
+    returns should_advance=False -- the state would silently never advance,
+    stranding the performer mid-set with no diagnostic.
+    """
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {"type": "audio", "feature": "kick_count"},
+                scene([node(1)]),
+            )
+        ]
+    )
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert len(findings) == 1
+    assert findings[0].category == "trigger"
+
+
+def test_threshold_trigger_with_above_and_hold_is_accepted():
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {"type": "audio", "feature": "kick_count", "above": 0.5, "hold": 1.0},
+                scene([node(1)]),
+            )
+        ]
+    )
+    assert validate_session(session, OPCODES, FEATURES) == []
+
+
 def test_all_findings_reported_together_with_state_indices():
     session = LiveSession(
         states=[

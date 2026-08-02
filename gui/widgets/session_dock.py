@@ -1,6 +1,5 @@
 """Live session dock: state list, transport, and the validation banner."""
 
-from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -11,14 +10,18 @@ from PyQt5.QtWidgets import (
     QWidget,
 )
 
-WARNING_ROLE = Qt.UserRole + 1
-
 
 class QDMSessionDock(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.player = None
         self.warned_states = set()
+        # Set by the owner (PataNode.createSessionDock) so onFixAndReload
+        # can clear the main window's reference too, not just the dock's --
+        # otherwise PataNode.session_player keeps pointing at the dropped
+        # player and app.py's 60 Hz audio tick keeps driving a session with
+        # no visible transport.
+        self.on_player_dropped = None
 
         layout = QVBoxLayout()
 
@@ -122,6 +125,8 @@ class QDMSessionDock(QWidget):
         self.banner_buttons.hide()
         self.warned_states = set()
         self.player = None
+        if self.on_player_dropped is not None:
+            self.on_player_dropped()
         self.refresh()
 
     def refresh(self):

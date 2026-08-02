@@ -259,7 +259,7 @@ def propagate_structure(
                     (
                         state_index,
                         "removed node %s" % node_id,
-                        "state wires N new edge(s) into it",
+                        "state wires %d new edge(s) into it" % len(new_edges),
                     )
                 )
                 continue

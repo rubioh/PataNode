@@ -114,4 +114,29 @@ def _validate_trigger(index, state, known_features):
             )
         ]
 
+    # An audio trigger must be either a counter ("count") or a threshold
+    # ("above" + "hold") -- trigger.py:evaluate_trigger only knows those two
+    # shapes. Neither present means the trigger never advances (silently
+    # stuck mid-set); "above" without "hold" means trigger.py:62 does
+    # trigger["hold"] and raises KeyError straight into the 60 Hz audio
+    # timer (SessionPlayer.tick -> app.py:122).
+    if "count" not in trigger and "above" not in trigger:
+        return [
+            Finding(
+                index,
+                "trigger",
+                "Audio trigger has neither 'count' nor 'above' and will "
+                "never advance",
+            )
+        ]
+
+    if "above" in trigger and "hold" not in trigger:
+        return [
+            Finding(
+                index,
+                "trigger",
+                "Threshold trigger on '%s' is missing 'hold'" % feature,
+            )
+        ]
+
     return []

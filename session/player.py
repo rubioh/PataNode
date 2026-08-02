@@ -28,15 +28,28 @@ class SessionPlayer:
         self._entry = {}
         self._last_features = {}
         self._now = 0.0
+        # Index of the state we've already warned about having a malformed
+        # trigger, so tick() (60 Hz) reports it once instead of spamming
+        # on_status every frame.
+        self._bad_trigger_index = None
 
     def load(self, session, known_opcodes: set, known_features: set) -> list:
         """Instantiate the union and return every problem found.
 
         This is the slow step: it compiles every shader the session uses.
+
+        A session with no states has an empty union. Scene.deserialize
+        removes every node absent from the incoming data (its normal
+        reuse-and-remove semantics), so feeding it {"nodes": [], "edges":
+        []} would silently delete the whole open graph. A session with no
+        states yet has nothing to instantiate, so leave the scene alone.
         """
         self.session = session
         self.current_index = -1
         self.findings = validate_session(session, known_opcodes, known_features)
+
+        if not session.states:
+            return self.findings
 
         union = session.compute_union()
         union_scene = {
@@ -94,7 +107,14 @@ class SessionPlayer:
         except Exception as exc:
             # restore_window_size=False: this is a same-state restore, not a
             # real transition -- it must not trigger reload_program().
-            self.scene.deserialize(rollback, {}, True, restore_window_size=False)
+            try:
+                self.scene.deserialize(rollback, {}, True, restore_window_size=False)
+            except Exception as rollback_exc:
+                self.on_status(
+                    "Could not switch to state '%s': %s (rollback also failed: %s)"
+                    % (state.name, exc, rollback_exc)
+                )
+                return False
             self.on_status("Could not switch to state '%s': %s" % (state.name, exc))
             return False
 
@@ -157,8 +177,15 @@ class SessionPlayer:
             node.deserialize(node_data, {}, True, restore_window_size=False)
 
     def _rewire(self, staged_edges: list) -> None:
+        # silent=True: Edge.remove() otherwise notifies both endpoint nodes
+        # per removed edge (onEdgeConnectionChanged + onInputChanged on the
+        # input side -- nodeeditor/node_edge.py:290-303), and
+        # ShaderNode.onInputChanged calls self.eval() (node/shader_node_base.py).
+        # Without silencing this, every removed edge triggers a full
+        # upstream render pull while the graph is half torn down -- exactly
+        # the mid-transition hitching the union model exists to avoid.
         for edge in list(self.scene.edges):
-            edge.remove()
+            edge.remove(silent=True)
 
         for start_socket, end_socket, edge_type in staged_edges:
             Edge(self.scene, start_socket, end_socket, edge_type)
@@ -167,9 +194,10 @@ class SessionPlayer:
         """One render pull after the graph has settled.
 
         Edge *removal* fires onInputChanged per socket
-        (nodeeditor/node_edge.py:300-303, inside Edge.remove()), so
-        evaluating during the rewire would cascade. Doing it once at the end
-        avoids that.
+        (nodeeditor/node_edge.py:290-303, inside Edge.remove()), which for a
+        ShaderNode triggers a real evaluation -- so evaluating during the
+        rewire would cascade. _rewire silences that (silent=True) and this
+        is the single evaluation that replaces it, done once at the end.
         """
         self.on_evaluate()
 
@@ -199,11 +227,36 @@ class SessionPlayer:
             # was stale (or absent) at goTo time. Don't evaluate against
             # it in the same tick -- that would let a single tick both
             # anchor and immediately fire off a coincidental delta.
-            self._entry = make_entry_snapshot(trigger, features, now)
+            try:
+                self._entry = make_entry_snapshot(trigger, features, now)
+            except KeyError:
+                self._entry = {}
+                self._report_bad_trigger()
             return
 
-        result = evaluate_trigger(trigger, features, self._entry, now)
+        # A malformed trigger (e.g. a threshold trigger missing "hold") must
+        # degrade to "never advances", not escape into the 60 Hz Qt audio
+        # slot (SessionPlayer.tick is called from app.py:122's
+        # on_audio_job_finished) mid-performance. validate_session rejects
+        # this shape at load time; this is the last-ditch guard for a
+        # session file that was hand-edited after loading, or a future
+        # trigger shape the validator doesn't know about yet.
+        try:
+            result = evaluate_trigger(trigger, features, self._entry, now)
+        except KeyError:
+            self._report_bad_trigger()
+            return
+
         self._entry = result.entry
 
         if result.should_advance:
             self.next()
+
+    def _report_bad_trigger(self) -> None:
+        if self._bad_trigger_index == self.current_index:
+            return  # already warned about this state; don't spam at 60 Hz
+        self._bad_trigger_index = self.current_index
+        self.on_status(
+            "State %d has a malformed trigger and will never auto-advance"
+            % self.current_index
+        )

@@ -378,7 +378,16 @@ def test_propagate_structure_skips_removal_if_state_added_wiring():
 
     # State 2 should keep node 1 (added new edge to node 2)
     assert [n["id"] for n in session.states[2].scene["nodes"]] == [1, 2]
-    assert len([s for s in outcome.skipped if s[0] == 2]) == 1
+    skipped_for_state_2 = [s for s in outcome.skipped if s[0] == 2]
+    assert len(skipped_for_state_2) == 1
+
+    # The skip reason reaches the performer-facing propagation dialog
+    # (gui/patanode.py:onSessionOverwrite) verbatim -- the edge count must
+    # be the real count (1, for the single new edge 11), not the literal
+    # unformatted "N" placeholder.
+    reason = skipped_for_state_2[0][2]
+    assert "1 new edge(s)" in reason
+    assert "N new edge" not in reason
 
 
 def test_propagate_structure_removes_inherited_node():
