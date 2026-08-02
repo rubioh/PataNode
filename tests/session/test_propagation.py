@@ -1,5 +1,10 @@
 from session.model import LiveSession, SessionState
-from session.propagation import diff_scene_params, propagate_params
+from session.propagation import (
+    diff_scene_params,
+    diff_scene_structure,
+    propagate_params,
+    propagate_structure,
+)
 
 
 def node(nid, cpu=None, gpu=None):
@@ -192,3 +197,84 @@ def test_propagation_ignores_states_missing_the_node():
 
     assert outcome.applied == []
     assert outcome.skipped == []
+
+
+def edge(eid, start, end):
+    return {"id": eid, "start": start, "end": end, "edge_type": 2}
+
+
+def test_structural_diff_detects_added_and_removed_nodes():
+    baseline = make_scene([node(1), node(2)])
+    current = make_scene([node(1), node(3)])
+
+    diff = diff_scene_structure(baseline, current)
+
+    assert [n["id"] for n in diff.added_nodes] == [3]
+    assert diff.removed_node_ids == {2}
+
+
+def test_structural_diff_detects_added_and_removed_edges():
+    baseline = {**make_scene([node(1)]), "edges": [edge(10, 1, 2)]}
+    current = {**make_scene([node(1)]), "edges": [edge(11, 2, 3)]}
+
+    diff = diff_scene_structure(baseline, current)
+
+    assert [e["id"] for e in diff.added_edges] == [11]
+    assert diff.removed_edge_ids == {10}
+
+
+def test_propagate_structure_adds_node_to_later_states():
+    session = LiveSession(
+        states=[
+            SessionState("a", {}, make_scene([node(1), node(3)])),
+            SessionState("b", {}, make_scene([node(1)])),
+        ]
+    )
+    diff = diff_scene_structure(make_scene([node(1)]), make_scene([node(1), node(3)]))
+
+    outcome = propagate_structure(session, 0, diff)
+
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [1, 3]
+    assert len(outcome.applied) == 1
+
+
+def test_propagate_structure_removes_node_from_later_states():
+    session = LiveSession(
+        states=[
+            SessionState("a", {}, make_scene([node(1)])),
+            SessionState("b", {}, make_scene([node(1), node(2)])),
+        ]
+    )
+    diff = diff_scene_structure(make_scene([node(1), node(2)]), make_scene([node(1)]))
+
+    propagate_structure(session, 0, diff)
+
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [1]
+
+
+def test_propagate_structure_does_not_duplicate_existing_nodes():
+    session = LiveSession(
+        states=[
+            SessionState("a", {}, make_scene([node(1), node(3)])),
+            SessionState("b", {}, make_scene([node(1), node(3)])),
+        ]
+    )
+    diff = diff_scene_structure(make_scene([node(1)]), make_scene([node(1), node(3)]))
+
+    propagate_structure(session, 0, diff)
+
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [1, 3]
+
+
+def test_propagate_structure_preview_does_not_mutate():
+    session = LiveSession(
+        states=[
+            SessionState("a", {}, make_scene([node(1), node(3)])),
+            SessionState("b", {}, make_scene([node(1)])),
+        ]
+    )
+    diff = diff_scene_structure(make_scene([node(1)]), make_scene([node(1), node(3)]))
+
+    propagate_structure(session, 0, diff, apply=False)
+
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [1]

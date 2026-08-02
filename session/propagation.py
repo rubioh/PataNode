@@ -7,6 +7,8 @@ old value still stands, skip and report where it does not.
 Pure dict manipulation -- no Qt, no GL, no scene.
 """
 
+import copy
+
 PARAM_KINDS = {"cpu": "cpu_adaptable_parameters", "gpu": "gpu_adaptable_parameters"}
 
 
@@ -123,5 +125,74 @@ def propagate_params(
                 outcome.applied.append((state_index, change))
             else:
                 outcome.skipped.append((state_index, change, actual))
+
+    return outcome
+
+
+class StructuralDiff:
+    def __init__(self, added_nodes, removed_node_ids, added_edges, removed_edge_ids):
+        self.added_nodes = added_nodes
+        self.removed_node_ids = removed_node_ids
+        self.added_edges = added_edges
+        self.removed_edge_ids = removed_edge_ids
+
+
+def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
+    baseline_nodes = _nodes_by_id(baseline)
+    current_nodes = _nodes_by_id(current)
+
+    baseline_edges = {e["id"]: e for e in baseline.get("edges", [])}
+    current_edges = {e["id"]: e for e in current.get("edges", [])}
+
+    return StructuralDiff(
+        added_nodes=[
+            node for nid, node in current_nodes.items() if nid not in baseline_nodes
+        ],
+        removed_node_ids=set(baseline_nodes) - set(current_nodes),
+        added_edges=[
+            edge for eid, edge in current_edges.items() if eid not in baseline_edges
+        ],
+        removed_edge_ids=set(baseline_edges) - set(current_edges),
+    )
+
+
+def propagate_structure(
+    session, from_index: int, diff: StructuralDiff, apply: bool = True
+) -> PropagationOutcome:
+    """Push node/edge additions and removals onto states after `from_index`."""
+    outcome = PropagationOutcome()
+
+    for state_index in range(from_index + 1, len(session.states)):
+        scene = session.states[state_index].scene
+        node_ids = {n["id"] for n in scene.get("nodes", [])}
+        edge_ids = {e["id"] for e in scene.get("edges", [])}
+
+        for node in diff.added_nodes:
+            if node["id"] in node_ids:
+                continue
+            if apply:
+                scene.setdefault("nodes", []).append(copy.deepcopy(node))
+            outcome.applied.append((state_index, "added node %s" % node["id"]))
+
+        for node_id in diff.removed_node_ids:
+            if node_id not in node_ids:
+                continue
+            if apply:
+                scene["nodes"] = [n for n in scene["nodes"] if n["id"] != node_id]
+            outcome.applied.append((state_index, "removed node %s" % node_id))
+
+        for edge in diff.added_edges:
+            if edge["id"] in edge_ids:
+                continue
+            if apply:
+                scene.setdefault("edges", []).append(copy.deepcopy(edge))
+            outcome.applied.append((state_index, "added edge %s" % edge["id"]))
+
+        for edge_id in diff.removed_edge_ids:
+            if edge_id not in edge_ids:
+                continue
+            if apply:
+                scene["edges"] = [e for e in scene["edges"] if e["id"] != edge_id]
+            outcome.applied.append((state_index, "removed edge %s" % edge_id))
 
     return outcome
