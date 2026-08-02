@@ -23,6 +23,7 @@ from gui.subwindow import PataNodeSubWindow
 from gui.widgets.audio_widget import AudioLogWidget
 from gui.widgets.drag_listbox_widget import QDMDragListbox
 from gui.widgets.inspector_widget import QDMInspector
+from gui.widgets.session_dock import QDMSessionDock
 from gui.widgets.shader_widget import ShaderWidget
 from node.node_conf import SHADER_NODES
 from nodeeditor.node_editor_window import NodeEditorWindow
@@ -97,6 +98,7 @@ class PataNode(NodeEditorWindow):
         self.initAudioLogDock()
         self.createNodesDock()
         self.createInspectorDock()
+        self.createSessionDock()
 
         self.createActions()
         self.createMenus()
@@ -575,6 +577,14 @@ class PataNode(NodeEditorWindow):
         self.updateWindowMenu()
         self.windowMenu.aboutToShow.connect(self.updateWindowMenu)
 
+        self.sessionMenu = self.menuBar().addMenu("&Session")
+        self.sessionMenu.addAction("&New Session", self.onSessionNew)
+        self.sessionMenu.addAction("&Open Session…", self.onSessionOpen)
+        self.sessionMenu.addAction("&Save Session", self.onSessionSave)
+        self.sessionMenu.addSeparator()
+        self.sessionMenu.addAction("&Capture State", self.onSessionCapture)
+        self.sessionMenu.addAction("&Overwrite State", self.onSessionOverwrite)
+
         self.menuBar().addSeparator()
 
         self.helpMenu = self.menuBar().addMenu("&Help")
@@ -684,6 +694,189 @@ class PataNode(NodeEditorWindow):
         self.inspectorDock.setFloating(False)
         self.addDockWidget(Qt.RightDockWidgetArea, self.inspectorDock)
         self.resizeDocks((self.inspectorDock,), (300,), Qt.Horizontal)
+
+    def createSessionDock(self):
+        self.session_widget = QDMSessionDock()
+        self.sessionDock = QDockWidget("Live Session")
+        self.sessionDock.setWidget(self.session_widget)
+        self.sessionDock.setFloating(False)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.sessionDock)
+
+    def onSessionNew(self):
+        from session.model import LiveSession
+        from session.player import SessionPlayer
+
+        editor = self.getCurrentNodeEditorWidget()
+        if editor is None:
+            return
+
+        player = SessionPlayer(
+            editor.scene,
+            on_status=self._sessionStatus,
+            on_evaluate=editor.doEvalOutputs,
+        )
+        player.load(LiveSession(), self._knownOpcodes(), self._knownFeatures())
+        self.session_player = player
+        self.session_widget.setPlayer(player)
+        self.session_filename = None
+
+    def onSessionOpen(self):
+        from PyQt5.QtWidgets import QFileDialog, QMessageBox
+
+        from session.model import (
+            InvalidSessionFile,
+            LiveSession,
+            UnknownSessionVersion,
+        )
+        from session.player import SessionPlayer
+
+        editor = self.getCurrentNodeEditorWidget()
+        if editor is None:
+            return
+
+        fname, _ = QFileDialog.getOpenFileName(
+            self, "Open live session", "saved", "Live Session (*.pnlive)"
+        )
+        if not fname:
+            return
+
+        try:
+            session = LiveSession.load(fname)
+        except (InvalidSessionFile, UnknownSessionVersion) as exc:
+            QMessageBox.warning(self, "Cannot open session", str(exc))
+            return
+
+        player = SessionPlayer(
+            editor.scene,
+            on_status=self._sessionStatus,
+            on_evaluate=editor.doEvalOutputs,
+        )
+        findings = player.load(session, self._knownOpcodes(), self._knownFeatures())
+
+        self.session_player = player
+        self.session_filename = fname
+        self.session_widget.setPlayer(player)
+        self.session_widget.showFindings(findings)
+        player.goTo(0)
+        self.session_widget.refresh()
+
+    def onSessionSave(self):
+        from PyQt5.QtWidgets import QFileDialog, QMessageBox
+
+        player = self.session_player
+        if player is None or player.session is None:
+            return
+
+        fname = self.session_filename
+        if not fname:
+            fname, _ = QFileDialog.getSaveFileName(
+                self, "Save live session", "saved", "Live Session (*.pnlive)"
+            )
+            if not fname:
+                return
+
+        try:
+            player.session.save(fname)
+        except OSError as exc:
+            QMessageBox.warning(
+                self,
+                "Cannot save session",
+                "The session could not be saved:\n\n%s\n\n"
+                "Your previously saved file has not been modified." % exc,
+            )
+            return
+
+        self.session_filename = fname
+        self.statusBar().showMessage("Session saved to %s" % fname, 5000)
+
+    def onSessionCapture(self):
+        editor = self.getCurrentNodeEditorWidget()
+        player = self.session_player
+        if editor is None or player is None or player.session is None:
+            return
+
+        index = player.session.capture(
+            editor.scene.serialize(),
+            "state %d" % (len(player.session.states) + 1),
+            after_index=player.current_index if player.current_index >= 0 else None,
+        )
+        player.current_index = index
+        self.session_widget.refresh()
+
+    def onSessionOverwrite(self):
+        from PyQt5.QtWidgets import QMessageBox
+
+        from session.propagation import (
+            diff_scene_params,
+            diff_scene_structure,
+            propagate_params,
+            propagate_structure,
+        )
+
+        editor = self.getCurrentNodeEditorWidget()
+        player = self.session_player
+        if editor is None or player is None or player.current_index < 0:
+            return
+
+        index = player.current_index
+        baseline = player.session.states[index].scene
+        current = editor.scene.serialize()
+
+        param_changes = diff_scene_params(baseline, current)
+        structure = diff_scene_structure(baseline, current)
+
+        preview_params = propagate_params(
+            player.session, index, param_changes, apply=False
+        )
+        preview_structure = propagate_structure(
+            player.session, index, structure, apply=False
+        )
+
+        player.session.overwrite(index, current)
+
+        total = len(preview_params.applied) + len(preview_structure.applied)
+        if total == 0 and not preview_params.skipped:
+            self.session_widget.refresh()
+            return
+
+        lines = [
+            "Applying %d change(s) to states %d–%d."
+            % (total, index + 1, len(player.session.states) - 1),
+            "  • %d will be applied" % total,
+        ]
+        for state_index, change, actual in preview_params.skipped:
+            lines.append(
+                "  • skipped — %s in state %d was changed independently "
+                "(%r, expected %r)"
+                % (change.uniform, state_index, actual, change.old_value)
+            )
+
+        answer = QMessageBox.question(
+            self,
+            "Propagate to following states?",
+            "\n".join(lines),
+            QMessageBox.Apply | QMessageBox.Cancel,
+        )
+        if answer == QMessageBox.Apply:
+            propagate_params(player.session, index, param_changes)
+            propagate_structure(player.session, index, structure)
+
+        self.session_widget.refresh()
+
+    def _sessionStatus(self, message):
+        self.statusBar().showMessage(message, 8000)
+
+    @staticmethod
+    def _knownOpcodes():
+        from node.node_conf import AUDIO_NODES, SHADER_NODES
+
+        return set(SHADER_NODES) | set(AUDIO_NODES)
+
+    @staticmethod
+    def _knownFeatures():
+        from audio.audio_conf import list_audio_features
+
+        return set(list_audio_features)
 
     def updateInspector(self, obj):
         if obj.__class__ in SHADER_NODES.values():
