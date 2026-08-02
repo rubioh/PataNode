@@ -231,26 +231,48 @@ def test_goto_reports_failure_through_status_callback(scene):
     assert messages
 
 
-def test_goto_rolls_back_when_apply_parameters_raises(loaded):
+def test_goto_reverts_node_parameters_when_apply_parameters_raises(scene):
     """Guards the gap ShaderNode.deserialize can hit: an unguarded key
     access after super().deserialize() (node/shader_node_base.py) can raise
     past Node.deserialize's own try/except. _stage_edges can't catch this --
     it only validates edges -- so goTo must roll back anything
-    _apply_parameters/_rewire already did.
+    _apply_parameters already did.
 
     The fixture's plain Node can't reach that code path (it never raises),
     so the failure is injected directly: monkeypatch one live node's
-    deserialize to blow up on the target state's (malformed) data, the same
-    shape of failure ShaderNode can hit for real. It only raises once --
-    like the real bug, the failure is triggered by the *target* state's bad
-    data, not by the valid data the rollback restores -- so the rollback
-    call must be able to actually repair the node, not just avoid a second
-    crash. If this test is satisfied by a fixture that can never fail on its
-    own, it isn't testing the rollback -- it has to force the failure.
-    """
-    loaded.goTo(1)
+    deserialize to blow up on the target state's data, the same shape of
+    failure ShaderNode can hit for real.
 
-    live_node_2 = next(n for n in loaded.scene.nodes if n.id == 2)
+    States 0 and 1 give node 1 a different title/pos_x, and node 1 is
+    ordered before node 2 in each state's node list, so by the time node 2's
+    (injected) failure fires, node 1 has already been mutated to state 1's
+    values. Asserting node 1 is back to state *0*'s values -- not merely
+    that some rollback ran -- is the point: a rollback call that is a no-op
+    (e.g. patched to `pass`) leaves node 1 on state 1's values and this
+    assertion is what catches that, not the edge count.
+    """
+    n1_state0 = node(1, outputs=[10])
+    n1_state0["title"] = "N1-a"
+    n1_state0["pos_x"] = 0
+
+    n1_state1 = node(1, outputs=[10])
+    n1_state1["title"] = "N1-b"
+    n1_state1["pos_x"] = 100
+
+    n2 = node(2, inputs=[20])
+
+    session = LiveSession(
+        states=[
+            SessionState("a", {"type": "manual"}, make_scene([n1_state0, n2])),
+            SessionState("b", {"type": "manual"}, make_scene([n1_state1, n2])),
+        ]
+    )
+    player = SessionPlayer(scene)
+    player.load(session, OPCODES, FEATURES)
+
+    assert player.goTo(0) is True
+
+    live_node_2 = next(n for n in player.scene.nodes if n.id == 2)
     original_deserialize = live_node_2.deserialize
     call_count = {"n": 0}
 
@@ -263,17 +285,70 @@ def test_goto_rolls_back_when_apply_parameters_raises(loaded):
     live_node_2.deserialize = flaky_deserialize
 
     messages = []
+    player.on_status = messages.append
+    evaluated = []
+    player.on_evaluate = lambda: evaluated.append(1)
+
+    assert player.goTo(1) is False
+
+    # current_index must not advance and on_evaluate must not fire
+    assert player.current_index == 0
+    assert evaluated == []
+
+    # node 1 must be back on state 0's values, not left on state 1's
+    live_node_1 = next(n for n in player.scene.nodes if n.id == 1)
+    assert live_node_1.title == "N1-a"
+    assert live_node_1.pos.x() == 0
+
+    assert messages
+
+
+def test_goto_restores_edges_when_rewire_raises(loaded, monkeypatch):
+    """Guards the other half of the rollback: _rewire removes every current
+    edge *before* constructing the replacements, so a failure partway
+    through edge construction leaves the scene with zero edges unless the
+    rollback restores them.
+
+    _apply_parameters must succeed here so the failure is isolated to
+    _rewire -- the previous test already covers a failure during parameter
+    application. The construction failure is injected by patching the
+    `Edge` name `session.player` imports (not `nodeeditor.node_edge.Edge`
+    itself), so the rollback path -- which goes through
+    `Scene.deserialize`, using its own direct import of the real `Edge` --
+    is unaffected and can actually recreate the removed edge. It raises
+    only on the first call (the real transition's attempt); the rollback's
+    own edge construction is expected to succeed.
+    """
+    assert loaded.goTo(1) is True
+
+    import session.player as player_module
+
+    real_edge_cls = player_module.Edge
+    call_count = {"n": 0}
+
+    def flaky_edge(*args, **kwargs):
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            raise RuntimeError("simulated edge construction failure")
+        return real_edge_cls(*args, **kwargs)
+
+    monkeypatch.setattr(player_module, "Edge", flaky_edge)
+
+    messages = []
     loaded.on_status = messages.append
     evaluated = []
     loaded.on_evaluate = lambda: evaluated.append(1)
 
-    assert loaded.goTo(0) is False
+    # Re-apply state 1: _stage_edges and _apply_parameters succeed, then
+    # _rewire tears down the existing edge and fails constructing its
+    # replacement.
+    assert loaded.goTo(1) is False
 
-    # current_index must not advance and on_evaluate must not fire
     assert loaded.current_index == 1
     assert evaluated == []
 
-    # the scene must still show state 1's edges, untouched
+    # the edge must be back, not merely "still there" -- _rewire already
+    # removed it before the injected failure fired.
     assert len(loaded.scene.edges) == 1
     assert loaded.scene.edges[0].start_socket.id == 10
     assert loaded.scene.edges[0].end_socket.id == 20
