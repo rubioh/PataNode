@@ -99,7 +99,15 @@ class SessionPlayer:
             return False
 
         self.current_index = index
-        self._entry = make_entry_snapshot(state.trigger, self._last_features, self._now)
+        # Snapshot lazily on the next tick, not here: at goTo time
+        # self._last_features may be stale (e.g. {} from __init__, before
+        # any tick has run) or simply belong to a different moment than
+        # when the audience actually starts hearing this state. Anchoring
+        # against a stale/zero baseline lets a monotonic counter's delta
+        # blow past the threshold on the very next tick -- an instant,
+        # unwanted auto-advance right after load. None means "not yet
+        # anchored"; tick() takes the real snapshot from live features.
+        self._entry = None
         self._evaluate_once()
         return True
 
@@ -184,6 +192,16 @@ class SessionPlayer:
             return
 
         trigger = self.session.states[self.current_index].trigger
+
+        if self._entry is None:
+            # First tick since goTo landed on this state: anchor the
+            # baseline against features observed right now, not whatever
+            # was stale (or absent) at goTo time. Don't evaluate against
+            # it in the same tick -- that would let a single tick both
+            # anchor and immediately fire off a coincidental delta.
+            self._entry = make_entry_snapshot(trigger, features, now)
+            return
+
         result = evaluate_trigger(trigger, features, self._entry, now)
         self._entry = result.entry
 
