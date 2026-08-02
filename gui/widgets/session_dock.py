@@ -59,14 +59,28 @@ class QDMSessionDock(QWidget):
         self.btn_next.clicked.connect(self.onNext)
         self.btn_play.clicked.connect(self.onTogglePlay)
         self.btn_run_anyway.clicked.connect(self.onRunAnyway)
+        self.btn_reload.clicked.connect(self.onFixAndReload)
 
     def setPlayer(self, player):
         self.player = player
         self.refresh()
 
     def showFindings(self, findings):
-        """Blocking banner. Playback cannot start until it is dismissed."""
-        self.warned_states = {f.state_index for f in findings if f.state_index >= 0}
+        """Blocking banner. Playback cannot start until it is dismissed.
+
+        Markers are keyed on the SessionState objects themselves, not their
+        list index -- a later capture() shifts every following index, and a
+        marker that remembered "index 2" would silently point at whatever
+        state ends up there instead of the one that was actually warned.
+        """
+        states = (
+            self.player.session.states
+            if self.player is not None and self.player.session is not None
+            else []
+        )
+        self.warned_states = {
+            states[f.state_index] for f in findings if 0 <= f.state_index < len(states)
+        }
 
         if not findings:
             self.banner.hide()
@@ -95,6 +109,21 @@ class QDMSessionDock(QWidget):
         self.banner.hide()
         self.banner_buttons.hide()
 
+    def onFixAndReload(self):
+        """Drop the loaded session so the fixed file must be reopened.
+
+        The dock has no filename of its own (only the main window does), so
+        there is no honest "reload from disk" it can perform by itself.
+        Dropping the player is the truthful alternative to a button that
+        looks like it reloads but silently does nothing: it forces the next
+        step to be an explicit Session -> Open Session on the corrected file.
+        """
+        self.banner.hide()
+        self.banner_buttons.hide()
+        self.warned_states = set()
+        self.player = None
+        self.refresh()
+
     def refresh(self):
         self.state_list.clear()
         if self.player is None or self.player.session is None:
@@ -110,7 +139,7 @@ class QDMSessionDock(QWidget):
                 label = "▶ " + label
             else:
                 label = "   " + label
-            if index in self.warned_states:
+            if state in self.warned_states:
                 label += "   ⚠"
 
             item = QListWidgetItem(label)

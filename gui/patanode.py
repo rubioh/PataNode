@@ -835,7 +835,7 @@ class PataNode(NodeEditorWindow):
         player.session.overwrite(index, current)
 
         total = len(preview_params.applied) + len(preview_structure.applied)
-        if total == 0 and not preview_params.skipped:
+        if total == 0 and not preview_params.skipped and not preview_structure.skipped:
             self.session_widget.refresh()
             return
 
@@ -849,6 +849,10 @@ class PataNode(NodeEditorWindow):
                 "  • skipped — %s in state %d was changed independently "
                 "(%r, expected %r)"
                 % (change.uniform, state_index, actual, change.old_value)
+            )
+        for state_index, description, reason in preview_structure.skipped:
+            lines.append(
+                "  • skipped — %s in state %d: %s" % (description, state_index, reason)
             )
 
         answer = QMessageBox.question(
