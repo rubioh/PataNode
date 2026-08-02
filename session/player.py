@@ -75,8 +75,22 @@ class SessionPlayer:
             )
             return False
 
-        self._apply_parameters(scene_data)
-        self._rewire(staged_edges)
+        # Node.deserialize swallows its own internal errors, but subclasses
+        # (e.g. ShaderNode, node/shader_node_base.py) can still raise past
+        # that guard on malformed node data. Snapshot the live graph first so
+        # a mid-loop failure here rolls back instead of leaving the scene
+        # half-applied -- some nodes on the new state's values, edges still
+        # on the old state's.
+        rollback = self.scene.serialize()
+        try:
+            self._apply_parameters(scene_data)
+            self._rewire(staged_edges)
+        except Exception as exc:
+            # restore_window_size=False: this is a same-state restore, not a
+            # real transition -- it must not trigger reload_program().
+            self.scene.deserialize(rollback, {}, True, restore_window_size=False)
+            self.on_status("Could not switch to state '%s': %s" % (state.name, exc))
+            return False
 
         self.current_index = index
         self._evaluate_once()
@@ -137,8 +151,9 @@ class SessionPlayer:
     def _evaluate_once(self) -> None:
         """One render pull after the graph has settled.
 
-        Edge assignment fires onInputChanged per socket
-        (nodeeditor/node_edge.py:300), so evaluating during the rewire would
-        cascade. Doing it once at the end avoids that.
+        Edge *removal* fires onInputChanged per socket
+        (nodeeditor/node_edge.py:300-303, inside Edge.remove()), so
+        evaluating during the rewire would cascade. Doing it once at the end
+        avoids that.
         """
         self.on_evaluate()

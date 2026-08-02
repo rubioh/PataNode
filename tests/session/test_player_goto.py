@@ -229,3 +229,53 @@ def test_goto_reports_failure_through_status_callback(scene):
 
     assert player.goTo(0) is False
     assert messages
+
+
+def test_goto_rolls_back_when_apply_parameters_raises(loaded):
+    """Guards the gap ShaderNode.deserialize can hit: an unguarded key
+    access after super().deserialize() (node/shader_node_base.py) can raise
+    past Node.deserialize's own try/except. _stage_edges can't catch this --
+    it only validates edges -- so goTo must roll back anything
+    _apply_parameters/_rewire already did.
+
+    The fixture's plain Node can't reach that code path (it never raises),
+    so the failure is injected directly: monkeypatch one live node's
+    deserialize to blow up on the target state's (malformed) data, the same
+    shape of failure ShaderNode can hit for real. It only raises once --
+    like the real bug, the failure is triggered by the *target* state's bad
+    data, not by the valid data the rollback restores -- so the rollback
+    call must be able to actually repair the node, not just avoid a second
+    crash. If this test is satisfied by a fixture that can never fail on its
+    own, it isn't testing the rollback -- it has to force the failure.
+    """
+    loaded.goTo(1)
+
+    live_node_2 = next(n for n in loaded.scene.nodes if n.id == 2)
+    original_deserialize = live_node_2.deserialize
+    call_count = {"n": 0}
+
+    def flaky_deserialize(*args, **kwargs):
+        call_count["n"] += 1
+        if call_count["n"] == 1:
+            raise RuntimeError("simulated ShaderNode.deserialize failure")
+        return original_deserialize(*args, **kwargs)
+
+    live_node_2.deserialize = flaky_deserialize
+
+    messages = []
+    loaded.on_status = messages.append
+    evaluated = []
+    loaded.on_evaluate = lambda: evaluated.append(1)
+
+    assert loaded.goTo(0) is False
+
+    # current_index must not advance and on_evaluate must not fire
+    assert loaded.current_index == 1
+    assert evaluated == []
+
+    # the scene must still show state 1's edges, untouched
+    assert len(loaded.scene.edges) == 1
+    assert loaded.scene.edges[0].start_socket.id == 10
+    assert loaded.scene.edges[0].end_socket.id == 20
+
+    assert messages
