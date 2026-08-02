@@ -1697,7 +1697,16 @@ Change it to:
             self.session_player.tick(self.last_audio_features, time.monotonic())
 ```
 
-Add `import time` to the top of `app.py` and `self.session_player = None` in `PataShadeApp.__init__`.
+Add `import time` to the top of `app.py`.
+
+**`PataShadeApp` *is* the main window** — it subclasses `PataNode` (`app.py:35`), and `main.py:49` instantiates it directly. There is no `self.app` attribute on it. So declare the player on the base class, in `PataNode.__init__` (`gui/patanode.py:49-56`), alongside `self.active_graph = None`:
+
+```python
+        self.session_player = None
+        self.session_filename = None
+```
+
+Every handler in Task 9 then reaches it as `self.session_player`, and `on_audio_job_finished` above sees it through inheritance.
 
 - [ ] **Step 6: Verify the app still starts**
 
@@ -2295,8 +2304,7 @@ The UI. Follows the existing dock pattern at `gui/patanode.py:668-683`.
 
 **Files:**
 - Create: `gui/widgets/session_dock.py`
-- Modify: `gui/patanode.py` (dock creation, `&Session` menu)
-- Modify: `app.py` (own the `SessionPlayer`)
+- Modify: `gui/patanode.py` — dock creation, `&Session` menu, handlers. (`self.session_player` / `self.session_filename` were declared in `PataNode.__init__` back in Task 6.)
 
 **Interfaces:**
 - Consumes: `SessionPlayer`, `LiveSession`, `validate_session`, `propagate_params`, `propagate_structure`
@@ -2521,7 +2529,7 @@ Add the handlers to `PataNode`:
             on_evaluate=editor.doEvalOutputs,
         )
         player.load(LiveSession(), self._knownOpcodes(), self._knownFeatures())
-        self.app.session_player = player
+        self.session_player = player
         self.session_widget.setPlayer(player)
         self.session_filename = None
 
@@ -2557,7 +2565,7 @@ Add the handlers to `PataNode`:
         )
         findings = player.load(session, self._knownOpcodes(), self._knownFeatures())
 
-        self.app.session_player = player
+        self.session_player = player
         self.session_filename = fname
         self.session_widget.setPlayer(player)
         self.session_widget.showFindings(findings)
@@ -2567,11 +2575,11 @@ Add the handlers to `PataNode`:
     def onSessionSave(self):
         from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-        player = getattr(self.app, "session_player", None)
+        player = self.session_player
         if player is None or player.session is None:
             return
 
-        fname = getattr(self, "session_filename", None)
+        fname = self.session_filename
         if not fname:
             fname, _ = QFileDialog.getSaveFileName(
                 self, "Save live session", "saved", "Live Session (*.pnlive)"
@@ -2595,7 +2603,7 @@ Add the handlers to `PataNode`:
 
     def onSessionCapture(self):
         editor = self.getCurrentNodeEditorWidget()
-        player = getattr(self.app, "session_player", None)
+        player = self.session_player
         if editor is None or player is None or player.session is None:
             return
 
@@ -2617,7 +2625,7 @@ Add the handlers to `PataNode`:
         )
 
         editor = self.getCurrentNodeEditorWidget()
-        player = getattr(self.app, "session_player", None)
+        player = self.session_player
         if editor is None or player is None or player.current_index < 0:
             return
 
