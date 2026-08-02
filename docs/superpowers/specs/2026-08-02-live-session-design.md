@@ -165,7 +165,11 @@ Propagation then walks states *i+1…N*, applying each change **conditionally**:
 
 - **Parameter changed old → new:** if the state still holds `old`, set it to `new`. If it holds anything else, **skip** — that value was deliberately changed downstream and clobbering it would destroy work.
 - **Node added:** ensure present in later states (same `id`). Usually already true.
-- **Node or edge removed:** remove from later states where it still matches.
+- **Node or edge removed:** remove from later states — **unless that state built on it**, in which case skip and report, exactly as for a diverged parameter.
+
+  "Built on it" means the later state has an edge touching the removed node that the edited state did not have. Concretely: you add a Bloom node in state 3, wire it into Mapping by state 6, then go back and delete it from state 3. State 6 keeps its Bloom and appears in the skipped list; states 4 and 5, which only inherited it untouched, lose it.
+
+  Without this rule, deleting a node silently destroys later wiring while the *parameter* rule right above it carefully protects a tweaked slider — an asymmetry that would lose real work and only surface mid-set.
 
 The skip rule is the safety property, and it is not silent. Overwrite shows a summary before committing:
 
