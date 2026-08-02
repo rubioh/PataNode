@@ -1,4 +1,5 @@
 import json
+import os
 
 import pytest
 
@@ -97,6 +98,27 @@ def test_failed_save_leaves_existing_file_intact(tmp_path, monkeypatch):
     with pytest.raises(RuntimeError):
         session.save(str(path))
 
+    assert path.read_text() == original
+    assert not (tmp_path / "set.pnlive.tmp").exists()
+
+
+def test_failed_write_leaves_existing_file_intact(tmp_path, monkeypatch):
+    """Verify atomic save cleanup runs when os.replace fails after tmp file exists."""
+    path = tmp_path / "set.pnlive"
+    original = "PRECIOUS"
+    path.write_text(original)
+
+    real_replace = os.replace
+
+    def failing_replace(src, dst):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(os, "replace", failing_replace)
+
+    with pytest.raises(OSError):
+        make_session().save(str(path))
+
+    monkeypatch.setattr(os, "replace", real_replace)
     assert path.read_text() == original
     assert not (tmp_path / "set.pnlive.tmp").exists()
 
