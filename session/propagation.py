@@ -130,11 +130,35 @@ def propagate_params(
 
 
 class StructuralDiff:
-    def __init__(self, added_nodes, removed_node_ids, added_edges, removed_edge_ids):
+    def __init__(
+        self,
+        added_nodes,
+        removed_node_ids,
+        added_edges,
+        removed_edge_ids,
+        removed_node_baseline_edges=None,
+    ):
         self.added_nodes = added_nodes
         self.removed_node_ids = removed_node_ids
         self.added_edges = added_edges
         self.removed_edge_ids = removed_edge_ids
+        self.removed_node_baseline_edges = (
+            removed_node_baseline_edges
+            if removed_node_baseline_edges is not None
+            else {}
+        )
+
+
+def _socket_ids_for_node(node: dict) -> set:
+    """Extract all socket ids from a node's inputs and outputs."""
+    socket_ids = set()
+    for socket in node.get("inputs", []):
+        if "id" in socket:
+            socket_ids.add(socket["id"])
+    for socket in node.get("outputs", []):
+        if "id" in socket:
+            socket_ids.add(socket["id"])
+    return socket_ids
 
 
 def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
@@ -144,28 +168,47 @@ def diff_scene_structure(baseline: dict, current: dict) -> StructuralDiff:
     baseline_edges = {e["id"]: e for e in baseline.get("edges", [])}
     current_edges = {e["id"]: e for e in current.get("edges", [])}
 
+    removed_node_ids = set(baseline_nodes) - set(current_nodes)
+
+    # For each removed node, track which baseline edges touched it
+    removed_node_baseline_edges = {}
+    for node_id in removed_node_ids:
+        node = baseline_nodes[node_id]
+        socket_ids = _socket_ids_for_node(node)
+        touching_edges = set()
+        for edge_id, edge in baseline_edges.items():
+            if edge.get("start") in socket_ids or edge.get("end") in socket_ids:
+                touching_edges.add(edge_id)
+        removed_node_baseline_edges[node_id] = touching_edges
+
     return StructuralDiff(
         added_nodes=[
             node for nid, node in current_nodes.items() if nid not in baseline_nodes
         ],
-        removed_node_ids=set(baseline_nodes) - set(current_nodes),
+        removed_node_ids=removed_node_ids,
         added_edges=[
             edge for eid, edge in current_edges.items() if eid not in baseline_edges
         ],
         removed_edge_ids=set(baseline_edges) - set(current_edges),
+        removed_node_baseline_edges=removed_node_baseline_edges,
     )
 
 
 def propagate_structure(
     session, from_index: int, diff: StructuralDiff, apply: bool = True
 ) -> PropagationOutcome:
-    """Push node/edge additions and removals onto states after `from_index`."""
+    """Push node/edge additions and removals onto states after `from_index`.
+
+    When removing a node, skip if the state built new wiring into it.
+    """
     outcome = PropagationOutcome()
 
     for state_index in range(from_index + 1, len(session.states)):
         scene = session.states[state_index].scene
-        node_ids = {n["id"] for n in scene.get("nodes", [])}
+        nodes_in_scene = {n["id"]: n for n in scene.get("nodes", [])}
+        node_ids = set(nodes_in_scene.keys())
         edge_ids = {e["id"] for e in scene.get("edges", [])}
+        edges_in_scene = {e["id"]: e for e in scene.get("edges", [])}
 
         for node in diff.added_nodes:
             if node["id"] in node_ids:
@@ -177,6 +220,37 @@ def propagate_structure(
         for node_id in diff.removed_node_ids:
             if node_id not in node_ids:
                 continue
+
+            # Check if this state built new wiring into the removed node
+            removed_node = nodes_in_scene[node_id]
+            state_socket_ids = _socket_ids_for_node(removed_node)
+
+            # Find edges in the state that touch this node
+            touching_edge_ids = set()
+            for edge_id, edge in edges_in_scene.items():
+                if (
+                    edge.get("start") in state_socket_ids
+                    or edge.get("end") in state_socket_ids
+                ):
+                    touching_edge_ids.add(edge_id)
+
+            # Check if any of these edges are new (not in baseline)
+            baseline_touching_edges = diff.removed_node_baseline_edges.get(
+                node_id, set()
+            )
+            new_edges = touching_edge_ids - baseline_touching_edges
+
+            if new_edges:
+                # State added new wiring, skip removal
+                outcome.skipped.append(
+                    (
+                        state_index,
+                        "removed node %s" % node_id,
+                        "state wires N new edge(s) into it",
+                    )
+                )
+                continue
+
             if apply:
                 scene["nodes"] = [n for n in scene["nodes"] if n["id"] != node_id]
             outcome.applied.append((state_index, "removed node %s" % node_id))

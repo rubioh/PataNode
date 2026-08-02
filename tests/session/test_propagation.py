@@ -203,6 +203,30 @@ def edge(eid, start, end):
     return {"id": eid, "start": start, "end": end, "edge_type": 2}
 
 
+def node_with_sockets(nid, input_ids=None, output_ids=None, cpu=None, gpu=None):
+    """Create a node with specified socket ids for inputs and outputs."""
+    if input_ids is None:
+        input_ids = []
+    if output_ids is None:
+        output_ids = []
+
+    data = {
+        "id": nid,
+        "title": "N%d" % nid,
+        "pos_x": 0,
+        "pos_y": 0,
+        "op_code": 100,
+        "inputs": [{"id": sid, "index": i} for i, sid in enumerate(input_ids)],
+        "outputs": [{"id": sid, "index": i} for i, sid in enumerate(output_ids)],
+        "content": {},
+    }
+    if cpu is not None:
+        data["cpu_adaptable_parameters"] = cpu
+    if gpu is not None:
+        data["gpu_adaptable_parameters"] = gpu
+    return data
+
+
 def test_structural_diff_detects_added_and_removed_nodes():
     baseline = make_scene([node(1), node(2)])
     current = make_scene([node(1), node(3)])
@@ -278,3 +302,197 @@ def test_propagate_structure_preview_does_not_mutate():
     propagate_structure(session, 0, diff, apply=False)
 
     assert [n["id"] for n in session.states[1].scene["nodes"]] == [1]
+
+
+def test_propagate_structure_skips_removal_if_state_added_wiring():
+    """If a later state wired a NEW edge into the removed node, keep it and skip."""
+    session = LiveSession(
+        states=[
+            # State 0: nodes 1 and 2, edge from 1 to 2
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            # State 1: inherited nodes 1 and 2, inherited edge 10
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            # State 2: inherited nodes 1 and 2, inherited edge 10, PLUS new edge to node 2
+            SessionState(
+                "c",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200), edge(11, 100, 201)],
+                },
+            ),
+        ]
+    )
+
+    # Remove node 1 from state 0 (which had edge 10: 100->200)
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100]),
+                    node_with_sockets(2, input_ids=[200]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene([node_with_sockets(2, input_ids=[200])]),
+            "edges": [edge(10, 100, 200)],  # Edge 10 removed, but node 1 had it
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff)
+
+    # State 1 should lose node 1 (inherited untouched)
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [2]
+    assert len([a for a in outcome.applied if a[0] == 1]) == 1
+
+    # State 2 should keep node 1 (added new edge to node 2)
+    assert [n["id"] for n in session.states[2].scene["nodes"]] == [1, 2]
+    assert len([s for s in outcome.skipped if s[0] == 2]) == 1
+
+
+def test_propagate_structure_removes_inherited_node():
+    """If a later state merely inherited the node, it should still be removed."""
+    session = LiveSession(
+        states=[
+            # State 0: nodes 1 and 2, edge between them
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            # State 1: inherited nodes 1 and 2, inherited edge
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+        ]
+    )
+
+    # Remove node 1 from state 0
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100]),
+                    node_with_sockets(2, input_ids=[200]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene([node_with_sockets(2, input_ids=[200])]),
+            "edges": [],
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff)
+
+    # State 1 should lose node 1
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [2]
+    assert len(outcome.applied) == 2  # node 1 removal and edge 10 removal
+    assert len(outcome.skipped) == 0
+
+
+def test_propagate_structure_skipped_removal_in_preview():
+    """Preview mode should report the same skips without mutating."""
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200)],
+                },
+            ),
+            SessionState(
+                "b",
+                {},
+                {
+                    **make_scene(
+                        [
+                            node_with_sockets(1, output_ids=[100]),
+                            node_with_sockets(2, input_ids=[200, 201]),
+                        ]
+                    ),
+                    "edges": [edge(10, 100, 200), edge(11, 100, 201)],
+                },
+            ),
+        ]
+    )
+
+    diff = diff_scene_structure(
+        {
+            **make_scene(
+                [
+                    node_with_sockets(1, output_ids=[100]),
+                    node_with_sockets(2, input_ids=[200]),
+                ]
+            ),
+            "edges": [edge(10, 100, 200)],
+        },
+        {
+            **make_scene([node_with_sockets(2, input_ids=[200])]),
+            "edges": [],
+        },
+    )
+
+    outcome = propagate_structure(session, 0, diff, apply=False)
+
+    # State 1 should keep node 1 (had new wiring)
+    assert [n["id"] for n in session.states[1].scene["nodes"]] == [1, 2]
+    assert len(outcome.skipped) == 1
+    assert outcome.skipped[0][0] == 1  # state_index
