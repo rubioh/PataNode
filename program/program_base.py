@@ -724,6 +724,12 @@ class ProgramsUniforms:
                         program_name + "program", uniform_name, data
                     )
 
+                    # What the GPU actually receives, kept so preview widgets
+                    # can show the effective value rather than the raw
+                    # attribute -- the two differ under an Inspector
+                    # expression or an audio binding.
+                    info["last_value"] = modified_data
+
                     if DEBUG:
                         print(
                             "ProgramUniform::bindUniformToProgram Trying to bind parameters",
