@@ -129,7 +129,32 @@ Append observations to this file under "Manual results" and commit.
 
 ## Manual results
 
-_Not yet run._
+**2026-08-08 — step 3 passed. The design's primary technical risk is cleared.**
+
+Session built in the app and saved as `saved/physarum_depth.pnlive`: 4 states, union of
+22 nodes, 14 distinct op_codes — real `ShaderNode`s with a live GL context, which is
+exactly what the automated harness could not exercise.
+
+Stepping through every state with the graph rendering produced **no visible hitch,
+stutter or dropped frame** at any transition. The union model's central claim — a state
+transition compiles nothing, so the projected output does not hitch mid-set — holds on
+real shader nodes, not just on plain `Node`s.
+
+Deviations from the checklist, so the coverage is not overstated:
+
+- **4 states, not the 8 asked for.** The node count (22) comfortably exceeds the 12
+  asked for, and union size is what drives both load cost and per-transition work, so
+  the dimension that matters is covered. Three real transitions were observed.
+- Steps 2, 5 and 6 were not separately recorded.
+- **Step 4 was not run at all** — no UI sets a trigger, so all four states are `manual`.
+  Audio-driven advancing remains unexercised in the real app.
+
+### Found in use: no way to delete a state
+
+Deleting a node from the graph left one captured state broken, and there is no action to
+remove that state — it has to be edited out of the `.pnlive` JSON by hand. `Delete State`
+was already listed below as specified-but-not-built; hitting it during the first real
+session moves it from a nice-to-have to the next thing worth building.
 
 ---
 
@@ -141,7 +166,7 @@ Triaged during the final whole-branch review and judged acceptable to ship. Reco
 
 **There is no way to set a trigger from the application.** Every captured state is written as `{"type": "manual"}`, and making a state wait on audio requires hand-editing the `.pnlive` JSON. The engine fully supports counter and threshold triggers, and validation covers them — only the control is missing. This is a scoping miss in the implementation plan, not a defect in the code.
 
-Also specified in the design but not built: Save As, Delete State, drag-to-reorder, rename, and key/MIDI-bound transport. The dock currently offers Play/Pause/Prev/Next and click-to-jump.
+Also specified in the design but not built: Save As, Delete State, drag-to-reorder, rename, and key/MIDI-bound transport. The dock offers Play/Pause/Prev/Next, Capture, and double-click-to-jump.
 
 ### Propagation
 
