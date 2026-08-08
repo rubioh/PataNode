@@ -10,7 +10,9 @@
   made the warning marker drift onto the wrong state.
 """
 
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
+import pytest
+from PyQt5.QtCore import QPoint, Qt
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMenu, QMessageBox
 
 import program.program_conf  # noqa: F401  (breaks the import cycle, see tests/serialization/test_save_load.py)
 from gui.patanode import PataNode
@@ -336,6 +338,7 @@ def test_session_dock_starts_hidden(qapp):
     window._clearSessionPlayer = lambda: None
     window.onSessionCapture = lambda: None
     window.onSessionDelete = lambda: None
+    window.onSessionDeleteAt = lambda index: None
 
     PataNode.createSessionDock(window)
     window.show()
@@ -519,6 +522,98 @@ def test_delete_leaves_no_dangling_index_if_the_next_state_will_not_load(
 
     assert len(player.session.states) == 2
     assert player.current_index < len(player.session.states)
+
+
+def _right_click_state(dock, monkeypatch, row, choose_delete=True):
+    """Drive the state list's context menu on `row`.
+
+    Goes through customContextMenuRequested rather than calling the handler
+    directly, so dropping the connect() in the dock fails these tests --
+    calling onStateContextMenu() by hand leaves that line unguarded.
+
+    itemAt() is stubbed because it resolves a pixel position against the
+    list's geometry -- irrelevant here and unreliable offscreen. The menu
+    itself is built for real; exec_ returns the chosen action.
+    """
+    item = dock.state_list.item(row)
+    monkeypatch.setattr(dock.state_list, "itemAt", lambda point: item)
+    monkeypatch.setattr(
+        QMenu, "exec_", lambda self, *args: self.actions()[0] if choose_delete else None
+    )
+    dock.state_list.customContextMenuRequested.emit(QPoint(0, 0))
+
+
+def test_state_list_asks_for_a_custom_context_menu(qapp):
+    """Without CustomContextMenu the widget never emits
+    customContextMenuRequested and a right-click falls through to Qt's
+    default menu -- the signal-based tests below cannot see that.
+    """
+    assert QDMSessionDock().state_list.contextMenuPolicy() == Qt.CustomContextMenu
+
+
+def test_right_click_delete_removes_the_state_that_was_clicked(
+    qapp, scene, monkeypatch
+):
+    """Not the current state -- the one under the cursor."""
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    window.session_widget.setPlayer(player)
+    _click_delete(monkeypatch, confirm=True)
+
+    _right_click_state(window.session_widget, monkeypatch, row=2)
+
+    assert [s.name for s in player.session.states] == ["a", "b"]
+
+
+def test_deleting_a_state_after_the_current_one_does_not_reload(
+    qapp, scene, monkeypatch
+):
+    """The displayed graph is untouched by removing a later state, so there
+    is nothing to transition to -- goTo would be a pointless rewire, and on
+    real shader nodes a pointless render pull.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(0)
+    window.session_widget.setPlayer(player)
+    _click_delete(monkeypatch, confirm=True)
+    monkeypatch.setattr(
+        player, "goTo", lambda index: pytest.fail("must not re-enter a state")
+    )
+
+    _right_click_state(window.session_widget, monkeypatch, row=2)
+
+    assert player.current_index == 0
+
+
+def test_deleting_a_state_before_the_current_one_keeps_the_same_state_showing(
+    qapp, scene, monkeypatch
+):
+    """Everything after the removed state shifts down one, so the index has
+    to follow or the dock marker lands on the wrong row -- but the graph on
+    screen is still the same state, so again no reload.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(2)
+    window.session_widget.setPlayer(player)
+    _click_delete(monkeypatch, confirm=True)
+    monkeypatch.setattr(
+        player, "goTo", lambda index: pytest.fail("must not re-enter a state")
+    )
+
+    _right_click_state(window.session_widget, monkeypatch, row=0)
+
+    assert player.current_index == 1
+    assert player.session.states[1].name == "c"
+
+
+def test_right_click_delete_cancelled_keeps_the_state(qapp, scene, monkeypatch):
+    """The confirmation applies to this path too, not just the button."""
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    window.session_widget.setPlayer(player)
+    _click_delete(monkeypatch, confirm=False)
+
+    _right_click_state(window.session_widget, monkeypatch, row=2)
+
+    assert [s.name for s in player.session.states] == ["a", "b", "c"]
 
 
 def test_delete_button_deletes_the_current_state(qapp, scene, monkeypatch):

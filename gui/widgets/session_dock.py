@@ -1,10 +1,12 @@
 """Live session dock: state list, transport, and the validation banner."""
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QListWidget,
     QListWidgetItem,
+    QMenu,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -30,6 +32,9 @@ class QDMSessionDock(QWidget):
         # Deleting needs the confirmation dialog and a real window to parent
         # it to, so it goes back to the owner the same way.
         self.on_delete_requested = None
+        # Right-clicking a row deletes *that* state, which is not
+        # necessarily the current one, so the index travels with the call.
+        self.on_delete_index_requested = None
 
         layout = QVBoxLayout()
 
@@ -53,6 +58,8 @@ class QDMSessionDock(QWidget):
 
         self.state_list = QListWidget()
         self.state_list.itemDoubleClicked.connect(self.onStateActivated)
+        self.state_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.state_list.customContextMenuRequested.connect(self.onStateContextMenu)
         layout.addWidget(self.state_list)
 
         transport = QHBoxLayout()
@@ -208,6 +215,23 @@ class QDMSessionDock(QWidget):
     def onDelete(self):
         if self.on_delete_requested is not None:
             self.on_delete_requested()
+
+    def onStateContextMenu(self, point):
+        """Right-click a row to delete that state, current or not."""
+        if self.player is None or self.player.session is None:
+            return
+
+        item = self.state_list.itemAt(point)
+        if item is None:
+            return
+        row = self.state_list.row(item)
+
+        menu = QMenu(self)
+        delete_action = menu.addAction("Delete State")
+        chosen = menu.exec_(self.state_list.mapToGlobal(point))
+
+        if chosen is delete_action and self.on_delete_index_requested is not None:
+            self.on_delete_index_requested(row)
 
     def onTogglePlay(self):
         if self.player is None:

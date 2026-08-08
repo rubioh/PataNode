@@ -707,6 +707,7 @@ class PataNode(NodeEditorWindow):
         # only this window can reach; same action as Session -> Capture State.
         self.session_widget.on_capture_requested = self.onSessionCapture
         self.session_widget.on_delete_requested = self.onSessionDelete
+        self.session_widget.on_delete_index_requested = self.onSessionDeleteAt
         self.sessionDock = QDockWidget("Live Session")
         self.sessionDock.setWidget(self.session_widget)
         self.sessionDock.setFloating(False)
@@ -918,18 +919,30 @@ class PataNode(NodeEditorWindow):
         self.session_widget.refresh()
 
     def onSessionDelete(self):
+        """Delete the current state. Menu action and dock button.
+
+        Takes no arguments on purpose: QAction.triggered carries a bool, and
+        PyQt passes it to any slot that will accept one. An `index=None`
+        parameter here would receive False from the menu -- which is 0, so
+        the menu would silently delete state 0 instead of the current one.
+        """
+        player = self.session_player
+        if player is None:
+            return
+        self.onSessionDeleteAt(player.current_index)
+
+    def onSessionDeleteAt(self, index):
         from PyQt5.QtWidgets import QMessageBox
 
         player = self.session_player
         if player is None or player.session is None:
             return
 
-        index = player.current_index
         if not (0 <= index < len(player.session.states)):
             return
 
-        # Deleting the state you are watching while it auto-advances is
-        # incoherent; pause the same way jumping to a state does.
+        # Deleting a state while playback advances through it is incoherent;
+        # pause the same way jumping to a state does.
         player.pause()
         state = player.session.states[index]
 
@@ -955,6 +968,14 @@ class PataNode(NodeEditorWindow):
         remaining = len(player.session.states)
         if remaining == 0:
             player.current_index = -1
+        elif index > player.current_index:
+            # A later state went away. What is on screen is untouched, so
+            # re-entering it would be a rewire and a render pull for nothing.
+            pass
+        elif index < player.current_index:
+            # Everything after the removed state shifted down one. Same graph
+            # on screen, so again no transition -- just keep the index on it.
+            player.current_index -= 1
         else:
             # Whatever shifted into this slot, or the new tail if the deleted
             # state was the last one.
