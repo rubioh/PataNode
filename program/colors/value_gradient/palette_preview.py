@@ -39,7 +39,6 @@ from PyQt5.QtGui import QColor, QLinearGradient, QPainter
 from PyQt5.QtWidgets import QWidget
 
 PARAM_NAMES = ("frequency", "phase_r", "phase_g", "phase_b", "saturation")
-GRADIENT_STOPS = 32
 REFRESH_MS = 50
 
 
@@ -49,8 +48,8 @@ class PalettePreviewWindow(QWidget):
     Refreshed by a timer rather than a signal: the parameters move from two
     directions -- Inspector edits and per-frame audio modulation -- and only
     the second would be practical to hook. Polling catches both, and
-    evaluating a cosine 32 times at 20 Hz costs nothing beside the 60 Hz
-    render already running.
+    evaluating a cosine once per band pixel at 20 Hz costs nothing beside
+    the 60 Hz render already running.
     """
 
     def __init__(self, node):
@@ -83,6 +82,17 @@ class PalettePreviewWindow(QWidget):
         frequency, phase_r, phase_g, phase_b, saturation = values
         return frequency, (phase_r, phase_g, phase_b), saturation
 
+    def gradientStops(self, band_width):
+        """How many segments to split the band into: one per pixel.
+
+        A fixed count aliases -- `frequency` is unbounded and audio-bindable,
+        and at frequency 8 thirty-two stops sample four points per cycle and
+        draw a pattern the shader, which evaluates per pixel, never produces.
+        Floored at 1 so a window squeezed narrower than the margins does not
+        divide by zero.
+        """
+        return max(1, int(band_width))
+
     def paintEvent(self, event):
         frequency, phases, saturation = self.currentParams()
 
@@ -91,8 +101,9 @@ class PalettePreviewWindow(QWidget):
 
         band = QRectF(12, 12, self.width() - 24, self.height() - 74)
         gradient = QLinearGradient(band.topLeft(), band.topRight())
-        for step in range(GRADIENT_STOPS + 1):
-            t = step / GRADIENT_STOPS
+        stops = self.gradientStops(band.width())
+        for step in range(stops + 1):
+            t = step / stops
             r, g, b = palette_rgb(t, frequency, phases, saturation)
             gradient.setColorAt(t, QColor(int(r * 255), int(g * 255), int(b * 255)))
         painter.fillRect(band, gradient)

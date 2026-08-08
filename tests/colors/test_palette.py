@@ -280,3 +280,43 @@ def test_reopening_after_a_window_manager_close_restarts_the_timer(qapp):
 
     node.setPreviewWindowVisible(True)
     assert window._timer.isActive() is True
+
+
+# --- Band resolution -------------------------------------------------------
+
+
+def test_the_band_is_sampled_once_per_pixel(qapp):
+    """frequency is unbounded and audio-bindable; a fixed 32 stops samples
+    four points per cycle at frequency 8 and draws a pattern the per-pixel
+    shader never produces."""
+    window = previewWindowFor(1.0, PHASES, 1.0)
+    assert window.gradientStops(336) == 336
+
+
+def test_a_degenerate_band_still_asks_for_one_stop(qapp):
+    """A window squeezed narrower than the 24 px of margin gives a zero or
+    negative band width, and step/stops would divide by zero."""
+    window = previewWindowFor(1.0, PHASES, 1.0)
+    assert window.gradientStops(0) == 1
+    assert window.gradientStops(-8) == 1
+
+
+def test_a_high_frequency_band_tracks_the_palette(qapp):
+    """At 32 stops the band aliases: the sampled points miss the cosine's
+    excursions and the preview shows the wrong colours."""
+    window = previewWindowFor(8.0, PHASES, 1.0)
+    window.resize(360, 150)
+    image = window.grab().toImage()
+
+    left, width = 12, window.width() - 24
+    worst = 0
+
+    for x in range(left + 2, left + width - 2, 3):
+        painted = image.pixelColor(x, 40)
+        expected = palette_rgb((x - left) / width, 8.0, PHASES, 1.0)
+        for got, want in zip(
+            (painted.red(), painted.green(), painted.blue()), expected
+        ):
+            worst = max(worst, abs(got - want * 255))
+
+    assert worst <= 20, "the painted band is off the palette by %d/255" % worst
