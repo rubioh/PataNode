@@ -16,6 +16,7 @@ import program.program_conf  # noqa: F401  (breaks the import cycle, see tests/s
 from gui.patanode import PataNode
 from gui.widgets.session_dock import QDMSessionDock
 from session.model import LiveSession, SessionState
+from session.player import SessionPlayer
 from session.validation import Finding
 
 
@@ -314,6 +315,9 @@ def make_session_window(editor):
     window.session_filename = None
     window.getCurrentNodeEditorWidget = lambda: editor
     window.addDockWidget = lambda *args: None
+    # _sessionStatus goes through statusBar(), which needs the QMainWindow
+    # this stub deliberately skips -- same category of stub as addDockWidget.
+    window._sessionStatus = lambda message: None
     window.createSessionDock()
     return window
 
@@ -331,6 +335,7 @@ def test_session_dock_starts_hidden(qapp):
     window = QMainWindow()
     window._clearSessionPlayer = lambda: None
     window.onSessionCapture = lambda: None
+    window.onSessionDelete = lambda: None
 
     PataNode.createSessionDock(window)
     window.show()
@@ -371,6 +376,163 @@ def test_open_session_reveals_the_dock(qapp, scene, monkeypatch, tmp_path):
     window.onSessionOpen()
 
     assert not window.sessionDock.isHidden()
+
+
+def plain_node(nid):
+    """A minimal node dict the `scene` fixture can deserialize (plain Node)."""
+    return {
+        "id": nid,
+        "title": "N%d" % nid,
+        "pos_x": 0,
+        "pos_y": 0,
+        "op_code": 100,
+        "inputs": [],
+        "outputs": [],
+        "content": {},
+    }
+
+
+def make_delete_window(scene, names):
+    """A window driving a *real* SessionPlayer over `names`, sitting on state 0.
+
+    Deletion has to be asserted through real behaviour -- which state the
+    player ends up on, what the session holds -- so this uses a real player
+    and the real Scene fixture rather than StubPlayer.
+    """
+    states = [
+        SessionState(name, {"type": "manual"}, make_scene(nodes=[plain_node(i + 1)]))
+        for i, name in enumerate(names)
+    ]
+    player = SessionPlayer(scene)
+    player.load(LiveSession(states=states), {100}, set())
+    player.goTo(0)
+
+    window = make_session_window(StubLiveEditor(scene))
+    window.session_player = player
+    return window, player
+
+
+def _destructive_button(box):
+    """Qt lays buttons out by role, not insertion order, so the confirming
+    button is found by its role rather than by position in buttons()."""
+    return next(
+        button
+        for button in box.buttons()
+        if box.buttonRole(button) == QMessageBox.DestructiveRole
+    )
+
+
+def _click_delete(monkeypatch, confirm):
+    """Answer the delete confirmation with Delete (confirm) or Cancel."""
+    _allow_message_box_with_stub_parent(monkeypatch)
+    monkeypatch.setattr(QMessageBox, "exec_", lambda self: None)
+    monkeypatch.setattr(
+        QMessageBox,
+        "clickedButton",
+        lambda self: (
+            _destructive_button(self) if confirm else self.button(QMessageBox.Cancel)
+        ),
+    )
+
+
+def test_delete_state_removes_the_current_state(qapp, scene, monkeypatch):
+    """The gap found during the first real session: a node deleted from the
+    graph left a captured state broken, with no way to remove that state
+    short of hand-editing the .pnlive.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(1)
+    _click_delete(monkeypatch, confirm=True)
+
+    window.onSessionDelete()
+
+    assert [s.name for s in player.session.states] == ["a", "c"]
+
+
+def test_delete_state_shows_the_state_that_took_its_place(qapp, scene, monkeypatch):
+    """Deleting state 1 of a,b,c leaves c at index 1 -- and the scene must
+    actually be showing c, not still rendering the deleted b.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(1)
+    _click_delete(monkeypatch, confirm=True)
+
+    window.onSessionDelete()
+
+    assert player.current_index == 1
+    assert player.session.states[1].name == "c"
+
+
+def test_delete_the_last_state_in_the_list_falls_back_to_the_previous(
+    qapp, scene, monkeypatch
+):
+    """Nothing shifts into the tail position, so the index has to step back
+    rather than point one past the end.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(2)
+    _click_delete(monkeypatch, confirm=True)
+
+    window.onSessionDelete()
+
+    assert player.current_index == 1
+    assert player.session.states[1].name == "b"
+
+
+def test_delete_the_only_state_leaves_no_current_state(qapp, scene, monkeypatch):
+    window, player = make_delete_window(scene, ["only"])
+    _click_delete(monkeypatch, confirm=True)
+
+    window.onSessionDelete()
+
+    assert player.session.states == []
+    assert player.current_index == -1
+
+
+def test_delete_state_cancelled_keeps_the_state(qapp, scene, monkeypatch):
+    """There is no session-level undo (spec), so Cancel must be honest."""
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(1)
+    _click_delete(monkeypatch, confirm=False)
+
+    window.onSessionDelete()
+
+    assert [s.name for s in player.session.states] == ["a", "b", "c"]
+    assert player.current_index == 1
+
+
+def test_delete_leaves_no_dangling_index_if_the_next_state_will_not_load(
+    qapp, scene, monkeypatch
+):
+    """States get deleted precisely because they are broken, so the state
+    that shifts into place may be broken too. goTo is all-or-nothing and
+    leaves current_index alone when it fails, which after a deletion would
+    leave it addressing a state that no longer exists -- tick() reads
+    states[current_index] at 60 Hz and would raise IndexError mid-set.
+    """
+    window, player = make_delete_window(scene, ["a", "b", "c"])
+    player.goTo(2)
+    _click_delete(monkeypatch, confirm=True)
+    monkeypatch.setattr(player, "goTo", lambda index: False)
+
+    window.onSessionDelete()
+
+    assert len(player.session.states) == 2
+    assert player.current_index < len(player.session.states)
+
+
+def test_delete_button_deletes_the_current_state(qapp, scene, monkeypatch):
+    """Drives the real QPushButton through the real createSessionDock, so
+    deleting either production wiring line fails this -- same reason
+    test_capture_button_captures_a_state does.
+    """
+    window, player = make_delete_window(scene, ["a", "b"])
+    window.session_widget.setPlayer(player)
+    _click_delete(monkeypatch, confirm=True)
+
+    window.session_widget.btn_delete.click()
+
+    assert [s.name for s in player.session.states] == ["b"]
 
 
 def test_capture_button_captures_a_state(qapp):

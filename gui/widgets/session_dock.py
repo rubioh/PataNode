@@ -27,6 +27,9 @@ class QDMSessionDock(QWidget):
         # (PataNode.createSessionDock) so the dock's Capture button and the
         # Session -> Capture State menu action run the same code.
         self.on_capture_requested = None
+        # Deleting needs the confirmation dialog and a real window to parent
+        # it to, so it goes back to the owner the same way.
+        self.on_delete_requested = None
 
         layout = QVBoxLayout()
 
@@ -57,7 +60,14 @@ class QDMSessionDock(QWidget):
         self.btn_play = QPushButton("▶ Play")
         self.btn_next = QPushButton("Next ▶")
         self.btn_capture = QPushButton("Capture")
-        for button in (self.btn_prev, self.btn_play, self.btn_next, self.btn_capture):
+        self.btn_delete = QPushButton("Delete")
+        for button in (
+            self.btn_prev,
+            self.btn_play,
+            self.btn_next,
+            self.btn_capture,
+            self.btn_delete,
+        ):
             transport.addWidget(button)
         layout.addLayout(transport)
 
@@ -69,6 +79,7 @@ class QDMSessionDock(QWidget):
         self.btn_run_anyway.clicked.connect(self.onRunAnyway)
         self.btn_reload.clicked.connect(self.onFixAndReload)
         self.btn_capture.clicked.connect(self.onCapture)
+        self.btn_delete.clicked.connect(self.onDelete)
 
     def setPlayer(self, player):
         self.player = player
@@ -193,6 +204,10 @@ class QDMSessionDock(QWidget):
     def onCapture(self):
         if self.on_capture_requested is not None:
             self.on_capture_requested()
+
+    def onDelete(self):
+        if self.on_delete_requested is not None:
+            self.on_delete_requested()
 
     def onTogglePlay(self):
         if self.player is None:
