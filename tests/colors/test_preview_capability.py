@@ -5,7 +5,6 @@ which deletes the whole panel -- an Inspector-owned window would be orphaned
 on every selection change, and several previews could not stay open at once.
 """
 
-import pytest
 from PyQt5.QtWidgets import QWidget
 
 from node.shader_node_base import ShaderNode
