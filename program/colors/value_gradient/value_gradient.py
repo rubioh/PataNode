@@ -2,6 +2,7 @@ from os.path import dirname, join
 
 from node.node_conf import register_node
 from node.shader_node_base import Colors, ShaderNode
+from program.colors.value_gradient.palette_preview import PalettePreviewWindow
 from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, name_to_opcode, register_program
 
@@ -86,6 +87,7 @@ class ValueGradientNode(ShaderNode, Colors):
     op_code = OP_CODE_VALUEGRADIENT
     content_label = ""
     content_label_objname = "shader_value_gradient"
+    preview_window_class = PalettePreviewWindow
 
     def __init__(self, scene):
         super().__init__(scene, inputs=[1], outputs=[3])

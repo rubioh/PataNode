@@ -47,3 +47,58 @@ def test_input_above_one_is_clamped():
 
 def test_negative_input_is_clamped():
     assert palette_rgb(-0.2, 2.0, PHASES, 1.0) == palette_rgb(0.0, 2.0, PHASES, 1.0)
+
+
+def test_current_params_prefer_the_bound_value_over_the_attribute(qapp):
+    """Under an Inspector expression or an audio binding, the attribute and
+    what the GPU received diverge -- the preview must show the latter or it
+    misleads on exactly the setups worth previewing."""
+    from program.colors.value_gradient.palette_preview import PalettePreviewWindow
+
+    class FakeUniforms:
+        uniforms = {
+            "": {
+                "frequency": {"last_value": 4.0},
+                "phase_r": {"last_value": 0.1},
+                "phase_g": {"last_value": 0.2},
+                "phase_b": {"last_value": 0.3},
+                "saturation": {"last_value": 0.5},
+            }
+        }
+
+    class FakeProgram:
+        programs_uniforms = FakeUniforms()
+        frequency = 1.0
+        phase_r = 0.0
+        phase_g = 0.33
+        phase_b = 0.67
+        saturation = 1.0
+
+    class FakeNode:
+        program = FakeProgram()
+
+    window = PalettePreviewWindow(FakeNode())
+    assert window.currentParams() == (4.0, (0.1, 0.2, 0.3), 0.5)
+
+
+def test_current_params_fall_back_to_attributes_before_the_first_render(qapp):
+    """A node that has never rendered has no last_value yet, and the window
+    can be opened immediately after dropping the node."""
+    from program.colors.value_gradient.palette_preview import PalettePreviewWindow
+
+    class FakeUniforms:
+        uniforms = {"": {}}
+
+    class FakeProgram:
+        programs_uniforms = FakeUniforms()
+        frequency = 1.0
+        phase_r = 0.0
+        phase_g = 0.33
+        phase_b = 0.67
+        saturation = 1.0
+
+    class FakeNode:
+        program = FakeProgram()
+
+    window = PalettePreviewWindow(FakeNode())
+    assert window.currentParams() == (1.0, (0.0, 0.33, 0.67), 1.0)
