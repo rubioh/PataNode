@@ -209,16 +209,13 @@ from os.path import dirname, join
 
 import program.program_conf  # noqa: F401  (registers every node; see tests/serialization)
 from node.node_conf import SHADER_NODES
+from program.colors.value_gradient import value_gradient as value_gradient_module
 from program.colors.value_gradient.value_gradient import (
     OP_CODE_VALUEGRADIENT,
     ValueGradientNode,
 )
 
-GLSL = join(
-    dirname(__import__("program.colors.value_gradient.value_gradient",
-                       fromlist=["value_gradient"]).__file__),
-    "value_gradient.glsl",
-)
+GLSL = join(dirname(value_gradient_module.__file__), "value_gradient.glsl")
 
 
 def test_the_node_is_registered_under_its_opcode():
