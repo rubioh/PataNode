@@ -6,7 +6,7 @@
 
 ## What this document is for
 
-The design rests on one claim that no unit test can prove: **a state transition compiles nothing, so the projected output does not hitch mid-set.** Everything else in the feature is covered by the 169 automated tests on this branch. This is the record of what was measured instead.
+The design rests on one claim that no unit test can prove: **a state transition compiles nothing, so the projected output does not hitch mid-set.** Everything else in the feature is covered by the 180 automated tests on this branch (all passing as of 2026-08-08). This is the record of what was measured instead.
 
 ## Automated results
 
@@ -18,34 +18,35 @@ Run with:
 QT_QPA_PLATFORM=offscreen PYTHONPATH=. .venv/bin/python tools/measure_session_cost.py
 ```
 
-> **These numbers are not yet trustworthy.** They were taken before the final
-> whole-branch review found that `_rewire` called `edge.remove()` without
-> `silent=True`, so every removed edge fired `onInputChanged` and, on a real
-> `ShaderNode`, a full upstream render pull — N cascading evaluations per
-> transition rather than one. The harness could not see it because it uses plain
-> `Node`, whose `onInputChanged` only marks dirty. That is now fixed
-> (`session/player.py`), but the figures below were measured on the old path and
-> on plain nodes either way. **Step 3 of the manual checklist is what actually
-> settles this.**
+> **Re-measured 2026-08-08**, after the final whole-branch review found that
+> `_rewire` called `edge.remove()` without `silent=True` — every removed edge
+> fired `onInputChanged` and, on a real `ShaderNode`, a full upstream render pull,
+> N cascading evaluations per transition rather than one. The harness could not
+> see it because it uses plain `Node`, whose `onInputChanged` only marks dirty, so
+> the improvement below understates what the fix is worth on real nodes. The
+> figures now reflect the fixed path; **they are still plain-`Node` numbers, so
+> step 3 of the manual checklist is what actually settles this.**
 
 ### Transition cost — 40 nodes, 30 states, plain `Node`, no GL
 
-| | |
-|---|---|
-| Union load (no GL) | 42.2 ms |
-| Transition, median | **2.50 ms** |
-| Transition, worst | **4.17 ms** |
-| Frame budget @ 60 fps | 16.67 ms |
+Previous column is the pre-fix run, kept for comparison.
 
-The worst transition sits at roughly a quarter of one frame. This measures exactly the work the union model claims is all a transition does: deepcopy the state dict, apply parameters by node id, tear down and rebuild edges, one evaluation pull.
+| | 2026-08-08 | pre-fix |
+|---|---|---|
+| Union load (no GL) | 37.6 ms | 42.2 ms |
+| Transition, median | **2.25 ms** | 2.50 ms |
+| Transition, worst | **2.78 ms** | 4.17 ms |
+| Frame budget @ 60 fps | 16.67 ms | 16.67 ms |
+
+The worst transition sits at roughly a sixth of one frame. This measures exactly the work the union model claims is all a transition does: deepcopy the state dict, apply parameters by node id, tear down and rebuild edges, one evaluation pull.
 
 ### Shader compile cost — standalone GL context
 
-| | |
-|---|---|
-| Single program compile, median of 10 | 0.28 ms |
-| Extrapolated floor, 15 nodes | 4.1 ms |
-| Extrapolated floor, 40 nodes | 11.0 ms |
+| | 2026-08-08 | pre-fix |
+|---|---|---|
+| Single program compile, median of 10 | 0.24 ms | 0.28 ms |
+| Extrapolated floor, 15 nodes | 3.6 ms | 4.1 ms |
+| Extrapolated floor, 40 nodes | 9.7 ms | 11.0 ms |
 
 Treat these as a **floor**, not an estimate: real nodes compile more than one program each, and a standalone context may optimise differently from the app's Qt GL widget. The useful conclusion is directional — compilation is cheap enough that front-loading it at session load should cost well under a second, not the "several seconds" the spec cautiously predicted.
 
