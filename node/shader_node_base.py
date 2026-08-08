@@ -78,6 +78,10 @@ class ShaderNode(Node):
     content_label = ""
     content_label_objname = "shader_node_bg"
 
+    # Subclasses opt into a floating preview by naming a QWidget class here.
+    # The Inspector discovers the capability from this attribute alone.
+    preview_window_class = None
+
     GraphicsNode_class = ShaderGraphicsNode
     NodeContent_class = ShaderContent
 
@@ -87,6 +91,7 @@ class ShaderNode(Node):
         self.should_update_preview = True
         self.value = None  # Using to store output texture reference
         self.program = None
+        self._preview_window = None
         self._container = None  # GraphContainer reference
         self._win_size = (1920, 1080)
 
@@ -538,6 +543,37 @@ class ShaderNode(Node):
             self.changeWindowSize(data["win_size"])
 
         return res
+
+    def setPreviewWindowVisible(self, visible):
+        """Open or hide this node's preview window.
+
+        The node owns the window rather than the Inspector: selecting a
+        different node rebuilds the entire Inspector panel, which would
+        orphan an Inspector-owned window every time.
+        """
+        if self.preview_window_class is None:
+            return
+
+        if visible:
+            if self._preview_window is None:
+                self._preview_window = self.preview_window_class(self)
+            self._preview_window.show()
+            self._preview_window.raise_()
+        elif self._preview_window is not None:
+            self._preview_window.hide()
+
+    def isPreviewWindowVisible(self):
+        return self._preview_window is not None and self._preview_window.isVisible()
+
+    def closePreviewWindow(self):
+        if self._preview_window is not None:
+            self._preview_window.close()
+            self._preview_window = None
+
+    def remove(self):
+        # Before super(), which tears down the node the window points at.
+        self.closePreviewWindow()
+        super().remove()
 
 
 class Utils:
