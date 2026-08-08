@@ -238,3 +238,45 @@ def test_the_painted_band_shows_the_palette_under_over_saturation(qapp):
                 painted.blue(),
                 expected,
             )
+
+
+# --- Refresh timer lifecycle ----------------------------------------------
+
+
+def test_the_timer_follows_visibility(qapp):
+    """A hidden window has nothing to repaint, so it must not keep waking up
+    every 50 ms -- previews accumulate as nodes are selected."""
+    window = previewWindowFor(1.0, PHASES, 1.0)
+    assert window._timer.isActive() is False
+
+    window.show()
+    assert window._timer.isActive() is True
+
+    window.hide()
+    assert window._timer.isActive() is False
+
+
+def test_reopening_after_a_window_manager_close_restarts_the_timer(qapp):
+    """Closing with the X button and re-ticking the Inspector box used to
+    give back a permanently frozen window, which mid-performance reads as a
+    stuck parameter."""
+    from node.shader_node_base import ShaderNode
+    from program.colors.value_gradient.palette_preview import PalettePreviewWindow
+
+    class Node(ShaderNode):
+        preview_window_class = PalettePreviewWindow
+
+        def __init__(self):
+            self._preview_window = None
+            self.program = previewWindowFor(1.0, PHASES, 1.0).node.program
+
+    node = Node()
+    node.setPreviewWindowVisible(True)
+    window = node._preview_window
+    assert window._timer.isActive() is True
+
+    window.close()
+    assert window._timer.isActive() is False
+
+    node.setPreviewWindowVisible(True)
+    assert window._timer.isActive() is True

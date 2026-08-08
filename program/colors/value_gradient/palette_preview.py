@@ -59,9 +59,13 @@ class PalettePreviewWindow(QWidget):
         self.setWindowTitle("Palette — %s" % getattr(node, "title", "Value Gradient"))
         self.resize(360, 150)
 
+        # Driven by showEvent/hideEvent rather than started here: a hidden
+        # window has nothing to repaint, and a window closed with the WM's X
+        # button must come back live when the Inspector box is re-ticked --
+        # stopping the timer on close with nothing to restart it left a
+        # permanently frozen preview.
         self._timer = QTimer(self)
         self._timer.timeout.connect(self.update)
-        self._timer.start(REFRESH_MS)
 
     def currentParams(self):
         """The values the shader actually received, falling back to the
@@ -108,6 +112,12 @@ class PalettePreviewWindow(QWidget):
         )
         painter.end()
 
-    def closeEvent(self, event):
+    def showEvent(self, event):
+        super().showEvent(event)
+        self._timer.start(REFRESH_MS)
+
+    def hideEvent(self, event):
+        # Covers closing too: Qt hides the widget as part of accepting a
+        # close event, so no closeEvent override is needed.
         self._timer.stop()
-        super().closeEvent(event)
+        super().hideEvent(event)
