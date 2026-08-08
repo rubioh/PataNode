@@ -702,10 +702,16 @@ class PataNode(NodeEditorWindow):
         # dropped player and app.py's 60 Hz audio tick would keep driving a
         # session with no visible transport.
         self.session_widget.on_player_dropped = self._clearSessionPlayer
+        # The dock's Capture button needs the active editor's scene, which
+        # only this window can reach; same action as Session -> Capture State.
+        self.session_widget.on_capture_requested = self.onSessionCapture
         self.sessionDock = QDockWidget("Live Session")
         self.sessionDock.setWidget(self.session_widget)
         self.sessionDock.setFloating(False)
         self.addDockWidget(Qt.BottomDockWidgetArea, self.sessionDock)
+        # Nothing to show until a session exists: revealed by onSessionNew
+        # and onSessionOpen, the only two ways one comes into being.
+        self.sessionDock.setVisible(False)
 
     def _clearSessionPlayer(self):
         self.session_player = None
@@ -727,6 +733,7 @@ class PataNode(NodeEditorWindow):
         self.session_player = player
         self.session_widget.setPlayer(player)
         self.session_filename = None
+        self.sessionDock.setVisible(True)
 
     def onSessionOpen(self):
         from PyQt5.QtWidgets import QFileDialog, QMessageBox
@@ -765,6 +772,7 @@ class PataNode(NodeEditorWindow):
         self.session_filename = fname
         self.session_widget.setPlayer(player)
         self.session_widget.showFindings(findings)
+        self.sessionDock.setVisible(True)
         player.goTo(0)
         self.session_widget.refresh()
 

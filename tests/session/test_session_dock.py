@@ -10,7 +10,7 @@
   made the warning marker drift onto the wrong state.
 """
 
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 import program.program_conf  # noqa: F401  (breaks the import cycle, see tests/serialization/test_save_load.py)
 from gui.patanode import PataNode
@@ -287,6 +287,123 @@ def test_capture_names_state_with_its_zero_based_index():
     # Captured right after state 0 -> lands at index 1.
     assert player.current_index == 1
     assert session.states[1].name == "state 1"
+
+
+class StubLiveEditor:
+    """Stands in for PataNodeSubWindow where a *real* Scene is needed.
+
+    onSessionNew/onSessionOpen hand editor.scene to SessionPlayer, which
+    deserializes the union into it -- StubScene's serialize()-only surface
+    is not enough.
+    """
+
+    def __init__(self, scene):
+        self.scene = scene
+
+    def doEvalOutputs(self):
+        pass
+
+
+def make_session_window(editor):
+    """A PataNode with a real session dock but no QMainWindow behind it.
+
+    addDockWidget is the only thing stubbed; see test_capture_button_captures_a_state.
+    """
+    window = PataNode.__new__(PataNode)
+    window.session_player = None
+    window.session_filename = None
+    window.getCurrentNodeEditorWidget = lambda: editor
+    window.addDockWidget = lambda *args: None
+    window.createSessionDock()
+    return window
+
+
+def test_session_dock_starts_hidden(qapp):
+    """The dock is meaningless until a session exists, so it must not take
+    up the bottom of the window on startup -- same treatment audioDock
+    already gets (gui/patanode.py:171).
+
+    This uses a real, shown QMainWindow rather than the PataNode.__new__
+    stub: isHidden() is true for any widget that was merely never shown, so
+    against an unshown parent the assertion would hold with or without the
+    fix and prove nothing.
+    """
+    window = QMainWindow()
+    window._clearSessionPlayer = lambda: None
+    window.onSessionCapture = lambda: None
+
+    PataNode.createSessionDock(window)
+    window.show()
+
+    try:
+        assert window.sessionDock.isHidden()
+    finally:
+        window.close()
+
+
+def test_new_session_reveals_the_dock(qapp, scene):
+    """Session -> New Session is one of the two ways a session comes into
+    existence, so it is one of the two places the dock must appear.
+    """
+    window = make_session_window(StubLiveEditor(scene))
+    window.sessionDock.hide()
+
+    window.onSessionNew()
+
+    assert not window.sessionDock.isHidden()
+
+
+def test_open_session_reveals_the_dock(qapp, scene, monkeypatch, tmp_path):
+    """The other way in. Opening also has to survive the validation banner
+    path, so the dock is revealed regardless of findings.
+    """
+    path = tmp_path / "s.pnlive"
+    LiveSession(
+        states=[SessionState("state 0", {"type": "manual"}, make_scene())]
+    ).save(str(path))
+
+    window = make_session_window(StubLiveEditor(scene))
+    window.sessionDock.hide()
+    monkeypatch.setattr(
+        QFileDialog, "getOpenFileName", lambda *args, **kwargs: (str(path), "")
+    )
+
+    window.onSessionOpen()
+
+    assert not window.sessionDock.isHidden()
+
+
+def test_capture_button_captures_a_state(qapp):
+    """The dock's Capture button was created and laid out but never
+    connected to anything, so it silently did nothing -- the only working
+    capture was the Session -> Capture State menu action.
+
+    This drives the whole path rather than asserting a callback exists:
+    createSessionDock runs for real (so deleting its wiring line fails this
+    test), the real QPushButton is clicked, and the assertion is on the
+    session actually gaining a state. addDockWidget is the one thing
+    stubbed -- it needs a fully initialized QMainWindow, and PataNode here
+    is built via __new__ (see make_patanode).
+    """
+    session = LiveSession(
+        states=[SessionState("existing", {"type": "manual"}, make_scene())]
+    )
+    player = StubPlayer(session, current_index=0)
+    player._entry = None
+    editor = StubEditor(make_scene(nodes=[{"id": 1}]))
+
+    window = PataNode.__new__(PataNode)
+    window.session_player = player
+    window.getCurrentNodeEditorWidget = lambda: editor
+    window.addDockWidget = lambda *args: None
+    window.createSessionDock()
+    window.session_widget.setPlayer(player)
+
+    window.session_widget.btn_capture.click()
+
+    assert len(session.states) == 2, "clicking Capture must append a state"
+    assert session.states[1].name == "state 1"
+    assert player.current_index == 1
 
 
 def test_capture_resets_the_trigger_entry_baseline():

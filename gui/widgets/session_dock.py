@@ -22,6 +22,11 @@ class QDMSessionDock(QWidget):
         # player and app.py's 60 Hz audio tick keeps driving a session with
         # no visible transport.
         self.on_player_dropped = None
+        # Same reason: capturing a state needs the active editor's scene,
+        # which only the main window can reach. Set by the owner
+        # (PataNode.createSessionDock) so the dock's Capture button and the
+        # Session -> Capture State menu action run the same code.
+        self.on_capture_requested = None
 
         layout = QVBoxLayout()
 
@@ -63,6 +68,7 @@ class QDMSessionDock(QWidget):
         self.btn_play.clicked.connect(self.onTogglePlay)
         self.btn_run_anyway.clicked.connect(self.onRunAnyway)
         self.btn_reload.clicked.connect(self.onFixAndReload)
+        self.btn_capture.clicked.connect(self.onCapture)
 
     def setPlayer(self, player):
         self.player = player
@@ -183,6 +189,10 @@ class QDMSessionDock(QWidget):
         if self.player is not None:
             self.player.next()
             self.refresh()
+
+    def onCapture(self):
+        if self.on_capture_requested is not None:
+            self.on_capture_requested()
 
     def onTogglePlay(self):
         if self.player is None:
