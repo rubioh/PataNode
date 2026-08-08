@@ -16,13 +16,22 @@ def palette_rgb(t, frequency, phases, saturation):
 
     The palette supplies hue and saturation only; `t` comes back as
     brightness so the input's relief survives colourisation.
+
+    The result is clamped exactly as the shader's last line is. `saturation`
+    is not clamped on the way in, because the shader does not clamp it
+    either: it extrapolates past full saturation and clamps the *output*.
+    Without the output clamp, a `saturation` above 1 -- an Inspector
+    expression, or an unbounded audio counter -- yields negative components,
+    which QColor rejects, and the preview shows an empty band while the
+    shader renders a correct over-saturated gradient.
     """
     t = min(1.0, max(0.0, t))
     palette = [
         0.5 + 0.5 * math.cos(TWO_PI * (frequency * t + phase)) for phase in phases
     ]
     hue, sat, _ = colorsys.rgb_to_hsv(*palette)
-    return colorsys.hsv_to_rgb(hue, sat * saturation, t)
+    rgb = colorsys.hsv_to_rgb(hue, sat * saturation, t)
+    return tuple(min(1.0, max(0.0, channel)) for channel in rgb)
 
 
 from PyQt5.QtCore import QRectF, Qt, QTimer
