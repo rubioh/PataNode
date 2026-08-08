@@ -4,6 +4,7 @@ from program.colors.hsv_offset import hsv_offset
 from program.colors.hsv_pow import hsv_pow
 from program.colors.predominant_color import predominant_color
 from program.colors.tone_mapping import tone_mapping
+from program.colors.value_gradient import value_gradient
 
 __all__ = [
     "bloom",
@@ -12,4 +13,5 @@ __all__ = [
     "hsv_pow",
     "predominant_color",
     "tone_mapping",
+    "value_gradient",
 ]
