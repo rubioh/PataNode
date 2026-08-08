@@ -196,6 +196,29 @@ class QDMInspector(QWidget):
     def createParametersWindow(self, parameters_informations):
         return ParametersWidget(parameters_informations)
 
+    def createPreviewToggle(self, node):
+        """A checkbox for nodes that offer a floating preview, None otherwise.
+
+        Discovery is by declared capability, not by node type: a node opts
+        in with preview_window_class and the Inspector needs no knowledge of
+        which node it is.
+        """
+        if getattr(node, "preview_window_class", None) is None:
+            return None
+
+        groupBox = QGroupBox("")
+        checkbox = QCheckBox("Palette preview")
+        # A window left open stays open when you reselect the node, so the
+        # box must start from the node's real state, not from unchecked.
+        checkbox.setChecked(node.isPreviewWindowVisible())
+        checkbox.toggled.connect(node.setPreviewWindowVisible)
+
+        vbox = QVBoxLayout()
+        vbox.addWidget(checkbox)
+        groupBox.setLayout(vbox)
+        groupBox.setFlat(True)
+        return groupBox
+
     def clearLayout(self):
         while self.grid.count():
             child = self.grid.takeAt(0)
@@ -213,6 +236,9 @@ class QDMInspector(QWidget):
         #       cpu_parameters_informations = obj.getCpuAdaptableParameters()
         uniforms_binding = obj.getUniformsBinding()
         self.createSetWinSizeToolbox(obj)
+        preview_toggle = self.createPreviewToggle(obj)
+        if preview_toggle is not None:
+            self.grid.addWidget(preview_toggle)
         self.createGpuParametersToolbox(obj.getGpuAdaptableParameters())
         self.createCpuParametersToolbox(obj.getCpuAdaptableParameters())
         self.createUniformsToolbox(uniforms_binding)
