@@ -585,6 +585,12 @@ class ProgramsUniforms:
         self.parent = parent
         self.init_binding = {}
         self.uniforms = {}
+        # What the GPU last received, per program and uniform. Deliberately
+        # a sibling of self.uniforms rather than a key inside it: the
+        # uniforms dict is deepcopied into UniformsLookup._all_bindings and
+        # serialized into the .pn file, so anything stored there becomes
+        # part of the saved format (and an ndarray value makes it unsavable).
+        self.last_values = {}
         self.programs = {}
         self.lookup = None
         self.protected = ["iResolution"]
@@ -599,8 +605,10 @@ class ProgramsUniforms:
             self.previous_uniforms = self.uniforms
             self.programs = {}
             self.uniforms = {}
+            self.last_values = {}
 
         self.uniforms[program_name] = {}
+        self.last_values[program_name] = {}
         self.programs[program_name] = getattr(self.parent, program_name + "program")
         file_lines = file.split(";")
 
@@ -727,8 +735,11 @@ class ProgramsUniforms:
                     # What the GPU actually receives, kept so preview widgets
                     # can show the effective value rather than the raw
                     # attribute -- the two differ under an Inspector
-                    # expression or an audio binding.
-                    info["last_value"] = modified_data
+                    # expression or an audio binding. Stored outside
+                    # self.uniforms, which is what gets serialized.
+                    self.last_values.setdefault(program_name, {})[
+                        uniform_name
+                    ] = modified_data
 
                     if DEBUG:
                         print(

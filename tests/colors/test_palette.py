@@ -56,13 +56,13 @@ def test_current_params_prefer_the_bound_value_over_the_attribute(qapp):
     from program.colors.value_gradient.palette_preview import PalettePreviewWindow
 
     class FakeUniforms:
-        uniforms = {
+        last_values = {
             "": {
-                "frequency": {"last_value": 4.0},
-                "phase_r": {"last_value": 0.1},
-                "phase_g": {"last_value": 0.2},
-                "phase_b": {"last_value": 0.3},
-                "saturation": {"last_value": 0.5},
+                "frequency": 4.0,
+                "phase_r": 0.1,
+                "phase_g": 0.2,
+                "phase_b": 0.3,
+                "saturation": 0.5,
             }
         }
 
@@ -87,7 +87,7 @@ def test_current_params_fall_back_to_attributes_before_the_first_render(qapp):
     from program.colors.value_gradient.palette_preview import PalettePreviewWindow
 
     class FakeUniforms:
-        uniforms = {"": {}}
+        last_values = {"": {}}
 
     class FakeProgram:
         programs_uniforms = FakeUniforms()

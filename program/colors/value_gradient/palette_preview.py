@@ -58,13 +58,12 @@ class PalettePreviewWindow(QWidget):
         """The values the shader actually received, falling back to the
         program attributes before the node has ever rendered."""
         program = self.node.program
-        uniforms = program.programs_uniforms.uniforms.get("", {})
+        last_values = program.programs_uniforms.last_values.get("", {})
 
         values = []
         for name in PARAM_NAMES:
-            info = uniforms.get(name, {})
-            if "last_value" in info:
-                values.append(float(info["last_value"]))
+            if name in last_values:
+                values.append(float(last_values[name]))
             else:
                 values.append(float(getattr(program, name)))
 
