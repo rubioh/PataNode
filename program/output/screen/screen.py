@@ -1,12 +1,13 @@
-import glm
 from os.path import dirname, join
 
+import glm
+from moderngl import Texture
+
 from node.node_conf import register_node
-from node.shader_node_base import ShaderNode, Output
+from node.shader_node_base import Output, ShaderNode
 from program.colors.predominant_color.predominant_color import PredominantColorNode
 from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, register_program
-from moderngl import Texture
 
 OP_CODE_SCREEN = 0
 
@@ -57,7 +58,7 @@ class Screen(ProgramBase):
         preview = fbo.color_attachments[0].read()
         return (new_size, preview)
 
-    def render(self, textures, af=None, mapping = None):
+    def render(self, textures, af=None, mapping=None):
         texture = textures[0]
         if mapping:
             mapping.updateParams()
@@ -120,7 +121,7 @@ class ScreenNode(ShaderNode, Output):
         self.grNode.setToolTip("")
         return True
 
-    def render(self, audio_features=None, with_preview=False, mapping = None):
+    def render(self, audio_features=None, with_preview=False, mapping=None):
         for node in self.scene.nodes:
             if isinstance(node, ShaderNode):
                 node.already_called = False
@@ -138,7 +139,6 @@ class ScreenNode(ShaderNode, Output):
         if self.plreturn is not None:
             self.buffer_col = self.plreturn.render(texture)
 
-       
         self.program.render([texture], audio_features, mapping)
         if with_preview:
             return self.program.make_preview(texture, audio_features)

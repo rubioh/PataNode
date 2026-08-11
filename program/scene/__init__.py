@@ -1,13 +1,18 @@
 from program.scene.abstractsqrt import abstractsqrt
-from program.scene.jellyfish import jellyfish
+from program.scene.bangersponge import bangersponge
+from program.scene.chomp import chomp
 from program.scene.cube import cube
 from program.scene.dome import dome
 from program.scene.eye import eye
+from program.scene.fractal import fractal
 from program.scene.gsstylized import gsstylized
 from program.scene.hexagons import hexagons
 from program.scene.hexshadows import hexshadows
+from program.scene.jellyfish import jellyfish
 from program.scene.lumtriangle import lumtriangle
+from program.scene.maze import maze
 from program.scene.neonparty import neonparty
+from program.scene.particles import particles
 from program.scene.patatrack3d import patatrack3d
 from program.scene.pharmacy import pharmacy
 from program.scene.pingouin import pingouin
@@ -18,11 +23,6 @@ from program.scene.template import template
 from program.scene.texture import texture
 from program.scene.triforce import triforce
 from program.scene.truchet import truchet
-from program.scene.bangersponge import bangersponge
-from program.scene.fractal import fractal
-from program.scene.particles import particles
-from program.scene.maze import maze
-from program.scene.chomp import chomp
 
 __all__ = [
     "abstractsqrt",
@@ -43,5 +43,5 @@ __all__ = [
     "template",
     "texture",
     "truchet",
-    "jellyfish"
+    "jellyfish",
 ]

@@ -9,7 +9,6 @@ from program.mesh_renderer.mesh_resource_manager import (
 from program.mesh_renderer.renderer import render
 from program.mesh_renderer.texture_loader import load_texture_from_gltf
 
-
 # TODO: separate gltf loading in another file
 # TODO: create a retained renderer
 
@@ -62,8 +61,12 @@ class MeshScene:
         self.materials = []
         self.root_nodes = []
         self.samplers = []
-        self.textures = []  # Textures as describe by gltf2.0 : a handlers to a image texture and a sampler
-        self.texture_resource_indices = []  # The indices of textures relative to the gltf scenes
+        self.textures = (
+            []
+        )  # Textures as describe by gltf2.0 : a handlers to a image texture and a sampler
+        self.texture_resource_indices = (
+            []
+        )  # The indices of textures relative to the gltf scenes
         self.ctx = ctx
         self.mesh_resource_manager = MeshResourceManager(ctx)
         self.texture_resource_manager = TextureResourceManager(ctx)

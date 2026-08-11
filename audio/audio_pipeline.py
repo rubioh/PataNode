@@ -1,16 +1,15 @@
 import os
 import time
+from collections import deque
 
 import numpy as np
 import scipy.fft
 import sounddevice as sd  # type: ignore[import-untyped]
 
-from collections import deque
-
-from audio.audio_utils import EnergyTracker
-from audio.audio_logger import AudioLogger
-from audio.audio_event import AudioEventTracker
 from audio.audio_bpm import BPM_estimator
+from audio.audio_event import AudioEventTracker
+from audio.audio_logger import AudioLogger
+from audio.audio_utils import EnergyTracker
 
 
 class AudioEngine:
@@ -166,7 +165,9 @@ class AudioEngine:
         self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
         if "on_chill" in self.features:
             self.add_to_features(
-                self.bpm_estimator(self.features["_bpm_on_kick"], self.features["on_chill"])
+                self.bpm_estimator(
+                    self.features["_bpm_on_kick"], self.features["on_chill"]
+                )
             )  # BPM, tempo
         #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
         self.features["pitch"] = 0

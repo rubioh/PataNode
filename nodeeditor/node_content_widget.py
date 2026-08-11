@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 """A module containing the base class for the Node's content graphical representation. It also contains an example of
-an overridden Text Widget, which can pass a notification to it's parent about being modified."""
+an overridden Text Widget, which can pass a notification to it's parent about being modified.
+"""
 
 from collections import OrderedDict
+
+from qtpy.QtWidgets import QLabel, QTextEdit, QVBoxLayout, QWidget
+
 from nodeeditor.node_serializable import Serializable
-from qtpy.QtWidgets import QWidget, QLabel, QVBoxLayout, QTextEdit
 
 
 class QDMNodeContentWidget(QWidget, Serializable):

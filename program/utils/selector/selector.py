@@ -1,11 +1,10 @@
-
+import math
 from os.path import dirname, join
 
 from node.node_conf import register_node
 from node.shader_node_base import ShaderNode, Utils
 from program.program_base import ProgramBase
-from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
-import math
+from program.program_conf import SQUARE_VERT_PATH, name_to_opcode, register_program
 
 OP_CODE_SELECTOR = name_to_opcode("selector")
 
@@ -43,9 +42,7 @@ class Selector(ProgramBase):
 
     def initUniformsBinding(self):
         binding = {"iChannel0": "iChannel0", "iResolution": "win_size"}
-        self.add_float_cpu_adaptable_parameter(
-            "index", self.index, lambda: 0
-        )
+        self.add_float_cpu_adaptable_parameter("index", self.index, lambda: 0)
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])
 
@@ -97,7 +94,7 @@ class SelectorNode(ShaderNode, Utils):
                 output_texture = self.program.render([texture], audio_features)
                 self.last_working_index = index
                 return output_texture
-        if self.last_working_index  >= 0:
+        if self.last_working_index >= 0:
             index = self.last_working_index
             texture = input_nodes[index].render(audio_features)
             output_texture = self.program.render([texture], audio_features)

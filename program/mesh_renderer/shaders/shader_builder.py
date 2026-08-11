@@ -78,10 +78,8 @@ color_texture = (
 color_no_texture = "vec3 tx_albedo = color * in_albedo.xyz;\n"
 
 # todo metallic
-metallic_rougness_texture = (
-    "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
+metallic_rougness_texture = "float metallicFactor = in_metallic * 0.000001 * texture(metallicRoughnessTexture, tcs).x;\n\
     float roughnessFactor = in_roughness * texture(metallicRoughnessTexture, tcs).y;\n"
-)
 
 metallic_roughness_no_texture = "    float metallicFactor = in_metallic;\n\
     float roughnessFactor = in_roughness;\n"

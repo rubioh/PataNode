@@ -2,15 +2,14 @@ from PyQt5.QtCore import QDataStream, QIODevice, Qt
 from PyQt5.QtGui import QIcon, QPixmap
 from PyQt5.QtWidgets import QAction, QGraphicsProxyWidget, QMenu
 
-from nodeeditor.node_edge import EDGE_TYPE_DIRECT, EDGE_TYPE_BEZIER, EDGE_TYPE_SQUARE
+from node.graph_container_node import GraphContainerNode
+from node.node_conf import LISTBOX_MIMETYPE, SHADER_NODES, get_class_from_opcode
+from node.shader_node_base import Map, ShaderNode
+from nodeeditor.node_edge import EDGE_TYPE_BEZIER, EDGE_TYPE_DIRECT, EDGE_TYPE_SQUARE
 from nodeeditor.node_editor_widget import NodeEditorWidget
 from nodeeditor.node_graphics_node import QDMGraphicsNode
 from nodeeditor.node_graphics_view import MODE_EDGE_DRAG
 from nodeeditor.utils import dumpException
-
-from node.graph_container_node import GraphContainerNode
-from node.node_conf import SHADER_NODES, get_class_from_opcode, LISTBOX_MIMETYPE
-from node.shader_node_base import ShaderNode, Map
 from program.map.mapping.mapping import Mapping
 from program.output.screen.screen import ScreenNode
 
@@ -78,7 +77,9 @@ class PataNodeSubWindow(NodeEditorWidget):
         elif self.screen_node not in self.scene.nodes:
             self.searchScreenNodes()
         else:
-            preview = self.screen_node.render(audio_features, should_update_preview, self.mapping)
+            preview = self.screen_node.render(
+                audio_features, should_update_preview, self.mapping
+            )
             if should_update_preview:
                 self.preview = preview
                 self.version = self.version + 1

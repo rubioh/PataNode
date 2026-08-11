@@ -1,11 +1,9 @@
-
 from os.path import dirname, join
 
 from node.node_conf import register_node
-from node.shader_node_base import ShaderNode, Scene
+from node.shader_node_base import Scene, ShaderNode
 from program.program_base import ProgramBase
-from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
-
+from program.program_conf import SQUARE_VERT_PATH, name_to_opcode, register_program
 
 OP_CODE_JELLYFISH = name_to_opcode("jellyfish")
 
@@ -37,9 +35,9 @@ class JellyFish(ProgramBase):
 
     def initParams(self):
         self.time = 0
-        self.hue = .49
-        self.hue2 = .51
-        self.strobe = 0.
+        self.hue = 0.49
+        self.hue2 = 0.51
+        self.strobe = 0.0
 
     def initUniformsBinding(self):
         binding = {
