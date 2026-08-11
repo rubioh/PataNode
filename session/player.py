@@ -8,6 +8,7 @@ parameter values -- no construction, no compilation, no hitch mid-set.
 import copy
 
 from nodeeditor.node_edge import Edge
+from session.fade import MAX_NESTING, ActiveFade, ResolvedFade, is_blendable
 from session.trigger import evaluate_trigger, make_entry_snapshot
 from session.validation import Finding, validate_session
 
@@ -25,6 +26,9 @@ class SessionPlayer:
         self.findings = []
 
         self.is_playing = False
+        # The eased transition currently in flight, or None for a hard cut.
+        # Advanced from tick(); see session/fade.py.
+        self._active_fade = None
         self._entry = {}
         self._last_features = {}
         self._now = 0.0
@@ -46,6 +50,7 @@ class SessionPlayer:
         """
         self.session = session
         self.current_index = -1
+        self._active_fade = None
         self.findings = validate_session(session, known_opcodes, known_features)
 
         if not session.states:
@@ -94,6 +99,16 @@ class SessionPlayer:
             )
             return False
 
+        # Read the outgoing values before _apply_parameters overwrites them
+        # with the incoming state's -- these are the "from" side of the fade.
+        # Reading live (rather than from the previous state's dict) is what
+        # makes a fade work no matter which state you jumped from, and what
+        # makes an interrupted fade seamless: the half-blended expression
+        # currently on the parameter is what gets eased away from. A no-op
+        # when the state has no fade.
+        fade_spec = getattr(state, "fade", None)
+        fade_sources = self._capture_fade_sources(fade_spec)
+
         # Node.deserialize swallows its own internal errors, but subclasses
         # (e.g. ShaderNode, node/shader_node_base.py) can still raise past
         # that guard on malformed node data. Snapshot the live graph first so
@@ -128,6 +143,9 @@ class SessionPlayer:
         # unwanted auto-advance right after load. None means "not yet
         # anchored"; tick() takes the real snapshot from live features.
         self._entry = None
+        # After the rewire, so a failed switch never leaves a fade running
+        # against a scene that rolled back.
+        self._start_fade(fade_spec, fade_sources)
         self._evaluate_once()
         return True
 
@@ -201,6 +219,175 @@ class SessionPlayer:
         """
         self.on_evaluate()
 
+    # -- fades --------------------------------------------------------------
+
+    @staticmethod
+    def _read_live_param(node, program, uniform):
+        """The expression string a node currently holds for one uniform.
+
+        Returns None for anything that isn't a real ShaderNode carrying that
+        uniform -- a fade must degrade to a hard cut, never raise into the
+        60 Hz audio slot that drives tick().
+        """
+        getter = getattr(node, "getGpuAdaptableParameters", None)
+        if getter is None:
+            return None
+        try:
+            return getter()[program][uniform]["eval_function"]["value"]
+        except (KeyError, TypeError):
+            return None
+
+    @staticmethod
+    def _write_live_param(node, program, uniform, value) -> bool:
+        """Write an expression straight into the live parameter dict.
+
+        No render pull needed: bindUniformToProgram re-reads and re-evals
+        this string every frame (program/program_base.py:706), so writing it
+        is the whole of applying a fade step.
+        """
+        setter = getattr(getattr(node, "program", None), "setAdaptableParameters", None)
+        if setter is None:
+            return False
+        try:
+            setter(program, uniform, "eval_function", value)
+        except (KeyError, TypeError):
+            return False
+        return True
+
+    def _capture_fade_sources(self, fade_spec) -> dict:
+        """Live "from" values, read before the incoming state is applied."""
+        if fade_spec is None or not fade_spec.params:
+            return {}
+
+        by_id = {node.id: node for node in self.scene.nodes}
+        sources = {}
+        for param in fade_spec.params:
+            if param.from_value is not None:
+                continue  # explicit override; nothing to read
+            node = by_id.get(param.node_id)
+            if node is None:
+                continue
+            sources[param.key] = self._read_live_param(
+                node, param.program, param.uniform
+            )
+        return sources
+
+    def _start_fade(self, fade_spec, fade_sources) -> None:
+        """Resolve both endpoints and put the parameters at their old values.
+
+        Runs after _apply_parameters, so an unspecified "to" is simply what
+        the incoming state just wrote. Writing the a=0 expression here (and
+        not waiting for the first tick) means the first rendered frame shows
+        the outgoing value rather than flashing the incoming one.
+        """
+        superseded = self._active_fade
+        self._active_fade = None
+
+        if fade_spec is None or not fade_spec.params:
+            return
+
+        previous = (
+            {entry.key: entry for entry in superseded.entries} if superseded else {}
+        )
+        by_id = {node.id: node for node in self.scene.nodes}
+
+        entries = []
+        for param in fade_spec.params:
+            node = by_id.get(param.node_id)
+            if node is None:
+                continue  # validate_session already reported this
+
+            old = (
+                param.from_value
+                if param.from_value is not None
+                else fade_sources.get(param.key)
+            )
+            new = (
+                param.to_value
+                if param.to_value is not None
+                else self._read_live_param(node, param.program, param.uniform)
+            )
+
+            depth = 0
+            interrupted = previous.get(param.key)
+            if interrupted is not None:
+                # `old` is the interrupted fade's own half-blended
+                # expression, which is why resuming from it looks seamless.
+                # Each interruption wraps it one level deeper, so past the
+                # cap fall back to that fade's clean target instead.
+                depth = interrupted.depth + 1
+                if depth > MAX_NESTING:
+                    old, depth = interrupted.new, 0
+
+            if not (is_blendable(old) and is_blendable(new)) or old == new:
+                # Nothing to ease between: _apply_parameters already put the
+                # parameter on the incoming value, so this one hard-cuts.
+                continue
+
+            entries.append(
+                ResolvedFade(
+                    param.node_id, param.program, param.uniform, old, new, depth
+                )
+            )
+
+        if not entries:
+            return
+
+        # start=None: anchored on the first tick, not here. self._now is
+        # whatever the last audio tick reported, which before any tick is
+        # 0.0 -- anchoring against that would make the very first real tick
+        # see an elapsed time of "since the epoch" and snap the fade shut.
+        # Same lazy-anchor reasoning as self._entry above.
+        self._active_fade = ActiveFade(
+            entries, fade_spec.duration, fade_spec.curve, None
+        )
+        self._write_fade(self._active_fade, 0.0)
+
+    def _write_fade(self, fade, a: float) -> None:
+        by_id = {node.id: node for node in self.scene.nodes}
+        for entry in fade.entries:
+            node = by_id.get(entry.node_id)
+            if node is None:
+                continue
+            self._write_live_param(
+                node, entry.program, entry.uniform, entry.value_at(a)
+            )
+
+    def _advance_fade(self, now: float) -> None:
+        fade = self._active_fade
+        if fade is None:
+            return
+
+        if fade.start is None:
+            fade.start = now
+            return  # already sitting at a=0 from _start_fade
+
+        if fade.is_done(now):
+            self.finishFade()
+            return
+
+        self._write_fade(fade, fade.progress(now))
+
+    def finishFade(self) -> None:
+        """Snap every fading parameter to its real target string.
+
+        Public because a synthesized blend expression must never reach a
+        saved file: capturing or overwriting a state mid-fade serializes the
+        live scene, and "(1-0.4)*(x*2)+(0.4)*(.9)" would be baked in as if
+        the user had typed it. Same class of bug as commit 7ba3213.
+        """
+        fade = self._active_fade
+        if fade is None:
+            return
+
+        self._active_fade = None
+        by_id = {node.id: node for node in self.scene.nodes}
+        for entry in fade.entries:
+            node = by_id.get(entry.node_id)
+            if node is None:
+                continue
+            self._write_live_param(node, entry.program, entry.uniform, entry.new)
+
     # -- playback -----------------------------------------------------------
 
     def play(self) -> None:
@@ -213,6 +400,10 @@ class SessionPlayer:
         """Called from the audio timer. Advances if the trigger fires."""
         self._last_features = features
         self._now = now
+
+        # Before the is_playing guard: manual transport works while paused,
+        # so a fade started by the Next button must still run to completion.
+        self._advance_fade(now)
 
         if not self.is_playing or self.session is None:
             return
