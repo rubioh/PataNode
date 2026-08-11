@@ -45,8 +45,12 @@ def _nodes_by_id(scene: dict) -> dict:
     return {node["id"]: node for node in scene.get("nodes", [])}
 
 
-def _values(node: dict, kind: str):
-    """Yield (program, uniform, value) for one parameter kind."""
+def values_for_kind(node: dict, kind: str):
+    """Yield (program, uniform, value) for one parameter kind.
+
+    Public because session/fade.py enumerates the same parameters to build
+    the Fade window's candidate list.
+    """
     container = node.get(PARAM_KINDS[kind], {}) or {}
     for program, uniforms in container.items():
         for uniform, spec in uniforms.items():
@@ -76,7 +80,7 @@ def diff_scene_params(baseline: dict, current: dict) -> list:
             continue
 
         for kind in PARAM_KINDS:
-            for program, uniform, new_value in _values(current_node, kind):
+            for program, uniform, new_value in values_for_kind(current_node, kind):
                 old_value, found = _find_value(baseline_node, kind, program, uniform)
                 if found and old_value != new_value:
                     changes.append(
