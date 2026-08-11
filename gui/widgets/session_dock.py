@@ -16,6 +16,9 @@ class QDMSessionDock(QWidget):
         super().__init__(parent)
         self.player = None
         self.warned_states = set()
+        # Built on first use and then shown/hidden, like a node's preview
+        # window (node/shader_node_base.py:setPreviewWindowVisible).
+        self._fade_window = None
         # Set by the owner (PataNode.createSessionDock) so onFixAndReload
         # can clear the main window's reference too, not just the dock's --
         # otherwise PataNode.session_player keeps pointing at the dropped
@@ -57,7 +60,14 @@ class QDMSessionDock(QWidget):
         self.btn_play = QPushButton("▶ Play")
         self.btn_next = QPushButton("Next ▶")
         self.btn_capture = QPushButton("Capture")
-        for button in (self.btn_prev, self.btn_play, self.btn_next, self.btn_capture):
+        self.btn_fade = QPushButton("Fade…")
+        for button in (
+            self.btn_prev,
+            self.btn_play,
+            self.btn_next,
+            self.btn_capture,
+            self.btn_fade,
+        ):
             transport.addWidget(button)
         layout.addLayout(transport)
 
@@ -69,6 +79,7 @@ class QDMSessionDock(QWidget):
         self.btn_run_anyway.clicked.connect(self.onRunAnyway)
         self.btn_reload.clicked.connect(self.onFixAndReload)
         self.btn_capture.clicked.connect(self.onCapture)
+        self.btn_fade.clicked.connect(self.onFade)
 
     def setPlayer(self, player):
         self.player = player
@@ -131,6 +142,7 @@ class QDMSessionDock(QWidget):
         self.banner_buttons.hide()
         self.warned_states = set()
         self.player = None
+        self.closeFadeWindow()
         if self.on_player_dropped is not None:
             self.on_player_dropped()
         self.refresh()
@@ -141,10 +153,11 @@ class QDMSessionDock(QWidget):
             return
 
         for index, state in enumerate(self.player.session.states):
-            label = "%2d  %s   [%s]" % (
+            label = "%2d  %s   [%s]%s" % (
                 index,
                 state.name or "(unnamed)",
                 self._trigger_summary(state.trigger),
+                self._fade_summary(state),
             )
             if index == self.player.current_index:
                 label = "▶ " + label
@@ -157,6 +170,14 @@ class QDMSessionDock(QWidget):
             self.state_list.addItem(item)
 
         self.btn_play.setText("❚❚ Pause" if self.player.is_playing else "▶ Play")
+
+    @staticmethod
+    def _fade_summary(state):
+        """Which states ease in, visible at a glance during a set."""
+        fade = getattr(state, "fade", None)
+        if fade is None or not fade.params:
+            return ""
+        return "  ~%gs ×%d" % (fade.duration, len(fade.params))
 
     @staticmethod
     def _trigger_summary(trigger):
@@ -193,6 +214,31 @@ class QDMSessionDock(QWidget):
     def onCapture(self):
         if self.on_capture_requested is not None:
             self.on_capture_requested()
+
+    def onFade(self):
+        """Edit the fade into whichever state is selected in the list."""
+        if self.player is None or self.player.session is None:
+            return
+
+        index = self.state_list.currentRow()
+        if index < 0:
+            index = max(self.player.current_index, 0)
+
+        if self._fade_window is None:
+            from gui.widgets.fade_window import QDMFadeWindow
+
+            self._fade_window = QDMFadeWindow()
+            self._fade_window.on_applied = self.refresh
+
+        self._fade_window.setTarget(self.player, index)
+        self._fade_window.show()
+        self._fade_window.raise_()
+
+    def closeFadeWindow(self):
+        """Drop the editor along with the session it was editing."""
+        if self._fade_window is not None:
+            self._fade_window.close()
+            self._fade_window = None
 
     def onTogglePlay(self):
         if self.player is None:
