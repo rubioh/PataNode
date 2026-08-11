@@ -8,6 +8,7 @@ GLSL-compile failures are not detectable here -- SessionPlayer.load appends
 those.
 """
 
+from session.fade import CURVES
 from session.trigger import COUNTER_FEATURES
 
 
@@ -40,6 +41,7 @@ def validate_session(session, known_opcodes: set, known_features: set) -> list:
         findings.extend(_validate_nodes(index, state, known_opcodes))
         findings.extend(_validate_edges(index, state))
         findings.extend(_validate_trigger(index, state, known_features))
+        findings.extend(_validate_fade(index, state))
 
     return findings
 
@@ -125,8 +127,7 @@ def _validate_trigger(index, state, known_features):
             Finding(
                 index,
                 "trigger",
-                "Audio trigger has neither 'count' nor 'above' and will "
-                "never advance",
+                "Audio trigger has neither 'count' nor 'above' and will never advance",
             )
         ]
 
@@ -140,3 +141,66 @@ def _validate_trigger(index, state, known_features):
         ]
 
     return []
+
+
+def _validate_fade(index, state):
+    """A fade that points at nothing would silently do nothing at runtime.
+
+    SessionPlayer._start_fade skips any param it cannot resolve rather than
+    raising into the 60 Hz audio timer, so a stale node id after an edit
+    turns into a transition that just looks like it forgot to fade. Say so
+    at load time instead.
+    """
+    fade = getattr(state, "fade", None)
+    if fade is None:
+        return []
+
+    findings = []
+
+    if not isinstance(fade.duration, (int, float)) or fade.duration <= 0:
+        findings.append(
+            Finding(
+                index,
+                "fade",
+                "Fade duration %r is not a positive number" % (fade.duration,),
+            )
+        )
+
+    if fade.curve not in CURVES:
+        findings.append(
+            Finding(
+                index,
+                "fade",
+                "Fade uses unknown curve '%s'. Known curves: %s"
+                % (fade.curve, ", ".join(sorted(CURVES))),
+            )
+        )
+
+    nodes = {node["id"]: node for node in state.scene.get("nodes", [])}
+    for param in fade.params:
+        node = nodes.get(param.node_id)
+        if node is None:
+            findings.append(
+                Finding(
+                    index,
+                    "fade",
+                    "Fade targets node %s, which this state does not contain"
+                    % param.node_id,
+                )
+            )
+            continue
+
+        uniforms = (node.get("gpu_adaptable_parameters", {}) or {}).get(
+            param.program, {}
+        )
+        if param.uniform not in uniforms:
+            findings.append(
+                Finding(
+                    index,
+                    "fade",
+                    "Fade targets '%s.%s' on node '%s', which does not declare it"
+                    % (param.program, param.uniform, node.get("title", "<untitled>")),
+                )
+            )
+
+    return findings

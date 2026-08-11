@@ -10,6 +10,12 @@ Pure data: no Qt, no GL.
 import json
 import os
 
+from session.fade import FadeSpec
+
+# Still 1 after the fade block was added, deliberately. `fade` is optional
+# and omitted when absent, so old files load unchanged and an older build
+# reading a new file simply drops the key. Bumping the version would make
+# from_dict below reject every session file already on disk outright.
 SESSION_VERSION = 1
 
 
@@ -22,13 +28,21 @@ class InvalidSessionFile(Exception):
 
 
 class SessionState:
-    def __init__(self, name: str, trigger: dict, scene: dict):
+    def __init__(self, name: str, trigger: dict, scene: dict, fade=None):
         self.name = name
         self.trigger = trigger
         self.scene = scene
+        # How this state eases in when the session arrives at it, or None
+        # for the original hard cut. See session/fade.py.
+        self.fade = fade
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "trigger": self.trigger, "scene": self.scene}
+        data = {"name": self.name, "trigger": self.trigger, "scene": self.scene}
+        # Omitted entirely when there is no fade, so a session that never
+        # used the feature round-trips byte-identically.
+        if self.fade is not None:
+            data["fade"] = self.fade.to_dict()
+        return data
 
     @classmethod
     def from_dict(cls, data: dict) -> "SessionState":
@@ -36,6 +50,7 @@ class SessionState:
             name=data.get("name", ""),
             trigger=data.get("trigger", {"type": "manual"}),
             scene=data["scene"],
+            fade=FadeSpec.from_dict(data.get("fade")),
         )
 
 

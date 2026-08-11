@@ -1,3 +1,4 @@
+from session.fade import FadeParam, FadeSpec
 from session.model import LiveSession, SessionState
 from session.validation import validate_session
 
@@ -192,3 +193,80 @@ def test_all_findings_reported_together_with_state_indices():
 
     assert len(findings) == 3
     assert {f.state_index for f in findings} == {0, 1}
+
+
+# -- fades ----------------------------------------------------------------
+
+
+def faded_node(nid, uniforms):
+    data = node(nid)
+    data["gpu_adaptable_parameters"] = {
+        "program": {
+            name: {"eval_function": {"value": value}}
+            for name, value in uniforms.items()
+        }
+    }
+    return data
+
+
+def faded_session(fade, uniforms={"speed": "1"}):
+    return LiveSession(
+        states=[
+            SessionState(
+                "a", {"type": "manual"}, scene([faded_node(1, uniforms)]), fade=fade
+            )
+        ]
+    )
+
+
+def test_a_valid_fade_produces_no_findings():
+    session = faded_session(
+        FadeSpec(2.0, "smoothstep", [FadeParam(1, "program", "speed")])
+    )
+    assert validate_session(session, OPCODES, FEATURES) == []
+
+
+def test_a_fade_targeting_a_missing_node_is_reported():
+    """SessionPlayer skips what it cannot resolve rather than raising into
+    the 60 Hz audio slot, so without this the transition would just look
+    like it forgot to fade."""
+    session = faded_session(
+        FadeSpec(2.0, "linear", [FadeParam(999, "program", "speed")])
+    )
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert [f.category for f in findings] == ["fade"]
+    assert "999" in findings[0].message
+
+
+def test_a_fade_targeting_an_undeclared_uniform_is_reported():
+    session = faded_session(FadeSpec(2.0, "linear", [FadeParam(1, "program", "nope")]))
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert [f.category for f in findings] == ["fade"]
+    assert "nope" in findings[0].message
+
+
+def test_a_non_positive_duration_is_reported():
+    """Duration 0 makes every fade land on its target on the first tick --
+    a hard cut wearing a fade's clothes."""
+    session = faded_session(FadeSpec(0.0, "linear", [FadeParam(1, "program", "speed")]))
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert [f.category for f in findings] == ["fade"]
+    assert "positive" in findings[0].message
+
+
+def test_an_unknown_curve_is_reported():
+    session = faded_session(FadeSpec(2.0, "bouncy", [FadeParam(1, "program", "speed")]))
+    findings = validate_session(session, OPCODES, FEATURES)
+
+    assert [f.category for f in findings] == ["fade"]
+    assert "bouncy" in findings[0].message
+
+
+def test_a_state_without_a_fade_is_never_flagged():
+    session = LiveSession(
+        states=[SessionState("a", {"type": "manual"}, scene([faded_node(1, {})]))]
+    )
+    assert validate_session(session, OPCODES, FEATURES) == []
