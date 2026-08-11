@@ -65,12 +65,20 @@ class StubEditor:
 
 
 class StubPlayer:
-    """Stands in for SessionPlayer: onSessionOverwrite only reads these two."""
+    """Stands in for SessionPlayer for the capture/overwrite paths."""
 
     def __init__(self, session, current_index, is_playing=False):
         self.session = session
         self.current_index = current_index
         self.is_playing = is_playing
+        self.finished_fades = 0
+
+    def finishFade(self):
+        """Both paths serialize the live scene, and both must land a running
+        fade first so a synthesized blend expression is never saved. Counted
+        rather than ignored so the calls stay asserted, not merely tolerated.
+        """
+        self.finished_fades += 1
 
 
 class StubDock:
@@ -222,9 +230,9 @@ def test_warning_marker_survives_a_capture_inserted_before_it(qapp):
     session.capture(make_scene(), "inserted", after_index=0)
     dock.refresh()
 
-    assert dock.state_list.item(3).text().endswith("⚠"), (
-        "the state that was actually warned must keep its marker at its " "new position"
-    )
+    assert (
+        dock.state_list.item(3).text().endswith("⚠")
+    ), "the state that was actually warned must keep its marker at its new position"
     assert not dock.state_list.item(2).text().endswith("⚠"), (
         "the state that only inherited the old numeric index must not "
         "inherit the marker too"

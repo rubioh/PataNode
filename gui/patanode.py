@@ -716,6 +716,24 @@ class PataNode(NodeEditorWindow):
     def _clearSessionPlayer(self):
         self.session_player = None
 
+    def _finishSessionFade(self):
+        """Land any running fade before the scene is written to disk.
+
+        A fade puts synthesized blend expressions on the live parameters;
+        saving the graph mid-transition would store one as if it were the
+        node's real setting. Same reason as onSessionCapture.
+        """
+        if self.session_player is not None:
+            self.session_player.finishFade()
+
+    def onFileSave(self):
+        self._finishSessionFade()
+        return super().onFileSave()
+
+    def onFileSaveAs(self):
+        self._finishSessionFade()
+        return super().onFileSaveAs()
+
     def onSessionNew(self):
         from session.model import LiveSession
         from session.player import SessionPlayer
@@ -811,6 +829,12 @@ class PataNode(NodeEditorWindow):
         if editor is None or player is None or player.session is None:
             return
 
+        # Mid-fade the live parameters hold synthesized blend expressions
+        # like "(1-0.4)*(x*2)+(0.4)*(.9)". Serializing one would bake it into
+        # the captured state as if the user had typed it, and it would then
+        # be the *target* of every later fade. Land the fade first.
+        player.finishFade()
+
         # capture() needs a name before it knows the final index (which
         # depends on where after_index inserts it), so name with a
         # placeholder and rename using the real, 0-based index afterwards --
@@ -842,6 +866,9 @@ class PataNode(NodeEditorWindow):
         player = self.session_player
         if editor is None or player is None or player.current_index < 0:
             return
+
+        # As in onSessionCapture: never serialize a half-blended expression.
+        player.finishFade()
 
         index = player.current_index
         baseline = player.session.states[index].scene
