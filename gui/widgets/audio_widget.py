@@ -23,6 +23,7 @@ from PyQt5.QtCore import (
 from PyQt5.QtGui import QColor, QDrag
 from pyqtgraph import mkPen, GraphicsLayoutWidget  # type: ignore[import-untyped]
 
+import profiler
 from audio.audio_pipeline import AudioEngine
 from nodeeditor.utils import dumpException
 
@@ -59,6 +60,10 @@ class AudioLogWidget(QWidget):
         self._fps_timer = value
 
     def setData(self):
+        with profiler.PROFILER.gui_span("audio dock: redraw pyqtgraph"):
+            self._setData()
+
+    def _setData(self):
         if len(self.data1) != self.audio_engine.logger.log_buffer_size + 1:
             del self.data1
             self.data1 = self.audio_engine.logger.information["smooth_low"]
@@ -152,9 +157,19 @@ class AudioLogWidget(QWidget):
     #       self.graphLayout.removeWidget(graph)
 
     def initTimer(self):
+        """Create the redraw timer, stopped.
+
+        Deliberately not started here. The dock is hidden at startup, and
+        starting the timer anyway left pyqtgraph clearing and replotting every
+        curve 30 times a second for a panel nobody was looking at -- on the
+        same thread that has to render. Measured with --profile-events: 247
+        PlotDataItem events a second with the dock closed. setHidden() is what
+        starts and stops it now, and PataNode.initAudioLogDock calls it
+        explicitly rather than trusting visibilityChanged, which Qt does not
+        emit for a dock that was never shown in the first place.
+        """
         self.timer = QTimer()
         self.timer.timeout.connect(self.setData)
-        self.timer.start(int(1 / self.fps_timer * 1000))
 
     def dragEnterEvent(self, e):
         e.accept()

@@ -126,10 +126,24 @@ class OrbbecSource(DepthSource):
         (640, 400, 15),
     )
 
+    # Applied in order to every frame. Decimation goes first so the four
+    # costlier filters behind it work on a quarter of the pixels -- and, being
+    # first, it is also what makes the delivered frame half the profile's
+    # resolution. Resolved by name at open() rather than imported at module
+    # scope, so a build missing one is reported as such instead of crashing.
+    FILTER_NAMES = (
+        "DecimationFilter",
+        "ThresholdFilter",
+        "NoiseRemovalFilter",
+        "SpatialAdvancedFilter",
+        "TemporalFilter",
+    )
+
     def __init__(self):
         self._pipeline = None
         self._width = 0
         self._height = 0
+        self._chain = []
         # Recorded for diagnostics: which profile actually got selected is the
         # first thing worth knowing when frames look wrong.
         self.profile_format = None
@@ -175,13 +189,58 @@ class OrbbecSource(DepthSource):
             ) from error
 
         self._pipeline = pipeline
-        self._width = profile.get_width()
-        self._height = profile.get_height()
         self.profile_format = self.DEPTH_FORMAT
         self.profile_fps = profile.get_fps()
 
-        depth_scale = self._read_depth_scale()
+        # Provisional. The chain changes the frame's dimensions, so the numbers
+        # this method returns have to come from a frame that has been through
+        # it, not from the profile -- DepthEngine publishes them and DepthInput
+        # sizes its texture from them.
+        self._width = profile.get_width()
+        self._height = profile.get_height()
+
+        # Rebuilt on every open() rather than in __init__: TemporalFilter and
+        # friends carry per-pixel state, and a reconnect must not blend the new
+        # stream against what the previous session left behind.
+        self._chain = self._buildChain()
+
+        depth_scale = self._readFirstProcessedFrame()
         return self._width, self._height, depth_scale
+
+    def _buildChain(self):
+        """Instantiate the preprocessing filters.
+
+        Resolved by getattr and reported separately from the Pipeline import on
+        purpose: a build that lacks one of these classes is an SDK that *is*
+        installed but is the wrong version, and "not installed" would send you
+        looking in entirely the wrong place. The message names the one missing.
+        """
+        import pyorbbecsdk
+
+        chain = []
+
+        for name in self.FILTER_NAMES:
+            factory = getattr(pyorbbecsdk, name, None)
+            if factory is None:
+                raise DepthSourceError(
+                    "this pyorbbecsdk build has no %s -- the preprocessing "
+                    "chain needs %s" % (name, ", ".join(self.FILTER_NAMES))
+                )
+            chain.append(factory())
+
+        return chain
+
+    def _process(self, depth_frame):
+        """Run the chain. None means the chain swallowed the frame."""
+        for depth_filter in self._chain:
+            depth_frame = depth_filter.process(depth_frame)
+            # A filter is allowed to hold a frame back while it warms up --
+            # TemporalFilter does. That is a timeout, not an error, and read()
+            # already reports None as "nothing arrived this tick".
+            if depth_frame is None:
+                return None
+
+        return depth_frame
 
     def _select_profile(self, profiles, wanted_format):
         """Pick the best profile this source can actually decode.
@@ -221,12 +280,16 @@ class OrbbecSource(DepthSource):
             key=lambda p: (p.get_width() * p.get_height(), p.get_fps()),
         )
 
-    def _read_depth_scale(self):
-        """Pull frames until one reports its depth scale.
+    def _readFirstProcessedFrame(self):
+        """Pull frames until one survives the chain, and return its depth scale.
 
         Only a frame carries the raw-units-to-millimetres factor, so open() has
         to see one. Succeeding here also means open() genuinely implies
         "streaming" rather than merely "device found".
+
+        It also settles the delivered resolution: the chain decimates, so the
+        profile's dimensions are not what read() will hand back. Taking them
+        from a processed frame is what keeps read()'s size check honest.
         """
         deadline = time.monotonic() + self.OPEN_TIMEOUT_S
 
@@ -247,7 +310,18 @@ class OrbbecSource(DepthSource):
             depth_frame = frames.get_depth_frame()
             if depth_frame is None:
                 continue
-            return depth_frame.get_depth_scale()
+
+            # Read the scale off the raw frame: it is a property of the sensor,
+            # and the filters have no reason to preserve it.
+            depth_scale = depth_frame.get_depth_scale()
+
+            depth_frame = self._process(depth_frame)
+            if depth_frame is None:
+                continue
+
+            self._width = depth_frame.get_width()
+            self._height = depth_frame.get_height()
+            return depth_scale
 
         self.close()
         raise DepthSourceError(
@@ -266,20 +340,26 @@ class OrbbecSource(DepthSource):
         if depth_frame is None:
             return None
 
+        depth_frame = self._process(depth_frame)
+        if depth_frame is None:
+            return None
+
         # np.frombuffer gives a read-only view onto memory the SDK will reuse.
         # Copy so the engine can publish it and the main thread can read it
         # long after this iteration.
         data = np.frombuffer(depth_frame.get_data(), dtype=np.uint16)
 
-        # A pixel count that contradicts the profile means the stream is not
-        # really the format we asked for. Reshaping would raise a bare
-        # ValueError about array shapes; the engine catches that and reports it
-        # verbatim, which explains nothing. Say what actually happened instead.
+        # Checked against the dimensions open() measured downstream of the
+        # chain, not against the profile's: decimation makes those two differ
+        # by design. A mismatch here means the chain changed its output size
+        # mid-stream, or the stream is not really the format we asked for.
+        # Reshaping would raise a bare ValueError about array shapes; the
+        # engine catches that and reports it verbatim, which explains nothing.
         expected = self._width * self._height
         if data.size != expected:
             raise DepthSourceError(
-                "expected %d pixels for %dx%d but the frame carried %d -- "
-                "the stream is probably not %s"
+                "expected %d pixels for %dx%d after the filter chain but the "
+                "frame carried %d -- the stream is probably not %s"
                 % (expected, self._width, self._height, data.size, self.DEPTH_FORMAT)
             )
 

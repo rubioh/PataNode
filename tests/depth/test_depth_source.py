@@ -97,6 +97,12 @@ class FakeDepthFrame:
         self._fill = fill
         self._buffer = buffer
 
+    def get_width(self):
+        return self._width
+
+    def get_height(self):
+        return self._height
+
     def get_depth_scale(self):
         return self._scale
 
@@ -192,11 +198,53 @@ def install_fake_sdk(
                 return FakePipeline.next_results.pop(0)
             return FakeFrames(FakeDepthFrame(width, height, scale, buffer=buffer))
 
+    class FakeDecimationFilter:
+        """Subsamples by two on both axes, as the real DecimationFilter does.
+
+        Modelled rather than stubbed out because this is the whole hazard of
+        the preprocessing chain: the delivered frame stops matching the profile
+        the moment decimation is in it. A pass-through stub would let read()'s
+        size check pass here and raise on every real frame.
+
+        Its output buffer is allocated once and rewritten in place, because the
+        SDK's filters reuse theirs the same way. Handing back a fresh buffer
+        per call would quietly mask read()'s .copy() -- the frame would stop
+        aliasing SDK memory for reasons the production path does not enjoy.
+        """
+
+        def __init__(self):
+            self._out = None
+
+        def process(self, frame):
+            source = np.frombuffer(bytes(frame.get_data()), dtype=np.uint16)
+            source = source.reshape((frame.get_height(), frame.get_width()))
+            decimated = source[::2, ::2]
+
+            if self._out is None:
+                self._out = bytearray(decimated.size * 2)
+            self._out[:] = decimated.tobytes()
+
+            return FakeDepthFrame(
+                decimated.shape[1],
+                decimated.shape[0],
+                frame.get_depth_scale(),
+                buffer=self._out,
+            )
+
+    class FakePassThroughFilter:
+        def process(self, frame):
+            return frame
+
     module.Pipeline = FakePipeline
     module.Config = lambda: types.SimpleNamespace(enable_stream=lambda _profile: None)
     module.OBSensorType = types.SimpleNamespace(DEPTH_SENSOR=object())
     module.OBFormat = formats
     module.buffer = buffer
+
+    module.DecimationFilter = FakeDecimationFilter
+    for name in ("ThresholdFilter", "NoiseRemovalFilter", "SpatialAdvancedFilter"):
+        setattr(module, name, FakePassThroughFilter)
+    module.TemporalFilter = FakePassThroughFilter
 
     monkeypatch.setitem(sys.modules, "pyorbbecsdk", module)
     return module
@@ -210,10 +258,15 @@ def test_a_missing_sdk_raises_depth_source_error_not_import_error(monkeypatch):
         OrbbecSource().open()
 
 
-def test_open_reports_the_profile_and_the_sensor_depth_scale(monkeypatch):
+def test_open_reports_the_delivered_size_not_the_profile_size(monkeypatch):
+    # The chain decimates, so 1280x800 off the sensor is delivered as 640x400.
+    # open() has to report what read() will actually hand back: DepthEngine
+    # publishes these numbers and DepthInput sizes its GL texture from them, so
+    # returning the profile's would allocate a texture four times too large and
+    # every upload would mismatch. The depth scale is the sensor's either way.
     install_fake_sdk(monkeypatch, width=1280, height=800, scale=0.25)
 
-    assert OrbbecSource().open() == (1280, 800, 0.25)
+    assert OrbbecSource().open() == (640, 400, 0.25)
 
 
 def test_open_rejects_the_compressed_default_and_takes_y16(monkeypatch):
@@ -253,7 +306,8 @@ def test_open_falls_through_to_the_next_preferred_frame_rate(monkeypatch):
     # full resolution matters more than frame rate.
     source = OrbbecSource()
 
-    assert source.open()[:2] == (1280, 800)
+    # 1280x800 selected, delivered at half that through the chain.
+    assert source.open()[:2] == (640, 400)
     # Asserted explicitly: the RLE default shares this resolution, so checking
     # only the size would pass even if the format were still wrong.
     assert (source.profile_format, source.profile_fps) == ("Y16", 15)
@@ -272,7 +326,8 @@ def test_open_falls_back_to_the_largest_y16_when_no_preference_matches(monkeypat
     )
 
     # An unusual device should still stream rather than report unavailable.
-    assert OrbbecSource().open()[:2] == (848, 480)
+    # 848x480 selected, halved by the chain.
+    assert OrbbecSource().open()[:2] == (424, 240)
 
 
 def test_open_raises_when_no_uncompressed_profile_exists(monkeypatch):
@@ -287,19 +342,21 @@ def test_open_raises_when_no_uncompressed_profile_exists(monkeypatch):
         OrbbecSource().open()
 
 
-def test_read_rejects_a_frame_whose_size_contradicts_the_profile(monkeypatch):
+def test_read_rejects_a_frame_whose_size_contradicts_what_open_measured(monkeypatch):
     module = install_fake_sdk(monkeypatch, width=1280, height=800)
     source = OrbbecSource()
     source.open()
 
-    # A frame carrying fewer pixels than the profile promises: the signature of
-    # a compressed stream. It must surface as a DepthSourceError the engine can
-    # report, not a bare ValueError about array shapes.
+    # A frame carrying fewer pixels than open() settled on: the signature of a
+    # compressed stream, or of a chain that changed its output size mid-flight.
+    # It must surface as a DepthSourceError the engine can report, not a bare
+    # ValueError about array shapes.
     module.Pipeline.next_results.append(
-        FakeFrames(FakeDepthFrame(64, 1, 1.0, buffer=bytearray(128)))
+        FakeFrames(FakeDepthFrame(128, 2, 1.0, buffer=bytearray(128 * 2 * 2)))
     )
 
-    with pytest.raises(DepthSourceError, match="1024000"):
+    # 256000, the post-decimation count -- not the profile's 1024000.
+    with pytest.raises(DepthSourceError, match="256000"):
         source.read()
 
 
@@ -311,8 +368,55 @@ def test_read_returns_a_reshaped_uint16_frame(monkeypatch):
     frame = source.read()
 
     assert frame.dtype == np.uint16
-    assert frame.shape == (800, 1280)
+    assert frame.shape == (400, 640)
+    # Decimation subsamples rather than inventing values, so the fill survives.
     assert (frame == 1234).all()
+
+
+def test_open_names_the_filter_an_older_sdk_build_is_missing(monkeypatch):
+    # The chain's classes arrived in pyorbbecsdk 2.x. A build without them is
+    # installed but too old, and reporting that as "not installed" sends you
+    # hunting for a missing package that is sitting right there -- which is
+    # exactly what a plain `from pyorbbecsdk import DecimationFilter` inside
+    # the ImportError guard did.
+    module = install_fake_sdk(monkeypatch)
+    del module.SpatialAdvancedFilter
+
+    with pytest.raises(DepthSourceError, match="SpatialAdvancedFilter"):
+        OrbbecSource().open()
+
+
+def test_a_filter_swallowing_a_frame_reads_as_a_timeout(monkeypatch):
+    # TemporalFilter holds frames back while it warms up. That is None from
+    # read(), which the engine already treats as "nothing this tick" -- not an
+    # exception, which it would treat as a disconnect and back off from.
+    module = install_fake_sdk(monkeypatch)
+    source = OrbbecSource()
+    source.open()
+
+    class SwallowingFilter:
+        def process(self, _frame):
+            return None
+
+    module.TemporalFilter = SwallowingFilter
+    source._chain[-1] = SwallowingFilter()
+
+    assert source.read() is None
+
+
+def test_a_reconnect_rebuilds_the_chain(monkeypatch):
+    # The filters carry per-pixel state. Reusing the instances across a
+    # reconnect would blend the new stream against whatever the dead one left
+    # behind, which shows up as ghosting for the first second after a replug.
+    install_fake_sdk(monkeypatch)
+    source = OrbbecSource()
+
+    source.open()
+    first = list(source._chain)
+    source.close()
+    source.open()
+
+    assert all(new is not old for new, old in zip(source._chain, first))
 
 
 def test_read_owns_its_buffer_so_the_sdk_may_reuse_its_own(monkeypatch):

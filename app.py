@@ -1,9 +1,9 @@
-import copy
 import time
 
 import numpy as np
 from PyQt5.QtCore import QObject, QRunnable, QThreadPool, QTimer, pyqtSignal, pyqtSlot
 
+import profiler
 from audio.audio_conf import list_audio_features
 from audio.audio_pipeline import AudioEngine
 from depth.depth_engine import DepthEngine
@@ -20,12 +20,18 @@ class WorkerSignals(QObject):
 
 
 class Worker(QRunnable):
-    def __init__(self, job_function, *args, **kwargs):
+    def __init__(self, job_function, signals, *args, **kwargs):
         super().__init__()
         self.job_function = job_function
         self.args = args
         self.kwargs = kwargs
-        self.signals = WorkerSignals()
+        # Handed in, not built here. A WorkerSignals per job meant a QObject
+        # constructed, connected and destroyed on every tick -- 105 a second
+        # between the audio and light timers. Measured with --profile-events:
+        # 207 DeferredDelete events a second costing 117 ms/s of the GUI
+        # thread, plus 33 ms/s delivering the queued finished signals. The
+        # signals object is per job kind and lives as long as the app.
+        self.signals = signals
 
     @pyqtSlot()
     def run(self):
@@ -95,37 +101,57 @@ class PataShadeApp(PataNode):
 
     def initAudioTimer(self):
         self.audio_engine.start_recording()
+        # One signals object for the lifetime of the app, connected once.
+        self.audio_signals = WorkerSignals()
+        self.audio_signals.finished.connect(self.on_audio_job_finished)
         self.audio_timer = QTimer()
         self.audio_timer.timeout.connect(self.start_audio_jobs)
 
     def initLightTimer(self):
+        self.light_signals = WorkerSignals()
+        self.light_signals.finished.connect(self.on_light_job_finished)
         self.light_timer = QTimer()
         self.light_timer.timeout.connect(self.start_light_jobs)
 
     def initShaderQTimer(self):
         self.shader_timer = QTimer()
-        self.shader_timer.timeout.connect(self.start_shader_jobs)
+        self.shader_timer.timeout.connect(self.requestShaderRepaint)
 
     def initPataserverQTimer(self):
+        self.server_signals = WorkerSignals()
+        self.server_signals.finished.connect(self.on_shader_job_finished)
         self.server_timer = QTimer()
         self.server_timer.timeout.connect(self.start_pataserver_jobs)
 
     # Audio thread
     def start_audio_jobs(self):
-        worker = Worker(self.update_audio)
-        worker.signals.finished.connect(self.on_audio_job_finished)
-        self.threadpool.start(worker)
+        # Timed: --profile-events charges ~170 ms/s to timer events that are
+        # not the frame timer, and these two are most of them. Queueing a
+        # runnable should be free, so if it is not, that is worth knowing.
+        with profiler.PROFILER.gui_span("dispatch job audio"):
+            self.threadpool.start(Worker(self.update_audio, self.audio_signals))
 
     def on_audio_job_finished(self):
-        self.set_audio_features()
-        if self.session_player is not None:
-            self.session_player.tick(self.last_audio_features, time.monotonic())
+        # Runs on the GUI thread, 60 times a second, ahead of any paint event
+        # queued after it. Timed because session_player.tick writes parameters
+        # across the whole scene during a fade, so unlike the audio analysis
+        # itself its cost grows with the node count.
+        with profiler.PROFILER.gui_span("slot audio (features + session tick)"):
+            self.set_audio_features()
+            if self.session_player is not None:
+                self.session_player.tick(self.last_audio_features, time.monotonic())
 
     def update_audio(self):
         self.audio_engine()
 
     def set_audio_features(self):
-        af = copy.deepcopy(self.audio_engine.features)
+        # A shallow copy is enough, and is the only copy needed: AudioEngine
+        # publishes each frame's features as a fresh dict it never mutates
+        # again (audio/audio_pipeline.py), so the values are stable. The copy
+        # is here only because the three on_* keys below are added on top.
+        # This used to be a deepcopy, which raced with the publisher and cost
+        # 73 us on the GUI thread every frame.
+        af = dict(self.audio_engine.features)
 
         try:
             af["on_kick"] = 1 if self.last_kick_count != af["kick_count"] else 0
@@ -147,26 +173,36 @@ class PataShadeApp(PataNode):
                 color=self.last_main_colors, audio_features=self.last_audio_features
             )
 
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_light_job_finished)
-        self.threadpool.start(worker)
+        with profiler.PROFILER.gui_span("dispatch job lumiere"):
+            self.threadpool.start(Worker(job, self.light_signals))
 
     def on_light_job_finished(self):
         #       print("Light Job done")
         pass
 
-    # Shader thread
-    def start_shader_jobs(self):
-        job = self.shader_widget.update
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_shader_job_finished)
-        self.threadpool.start(worker)
+    def requestShaderRepaint(self):
+        """Watchdog tick. Restarts the render loop if it is not turning.
+
+        The loop drives itself -- each frame asks for the next one -- so in
+        normal running this has nothing to do. It exists for the cases where
+        no frame is in flight to re-arm from: the shader window hidden and
+        shown again, or a frame lost to an exception.
+
+        Called directly, not through the threadpool. Routing it through a
+        QRunnable, a 5-thread pool shared with the audio (60 Hz) and light
+        (45 Hz) jobs, and a queued finished signal cost 9-12 ms of latency per
+        frame, measured -- for a job whose entire content is asking this same
+        thread to draw.
+        """
+        self.shader_widget.ensureRenderLoopRunning()
 
     def start_pataserver_jobs(self):
-        job = self.server.update
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_shader_job_finished)
-        self.threadpool.start(worker)
+        # NOTE: PataServer.update() is a bare time.sleep(1/60), and the HTTP
+        # server already runs serve_forever on its own thread -- so with
+        # --server this timer permanently parks one of the pool's five threads
+        # doing nothing. Left in place because nothing here needs it to change,
+        # but it is dead weight.
+        self.threadpool.start(Worker(self.server.update, self.server_signals))
 
     def on_shader_job_finished(self):
         pass
@@ -175,7 +211,13 @@ class PataShadeApp(PataNode):
     def start_jobs(self):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
-        self.shader_timer.start(int(1 / 60 * 1000))
+        # A watchdog, not the pacemaker. ShaderWidget.paintGL re-arms itself at
+        # the end of every frame, so in normal running this never has anything
+        # to do. It exists to restart the loop when no paint is in flight to
+        # re-arm it -- the shader window hidden and shown again, or a frame
+        # lost to an exception. Deliberately slow: a fast timer here is what
+        # was starving the native paint message in the first place.
+        self.shader_timer.start(100)
         if self.args.server:
             self.server_timer.start(int(1 / 60 * 1000))
 

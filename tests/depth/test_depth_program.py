@@ -22,6 +22,8 @@ from depth.depth_source import SyntheticSource
 from program.input.depth_input.depth_input import (
     DEFAULT_FAR_MM,
     DEFAULT_NEAR_MM,
+    DEFAULT_OSCILLATE,
+    DEFAULT_PERIOD_MM,
     DepthInput,
     DepthInputNode,
 )
@@ -41,6 +43,8 @@ EXPECTED_UNIFORMS = {
     "depth_scale",
     "flip_x",
     "flip_y",
+    "oscillate",
+    "period_mm",
 }
 
 # depth_map is a sampler unit and depth_scale is reported by the sensor;
@@ -121,6 +125,16 @@ def test_every_binding_target_exists_as_an_attribute(ctx):
 
     assert program.near_mm == DEFAULT_NEAR_MM
     assert program.far_mm == DEFAULT_FAR_MM
+
+
+def test_the_banded_mode_is_off_by_default(ctx):
+    # Scenes saved before this mode existed carry no value for either uniform,
+    # so deserialize leaves the defaults in place. They have to reproduce the
+    # plain near..far ramp those scenes were built against.
+    program = make_program(ctx)
+
+    assert program.oscillate == DEFAULT_OSCILLATE == 0.0
+    assert program.period_mm == DEFAULT_PERIOD_MM
 
 
 def test_without_an_engine_it_renders_transparent_black(ctx):
