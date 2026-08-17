@@ -51,18 +51,24 @@ can stay.
 ## Architecture
 
 One new file, `depth/depth_process.py`, containing the parent-side
-`ProcessSource` and the child entry point. `make_source_factory` gains a
-branch:
+`ProcessSource` and the child entry point. `make_source_factory` changes what
+`orbbec` maps to:
 
-| `--depth-source` | Source | Notes |
-|---|---|---|
-| `orbbec` | `ProcessSource` | new default |
-| `orbbec-inproc` | `OrbbecSource` | today's behaviour, kept for diagnosis |
-| `synthetic` | `SyntheticSource` | unchanged |
+| `--depth-source` | Source |
+|---|---|
+| `orbbec` | `ProcessSource` |
+| `synthetic` | `SyntheticSource` |
 
-**Nothing else changes.** `DepthEngine`, `DepthInput`, `DepthStatus`, the
-retry/backoff logic and every existing depth test stay as they are. The seam
-already exists: `DepthSource` is three methods.
+There is deliberately **no in-process Orbbec option**. Capture either runs in
+the child or not at all: two ways to run the camera would mean two behaviours
+to reason about when something goes wrong, and the whole point of this work is
+that the in-process one is not viable.
+
+`OrbbecSource` is not deleted — it is what the child runs, and its own tests
+keep exercising it directly.
+
+`DepthEngine`, `DepthInput`, `DepthStatus` and the retry/backoff logic are
+untouched. The seam already exists: `DepthSource` is three methods.
 
 ```python
 open()  -> (width, height, depth_scale)
@@ -199,8 +205,25 @@ to the real one), so the parent side is testable without a camera:
   the test process, read through the same code path, including a torn-read
   retry driven by mutating `seq` mid-copy
 
-Existing `tests/depth/` is untouched. New tests land in
-`tests/depth/test_depth_process.py`.
+New tests land in `tests/depth/test_depth_process.py`.
+
+Three existing assertions change, because they pin the factory mapping that
+this work redefines:
+
+- `tests/depth/test_app_wiring.py:50` — `make_source_factory("orbbec")` now
+  yields a `ProcessSource`
+- `tests/depth/test_depth_source.py:516` — same
+- `tests/depth/test_depth_source.py:517` — the unknown-kind fallback likewise
+
+Everything else under `tests/depth/` is untouched, including the whole of
+`test_depth_source.py`'s coverage of `OrbbecSource` itself: the filter chain,
+profile selection and post-chain dimensions are all still exercised directly,
+because the child runs that same class.
+
+Losing the in-process path does cost the A/B that diagnosed this problem. That
+is recoverable when needed by stubbing `OrbbecSource._process` in a throwaway
+harness, which is exactly how the measurement above was taken — it does not
+need to be a shipped flag.
 
 **Acceptance, measured against the real camera** with the same A/B harness
 used to diagnose this: `--depth-source orbbec` should reach ~72 fps with p99
