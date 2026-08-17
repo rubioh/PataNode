@@ -227,3 +227,52 @@ def test_shutdown_ends_the_child_loop():
     thread.join(5)
 
     assert not thread.is_alive()
+
+
+from depth.depth_process import ProcessSource, _reset_child_for_tests
+from depth.depth_source import DepthSourceError
+
+
+def child_with_fake_source(conn):
+    """A child target that serves FakeSource. Must be importable at module
+    level, because spawn pickles it by qualified name."""
+    _child_main(conn, FakeSource)
+
+
+@pytest.fixture(autouse=True)
+def fresh_child():
+    _reset_child_for_tests()
+    yield
+    _reset_child_for_tests()
+
+
+def test_open_returns_the_childs_dimensions():
+    source = ProcessSource(child_target=child_with_fake_source)
+    try:
+        assert source.open() == (4, 3, 0.5)
+    finally:
+        source.close()
+
+
+def test_read_returns_frames_then_none_until_the_next_one():
+    source = ProcessSource(child_target=child_with_fake_source)
+    try:
+        source.open()
+
+        deadline = time.time() + 10
+        frame = None
+        while frame is None and time.time() < deadline:
+            frame = source.read()
+
+        assert frame is not None
+        assert frame.shape == (3, 4)
+        assert frame.dtype == np.uint16
+    finally:
+        source.close()
+
+
+def test_read_before_open_is_an_error():
+    source = ProcessSource(child_target=child_with_fake_source)
+
+    with pytest.raises(DepthSourceError):
+        source.read()

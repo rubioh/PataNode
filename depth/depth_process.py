@@ -10,9 +10,13 @@ A child process has its own GIL, so the filters stop competing with rendering
 and all five can be kept rather than traded away for frame rate.
 """
 
+import atexit
+import multiprocessing
 from multiprocessing import shared_memory
 
 import numpy as np
+
+from depth.depth_source import DepthSource, DepthSourceError
 
 # Frame slots start here. One page, far more than the header needs, so the
 # slots land on a page boundary and the layout stays readable in a hex dump.
@@ -217,3 +221,175 @@ def _child_main(conn, source_factory=None):
             conn.close()
         except Exception:
             pass
+
+
+# How long open() waits for the child to report. A cold child pays a fresh
+# interpreter, the pyorbbecsdk import and the camera open; 15 s is generous
+# for all three and still bounded. This wait happens on DepthEngine's capture
+# thread, never on the GUI thread, so rendering is unaffected by it.
+OPEN_TIMEOUT_S = 15.0
+
+_child = None
+
+
+class _Child:
+    """Owns the capture process across ProcessSource instances.
+
+    DepthEngine builds a fresh source from the factory on every retry, so the
+    process cannot belong to a ProcessSource: a release/re-acquire cycle would
+    kill and respawn it, and a live session cycling through states would pay
+    seconds of black depth each time.
+
+    Module-level state, which is the ugly part of this design. Killing the
+    child on every release would be cleaner code and worse behaviour.
+    """
+
+    def __init__(self, target):
+        self.target = target
+        self.process = None
+        self.conn = None
+
+    def alive(self):
+        return self.process is not None and self.process.is_alive()
+
+    def ensure_started(self):
+        if self.alive():
+            return
+
+        self.shutdown()
+
+        # spawn, never fork: forking a process holding a GL context, Qt state
+        # and an open camera is exactly the class of intermittent failure this
+        # work exists to remove.
+        context = multiprocessing.get_context("spawn")
+        self.conn, child_conn = context.Pipe()
+        self.process = context.Process(
+            target=self.target, args=(child_conn,), name="depth-capture", daemon=True
+        )
+        self.process.start()
+        # The parent's copy of the child end is dead weight, and leaving it
+        # open means the child never sees EOF if the parent dies.
+        child_conn.close()
+
+    def start_stream(self):
+        self.ensure_started()
+        self.conn.send(("stream",))
+
+        if not self.conn.poll(OPEN_TIMEOUT_S):
+            raise DepthSourceError(
+                "depth process did not report within %ss" % OPEN_TIMEOUT_S
+            )
+
+        message = self.conn.recv()
+
+        if message[0] == "error":
+            raise DepthSourceError(message[1])
+
+        if message[0] != "ready":
+            raise DepthSourceError(
+                "unexpected message from depth process: %r" % (message,)
+            )
+
+        return message[1], message[2], message[3], message[4]
+
+    def stop_stream(self):
+        if not self.alive():
+            return
+        try:
+            self.conn.send(("stop",))
+        except (BrokenPipeError, OSError):
+            pass
+
+    def shutdown(self):
+        if self.process is not None:
+            try:
+                if self.process.is_alive():
+                    self.conn.send(("shutdown",))
+                    self.process.join(2.0)
+            except (BrokenPipeError, OSError):
+                pass
+
+            if self.process.is_alive():
+                self.process.terminate()
+                self.process.join(1.0)
+
+        if self.conn is not None:
+            try:
+                self.conn.close()
+            except OSError:
+                pass
+
+        self.process = None
+        self.conn = None
+
+
+def _get_child(target):
+    global _child
+
+    if _child is None or _child.target is not target:
+        if _child is not None:
+            _child.shutdown()
+        _child = _Child(target)
+
+    return _child
+
+
+def _reset_child_for_tests():
+    """Tear down the singleton. Tests only."""
+    global _child
+
+    if _child is not None:
+        _child.shutdown()
+        _child = None
+
+
+def _shutdown_at_exit():
+    _reset_child_for_tests()
+
+
+atexit.register(_shutdown_at_exit)
+
+
+class ProcessSource(DepthSource):
+    """A DepthSource whose capture runs in another process.
+
+    Implements the same three methods as OrbbecSource, so DepthEngine,
+    DepthInput and DepthStatus need no knowledge that anything changed.
+    """
+
+    def __init__(self, child_target=None):
+        self._target = child_target or _default_child_target
+        self._ring = None
+        self._last_seq = 0
+
+    def open(self):
+        child = _get_child(self._target)
+        name, width, height, scale = child.start_stream()
+
+        self._ring = FrameRing.attach(name)
+        self._last_seq = 0
+
+        return width, height, scale
+
+    def read(self):
+        if self._ring is None:
+            raise DepthSourceError("read() on a ProcessSource that is not open")
+
+        frame, seq = self._ring.read(self._last_seq)
+        self._last_seq = seq
+
+        return frame
+
+    def close(self):
+        if self._ring is not None:
+            self._ring.close()
+            self._ring = None
+
+        child = _child
+        if child is not None:
+            child.stop_stream()
+
+
+def _default_child_target(conn):
+    """Module-level so spawn can pickle it by qualified name."""
+    _child_main(conn)
