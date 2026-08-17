@@ -475,3 +475,45 @@ def test_a_frame_resets_the_wedge_timer(monkeypatch):
         assert len(seen) > 1, "self._last_frame_at never advanced"
     finally:
         source.close()
+
+
+def test_reopening_reuses_the_same_process():
+    # A live session cycling through states releases and re-acquires the
+    # engine. Respawning there would cost a fresh interpreter, the SDK import
+    # and a camera open -- seconds of black depth, mid-set.
+    first = ProcessSource(child_target=child_with_fake_source)
+    first.open()
+    pid = depth_process._child.process.pid
+    first.close()
+
+    second = ProcessSource(child_target=child_with_fake_source)
+    try:
+        second.open()
+        assert depth_process._child.process.pid == pid
+    finally:
+        second.close()
+
+
+def test_a_dead_child_is_replaced_on_the_next_open():
+    source = ProcessSource(child_target=child_with_fake_source)
+    source.open()
+    pid = depth_process._child.process.pid
+    depth_process._child.process.terminate()
+    depth_process._child.process.join(5)
+    source.close()
+
+    replacement = ProcessSource(child_target=child_with_fake_source)
+    try:
+        replacement.open()
+        assert depth_process._child.process.pid != pid
+        assert depth_process._child.alive()
+    finally:
+        replacement.close()
+
+
+def test_close_does_not_kill_the_process():
+    source = ProcessSource(child_target=child_with_fake_source)
+    source.open()
+    source.close()
+
+    assert depth_process._child.alive()
