@@ -243,3 +243,50 @@ Secondary check: the freeze log (`PATANODE_FREEZE_LOG=1`) over a real session
 should show the 104-126 ms stalls either gone or substantially rarer. They are
 pile-ups involving audio and the preview encode as well, so this work removes
 the dominant term but is not expected to eliminate them entirely.
+
+## Result
+
+Measured 2026-08-17, same machine as the baseline, camera connected
+(`lsusb`: `2bc5:0670 Orbbec 3D Technology International, Inc Orbbec(R)
+Gemini(TM)`), same harness (`tools/depth_bench.py`), identical command and
+60 s duration:
+
+```bash
+PATASHADE_INPUT_DEVICE=9 .venv/bin/python tools/depth_bench.py \
+    --label after --seconds 60 --out docs/superpowers/plans/depth-bench-after.json
+```
+
+| metric | before | after |
+| --- | ---: | ---: |
+| fps | 66.52 | 71.99 |
+| p50 | 13.98 | 13.89 |
+| p95 | 20.49 | 14.13 |
+| p99 | 22.43 | 14.35 |
+| max | 29.34 | 15.82 |
+| over_30ms | 0 | 0 |
+| over_50ms | 0 | 0 |
+
+Pass criteria (fixed before the measurement, from the in-process A/B):
+
+- `fps` ≥ 71.0 — **71.99, PASS**
+- `p99` ≤ 17.0 ms — **14.35, PASS**
+- `p50` unchanged within 0.5 ms of 13.98 — **13.89, delta 0.09 ms, PASS**
+
+All three pass criteria were met. The after numbers essentially match the
+chain-disabled arm of the original A/B (71.96 fps / 15.63 ms p99) while still
+running all five filters in the child process, which is exactly what the
+design set out to reach. `fps` landed above 71.0 directly, so the
+`PATANODE_FREEZE_LOG=1` fallback investigation for the 68-71 fps band was not
+needed.
+
+Side benefit observed but not part of the pass criteria: the teardown
+`malloc(): unaligned fastbin chunk detected` `SIGABRT` that was expected
+during Qt/GL/USB shutdown (per the task brief) **did not occur** on this run
+— the benchmark process exited with code 0. Moving the SDK into a child
+process appears to have also removed that teardown crash, though this is a
+single run and not a controlled test of that specific claim.
+
+A pre-existing unrelated `KeyError: 'low'` in `program/utils/blend/blend.py`
+printed once during the run, as expected; the harness does not count frames
+that raised, so it did not affect the numbers. No orphaned `depth-capture`
+process and no leftover block in `/dev/shm` after the run.
