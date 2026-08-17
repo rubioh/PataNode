@@ -160,6 +160,16 @@ release, is cleaner code and worse behaviour: state churn during a live
 session would mean repeated multi-second gaps before depth returns. The trade
 is deliberate.
 
+The keep-alive has a standing cost, and it is worth stating plainly: once the
+last `Depth Input` node is removed the child does not exit. `stop_stream()`
+closes the camera, but the process stays up with the SDK still loaded —
+**~282 MB RSS**, the figure sampled while streaming in the runtime evidence
+below, since closing a device handle does not unload the library. That memory
+is the standing price of the multi-second respawn it avoids. It is bounded —
+one child, never more — and it is released at app exit by the `atexit` hook. A
+future reader wondering why an app with no depth node in sight is holding a
+third of a gigabyte is looking at this trade.
+
 `spawn`, not `fork`. Forking a process holding a GL context, Qt state and an
 open camera is a source of exactly the intermittent failures this work exists
 to remove.
@@ -183,9 +193,10 @@ fixed in passing: today a missing camera makes `Pipeline()` block the GIL on
 every reconnect attempt.
 
 **Shared memory cleanup.** The child unlinks its block in a `finally`. If the
-child is `SIGKILL`ed the block leaks a file in `/dev/shm`; the name embeds the
-child pid so a leak cannot collide with the next run. Python's
-Python's `resource_tracker` also warns when an attaching process exits, and an
+child is `SIGKILL`ed the block leaks a file in `/dev/shm`; the name is the
+random one `SharedMemory(create=True)` generates (`psm_09fd87b7` and the like),
+so a leak cannot collide with the next run. Python's
+`resource_tracker` also warns when an attaching process exits, and an
 earlier draft of this spec called `unregister` after attaching to suppress
 that. That was wrong on both counts and has been removed: the tracker fd is
 inherited by children under both spawn and fork, so all processes share one
@@ -271,6 +282,12 @@ Pass criteria (fixed before the measurement, from the in-process A/B):
 - `fps` ≥ 71.0 — **71.99, PASS**
 - `p99` ≤ 17.0 ms — **14.35, PASS**
 - `p50` unchanged within 0.5 ms of 13.98 — **13.89, delta 0.09 ms, PASS**
+
+The load-bearing evidence is the tail: p95 20.49 → 14.13 and p99 22.43 →
+14.35. The `p50` criterion is a guard against a regression, not corroboration
+of the win, and it should not be read as one: both arms are pinned by the
+72 fps pacer (13.89 ms ≈ 1/72), and the after arm's 71.99 fps *is* that cap, so
+how much headroom is actually left is not something this measurement can say.
 
 All three pass criteria were met. The after numbers essentially match the
 chain-disabled arm of the original A/B (71.96 fps / 15.63 ms p99) while still
