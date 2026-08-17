@@ -55,6 +55,11 @@ if __name__ == "__main__":
 
     # Note: This import is here to avoid a circular import
     import app
+    import freeze_log
+
+    # No-op unless PATANODE_FREEZE_LOG is set. After `import app`, because it
+    # wraps ShaderWidget.drawFrame to keep its heartbeat.
+    freeze_log.install()
 
     the_app = QApplication(sys.argv)
 
@@ -71,5 +76,7 @@ if __name__ == "__main__":
 
     if args.open:
         patanode.openFile(args.open)
+
+    the_app.aboutToQuit.connect(freeze_log.report)
 
     sys.exit(the_app.exec_())
