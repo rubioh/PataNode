@@ -330,9 +330,9 @@ class _Child:
         return message[1], message[2], message[3], message[4]
 
     def stop_stream(self):
+        self.session = None
         if not self.alive():
             return
-        self.session = None
         try:
             self.conn.send(("stop",))
             # Consume the child's ("stopped",) reply here, rather than
@@ -460,7 +460,14 @@ class ProcessSource(DepthSource):
             # The most likely cause is the child having already unlinked
             # this block -- e.g. a stale reply from a torn-down session (see
             # start_stream's drain) pointed at a name that no longer exists.
-            child.stop_stream()
+            # Only stop the stream if it is still *our* session (child.session
+            # still equals the name we were handed): two overlapping open()
+            # calls -- a stale caller still inside a cold start_stream() while
+            # a newer one has already replaced it -- would otherwise let this
+            # unconditionally kill a session that is not ours to stop, the
+            # same failure Important 2 fixed for close().
+            if child.session == name:
+                child.stop_stream()
             self._child = None
             self._session = None
             raise DepthSourceError("depth process went away: %s" % error) from error
@@ -478,8 +485,8 @@ class ProcessSource(DepthSource):
             self._last_seq = seq
             return frame
 
-        deadline = time.time() + READ_TIMEOUT_S
-        while time.time() < deadline:
+        deadline = time.monotonic() + READ_TIMEOUT_S
+        while time.monotonic() < deadline:
             time.sleep(_READ_POLL_INTERVAL_S)
             frame, seq = self._ring.read(self._last_seq)
             if frame is not None:

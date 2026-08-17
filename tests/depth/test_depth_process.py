@@ -282,9 +282,17 @@ def test_read_returns_frames_then_none_until_the_next_one(monkeypatch):
         last_seq = source._last_seq
         monkeypatch.setattr(source._ring, "read", lambda seq: (None, seq))
 
-        started = time.time()
+        # Bounded above (does not idle out past the shrunk budget) and below
+        # (actually blocks for it rather than returning instantly, which is
+        # Critical 2's whole point -- an instant return here would busy-spin
+        # DepthEngine's capture loop in production and no other test would
+        # catch it, since every other assertion in this file only cares that
+        # a frame eventually arrives).
+        started = time.monotonic()
         assert source.read() is None
-        assert time.time() - started < 0.2
+        elapsed = time.monotonic() - started
+        assert elapsed >= 0.02
+        assert elapsed < 0.2
         assert source._last_seq == last_seq
     finally:
         source.close()
@@ -337,6 +345,17 @@ def test_close_on_a_stale_instance_does_not_stop_the_current_session():
     stale.close()
 
     try:
+        # Let the stray ("stop",) -- if the bug is present -- actually land
+        # and take effect, rather than racing it.
+        time.sleep(0.3)
+
+        # Drain whatever the child buffered into the ring before/around the
+        # stray stop: with the bug present the child unlinked the ring and
+        # exited its capture loop, but frames already written before that are
+        # still readable, so a single catch-up read must not be mistaken for
+        # "still streaming".
+        current.read()
+
         deadline = time.time() + 10
         frame = None
         while frame is None and time.time() < deadline:
