@@ -333,6 +333,48 @@ class PataNode(NodeEditorWindow):
                                     value
                                 )
 
+    def updatePhonePreviews(self, audio_features):
+        """Keep self.previews fresh for the phone's /get_image/ route.
+
+        Only ever read by server.py's /get_image/ handler, so render() skips
+        this entirely without --server. It used to run regardless, encoding a
+        BMP per graph per frame and usually throwing it away: 4765 calls
+        costing 2113 ms over 70 s, about 30 ms of every second on the thread
+        that also has to render.
+
+        The version check is what makes it cheap, and it used to be dead code.
+        The membership test asked whether an *int* id was in a dict keyed by
+        str(id) -- always false, so the first branch always fired and the
+        elif that compared versions never ran at all.
+
+        Only non-current graphs need rendering here: SubWindow.render sets
+        should_update_preview from its own nodes' flags, so the current graph
+        already produces its preview through render()'s normal path below.
+        Rendering it again here would be duplicate work.
+        """
+        for graph in self.graphs.values():
+            if graph.should_update_preview():
+                graph.render(audio_features, True)
+
+            if not graph.preview:
+                continue
+
+            key = str(graph.unique_session_id)
+            cached = self.previews.get(key)
+
+            if cached is not None and cached[0] == graph.version:
+                # The phone already has this version. version is bumped on
+                # exactly the frames preview is reassigned (SubWindow.render),
+                # so it is a faithful "the picture changed" marker.
+                continue
+
+            self.previews[key] = (
+                graph.version,
+                self.create_bmp_in_memory(
+                    graph.preview[0][0], graph.preview[0][1], graph.preview[1]
+                ),
+            )
+
     def render(self, audio_features=None):
         while len(self.queue) > 0:
             command = self.queue.pop(0)
@@ -342,18 +384,13 @@ class PataNode(NodeEditorWindow):
                     self.setActiveSubWindow(self.graphs[id].subwnd)
                     self.showShaderWindowFromPhone()
 
+        # Every graph needs the mapping, not just the visible one: the render
+        # below reads it off whichever graph is current.
         for graph in self.graphs.values():
             graph.mapping = self.mapping
-            if graph.should_update_preview():
-                graph.render(audio_features, True)
-            if graph.preview:
-                image = self.create_bmp_in_memory(
-                    graph.preview[0][0], graph.preview[0][1], graph.preview[1]
-                )
-                if graph.unique_session_id not in self.previews:
-                    self.previews[str(graph.unique_session_id)] = (graph.version, image)
-                elif self.previews[str(graph.unique_session_id)][0] != graph.version:
-                    self.previews[str(graph.unique_session_id)] = (graph.version, image)
+
+        if getattr(self.args, "server", False):
+            self.updatePhonePreviews(audio_features)
 
         # TODO: logic for choosing the rendering program
         if self.current_node_editor_widget is None:
