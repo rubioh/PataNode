@@ -229,6 +229,7 @@ def test_shutdown_ends_the_child_loop():
     assert not thread.is_alive()
 
 
+from depth import depth_process
 from depth.depth_process import ProcessSource, _reset_child_for_tests
 from depth.depth_source import DepthSourceError
 
@@ -254,7 +255,7 @@ def test_open_returns_the_childs_dimensions():
         source.close()
 
 
-def test_read_returns_frames_then_none_until_the_next_one():
+def test_read_returns_frames_then_none_until_the_next_one(monkeypatch):
     source = ProcessSource(child_target=child_with_fake_source)
     try:
         source.open()
@@ -267,6 +268,24 @@ def test_read_returns_frames_then_none_until_the_next_one():
         assert frame is not None
         assert frame.shape == (3, 4)
         assert frame.dtype == np.uint16
+
+        # "...then None until the next one": once read() has caught up to
+        # the ring, a call that sees no new write must return None, not
+        # replay the last frame. FakeSource is unpaced -- the child writes
+        # far faster than 31fps -- so a second *live* call almost always
+        # finds a frame already waiting, which would let this assertion
+        # pass by luck rather than by exercising the "no new write" path.
+        # Stubbing the ring's read makes "no new write" deterministic, and
+        # shrinking READ_TIMEOUT_S keeps the wait milliseconds rather than
+        # the full 200ms production budget.
+        monkeypatch.setattr(depth_process, "READ_TIMEOUT_S", 0.02)
+        last_seq = source._last_seq
+        monkeypatch.setattr(source._ring, "read", lambda seq: (None, seq))
+
+        started = time.time()
+        assert source.read() is None
+        assert time.time() - started < 0.2
+        assert source._last_seq == last_seq
     finally:
         source.close()
 
@@ -276,3 +295,53 @@ def test_read_before_open_is_an_error():
 
     with pytest.raises(DepthSourceError):
         source.read()
+
+
+def test_open_close_reopen_streams_frames_each_time():
+    """Regression: stop_stream used to leave its ("stopped",) reply unread
+    on the control pipe, so the next start_stream() would recv() that stale
+    reply -- or a stale ("error", ...) -- instead of the answer to its own
+    ("stream",) request, and could attach to a shm block the child was
+    already unlinking. Three sessions covers "the second and third open()".
+    """
+    source = ProcessSource(child_target=child_with_fake_source)
+    try:
+        for session in range(3):
+            dims = source.open()
+            assert dims == (4, 3, 0.5), "session %d got %r" % (session, dims)
+
+            deadline = time.time() + 10
+            frame = None
+            while frame is None and time.time() < deadline:
+                frame = source.read()
+
+            assert frame is not None, "session %d: no frame arrived" % session
+            source.close()
+    finally:
+        source.close()
+
+
+def test_close_on_a_stale_instance_does_not_stop_the_current_session():
+    """Regression: close() used to stop the module-level singleton
+    unconditionally, so a slow-to-unwind stale ProcessSource could tear down
+    a stream a newer ProcessSource had already started (and unlink the shm
+    block it had just attached to) -- same symptom as the pipe-desync bug
+    above, different trigger, and it survives fixing that one.
+    """
+    stale = ProcessSource(child_target=child_with_fake_source)
+    stale.open()
+
+    current = ProcessSource(child_target=child_with_fake_source)
+    current.open()
+
+    stale.close()
+
+    try:
+        deadline = time.time() + 10
+        frame = None
+        while frame is None and time.time() < deadline:
+            frame = current.read()
+
+        assert frame is not None, "current session died after a stale close()"
+    finally:
+        current.close()
