@@ -418,17 +418,60 @@ def test_a_silent_child_trips_the_wedge_timeout(monkeypatch):
         source.close()
 
 
+class PacedFakeSource(FakeSource):
+    """Like FakeSource, but sleeps between frames so read()'s bounded wait
+    genuinely expires at least once between writes.
+
+    Unpaced FakeSource produces so fast that read()'s pre-loop early-out
+    almost always finds a fresh frame immediately -- the "no frame within the
+    blocking budget" branch, which is the only branch that consults
+    self._last_frame_at, is essentially never reached. That made the wedge
+    timer's continuous-production test unable to fail on the bug it names:
+    deleting both `self._last_frame_at = time.monotonic()` lines from
+    read() still let it pass. Pacing writes slower than the (shrunk)
+    READ_TIMEOUT_S below forces every read() to actually reach that branch.
+    """
+
+    interval_s = 0.1
+
+    def read(self):
+        time.sleep(self.interval_s)
+        return super().read()
+
+
+def child_with_paced_fake_source(conn):
+    _child_main(conn, PacedFakeSource)
+
+
 def test_a_frame_resets_the_wedge_timer(monkeypatch):
     monkeypatch.setattr(depth_process, "WEDGE_TIMEOUT_S", 1.0)
-    source = ProcessSource(child_target=child_with_fake_source)
+    # Shrink the per-read blocking budget well below PacedFakeSource's 0.1s
+    # write interval, so read() must fall through to the "no frame within
+    # the budget" branch between every pair of frames -- the branch that
+    # actually consults self._last_frame_at -- rather than almost always
+    # catching a fresh frame in the pre-loop early-out and never touching it.
+    monkeypatch.setattr(depth_process, "READ_TIMEOUT_S", 0.02)
+    monkeypatch.setattr(depth_process, "_READ_POLL_INTERVAL_S", 0.002)
+
+    source = ProcessSource(child_target=child_with_paced_fake_source)
     try:
         source.open()
 
-        # FakeSource produces continuously, so two seconds of reading must not
-        # trip a one second timeout.
+        # PacedFakeSource writes roughly every 0.1s -- comfortably inside the
+        # 1s wedge timeout -- so 2s of reading must not trip it. Recording
+        # every distinct self._last_frame_at seen proves read() keeps
+        # updating it on each new frame (not just that no exception happens
+        # to be raised); combined with the timeout not firing despite the
+        # no-frame branch running on nearly every call, it also proves the
+        # wedge check downstream is actually consuming that updated value
+        # rather than a stale one.
+        seen = set()
         deadline = time.time() + 2.0
         while time.time() < deadline:
             source.read()
+            seen.add(source._last_frame_at)
             time.sleep(0.02)
+
+        assert len(seen) > 1, "self._last_frame_at never advanced"
     finally:
         source.close()
