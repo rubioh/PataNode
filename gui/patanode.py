@@ -170,6 +170,13 @@ class PataNode(NodeEditorWindow):
         # Hide the audio features when starting the app
         self.audioDock.setVisible(False)
 
+        # Explicitly, rather than relying on the visibilityChanged connection
+        # above: Qt does not emit that signal for a dock that was never shown,
+        # so setVisible(False) here is a no-op and onHideAudioDock never fires.
+        # Without this the widget's 30 Hz pyqtgraph redraw timer runs for the
+        # whole life of the process, for a panel that has never been on screen.
+        self.audio_log_widget.setHidden(True)
+
     # Collect infos about graphs and serialize them into json for pataphone
 
     # @timing

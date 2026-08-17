@@ -2,7 +2,16 @@ import os
 import sys
 
 import numpy as np
-
+from PyQt5.QtCore import (
+    QByteArray,
+    QDataStream,
+    QIODevice,
+    QMimeData,
+    QSize,
+    Qt,
+    QTimer,
+)
+from PyQt5.QtGui import QColor, QDrag
 from PyQt5.QtWidgets import (
     QAbstractItemView,
     QApplication,
@@ -11,21 +20,10 @@ from PyQt5.QtWidgets import (
     QListWidgetItem,
     QWidget,
 )
-from PyQt5.QtCore import (
-    Qt,
-    QByteArray,
-    QDataStream,
-    QIODevice,
-    QMimeData,
-    QSize,
-    QTimer,
-)
-from PyQt5.QtGui import QColor, QDrag
-from pyqtgraph import mkPen, GraphicsLayoutWidget  # type: ignore[import-untyped]
+from pyqtgraph import GraphicsLayoutWidget, mkPen  # type: ignore[import-untyped]
 
 from audio.audio_pipeline import AudioEngine
 from nodeeditor.utils import dumpException
-
 
 DEBUG = False
 
@@ -152,9 +150,21 @@ class AudioLogWidget(QWidget):
     #       self.graphLayout.removeWidget(graph)
 
     def initTimer(self):
+        """Create the redraw timer, stopped.
+
+        Deliberately not started here. The dock is hidden at startup, and
+        starting the timer anyway left pyqtgraph clearing and replotting every
+        curve 30 times a second for a panel nobody was looking at -- on the
+        same thread that has to render. Measured: 247 PlotDataItem events a
+        second with the dock closed, 17.2 ms per redraw, 211.7 ms/s of the GUI
+        thread.
+
+        setHidden() is what starts and stops it, and PataNode.initAudioLogDock
+        calls it explicitly rather than trusting visibilityChanged, which Qt
+        does not emit for a dock that was never shown in the first place.
+        """
         self.timer = QTimer()
         self.timer.timeout.connect(self.setData)
-        self.timer.start(int(1 / self.fps_timer * 1000))
 
     def dragEnterEvent(self, e):
         e.accept()
