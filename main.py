@@ -18,6 +18,26 @@ if __name__ == "__main__":
     parser.add_argument("--use-shader-buffer", metavar="use_shader_buffer")
     parser.add_argument("--server", action="store_true")
     parser.add_argument(
+        "--fps",
+        type=float,
+        default=72.0,
+        metavar="N",
+        help="target frame rate. The render loop paces itself to this cadence "
+        "instead of redrawing as fast as it can. 0 means uncapped. With vsync "
+        "on, only rates that divide the display's refresh can actually be "
+        "held -- on a 144Hz panel that is 144, 72, 48 or 36, so 60 there will "
+        "alternate between 13.9ms and 20.8ms frames. Use --vsync off, or a "
+        "60Hz output, if you need exactly 60",
+    )
+    parser.add_argument(
+        "--vsync",
+        choices=["on", "off"],
+        default="on",
+        help="sync presentation to the display refresh. With it on, frame "
+        "times quantise to multiples of the refresh period; turning it off "
+        "lets the pacer alone decide, at the cost of some tearing",
+    )
+    parser.add_argument(
         "--depth-source",
         choices=["orbbec", "synthetic"],
         default="orbbec",

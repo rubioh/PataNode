@@ -116,10 +116,8 @@ class PataShadeApp(PataNode):
         self.light_timer.timeout.connect(self.start_light_jobs)
 
     def initShaderQTimer(self):
-        self.shader_signals = WorkerSignals()
-        self.shader_signals.finished.connect(self.on_shader_job_finished)
         self.shader_timer = QTimer()
-        self.shader_timer.timeout.connect(self.start_shader_jobs)
+        self.shader_timer.timeout.connect(self.requestShaderRepaint)
 
     def initPataserverQTimer(self):
         self.server_signals = WorkerSignals()
@@ -179,9 +177,22 @@ class PataShadeApp(PataNode):
         #       print("Light Job done")
         pass
 
-    # Shader thread
-    def start_shader_jobs(self):
-        self.threadpool.start(Worker(self.shader_widget.update, self.shader_signals))
+    def requestShaderRepaint(self):
+        """Watchdog tick. Starts the render loop if it is not turning.
+
+        The loop drives itself -- each frame asks for the next -- so once it
+        is running this has nothing to do. It exists for the cases where no
+        frame is in flight to re-arm from: startup (the shader window is
+        hidden until shown, so the very first frame comes from here), and the
+        loop having been stopped for teardown and then resumed.
+
+        Called directly, not through the threadpool. Routing it through a
+        QRunnable, a 5-thread pool shared with the audio (60 Hz) and light
+        (45 Hz) jobs, and a queued finished signal cost 9-12 ms of latency
+        per frame -- for a job whose entire content is asking this same
+        thread to draw.
+        """
+        self.shader_widget.ensureRenderLoopRunning()
 
     def start_pataserver_jobs(self):
         self.threadpool.start(Worker(self.server.update, self.server_signals))
@@ -193,7 +204,11 @@ class PataShadeApp(PataNode):
     def start_jobs(self):
         self.audio_timer.start(int(1 / 60 * 1000))
         self.light_timer.start(int(1 / 45 * 1000))
-        self.shader_timer.start(int(1 / 60 * 1000))
+        # A watchdog, not the pacemaker: ShaderWidget re-arms itself at the
+        # end of every frame. Deliberately slow -- a fast timer here is what
+        # was starving the paint message in the first place.
+        self.shader_timer.start(100)
+        self.shader_widget.ensureRenderLoopRunning()
         if self.args.server:
             self.server_timer.start(int(1 / 60 * 1000))
 
@@ -201,6 +216,11 @@ class PataShadeApp(PataNode):
         self.audio_timer.stop()
         self.light_timer.stop()
         self.shader_timer.stop()
+        # Stopping the watchdog is no longer enough to stop the frames: the
+        # render loop re-arms itself. PataNode.closeEvent calls this before
+        # closeAllSubWindows precisely so nothing renders a scene that is
+        # being dismantled, so the loop itself has to come to a halt here.
+        self.shader_widget.stopRenderLoop()
         if self.args.server:
             self.server_timer.stop()
 

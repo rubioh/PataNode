@@ -493,6 +493,7 @@ class PataNode(NodeEditorWindow):
         self.current_node_editor_widget = None
         self.active_graph = self.mdiArea.activeSubWindow()
         self.gl_widget.showFullScreen()
+        self.gl_widget.ensureRenderLoopRunning()
 
     def showShaderWindow(self):
         self.current_node_editor_widget = None
@@ -500,6 +501,10 @@ class PataNode(NodeEditorWindow):
             self.graphs[k].version = self.graphs[k].version + 1
         self.active_graph = self.mdiArea.activeSubWindow()
         self.gl_widget.showFullScreen()
+        # The loop stops itself while the window is hidden, and the watchdog
+        # would only notice up to 100 ms later -- which is 100 ms of black on
+        # the way into a scene. Start it here instead; the call is idempotent.
+        self.gl_widget.ensureRenderLoopRunning()
 
     def hideAudioLogWindow(self):
         self.audio_log_widget.setVisible(False)
