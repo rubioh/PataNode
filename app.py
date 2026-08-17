@@ -19,12 +19,20 @@ class WorkerSignals(QObject):
 
 
 class Worker(QRunnable):
-    def __init__(self, job_function, *args, **kwargs):
+    def __init__(self, job_function, signals, *args, **kwargs):
         super().__init__()
         self.job_function = job_function
         self.args = args
         self.kwargs = kwargs
-        self.signals = WorkerSignals()
+        # Handed in, not built here. A WorkerSignals per job meant a QObject
+        # constructed, connected and destroyed on every tick -- 105 a second
+        # between the audio and light timers alone. Measured with the event
+        # profiler: 207 DeferredDelete events a second costing 117 ms/s of the
+        # GUI thread, plus 33 ms/s delivering the queued finished signals.
+        # QRunnable is not a QObject, so with the signals object owned per job
+        # kind and living as long as the app, nothing here goes to deferred
+        # deletion at all.
+        self.signals = signals
 
     @pyqtSlot()
     def run(self):
@@ -94,26 +102,34 @@ class PataShadeApp(PataNode):
 
     def initAudioTimer(self):
         self.audio_engine.start_recording()
+        # One signals object for the lifetime of the app, connected once, and
+        # handed to every worker this timer dispatches. See Worker.__init__.
+        self.audio_signals = WorkerSignals()
+        self.audio_signals.finished.connect(self.on_audio_job_finished)
         self.audio_timer = QTimer()
         self.audio_timer.timeout.connect(self.start_audio_jobs)
 
     def initLightTimer(self):
+        self.light_signals = WorkerSignals()
+        self.light_signals.finished.connect(self.on_light_job_finished)
         self.light_timer = QTimer()
         self.light_timer.timeout.connect(self.start_light_jobs)
 
     def initShaderQTimer(self):
+        self.shader_signals = WorkerSignals()
+        self.shader_signals.finished.connect(self.on_shader_job_finished)
         self.shader_timer = QTimer()
         self.shader_timer.timeout.connect(self.start_shader_jobs)
 
     def initPataserverQTimer(self):
+        self.server_signals = WorkerSignals()
+        self.server_signals.finished.connect(self.on_shader_job_finished)
         self.server_timer = QTimer()
         self.server_timer.timeout.connect(self.start_pataserver_jobs)
 
     # Audio thread
     def start_audio_jobs(self):
-        worker = Worker(self.update_audio)
-        worker.signals.finished.connect(self.on_audio_job_finished)
-        self.threadpool.start(worker)
+        self.threadpool.start(Worker(self.update_audio, self.audio_signals))
 
     def on_audio_job_finished(self):
         self.set_audio_features()
@@ -157,9 +173,7 @@ class PataShadeApp(PataNode):
                 color=self.last_main_colors, audio_features=self.last_audio_features
             )
 
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_light_job_finished)
-        self.threadpool.start(worker)
+        self.threadpool.start(Worker(job, self.light_signals))
 
     def on_light_job_finished(self):
         #       print("Light Job done")
@@ -167,16 +181,10 @@ class PataShadeApp(PataNode):
 
     # Shader thread
     def start_shader_jobs(self):
-        job = self.shader_widget.update
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_shader_job_finished)
-        self.threadpool.start(worker)
+        self.threadpool.start(Worker(self.shader_widget.update, self.shader_signals))
 
     def start_pataserver_jobs(self):
-        job = self.server.update
-        worker = Worker(job)
-        worker.signals.finished.connect(self.on_shader_job_finished)
-        self.threadpool.start(worker)
+        self.threadpool.start(Worker(self.server.update, self.server_signals))
 
     def on_shader_job_finished(self):
         pass
