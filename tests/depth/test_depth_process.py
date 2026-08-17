@@ -477,6 +477,56 @@ def test_a_frame_resets_the_wedge_timer(monkeypatch):
         source.close()
 
 
+def test_a_frame_found_in_the_blocking_wait_resets_the_wedge_timer(monkeypatch):
+    """The wedge timer's *blocking-loop* reset, specifically.
+
+    read() sets self._last_frame_at in two places: the pre-loop early-out and
+    the blocking wait. The test above covers the early-out -- deleting that
+    line makes it fail -- but not the blocking wait, because PacedFakeSource
+    lands frames in whichever of the two happens to be running, so the
+    early-out alone keeps _last_frame_at advancing. The blocking wait is the
+    production-dominant path: at 31 fps against a 200 ms budget the engine
+    almost always ends up there, so a regression on that line would fire the
+    wedge every WEDGE_TIMEOUT_S during perfectly healthy streaming, with the
+    suite green.
+
+    Stubbing the ring pins which path answers: nothing on the first (early-out)
+    call, a frame on the second, which can only be the loop's.
+    """
+    monkeypatch.setattr(depth_process, "READ_TIMEOUT_S", 0.2)
+    monkeypatch.setattr(depth_process, "_READ_POLL_INTERVAL_S", 0.002)
+
+    source = ProcessSource(child_target=child_with_fake_source)
+    try:
+        source.open()
+
+        calls = {"n": 0}
+        published = make_frame(7)
+
+        def staged_read(last_seq):
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return None, last_seq
+            return published, last_seq + 1
+
+        monkeypatch.setattr(source._ring, "read", staged_read)
+
+        # Old enough that the wedge check would fire on it, so an unrefreshed
+        # timestamp is unmistakable rather than a sub-millisecond difference.
+        source._last_frame_at = time.monotonic() - 1000.0
+        before = source._last_frame_at
+
+        frame = source.read()
+
+        assert frame is not None
+        assert calls["n"] >= 2, "the frame came from the early-out, not the wait"
+        assert (
+            source._last_frame_at > before
+        ), "a frame from the blocking wait did not reset the wedge timer"
+    finally:
+        source.close()
+
+
 def test_reopening_reuses_the_same_process():
     # A live session cycling through states releases and re-acquires the
     # engine. Respawning there would cost a fresh interpreter, the SDK import
@@ -517,3 +567,319 @@ def test_close_does_not_kill_the_process():
     source.close()
 
     assert depth_process._child.alive()
+
+
+import threading
+
+
+class SlowOpenFakeSource(FakeSource):
+    """Takes long enough to open that two open() calls genuinely overlap.
+
+    A cold open in production (spawn, SDK import, camera) takes seconds, which
+    is longer than DepthEngine.close()'s JOIN_TIMEOUT_S: the abandoned capture
+    thread is still inside open() when the next acquire() starts a new one.
+    """
+
+    open_delay_s = 0.2
+
+    def open(self):
+        time.sleep(self.open_delay_s)
+        return super().open()
+
+
+def child_with_slow_open_source(conn):
+    _child_main(conn, SlowOpenFakeSource)
+
+
+# How many times the two-thread scenario below is replayed. The bug it pins is
+# a data race, so one round can pass by luck: measured against the unlocked
+# code a single round failed roughly one run in three, five rounds every run.
+_CONCURRENT_OPEN_ROUNDS = 5
+
+
+def _open_from_two_threads():
+    """Overlap two open() calls the way a state switch does, and report both.
+
+    The second thread starts while the first is already blocked waiting for
+    the child's reply -- that is the production shape: DepthEngine.close()
+    abandons its capture thread mid-open after JOIN_TIMEOUT_S and a following
+    acquire() starts another one on the same singleton.
+    """
+    barrier = threading.Barrier(2)
+    results = {}
+
+    def worker(index):
+        source = ProcessSource(child_target=child_with_slow_open_source)
+        results[index] = [source, None]
+        barrier.wait()
+        if index == 1:
+            time.sleep(SlowOpenFakeSource.open_delay_s / 2)
+        try:
+            source.open()
+        except (
+            Exception
+        ) as error:  # noqa: BLE001 -- an unpickling error is a failure too
+            results[index][1] = error
+
+    threads = [threading.Thread(target=worker, args=(index,)) for index in (0, 1)]
+    for thread in threads:
+        thread.start()
+
+    # Two serialised slow opens are well under a second. Ten is generous for
+    # that and far below OPEN_TIMEOUT_S, so a thread still running here means
+    # the pipe wedged rather than merely queued.
+    for thread in threads:
+        thread.join(10)
+
+    return threads, [results[index] for index in sorted(results)]
+
+
+def test_two_threads_opening_at_once_leave_exactly_one_live_session():
+    """Regression: the control pipe had no mutual exclusion.
+
+    Two capture threads is ordinary use, not an exotic race -- DepthEngine
+    gives up joining its capture thread after JOIN_TIMEOUT_S and a following
+    acquire() immediately starts another, while a cold open takes longer than
+    that. Unserialised, the two recv() calls on one multiprocessing.Connection
+    either steal each other's replies (both open() calls succeed, one of them
+    attached to a ring the child has already torn down -- frozen depth
+    reported as STREAMING) or split a 4-byte length header from its payload,
+    which raises UnpicklingError, loses framing for good and leaves both
+    threads blocked inside recv() forever.
+
+    Four things must hold: both opens finish, neither fails, exactly one
+    instance owns the session the child is actually running, and that instance
+    gets frames.
+    """
+    for round_index in range(_CONCURRENT_OPEN_ROUNDS):
+        threads, results = _open_from_two_threads()
+        sources = [source for source, _ in results]
+
+        try:
+            assert not any(thread.is_alive() for thread in threads), (
+                "round %d: an open() never returned -- the control pipe wedged"
+                % round_index
+            )
+
+            errors = [error for _, error in results]
+            assert errors == [None, None], "round %d: an open() failed: %r" % (
+                round_index,
+                errors,
+            )
+
+            child = depth_process._child
+            owners = [
+                source
+                for source in sources
+                if source._session is not None and source._session == child.session
+            ]
+            assert (
+                len(owners) == 1
+            ), "round %d: %d of 2 instances believe they own the live session" % (
+                round_index,
+                len(owners),
+            )
+
+            # The survivor is a working stream, not a ring the child already
+            # unlinked: the pre-fix failure was two *apparently* successful
+            # opens, and in half the reproductions the dead one was the newer
+            # session -- the one the engine cares about.
+            owner = owners[0]
+            deadline = time.time() + 10
+            frame = None
+            while frame is None and time.time() < deadline:
+                frame = owner.read()
+
+            assert frame is not None, (
+                "round %d: the surviving session produced no frames" % round_index
+            )
+        finally:
+            for source in sources:
+                source.close()
+
+
+import os
+import tempfile
+
+# The child is a real process, so it cannot report back through shared test
+# state. A file it touches on close() is the simplest cross-process signal.
+CLOSE_MARKER = os.path.join(tempfile.gettempdir(), "patanode-depth-source-closed")
+
+
+class HangingOpenSource(FakeSource):
+    """Still opening when the parent's open timeout expires."""
+
+    open_delay_s = 1.0
+
+    def open(self):
+        time.sleep(self.open_delay_s)
+        return super().open()
+
+    def close(self):
+        with open(CLOSE_MARKER, "w") as marker:
+            marker.write("closed")
+
+
+def child_with_hanging_open_source(conn):
+    _child_main(conn, HangingOpenSource)
+
+
+def test_a_timed_out_open_does_not_leave_the_child_streaming(monkeypatch):
+    """Regression: a timed-out start_stream told the child nothing.
+
+    open() then never recorded the child, so close() computed
+    owns_current_session as False and sent no stop either. The child finished
+    opening into a stream nobody would ever read -- a claimed USB device and a
+    burned core for the life of the app.
+    """
+    monkeypatch.setattr(depth_process, "OPEN_TIMEOUT_S", 0.2)
+
+    if os.path.exists(CLOSE_MARKER):
+        os.unlink(CLOSE_MARKER)
+
+    source = ProcessSource(child_target=child_with_hanging_open_source)
+    try:
+        with pytest.raises(DepthSourceError):
+            source.open()
+
+        # The child is still inside its slow open at this point; the stop only
+        # takes effect once it comes back out.
+        deadline = time.time() + 10
+        while not os.path.exists(CLOSE_MARKER) and time.time() < deadline:
+            time.sleep(0.05)
+
+        assert os.path.exists(
+            CLOSE_MARKER
+        ), "the child kept the camera open after the parent gave up on it"
+    finally:
+        source.close()
+        if os.path.exists(CLOSE_MARKER):
+            os.unlink(CLOSE_MARKER)
+
+
+class RecordingConnection:
+    """A control pipe that records any two threads using it at once.
+
+    The outcome test above is a race: replayed against the unlocked code a
+    single round failed about one run in three, five rounds about one run in
+    two, because two unsynchronised recv() calls often happen to pick up the
+    right messages anyway. This watches the invariant itself -- one thread on
+    the connection at a time -- which either holds or does not, with no luck
+    involved once the two threads genuinely overlap.
+    """
+
+    def __init__(self, conn):
+        self._conn = conn
+        self._guard = threading.Lock()
+        self._in_flight = set()
+        self.overlaps = []
+
+    def _call(self, name, method, *args):
+        thread = threading.current_thread().name
+        with self._guard:
+            if self._in_flight:
+                self.overlaps.append((name, thread, sorted(self._in_flight)))
+            self._in_flight.add(thread)
+        try:
+            return method(*args)
+        finally:
+            with self._guard:
+                self._in_flight.discard(thread)
+
+    def poll(self, *args):
+        return self._call("poll", self._conn.poll, *args)
+
+    def recv(self):
+        return self._call("recv", self._conn.recv)
+
+    def send(self, message):
+        return self._call("send", self._conn.send, message)
+
+    def close(self):
+        return self._conn.close()
+
+    def fileno(self):
+        return self._conn.fileno()
+
+
+def test_the_control_pipe_is_never_used_by_two_threads_at_once():
+    """The serialisation itself, rather than one sampling of its consequences.
+
+    multiprocessing.Connection is not thread-safe: overlapping recv() calls
+    split a length header from its payload and framing is then lost for good,
+    with both threads blocked inside recv() for the life of the app. The
+    second thread below enters while the first is parked waiting on the
+    child's reply, so any un-serialised access shows up here every run.
+    """
+    child = depth_process._get_child(child_with_slow_open_source)
+    child.ensure_started()
+    recorder = RecordingConnection(child.conn)
+    child.conn = recorder
+
+    threads, results = _open_from_two_threads()
+    try:
+        assert not any(
+            thread.is_alive() for thread in threads
+        ), "an open() never returned -- the control pipe wedged"
+        assert (
+            recorder.overlaps == []
+        ), "two threads used the control pipe at once: %r" % (recorder.overlaps[:3],)
+    finally:
+        for source, _ in results:
+            source.close()
+
+
+class DyingSource(FakeSource):
+    """Streams for a moment, then fails the way a yanked USB cable does.
+
+    Timed rather than counted, and paced: an unpaced source that failed after
+    three frames could tear the ring down before the parent's open() had even
+    attached to it, which is a different failure from the one under test.
+    """
+
+    alive_s = 0.5
+    interval_s = 0.01
+
+    def __init__(self):
+        super().__init__()
+        self._dies_at = time.monotonic() + self.alive_s
+
+    def read(self):
+        time.sleep(self.interval_s)
+        if time.monotonic() > self._dies_at:
+            from depth.depth_source import DepthSourceError as SourceError
+
+            raise SourceError("device disconnected")
+        return super().read()
+
+
+def child_with_dying_source(conn):
+    _child_main(conn, DyingSource)
+
+
+def test_a_child_side_read_failure_is_reported_without_waiting_out_the_wedge(
+    monkeypatch,
+):
+    """Regression: the child reported the failure instantly and read() ignored
+    it, so recovery waited out the full WEDGE_TIMEOUT_S -- measured at ~6 s of
+    frozen depth still reported as STREAMING, with the answer sitting unread
+    on the control pipe the whole time.
+
+    WEDGE_TIMEOUT_S is raised well above this test's own deadline, so the
+    wedge cannot be what rescues it: either read() consults the pipe, or the
+    test fails.
+    """
+    monkeypatch.setattr(depth_process, "WEDGE_TIMEOUT_S", 60.0)
+    monkeypatch.setattr(depth_process, "READ_TIMEOUT_S", 0.02)
+
+    source = ProcessSource(child_target=child_with_dying_source)
+    try:
+        source.open()
+
+        deadline = time.time() + 10
+        with pytest.raises(DepthSourceError, match="device disconnected"):
+            while time.time() < deadline:
+                source.read()
+            pytest.fail("read() never surfaced the child's error report")
+    finally:
+        source.close()

@@ -12,12 +12,14 @@ and all five can be kept rather than traded away for frame rate.
 
 import atexit
 import multiprocessing
+import threading
 import time
 from multiprocessing import shared_memory
 
 import numpy as np
 
 from depth.depth_source import DepthSource, DepthSourceError
+from numeric_locale import restoreCNumericLocale
 
 # Frame slots start here. One page, far more than the header needs, so the
 # slots land on a page boundary and the layout stays readable in a hex dump.
@@ -148,6 +150,11 @@ def _child_main(conn, source_factory=None):
     with the same profile selection, the same filter chain and the same error
     messages that ran in-process before. Capture was relocated, not rewritten.
     """
+    # This process, not the parent, is now the one that loads the Orbbec SDK,
+    # and the SDK misparses its own config under a comma-decimal locale (see
+    # numeric_locale). main.py's call no longer covers this interpreter.
+    restoreCNumericLocale()
+
     if source_factory is None:
         from depth.depth_source import OrbbecSource
 
@@ -165,7 +172,13 @@ def _child_main(conn, source_factory=None):
                 pass
             source = None
         if ring is not None:
-            ring.close()
+            # Guarded like source.close() above: an exception escaping
+            # teardown() would be re-raised by the finally's second call,
+            # skipping conn.close() and leaving the parent without EOF.
+            try:
+                ring.close()
+            except Exception:
+                pass
             try:
                 ring.unlink()
             except FileNotFoundError:
@@ -239,6 +252,11 @@ STOP_TIMEOUT_S = 2.0
 
 _child = None
 
+# Guards the _child global itself. Ordered outside _Child._lock: _get_child
+# takes this and then the child's lock (via shutdown), and nothing takes them
+# the other way round.
+_child_lock = threading.Lock()
+
 
 class _Child:
     """Owns the capture process across ProcessSource instances.
@@ -256,6 +274,22 @@ class _Child:
         self.target = target
         self.process = None
         self.conn = None
+        # Serialises every use of self.conn. A multiprocessing.Connection is
+        # not thread-safe, and two capture threads on one connection is not an
+        # exotic race: DepthEngine.close() gives up joining its capture thread
+        # after JOIN_TIMEOUT_S (2 s) and a following acquire() starts a second
+        # one, while a cold open here takes longer than that. Unserialised,
+        # the two recv() calls split a 4-byte length header from its payload,
+        # framing is lost for good and both threads block forever inside
+        # recv() -- poll() only promises *some* bytes are readable. Depth is
+        # then dead for the life of the app.
+        #
+        # Serialising is the right semantics, not just the safe one: a capture
+        # thread waiting out another thread's open is exactly what should
+        # happen, and it is what makes the session token below meaningful.
+        # RLock because start_stream() calls ensure_started(), which calls
+        # shutdown(), and both take this lock.
+        self._lock = threading.RLock()
         # The shm name of the stream currently running, or None. This is the
         # session token ProcessSource.close() checks against: the _Child
         # object itself stays the same instance across every session on the
@@ -292,7 +326,28 @@ class _Child:
         child_conn.close()
 
     def start_stream(self):
-        self.ensure_started()
+        with self._lock:
+            try:
+                return self._start_stream_locked()
+            except Exception:
+                # Whatever failed -- a spawn error, the open timeout, a dead
+                # pipe -- the child may still be part-way through opening the
+                # camera, and would then hold the device and write frames into
+                # a block nobody reads for the life of the app. Tell it to
+                # stop. The lock is an RLock, so this re-entry is fine.
+                self.stop_stream()
+                raise
+
+    def _start_stream_locked(self):
+        try:
+            self.ensure_started()
+        except OSError as error:
+            # Inside start_stream's error handling on purpose: open() documents
+            # DepthSourceError as the only failure it raises, and Process.start()
+            # raises OSError.
+            raise DepthSourceError(
+                "could not start the depth process: %s" % error
+            ) from error
 
         try:
             # Discard anything already sitting on the pipe. stop_stream
@@ -330,79 +385,129 @@ class _Child:
         return message[1], message[2], message[3], message[4]
 
     def stop_stream(self):
-        self.session = None
-        if not self.alive():
-            return
+        with self._lock:
+            self.session = None
+            if not self.alive() or self.conn is None:
+                return
+            try:
+                self.conn.send(("stop",))
+                # Consume the child's ("stopped",) reply here, rather than
+                # leaving it on the pipe: it is the read of this reply -- not
+                # the send above -- that keeps the channel
+                # request/response-correct, so the next start_stream() never
+                # mistakes it for its own.
+                if self.conn.poll(STOP_TIMEOUT_S):
+                    self.conn.recv()
+            except (BrokenPipeError, OSError, EOFError):
+                pass
+
+    def poll_error(self):
+        """A pending ("error", msg) from the child, or None. Never blocks.
+
+        When the source dies mid-stream the child tears down and reports it on
+        the control pipe immediately, but nothing else in the parent reads that
+        pipe between opens: without this, recovery waits out the whole of
+        WEDGE_TIMEOUT_S with the answer sitting unread, showing ~6 s of frozen
+        depth as STREAMING.
+
+        Non-blocking in both directions. It skips the check rather than waiting
+        for the lock, because read() calls this on the capture thread and the
+        lock can be held for a whole OPEN_TIMEOUT_S by a concurrent open. Being
+        early to the wedge timeout is the point; being reliable is the wedge
+        timeout's job.
+        """
+        if not self._lock.acquire(blocking=False):
+            return None
+
         try:
-            self.conn.send(("stop",))
-            # Consume the child's ("stopped",) reply here, rather than
-            # leaving it on the pipe: it is the read of this reply -- not the
-            # send above -- that keeps the channel request/response-correct,
-            # so the next start_stream() never mistakes it for its own.
-            if self.conn.poll(STOP_TIMEOUT_S):
-                self.conn.recv()
-        except (BrokenPipeError, OSError, EOFError):
-            pass
+            if self.conn is None or not self.conn.poll(0):
+                return None
+
+            try:
+                message = self.conn.recv()
+            except (OSError, EOFError):
+                # read()'s own liveness checks cover a dead pipe.
+                return None
+
+            if message and message[0] == "error":
+                return message[1]
+
+            # Anything else is a stale reply to a request that has already
+            # given up on it; dropping it is what start_stream's drain would
+            # have done anyway.
+            return None
+        finally:
+            self._lock.release()
 
     def shutdown(self):
-        if self.process is not None:
-            try:
+        with self._lock:
+            if self.process is not None:
+                try:
+                    if self.process.is_alive():
+                        self.conn.send(("shutdown",))
+                        self.process.join(2.0)
+                except (BrokenPipeError, OSError):
+                    pass
+
                 if self.process.is_alive():
-                    self.conn.send(("shutdown",))
-                    self.process.join(2.0)
-            except (BrokenPipeError, OSError):
-                pass
+                    self.process.terminate()
+                    self.process.join(1.0)
 
-            if self.process.is_alive():
-                self.process.terminate()
-                self.process.join(1.0)
+                if self.process.is_alive():
+                    # SIGTERM was ignored or the child was too wedged to act
+                    # on it. SIGKILL cannot be caught or blocked, so this
+                    # always ends the process; the cost is the accepted gap
+                    # documented on FrameRing.attach -- a killed child orphans
+                    # its shm segment, which the resource tracker's leak
+                    # warning is left to surface rather than being cleaned up
+                    # here.
+                    self.process.kill()
+                    self.process.join(0.5)
 
-            if self.process.is_alive():
-                # SIGTERM was ignored or the child was too wedged to act on
-                # it. SIGKILL cannot be caught or blocked, so this always
-                # ends the process; the cost is the accepted gap documented
-                # on FrameRing.attach -- a killed child orphans its shm
-                # segment, which the resource tracker's leak warning is left
-                # to surface rather than being cleaned up here.
-                self.process.kill()
-                self.process.join(0.5)
+            if self.conn is not None:
+                try:
+                    self.conn.close()
+                except OSError:
+                    pass
 
-        if self.conn is not None:
-            try:
-                self.conn.close()
-            except OSError:
-                pass
-
-        self.process = None
-        self.conn = None
-        self.session = None
+            self.process = None
+            self.conn = None
+            self.session = None
 
 
 def _get_child(target):
     global _child
 
-    if _child is None or _child.target is not target:
+    # The whole read-modify-write, not just the assignment. Two capture threads
+    # can both find _child None (see the lock on _Child): unsynchronised, both
+    # construct and start a process, the second assignment wins, and the first
+    # child is orphaned as a daemon still holding the camera -- leaving the
+    # winner's open() failing device-busy forever, with no retry that can help.
+    with _child_lock:
+        if _child is None or _child.target is not target:
+            if _child is not None:
+                _child.shutdown()
+            _child = _Child(target)
+
+        return _child
+
+
+def _shutdown_child():
+    """Tear down the singleton, if there is one."""
+    global _child
+
+    with _child_lock:
         if _child is not None:
             _child.shutdown()
-        _child = _Child(target)
-
-    return _child
+            _child = None
 
 
 def _reset_child_for_tests():
-    """Tear down the singleton. Tests only."""
-    global _child
-
-    if _child is not None:
-        _child.shutdown()
-        _child = None
+    """Tear down the singleton between test cases."""
+    _shutdown_child()
 
 
-def _shutdown_at_exit():
-    _reset_child_for_tests()
-
-
-atexit.register(_shutdown_at_exit)
+atexit.register(_shutdown_child)
 
 
 # Matches OrbbecSource.READ_TIMEOUT_MS (200 ms), so DepthEngine's capture
@@ -519,6 +624,19 @@ class ProcessSource(DepthSource):
                 else child.process.exitcode
             )
             raise DepthSourceError("depth process exited (code %s)" % code)
+
+        # Before waiting out the wedge timeout, ask whether the child has
+        # already said what is wrong. It reports a read failure -- a yanked USB
+        # cable, an SDK error mid-stream -- on the control pipe the instant it
+        # happens, and that message is the difference between recovering now
+        # and showing 5 s of frozen depth labelled STREAMING. Only the instance
+        # whose session is the live one consumes it, so a stale instance
+        # unwinding on another thread cannot swallow the current session's
+        # error report.
+        if self._session is not None and child.session == self._session:
+            reported = child.poll_error()
+            if reported is not None:
+                raise DepthSourceError(reported)
 
         silent_for = time.monotonic() - self._last_frame_at
 
