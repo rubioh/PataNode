@@ -1,4 +1,5 @@
 import argparse
+import gc
 import importlib
 import os
 import sys
@@ -73,6 +74,24 @@ if __name__ == "__main__":
 
     patanode = app.PataShadeApp(args)
     patanode.show()
+
+    # Everything alive at this point is the app's permanent furniture: the
+    # imported modules and the shader program registry, which alone is about
+    # 154k tracked objects because every node type registers on import.
+    #
+    # CPython frees almost everything by refcount; the collector exists only
+    # to break reference cycles. But a gen-2 pass scans every tracked object
+    # in the process and holds the GIL throughout, so at 236k objects it
+    # stopped every thread for ~71 ms, roughly once a minute -- a visible
+    # hitch in a live set. freeze() moves the current objects into a
+    # generation that is never scanned again: measured 71 ms -> 0.8 ms.
+    #
+    # Before openFile deliberately. Freezing after a scene loads is just as
+    # fast, but exempts that scene's objects from cycle collection too, so
+    # closing it would leak them. Scenes must stay collectable; the startup
+    # furniture never goes away anyway.
+    gc.collect()
+    gc.freeze()
 
     if args.open:
         patanode.openFile(args.open)
