@@ -279,6 +279,49 @@ design set out to reach. `fps` landed above 71.0 directly, so the
 `PATANODE_FREEZE_LOG=1` fallback investigation for the 68-71 fps band was not
 needed.
 
+The after arm beats the chain-disabled arm at every percentile (p99 14.35 ms
+vs. 15.63 ms), which is worth explaining rather than leaving as an
+unexplained anomaly: the chain-disabled arm still paid raw SDK I/O cost in
+the render process — `wait_for_frames`, decode, reshape, copy — since only
+the filter chain was skipped there, capture itself was still in-process.
+Full process offload removes that I/O cost too, not just the filter time, so
+beating the chain-disabled arm is the expected result of moving capture out
+entirely, not a sign the filters were skipped.
+
+### Runtime evidence the filters actually ran
+
+The comparison above is necessary but not sufficient: identical numbers
+would also result from the filter chain silently failing to run in the
+child, since a no-op chain is faster than a working one, not slower. That
+loophole needed closing with evidence captured *during* a run, not just the
+static call path from `make_source_factory("orbbec")` through
+`ProcessSource` to `_child_main` to `OrbbecSource._buildChain`.
+
+Method: a second, shorter run (25 s, otherwise identical setup) with the
+`depth-capture` child's CPU sampled directly from `/proc/<pid>/stat`
+(`utime`+`stime` deltas over 1 s windows, converted to instantaneous CPU%)
+every second while it streamed. No production code was touched — this was
+external process sampling only.
+
+```
+child pid 106722, parent (depth_bench.py) pid 106605 — distinct processes,
+confirmed via `ps -p 106722 -o pid,ppid,cmd`
+
+instant CPU%, steady state (excluding the first ~2s startup transient):
+72.2, 67.4, 65.5, 62.7, 65.6, 65.6, 61.8   (also 23.2, 69.5, 62.5, 62.7, 66.6,
+                                             61.7 in the seconds just before)
+range ~62-72%, RSS steady at ~282 MB
+```
+
+Assessment: this confirms the filter chain ran. The design doc's own
+measurement put the chain at ~14.5 ms/frame at ~31 fps, i.e. roughly 45% of
+one core; the observed ~62-72% sustained is at or above that figure, not
+near zero, which is what a silently-skipped chain would show. Frame cadence
+in this same run (fps 71.95, p99 14.79 ms) matched the committed after
+result within noise, so the CPU evidence and the timing evidence come from
+the same execution, not a separate favorable run. Full observed samples are
+in the Task 8 report.
+
 Side benefit observed but not part of the pass criteria: the teardown
 `malloc(): unaligned fastbin chunk detected` `SIGABRT` that was expected
 during Qt/GL/USB shutdown (per the task brief) **did not occur** on this run
