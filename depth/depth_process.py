@@ -423,6 +423,12 @@ READ_TIMEOUT_S = 0.2
 # itself is not what saturates the GIL in its place.
 _READ_POLL_INTERVAL_S = 0.002
 
+# How long a live-but-silent child gets before it is treated as wedged. About
+# 155 missed frames at 31 fps, so it cannot fire on a merely slow frame. The
+# cost of it being wrong in the other direction is 5 s of frozen depth before
+# recovery starts.
+WEDGE_TIMEOUT_S = 5.0
+
 
 class ProcessSource(DepthSource):
     """A DepthSource whose capture runs in another process.
@@ -443,6 +449,9 @@ class ProcessSource(DepthSource):
         # session on the same target.
         self._child = None
         self._session = None
+        # When the last frame arrived, used by read() to detect a live child
+        # that has stopped producing (see WEDGE_TIMEOUT_S).
+        self._last_frame_at = None
 
     def open(self):
         child = _get_child(self._target)
@@ -473,6 +482,7 @@ class ProcessSource(DepthSource):
             raise DepthSourceError("depth process went away: %s" % error) from error
 
         self._last_seq = 0
+        self._last_frame_at = time.monotonic()
 
         return width, height, scale
 
@@ -483,6 +493,7 @@ class ProcessSource(DepthSource):
         frame, seq = self._ring.read(self._last_seq)
         if frame is not None:
             self._last_seq = seq
+            self._last_frame_at = time.monotonic()
             return frame
 
         deadline = time.monotonic() + READ_TIMEOUT_S
@@ -491,7 +502,30 @@ class ProcessSource(DepthSource):
             frame, seq = self._ring.read(self._last_seq)
             if frame is not None:
                 self._last_seq = seq
+                self._last_frame_at = time.monotonic()
                 return frame
+
+        # No frame within the blocking budget, which is normal -- the camera
+        # runs at 31 fps and this is called far more often. It stops being
+        # normal if the child has gone, or has stopped producing entirely:
+        # both are disconnects, and DepthEngine already knows how to back off
+        # and rebuild a source.
+        child = self._child
+
+        if child is None or not child.alive():
+            code = (
+                None
+                if child is None or child.process is None
+                else child.process.exitcode
+            )
+            raise DepthSourceError("depth process exited (code %s)" % code)
+
+        silent_for = time.monotonic() - self._last_frame_at
+
+        if silent_for > WEDGE_TIMEOUT_S:
+            raise DepthSourceError(
+                "no depth frame from the capture process in %.1fs" % silent_for
+            )
 
         return None
 

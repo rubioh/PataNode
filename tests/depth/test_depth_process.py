@@ -142,7 +142,11 @@ class FakeSource:
         return self.width, self.height, self.scale
 
     def read(self):
-        self._value += 1
+        # Wrapped modulo uint16's range: FakeSource is unpaced and a
+        # multi-second test can drive it past 65536 reads, where an
+        # unwrapped counter would overflow the frame's uint16 dtype and
+        # raise inside the child, silently ending the stream.
+        self._value = (self._value + 1) % 65536
         return np.full((self.height, self.width), self._value, dtype=np.uint16)
 
     def close(self):
@@ -364,3 +368,67 @@ def test_close_on_a_stale_instance_does_not_stop_the_current_session():
         assert frame is not None, "current session died after a stale close()"
     finally:
         current.close()
+
+
+def child_that_exits(conn):
+    """Answers 'stream' normally, then dies."""
+    ring = FrameRing.create(4, 3)
+    conn.send(("ready", ring.name, 4, 3, 1.0))
+    time.sleep(0.2)
+    ring.close()
+
+
+def child_that_goes_silent(conn):
+    """Answers 'stream', publishes one frame, then never publishes again."""
+    ring = FrameRing.create(4, 3)
+    conn.send(("ready", ring.name, 4, 3, 1.0))
+    ring.write(np.full((3, 4), 5, dtype=np.uint16))
+    while True:
+        time.sleep(0.1)
+
+
+def test_a_dead_child_is_reported_as_a_source_error():
+    source = ProcessSource(child_target=child_that_exits)
+    try:
+        source.open()
+
+        deadline = time.time() + 10
+        with pytest.raises(DepthSourceError, match="depth process"):
+            while time.time() < deadline:
+                source.read()
+                time.sleep(0.05)
+            pytest.fail("read() never raised after the child exited")
+    finally:
+        source.close()
+
+
+def test_a_silent_child_trips_the_wedge_timeout(monkeypatch):
+    monkeypatch.setattr(depth_process, "WEDGE_TIMEOUT_S", 0.5)
+    source = ProcessSource(child_target=child_that_goes_silent)
+    try:
+        source.open()
+
+        deadline = time.time() + 10
+        with pytest.raises(DepthSourceError, match="no depth frame"):
+            while time.time() < deadline:
+                source.read()
+                time.sleep(0.05)
+            pytest.fail("read() never raised for a silent child")
+    finally:
+        source.close()
+
+
+def test_a_frame_resets_the_wedge_timer(monkeypatch):
+    monkeypatch.setattr(depth_process, "WEDGE_TIMEOUT_S", 1.0)
+    source = ProcessSource(child_target=child_with_fake_source)
+    try:
+        source.open()
+
+        # FakeSource produces continuously, so two seconds of reading must not
+        # trip a one second timeout.
+        deadline = time.time() + 2.0
+        while time.time() < deadline:
+            source.read()
+            time.sleep(0.02)
+    finally:
+        source.close()
