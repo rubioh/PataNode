@@ -185,8 +185,16 @@ every reconnect attempt.
 **Shared memory cleanup.** The child unlinks its block in a `finally`. If the
 child is `SIGKILL`ed the block leaks a file in `/dev/shm`; the name embeds the
 child pid so a leak cannot collide with the next run. Python's
-`resource_tracker` also warns when an attaching process exits, so the parent
-unregisters the block after attaching to keep logs clean.
+Python's `resource_tracker` also warns when an attaching process exits, and an
+earlier draft of this spec called `unregister` after attaching to suppress
+that. That was wrong on both counts and has been removed: the tracker fd is
+inherited by children under both spawn and fork, so all processes share one
+table and unregistering merely races the creator's `unlink`, printing a
+`KeyError` traceback on every clean shutdown. It buys no safety either —
+measured, a creator killed before it unlinks leaks the segment whether or not
+anyone unregistered, because the tracker only sweeps at its own shutdown. The
+warning stays: on the normal path the creator's `unlink` clears the entry and
+nothing is printed, and on the abnormal path a warning is what should happen.
 
 ## Testing
 
