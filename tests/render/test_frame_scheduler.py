@@ -182,6 +182,57 @@ def test_restarting_drops_a_stale_deadline(clock):
     assert loop._frame_timer.delays[-1] == pytest.approx(17, abs=1)
 
 
+class Frame(Loop):
+    """Adds what renderFrame touches on top of the scheduler stub."""
+
+    def __init__(self, fps=60, visible=True, raises=False):
+        super().__init__(fps)
+        self.visible = visible
+        self.raises = raises
+        self.draws = 0
+
+    def isVisible(self):
+        return self.visible
+
+    def drawFrame(self):
+        self.draws += 1
+        if self.raises:
+            raise RuntimeError("a node blew up mid-frame")
+
+    renderFrame = ShaderWidget.renderFrame
+
+
+def test_a_frame_that_raises_still_books_the_next_one(clock):
+    # The loop is a chain -- this frame arming the timer is the only thing
+    # that keeps it turning. Losing that once would strand the loop on the
+    # 100 ms watchdog at 10 fps, with no error after the first.
+    loop = Frame(raises=True)
+
+    with pytest.raises(RuntimeError):
+        loop.renderFrame()
+
+    assert loop.draws == 1
+    assert loop._frame_timer.isActive(), "the loop died on a single bad frame"
+
+
+def test_a_normal_frame_draws_then_books_the_next(clock):
+    loop = Frame()
+    loop.renderFrame()
+
+    assert loop.draws == 1
+    assert loop._frame_timer.isActive()
+
+
+def test_a_hidden_window_neither_draws_nor_re_arms(clock):
+    # Re-arming here would spin at the frame rate against a window that
+    # cannot be drawn into; ensureRenderLoopRunning is what brings it back.
+    loop = Frame(visible=False)
+    loop.renderFrame()
+
+    assert loop.draws == 0
+    assert not loop._frame_timer.isActive()
+
+
 def test_ensure_leaves_an_already_running_loop_alone(clock):
     loop = Loop(60)
     loop.schedule()

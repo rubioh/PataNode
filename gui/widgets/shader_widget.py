@@ -98,8 +98,16 @@ class ShaderWidget(QtOpenGL.QGLWidget):
             # comes back -- via showShaderWindow, or the app's watchdog.
             return
 
-        self.drawFrame()
-        self._scheduleNextFrame()
+        # finally, because the loop is a chain: this frame booking the next
+        # one is the only thing that keeps it turning. A node raising
+        # mid-frame would otherwise break the chain for good, and the 100 ms
+        # watchdog would quietly hold the whole set at 10 fps. The exception
+        # still propagates -- PyQt aborts on one raised in a slot, which is
+        # the loud failure and the one worth keeping.
+        try:
+            self.drawFrame()
+        finally:
+            self._scheduleNextFrame()
 
     def _scheduleNextFrame(self):
         """Arm the timer so frames land on a fixed cadence.
