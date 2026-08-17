@@ -116,24 +116,22 @@ class AudioEngine:
         self.bpm_estimator = BPM_estimator(0.5, 30, 110, 15)
         self.true_bpm = None
 
-    def add_to_features(self, D):
+    def add_to_features(self, features, D):
         """
         Inputs:
-            D a dictionary of features
-        Ouputs: (implicit)
-            self.res : dictionary of features
-        Update self.res dictionnary with the key,value of D
+            features : the dictionary being built for this frame
+            D : a dictionary of features to merge into it
         """
         for key, value in D.items():
             # value to ndarray with dtype float32 (moderngl compatibility)
-            self.features[key] = np.array(value, dtype=np.float32)
+            features[key] = np.array(value, dtype=np.float32)
 
-    def get_shared_features(self):
-        if "bpm" in self.features:
-            self.bpm = self.features["bpm"]
+    def get_shared_features(self, features):
+        if "bpm" in features:
+            self.bpm = features["bpm"]
         else:
             self.bpm = 100
-        self.mini_chill = self.features["mini_chill"]
+        self.mini_chill = features["mini_chill"]
 
     def __call__(self):
         # Sleep a bit when recording start
@@ -155,32 +153,46 @@ class AudioEngine:
         else:
             _on_kick = 0
 
-        self.features = {}
-        self.features["_on_kick"] = _on_kick
-        self.features["fft"] = np.abs(self.fft)  # First get dft
-        self.features["mini_chill"] = self.mini_chill
+        # Built locally and published in one rebind at the end. This runs on a
+        # worker thread while the GUI thread reads self.features; filling a
+        # dict already assigned to self.features let the reader observe it
+        # half-populated, which crashed as "dictionary changed size during
+        # iteration" in app.set_audio_features. A single atomic assignment
+        # means a reader sees either the previous frame's features or this
+        # frame's, never a mix -- and never needs to copy them to be safe.
+        features = {}
+        features["_on_kick"] = _on_kick
+        features["fft"] = np.abs(self.fft)  # First get dft
+        features["mini_chill"] = self.mini_chill
         self.add_to_features(
-            self.ET(np.abs(self.fft), self.features, audio=self.buffer)
+            features, self.ET(np.abs(self.fft), features, audio=self.buffer)
         )  # Energy things
-        self.add_to_features(self.tracker(self.features, self.bpm))  # Kick, Hat, Snare
-        if "on_chill" in self.features:
+        self.add_to_features(
+            features, self.tracker(features, self.bpm)
+        )  # Kick, Hat, Snare
+        if "on_chill" in features:
             self.add_to_features(
-                self.bpm_estimator(
-                    self.features["_bpm_on_kick"], self.features["on_chill"]
-                )
+                features,
+                self.bpm_estimator(features["_bpm_on_kick"], features["on_chill"]),
             )  # BPM, tempo
-        #       self.add_to_features(self.pesto.get_features(self.buffer, self.features)) # Pitch
-        self.features["pitch"] = 0
+        #  self.add_to_features(
+        #      features, self.pesto.get_features(self.buffer, features)
+        #  )  # Pitch
+        features["pitch"] = 0
 
         # Get shared features for the next iteration
-        self.get_shared_features()
+        self.get_shared_features(features)
+
+        # Publish. Everything below reads the local dict, so nothing can add a
+        # key to what a consumer is already holding.
+        self.features = features
 
         # Logger
         if self.queue_callback:
-            self.logger.update_info(self.current_chunk, self.features)
+            self.logger.update_info(self.current_chunk, features)
         else:
-            self.logger.update_info(self.buffer[self.previous_length :], self.features)
+            self.logger.update_info(self.buffer[self.previous_length :], features)
 
         self.previous_length = self.buffer.shape[0]
 
-        return self.features
+        return features

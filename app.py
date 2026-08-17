@@ -1,4 +1,3 @@
-import copy
 import time
 
 import numpy as np
@@ -125,7 +124,18 @@ class PataShadeApp(PataNode):
         self.audio_engine()
 
     def set_audio_features(self):
-        af = copy.deepcopy(self.audio_engine.features)
+        # A shallow copy is enough, and is the only copy needed: AudioEngine
+        # publishes each frame's features as a fresh dict it never mutates
+        # again (audio/audio_pipeline.py), so the values are stable. The copy
+        # is here only because the three on_* keys below are added on top.
+        #
+        # This used to be a deepcopy, which raced with the publisher: it read
+        # the dict while the audio thread was still filling it, and raised
+        # "dictionary changed size during iteration". Note the copy happens
+        # outside the try below, so that RuntimeError was never caught -- and
+        # this runs in a slot invoked from C++, where PyQt aborts the process
+        # rather than propagating. It cost 73 us a frame as well.
+        af = dict(self.audio_engine.features)
 
         try:
             af["on_kick"] = 1 if self.last_kick_count != af["kick_count"] else 0
