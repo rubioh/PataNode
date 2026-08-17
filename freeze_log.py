@@ -46,6 +46,12 @@ class _Recorder:
         self.path = path
         self.heartbeat = time.perf_counter()
         self.main_tid = threading.get_ident()
+        # The loop legitimately stops drawing when the shader window is hidden
+        # and before the first frame is ever drawn -- startup spends seconds
+        # opening the camera with nothing on screen. Neither is a freeze, and
+        # logging them buries the real ones. `widget` is filled in by the
+        # drawFrame wrapper, so it also doubles as "a frame has happened".
+        self.widget = None
         self.frame_ms = []
         self.stalls = []
         self.gc_pauses = []
@@ -77,6 +83,15 @@ class _Recorder:
             if (time.perf_counter() - self.heartbeat) * 1000 < self.threshold_ms:
                 continue
 
+            if not self._loop_should_be_running():
+                # Not a stall: the loop is legitimately not drawing. Keep the
+                # heartbeat fresh, or the whole idle stretch gets measured as
+                # one enormous stall the moment drawing resumes -- the window
+                # comes back, the gate opens, and the still-stale heartbeat
+                # from before it was hidden is what gets compared against.
+                self.heartbeat = time.perf_counter()
+                continue
+
             began = self.heartbeat
             samples = []
 
@@ -93,6 +108,26 @@ class _Recorder:
 
             end = self.heartbeat if self.heartbeat != began else time.perf_counter()
             self._record((end - began) * 1000, samples)
+
+    def _loop_should_be_running(self):
+        """True only when a missing frame actually means something is wrong.
+
+        Reading isVisible() from this thread is not strictly safe -- it is a
+        Qt call off the GUI thread -- but it is a plain bool read of a widget
+        that outlives us, and the alternative is a log full of the shader
+        window being hidden.
+        """
+        widget = self.widget
+
+        if widget is None:
+            # No frame drawn yet: still starting up. Opening the camera takes
+            # seconds with nothing on screen, and that is not a freeze.
+            return False
+
+        try:
+            return bool(widget.isVisible())
+        except Exception:
+            return False
 
     def _snapshot(self):
         names = {t.ident: t.name for t in threading.enumerate()}
@@ -200,6 +235,7 @@ def install():
     def drawFrame(self):
         t0 = time.perf_counter()
         rec.heartbeat = t0
+        rec.widget = self
         try:
             return original(self)
         finally:
