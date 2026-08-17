@@ -59,10 +59,14 @@ def main():
     original = ShaderWidget.drawFrame
 
     def timed(self):
-        try:
-            return original(self)
-        finally:
-            stamps.append(time.perf_counter())
+        # Only count a cycle as a presented frame if it completed without
+        # raising. renderFrame() wraps drawFrame() in its own try/finally so
+        # the render loop survives an exception; that behavior is preserved
+        # here by letting the exception propagate unchanged, we just don't
+        # record a timestamp for it.
+        result = original(self)
+        stamps.append(time.perf_counter())
+        return result
 
     ShaderWidget.drawFrame = timed
 
