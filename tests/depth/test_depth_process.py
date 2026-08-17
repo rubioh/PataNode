@@ -1,5 +1,7 @@
 """The shared-memory transport between the depth child and the render process."""
 
+import time
+
 import numpy as np
 import pytest
 
@@ -116,3 +118,112 @@ def test_a_torn_read_is_retried(ring, monkeypatch):
         assert seen["n"] > 2
     finally:
         reader.close()
+
+
+import multiprocessing
+
+from depth.depth_process import _child_main
+
+
+class FakeSource:
+    """Stands in for OrbbecSource inside the child."""
+
+    width, height, scale = 4, 3, 0.5
+    fail_on_open = False
+
+    def __init__(self):
+        self._value = 0
+
+    def open(self):
+        if type(self).fail_on_open:
+            from depth.depth_source import DepthSourceError
+
+            raise DepthSourceError("no device here")
+        return self.width, self.height, self.scale
+
+    def read(self):
+        self._value += 1
+        return np.full((self.height, self.width), self._value, dtype=np.uint16)
+
+    def close(self):
+        pass
+
+
+def run_child(source_factory):
+    """Drive _child_main in-process on a thread, over a real Pipe pair."""
+    import threading
+
+    parent_conn, child_conn = multiprocessing.Pipe()
+    thread = threading.Thread(
+        target=_child_main, args=(child_conn, source_factory), daemon=True
+    )
+    thread.start()
+    return parent_conn, thread
+
+
+def test_the_child_reports_dimensions_after_stream():
+    conn, thread = run_child(FakeSource)
+    try:
+        conn.send(("stream",))
+        assert conn.poll(5), "child never answered"
+        kind, name, width, height, scale = conn.recv()
+
+        assert kind == "ready"
+        assert (width, height, scale) == (4, 3, 0.5)
+        assert isinstance(name, str) and name
+    finally:
+        conn.send(("shutdown",))
+        thread.join(5)
+
+
+def test_the_child_publishes_frames_into_the_ring():
+    conn, thread = run_child(FakeSource)
+    try:
+        conn.send(("stream",))
+        assert conn.poll(5)
+        _, name, _, _, _ = conn.recv()
+
+        reader = FrameRing.attach(name)
+        try:
+            deadline = time.time() + 5
+            frame = None
+            while frame is None and time.time() < deadline:
+                frame, _ = reader.read(0)
+                time.sleep(0.01)
+
+            assert frame is not None, "no frame arrived"
+            assert frame.shape == (3, 4)
+        finally:
+            reader.close()
+    finally:
+        conn.send(("shutdown",))
+        thread.join(5)
+
+
+def test_a_source_that_cannot_open_is_reported_as_an_error():
+    FakeSource.fail_on_open = True
+    try:
+        conn, thread = run_child(FakeSource)
+        try:
+            conn.send(("stream",))
+            assert conn.poll(5)
+            kind, message = conn.recv()
+
+            assert kind == "error"
+            assert "no device here" in message
+        finally:
+            conn.send(("shutdown",))
+            thread.join(5)
+    finally:
+        FakeSource.fail_on_open = False
+
+
+def test_shutdown_ends_the_child_loop():
+    conn, thread = run_child(FakeSource)
+    conn.send(("stream",))
+    assert conn.poll(5)
+    conn.recv()
+    conn.send(("shutdown",))
+    thread.join(5)
+
+    assert not thread.is_alive()

@@ -127,3 +127,93 @@ class FrameRing:
     def unlink(self):
         """Destroy the block. Only the creating process calls this."""
         self._shm.unlink()
+
+
+# How long the child waits on the control pipe between capture attempts while
+# it is idle. Short enough that a shutdown is not perceptible, long enough that
+# an idle child costs nothing.
+POLL_INTERVAL_S = 0.05
+
+
+def _child_main(conn, source_factory=None):
+    """Run capture and publish frames. The entry point of the child process.
+
+    Deliberately thin: it owns no capture logic of its own, only a loop around
+    the source it is handed. That source is OrbbecSource -- the same class,
+    with the same profile selection, the same filter chain and the same error
+    messages that ran in-process before. Capture was relocated, not rewritten.
+    """
+    if source_factory is None:
+        from depth.depth_source import OrbbecSource
+
+        source_factory = OrbbecSource
+
+    source = None
+    ring = None
+
+    def teardown():
+        nonlocal source, ring
+        if source is not None:
+            try:
+                source.close()
+            except Exception:
+                pass
+            source = None
+        if ring is not None:
+            ring.close()
+            try:
+                ring.unlink()
+            except FileNotFoundError:
+                pass
+            ring = None
+
+    try:
+        while True:
+            if conn.poll(POLL_INTERVAL_S if source is None else 0):
+                try:
+                    message = conn.recv()
+                except EOFError:
+                    # The parent died. Nothing left to serve.
+                    break
+
+                command = message[0]
+
+                if command == "shutdown":
+                    break
+
+                if command == "stop":
+                    teardown()
+                    conn.send(("stopped",))
+                    continue
+
+                if command == "stream":
+                    teardown()
+                    try:
+                        source = source_factory()
+                        width, height, scale = source.open()
+                        ring = FrameRing.create(width, height)
+                    except Exception as error:
+                        teardown()
+                        conn.send(("error", str(error)))
+                        continue
+
+                    conn.send(("ready", ring.name, width, height, scale))
+
+            if source is None:
+                continue
+
+            try:
+                frame = source.read()
+            except Exception as error:
+                teardown()
+                conn.send(("error", str(error)))
+                continue
+
+            if frame is not None:
+                ring.write(frame)
+    finally:
+        teardown()
+        try:
+            conn.close()
+        except Exception:
+            pass
