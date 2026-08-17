@@ -42,10 +42,67 @@ def make_session(prev_uniforms, next_uniforms, fade=None, title="Blend"):
 
 
 class StubPlayer:
-    def __init__(self, session, current_index=0):
+    def __init__(self, session, current_index=0, scene=None):
         self.session = session
         self.current_index = current_index
         self.is_playing = False
+        if scene is not None:
+            self.scene = scene
+
+
+class FakeGrNode:
+    def __init__(self):
+        self.hovered = False
+        self.updates = 0
+
+    def update(self):
+        self.updates += 1
+
+
+class FakeNode:
+    """Just enough of a ShaderNode for the live read and the highlight."""
+
+    def __init__(self, nid, uniforms):
+        self.id = nid
+        self.grNode = FakeGrNode()
+        self._uniforms = {
+            "program": {
+                name: {"eval_function": {"value": value}}
+                for name, value in uniforms.items()
+            }
+        }
+
+    def getGpuAdaptableParameters(self):
+        return self._uniforms
+
+
+class FakeScene:
+    def __init__(self, nodes):
+        self.nodes = nodes
+
+
+def make_session_with_new_node(next_uniforms, new_node_uniforms):
+    """State 'b' introduces node 2, which state 'a' does not carry at all."""
+    return LiveSession(
+        states=[
+            SessionState(
+                "a",
+                {"type": "manual"},
+                {"nodes": [gpu_node(1, "Blend", {"speed": "1"})], "edges": []},
+            ),
+            SessionState(
+                "b",
+                {"type": "manual"},
+                {
+                    "nodes": [
+                        gpu_node(1, "Blend", next_uniforms),
+                        gpu_node(2, "Introduced", new_node_uniforms),
+                    ],
+                    "edges": [],
+                },
+            ),
+        ]
+    )
 
 
 def param_items(window):
@@ -125,6 +182,155 @@ def test_an_existing_fade_is_loaded_back(window):
     assert items["bias"].checkState(0) == Qt.Unchecked
     assert window.tree.itemWidget(items["baseBlend"], 1).text() == "0"
     assert window.tree.itemWidget(items["baseBlend"], 2).text() == "1"
+
+
+# -- nodes the target state introduces -------------------------------------
+
+
+def node_items(window):
+    return {
+        window.tree.topLevelItem(i).data(0, Qt.UserRole)[
+            "node_id"
+        ]: window.tree.topLevelItem(i)
+        for i in range(window.tree.topLevelItemCount())
+    }
+
+
+def params_of(window, node_id):
+    node_item = node_items(window)[node_id]
+    return {
+        node_item.child(j).data(0, Qt.UserRole)["uniform"]: node_item.child(j)
+        for j in range(node_item.childCount())
+    }
+
+
+def test_a_node_only_the_target_has_is_listed(window):
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    window.setTarget(StubPlayer(session), 1)
+
+    assert sorted(node_items(window)) == [1, 2]
+
+
+def test_an_introduced_row_shows_the_nodes_live_value_not_the_default(window):
+    """The fade actually eases from whatever the node currently holds, so the
+    From column has to say so rather than showing a bare 'x'."""
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    scene = FakeScene([FakeNode(1, {"speed": "1"}), FakeNode(2, {"decay": "x*3"})])
+    window.setTarget(StubPlayer(session, scene=scene), 1)
+
+    item = params_of(window, 2)["decay"]
+    assert window.tree.itemWidget(item, 1).text() == "x*3"
+
+
+def test_an_introduced_row_left_alone_still_resolves_live(window):
+    """Showing the live value must not turn it into a pinned endpoint."""
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    scene = FakeScene([FakeNode(1, {"speed": "1"}), FakeNode(2, {"decay": "x*3"})])
+    window.setTarget(StubPlayer(session, scene=scene), 1)
+    params_of(window, 2)["decay"].setCheckState(0, Qt.Checked)
+
+    window.onApply()
+
+    param = next(p for p in session.states[1].fade.params if p.node_id == 2)
+    assert param.from_value is None
+
+
+def test_an_introduced_row_already_on_target_is_not_starred(window):
+    """The union model instantiates an introduced node from the state that
+    first carries it, so on the first visit it already holds the target.
+    Starring that would promise an ease _start_fade skips as old == new."""
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    scene = FakeScene([FakeNode(1, {"speed": "1"}), FakeNode(2, {"decay": "0.8"})])
+    window.setTarget(StubPlayer(session, scene=scene), 1)
+
+    item = params_of(window, 2)["decay"]
+    assert "*" not in item.text(0)
+    assert item.checkState(0) == Qt.Unchecked
+
+
+def test_an_introduced_row_away_from_target_is_starred(window):
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    scene = FakeScene([FakeNode(1, {"speed": "1"}), FakeNode(2, {"decay": "x"})])
+    window.setTarget(StubPlayer(session, scene=scene), 1)
+
+    item = params_of(window, 2)["decay"]
+    assert "*" in item.text(0)
+    assert item.checkState(0) == Qt.Checked
+
+
+def test_an_introduced_row_falls_back_to_the_default_without_a_scene(window):
+    """The dock can point the window at a player before a scene exists; a
+    missing live value must degrade, not raise."""
+    session = make_session_with_new_node({"speed": "1"}, {"decay": "0.8"})
+    window.setTarget(StubPlayer(session), 1)
+
+    item = params_of(window, 2)["decay"]
+    assert window.tree.itemWidget(item, 1).text() == "x"
+
+
+# -- highlighting the hovered node -----------------------------------------
+
+
+def highlight_window(window):
+    session = make_session_with_new_node({"speed": "2"}, {"decay": "0.8"})
+    scene = FakeScene([FakeNode(1, {"speed": "1"}), FakeNode(2, {"decay": "x"})])
+    window.setTarget(StubPlayer(session, scene=scene), 1)
+    return {node.id: node for node in scene.nodes}
+
+
+def test_hovering_a_param_row_highlights_its_node(window):
+    nodes = highlight_window(window)
+
+    window.tree.itemEntered.emit(params_of(window, 2)["decay"], 0)
+
+    assert nodes[2].grNode.hovered is True
+    assert nodes[1].grNode.hovered is False
+
+
+def test_hovering_a_node_row_highlights_the_same_node(window):
+    nodes = highlight_window(window)
+
+    window.tree.itemEntered.emit(node_items(window)[2], 0)
+
+    assert nodes[2].grNode.hovered is True
+
+
+def test_only_one_node_stays_highlighted(window):
+    nodes = highlight_window(window)
+
+    window.tree.itemEntered.emit(node_items(window)[2], 0)
+    window.tree.itemEntered.emit(node_items(window)[1], 0)
+
+    assert nodes[1].grNode.hovered is True
+    assert nodes[2].grNode.hovered is False
+
+
+def test_dismissing_the_window_clears_the_highlight(window):
+    """Otherwise a node stays outlined on the canvas with nothing pointing
+    at it. Close rather than hide: an unshown widget gets no hide event."""
+    nodes = highlight_window(window)
+    window.tree.itemEntered.emit(node_items(window)[2], 0)
+
+    window.close()
+
+    assert nodes[2].grNode.hovered is False
+
+
+def test_retargeting_clears_the_highlight(window):
+    """Repopulating invalidates every id in the tree."""
+    nodes = highlight_window(window)
+    window.tree.itemEntered.emit(node_items(window)[2], 0)
+
+    window.setTarget(None, -1)
+
+    assert nodes[2].grNode.hovered is False
+
+
+def test_hovering_without_a_scene_does_not_raise(window):
+    session = make_session_with_new_node({"speed": "2"}, {"decay": "0.8"})
+    window.setTarget(StubPlayer(session), 1)
+
+    window.tree.itemEntered.emit(params_of(window, 2)["decay"], 0)
 
 
 # -- applying -------------------------------------------------------------

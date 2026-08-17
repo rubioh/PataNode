@@ -7,6 +7,7 @@ import pytest
 from session.fade import (
     CURVES,
     DEFAULT_CURVE,
+    DEFAULT_EXPRESSION,
     FadeParam,
     FadeSpec,
     blend_expression,
@@ -196,7 +197,9 @@ def test_candidates_offer_unchanged_params_too():
     assert params["bias"]["from"] == "x" and params["bias"]["to"] == "x*2"
 
 
-def test_candidates_skip_nodes_only_one_side_has():
+def test_candidates_offer_nodes_only_the_target_has():
+    """A node the target introduces still has somewhere to fade *to*, and the
+    union model keeps it resident, so it has a live value to fade *from*."""
     prev = {"nodes": [gpu_node(1, "A", {"speed": "1"})]}
     nxt = {
         "nodes": [
@@ -204,7 +207,56 @@ def test_candidates_skip_nodes_only_one_side_has():
             gpu_node(2, "B", {"speed": "3"}),
         ]
     }
+    candidates = {c["node_id"]: c for c in fade_candidates(prev, nxt)}
+
+    assert sorted(candidates) == [1, 2]
+    param = candidates[2]["params"][0]
+    assert param["from"] == DEFAULT_EXPRESSION
+    assert param["from_missing"] is True
+    assert param["differs"] is True
+
+
+def test_candidates_skip_nodes_only_the_previous_state_has():
+    """Nothing to fade into: the target never applies the node at all."""
+    prev = {
+        "nodes": [
+            gpu_node(1, "A", {"speed": "1"}),
+            gpu_node(2, "B", {"speed": "3"}),
+        ]
+    }
+    nxt = {"nodes": [gpu_node(1, "A", {"speed": "2"})]}
+
     assert [c["node_id"] for c in fade_candidates(prev, nxt)] == [1]
+
+
+def test_a_uniform_the_previous_state_lacks_falls_back_to_the_default():
+    """Same rule as a missing node: an unset uniform holds the identity
+    expression, so that is the honest stand-in for the outgoing side."""
+    prev = {"nodes": [gpu_node(1, "A", {"speed": "1"})]}
+    nxt = {"nodes": [gpu_node(1, "A", {"speed": "1", "decay": ".5"})]}
+
+    params = {p["uniform"]: p for p in fade_candidates(prev, nxt)[0]["params"]}
+
+    assert params["decay"]["from"] == DEFAULT_EXPRESSION
+    assert params["decay"]["from_missing"] is True
+    assert params["speed"]["from_missing"] is False
+
+
+def test_an_introduced_nodes_untouched_params_are_not_flagged_as_differing():
+    """The pre-tick heuristic rides on `differs`. A node arriving with 20
+    default uniforms must not pre-tick all 20 -- only what the target sets."""
+    prev = {"nodes": [gpu_node(1, "A", {"speed": "1"})]}
+    nxt = {
+        "nodes": [
+            gpu_node(1, "A", {"speed": "1"}),
+            gpu_node(2, "B", {"untouched": "x", "set": "0.8"}),
+        ]
+    }
+    candidates = {c["node_id"]: c for c in fade_candidates(prev, nxt)}
+    params = {p["uniform"]: p for p in candidates[2]["params"]}
+
+    assert params["untouched"]["differs"] is False
+    assert params["set"]["differs"] is True
 
 
 def test_candidates_exclude_cpu_parameters():
