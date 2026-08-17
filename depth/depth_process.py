@@ -80,19 +80,12 @@ class FrameRing:
     def attach(cls, name):
         shm = shared_memory.SharedMemory(name=name)
 
-        # Python's resource_tracker registers every block a process attaches
-        # to and warns about "leaked shared_memory objects" when that process
-        # exits -- even though this process did not create the block and must
-        # not unlink it. The child owns the block's lifetime; unregistering
-        # here keeps the parent from claiming otherwise on the way out.
-        try:
-            from multiprocessing import resource_tracker
-
-            resource_tracker.unregister(shm._name, "shared_memory")
-        except Exception:
-            # Private API. If a future Python moves it, a spurious warning on
-            # exit is not worth failing capture over.
-            pass
+        # Deliberately left registered with the resource_tracker. On the
+        # normal path the creator's unlink() clears this block's entry, so
+        # attaching here warns about nothing. On the abnormal path -- the
+        # creator dies before it unlinks -- the tracker's "leaked shared_memory
+        # objects" warning is the honest signal that a block was orphaned, not
+        # noise to be suppressed.
 
         header = np.ndarray((4,), dtype=np.uint32, buffer=shm.buf)
         return cls(shm, int(header[_WIDTH]), int(header[_HEIGHT]))
