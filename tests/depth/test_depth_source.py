@@ -4,6 +4,7 @@ import types
 import numpy as np
 import pytest
 
+from depth.depth_process import ProcessSource
 from depth.depth_source import (
     DepthSourceError,
     OrbbecSource,
@@ -513,5 +514,5 @@ def test_factory_selects_the_synthetic_source():
 
 
 def test_factory_defaults_to_the_real_camera():
-    assert isinstance(make_source_factory("orbbec")(), OrbbecSource)
-    assert isinstance(make_source_factory("anything-else")(), OrbbecSource)
+    assert isinstance(make_source_factory("orbbec")(), ProcessSource)
+    assert isinstance(make_source_factory("anything-else")(), ProcessSource)

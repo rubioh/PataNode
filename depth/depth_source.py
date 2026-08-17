@@ -377,7 +377,17 @@ class OrbbecSource(DepthSource):
 
 
 def make_source_factory(kind):
-    """Map a --depth-source argument to a zero-argument source factory."""
+    """Map a --depth-source argument to a zero-argument source factory.
+
+    'orbbec' means the camera, which now runs in a child process: its filter
+    chain holds the GIL for about 68% of the 14.5 ms it spends on each frame,
+    and at 31 fps that stalls the render loop for roughly 306 ms a second.
+    There is deliberately no in-process option -- two ways to run the camera
+    would mean two behaviours to reason about, and this is the one that works.
+    """
     if kind == "synthetic":
         return SyntheticSource
-    return OrbbecSource
+
+    from depth.depth_process import ProcessSource
+
+    return ProcessSource

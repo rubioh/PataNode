@@ -9,7 +9,8 @@ import subprocess
 import sys
 
 from depth.depth_engine import DepthEngine, DepthStatus
-from depth.depth_source import OrbbecSource, SyntheticSource, make_source_factory
+from depth.depth_process import ProcessSource
+from depth.depth_source import SyntheticSource, make_source_factory
 
 # Anchored on this file's location, not the process cwd: pytest may be invoked
 # from anywhere, and a cwd-relative "main.py" would either raise or (worse)
@@ -47,4 +48,4 @@ def test_an_engine_built_from_the_default_factory_stays_idle():
 
 def test_the_synthetic_factory_is_selected_by_name():
     assert isinstance(make_source_factory("synthetic")(), SyntheticSource)
-    assert isinstance(make_source_factory("orbbec")(), OrbbecSource)
+    assert isinstance(make_source_factory("orbbec")(), ProcessSource)
