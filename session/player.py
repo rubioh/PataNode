@@ -13,6 +13,26 @@ from session.trigger import evaluate_trigger, make_entry_snapshot
 from session.validation import Finding, validate_session
 
 
+def read_live_param(node, program, uniform):
+    """The expression string a node currently holds for one uniform.
+
+    Returns None for anything that isn't a real ShaderNode carrying that
+    uniform -- a fade must degrade to a hard cut, never raise into the
+    60 Hz audio slot that drives tick().
+
+    Module-level because the Fade editor needs the identical read to show
+    what an introduced node will actually ease away from
+    (gui/widgets/fade_window.py).
+    """
+    getter = getattr(node, "getGpuAdaptableParameters", None)
+    if getter is None:
+        return None
+    try:
+        return getter()[program][uniform]["eval_function"]["value"]
+    except (KeyError, TypeError):
+        return None
+
+
 class SessionPlayer:
     def __init__(self, scene, on_status=None, on_evaluate=None):
         self.scene = scene
@@ -237,21 +257,9 @@ class SessionPlayer:
 
     # -- fades --------------------------------------------------------------
 
-    @staticmethod
-    def _read_live_param(node, program, uniform):
-        """The expression string a node currently holds for one uniform.
-
-        Returns None for anything that isn't a real ShaderNode carrying that
-        uniform -- a fade must degrade to a hard cut, never raise into the
-        60 Hz audio slot that drives tick().
-        """
-        getter = getattr(node, "getGpuAdaptableParameters", None)
-        if getter is None:
-            return None
-        try:
-            return getter()[program][uniform]["eval_function"]["value"]
-        except (KeyError, TypeError):
-            return None
+    # Kept as a name on the class: the module-level function is the
+    # implementation, this is what the fade code below reads through.
+    _read_live_param = staticmethod(read_live_param)
 
     @staticmethod
     def _write_live_param(node, program, uniform, value) -> bool:

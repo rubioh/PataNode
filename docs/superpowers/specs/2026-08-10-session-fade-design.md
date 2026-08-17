@@ -48,7 +48,8 @@ the design leans on:
 | Topology | Edges rewire at t=0, exactly as today | Zero risk to the existing switch path. A newly-connected branch still pops in; hide it by fading its blend parameter. |
 | Interrupt | Seamless — the live expression becomes the next fade's `old` | No pop on Next. Nesting capped at `MAX_NESTING = 4`, past which the interrupted fade's clean target is used. |
 | Param kinds | GPU uniforms only | CPU params are read as raw strings with no `eval` (`getSingleCpuParameters`), so a blend expression would reach the consumer as literal text. |
-| Candidate list | **All** GPU uniforms of every common node, differing ones pre-ticked | A `Blend` node stores the same `baseBlend` in both states — only the wiring differs — and sweeping it is what makes the transition a crossfade. Listing only what differs would hide it. |
+| Candidate list | **All** GPU uniforms of every node the *target* state carries, differing ones pre-ticked | A `Blend` node stores the same `baseBlend` in both states — only the wiring differs — and sweeping it is what makes the transition a crossfade. Listing only what differs would hide it. |
+| Nodes the previous state lacks | Offered, outgoing side defaults to `"x"` | The node has a value to ease into, and the union model keeps it resident, so it has a live value to ease out of. Requiring it in both states meant an introduced node could only ever hard-cut. Prev-only nodes stay excluded — nothing to fade into. |
 | Endpoint overrides | Per-param `from`/`to`, null = resolve at switch time | Null keeps a fade path-independent; explicit values are the Blend case. |
 
 ## File format
@@ -105,6 +106,17 @@ synthesized blend expression reaching a saved file would be
 indistinguishable from one the user typed, and would become the *target* of
 every later fade — the same class of bug as commit 7ba3213.
 
+`fade_candidates` substitutes `"x"` — `program_base.IDENTITY_EXPRESSION`, what
+an unset uniform holds — only when the outgoing value is *absent* (missing node
+or missing uniform), never when it is present but blank; a blanked expression is
+malformed and stays dropped. The substitute is flagged `from_missing` so the
+editor can show the node's real live value instead, read through
+`session.player.read_live_param`. That is display only: an untouched endpoint
+still persists as `null` and resolves live at switch time, so these fades stay
+path-independent like every other. `differs` keeps the pre-tick honest by
+itself — an introduced node's untouched uniforms sit at `"x"` on both sides, so
+a node arriving with 20 defaults pre-ticks none of them.
+
 `gui/widgets/fade_window.py` is a top-level `QWidget` following
 `PalettePreviewWindow`: created lazily by the dock, then shown/hidden, never
 rebuilt. No refresh timer — it is an editor, not a live view. Only nodes
@@ -112,10 +124,20 @@ with something ticked start expanded: a real state pair in
 `saved/physarum_depth.pnlive` is 22 nodes and 125 parameters with **3**
 differing, and expanding all of it buries the rows worth looking at.
 
+At that size a row is hard to tie back to a node on the canvas, so hovering one
+outlines its node in the graph. It drives `QDMGraphicsNode.hovered`
+(`nodeeditor/node_graphics_node.py:257`) rather than inventing a second
+highlight, so pointing at a row reads exactly like pointing at the node. Node
+rows carry the same `node_id` role as their parameter rows, so either resolves
+the same way. Cleared on viewport `Leave`, on hide, on close, and on `setTarget`
+— repopulating invalidates every id. The whole path is `getattr`-guarded: the
+window can be pointed at a player before a scene exists, and a hover must never
+raise.
+
 ## Verification
 
 `tests/session/test_fade.py`, `test_player_fade.py`, `test_fade_window.py`,
-plus fade cases in `test_validation.py` — 281 tests pass.
+plus fade cases in `test_validation.py` — 389 tests pass.
 
 Verified end to end against `saved/physarum_depth.pnlive` on 22 real
 `ShaderNode`s with compiled GLSL and a standalone GL context: the three
