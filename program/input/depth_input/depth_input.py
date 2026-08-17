@@ -15,6 +15,13 @@ OP_CODE_DEPTH_INPUT = name_to_opcode("DepthInput")
 DEFAULT_NEAR_MM = 500.0
 DEFAULT_FAR_MM = 4000.0
 
+# One full band cycle every 500mm: seven bands across the default 500..4000
+# window, which is coarse enough to read as distinct contours on a person and
+# fine enough that a step forward crosses one. Off by default, so every scene
+# saved before the banded mode existed keeps rendering its plain ramp.
+DEFAULT_PERIOD_MM = 500.0
+DEFAULT_OSCILLATE = 0.0
+
 # Slow enough to be free, fast enough that a disconnect shows up while the user
 # is still looking at the node.
 TOOLTIP_REFRESH_MS = 500
@@ -66,6 +73,12 @@ class DepthInput(ProgramBase):
         self.flip_x = 0.0
         self.flip_y = 0.0
 
+        # Left drivable from the inspector rather than protected: modulating
+        # the period is the whole point of the mode -- an audio-driven period
+        # makes the contours breathe in and out with the sound.
+        self.oscillate = DEFAULT_OSCILLATE
+        self.period_mm = DEFAULT_PERIOD_MM
+
         # Reported by the sensor, not a user control -- protected below.
         self.depth_scale = 1.0
 
@@ -98,6 +111,8 @@ class DepthInput(ProgramBase):
             "far_mm": "far_mm",
             "flip_x": "flip_x",
             "flip_y": "flip_y",
+            "oscillate": "oscillate",
+            "period_mm": "period_mm",
             "depth_scale": "depth_scale",
         }
         super().initUniformsBinding(binding, program_name="")
