@@ -9,7 +9,7 @@ All the dict-walking lives in session/fade.py:fade_candidates. This file is
 only the widget.
 """
 
-from PyQt5.QtCore import QEvent, Qt
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QComboBox,
     QDoubleSpinBox,
@@ -30,9 +30,7 @@ from session.fade import (
     FadeParam,
     FadeSpec,
     fade_candidates,
-    is_blendable,
 )
-from session.player import read_live_param
 
 PARAM_ROLE = Qt.UserRole
 
@@ -49,8 +47,6 @@ class QDMFadeWindow(QWidget):
         # state list's duration marker without this window holding a
         # reference back to the dock.
         self.on_applied = None
-        # Node id currently outlined on the canvas, or None. One at a time.
-        self._highlighted = None
 
         layout = QVBoxLayout()
 
@@ -62,13 +58,6 @@ class QDMFadeWindow(QWidget):
         self.tree.setColumnCount(3)
         self.tree.setHeaderLabels(["Parameter", "From", "To"])
         self.tree.setColumnWidth(0, 260)
-        # itemEntered only fires with mouse tracking on; the viewport is what
-        # actually receives the moves. The Leave filter is what clears the
-        # highlight when the pointer exits the tree without entering a row.
-        self.tree.setMouseTracking(True)
-        self.tree.viewport().setMouseTracking(True)
-        self.tree.viewport().installEventFilter(self)
-        self.tree.itemEntered.connect(self.onItemEntered)
         layout.addWidget(self.tree)
 
         controls = QHBoxLayout()
@@ -102,9 +91,6 @@ class QDMFadeWindow(QWidget):
 
     def setTarget(self, player, index: int) -> None:
         """Point the window at "the fade into state `index`"."""
-        # Before the reassignment: clearing has to reach the scene the
-        # highlighted id belongs to, and repopulating invalidates every id.
-        self._highlight(None)
         self.player = player
         self.index = index
         self.tree.clear()
@@ -182,9 +168,6 @@ class QDMFadeWindow(QWidget):
             node_item.flags() | Qt.ItemIsUserCheckable | Qt.ItemIsAutoTristate
         )
         node_item.setCheckState(0, Qt.Unchecked)
-        # Same role as the param rows carry, so hovering either resolves to
-        # one node id without the handler caring which kind of row it got.
-        node_item.setData(0, PARAM_ROLE, {"node_id": candidate["node_id"]})
 
         for param in candidate["params"]:
             self._addParam(node_item, candidate["node_id"], param, selected)
@@ -202,32 +185,13 @@ class QDMFadeWindow(QWidget):
 
     def _addParam(self, node_item, node_id, param: dict, selected: dict) -> None:
         item = QTreeWidgetItem(node_item)
+        item.setText(0, param["uniform"] + ("  *" if param["differs"] else ""))
+        if param["differs"]:
+            item.setToolTip(0, "Differs between the two states")
         item.setFlags(item.flags() | Qt.ItemIsUserCheckable)
 
         key = (node_id, param["program"], param["uniform"])
         chosen = selected.get(key) if selected is not None else None
-
-        # A node the previous state does not carry has no stored outgoing
-        # value, so fade_candidates hands over the bare default. The fade
-        # will actually ease from whatever the node holds live -- show that
-        # instead, and keep it as `state_from` so leaving the field alone
-        # still persists null and still resolves live at switch time.
-        state_from = param["from"]
-        differs = param["differs"]
-        if param["from_missing"]:
-            live = self._liveValue(node_id, param["program"], param["uniform"])
-            if is_blendable(live):
-                state_from = live
-                # Re-judge against what is actually on screen. The model
-                # compared against the default because it cannot see the live
-                # scene; starring a row whose From and To read identical would
-                # promise an ease that _start_fade skips as old == new.
-                differs = state_from != param["to"]
-
-        item.setText(0, param["uniform"] + ("  *" if differs else ""))
-        if differs:
-            item.setToolTip(0, "Differs between the two states")
-
         item.setData(
             0,
             PARAM_ROLE,
@@ -237,7 +201,7 @@ class QDMFadeWindow(QWidget):
                 "uniform": param["uniform"],
                 # The state values, kept so onApply can tell an edited
                 # endpoint from an untouched one and leave the latter null.
-                "state_from": state_from,
+                "state_from": param["from"],
                 "state_to": param["to"],
             },
         )
@@ -248,13 +212,13 @@ class QDMFadeWindow(QWidget):
         else:
             # Never authored: differing parameters are the ones worth easing,
             # so pre-tick them and leave the rest as opt-in.
-            checked = differs
+            checked = param["differs"]
         item.setCheckState(0, Qt.Checked if checked else Qt.Unchecked)
 
         from_edit = QLineEdit(
             chosen.from_value
             if chosen is not None and chosen.from_value is not None
-            else state_from
+            else param["from"]
         )
         to_edit = QLineEdit(
             chosen.to_value
@@ -263,75 +227,6 @@ class QDMFadeWindow(QWidget):
         )
         self.tree.setItemWidget(item, 1, from_edit)
         self.tree.setItemWidget(item, 2, to_edit)
-
-    # -- the live scene ---------------------------------------------------
-
-    def _sceneNode(self, node_id):
-        """The live node behind a row, or None.
-
-        getattr rather than an attribute: the dock can point this window at a
-        player before a scene exists, and neither a hover nor a repopulate
-        may raise over it.
-        """
-        scene = getattr(self.player, "scene", None)
-        if scene is None:
-            return None
-        for node in getattr(scene, "nodes", []):
-            if node.id == node_id:
-                return node
-        return None
-
-    def _liveValue(self, node_id, program, uniform):
-        node = self._sceneNode(node_id)
-        if node is None:
-            return None
-        return read_live_param(node, program, uniform)
-
-    # -- highlighting -----------------------------------------------------
-
-    def onItemEntered(self, item, column) -> None:
-        meta = item.data(0, PARAM_ROLE)
-        self._highlight(meta["node_id"] if meta else None)
-
-    def _highlight(self, node_id) -> None:
-        if node_id == self._highlighted:
-            return
-        self._setHovered(self._highlighted, False)
-        self._highlighted = node_id
-        self._setHovered(node_id, True)
-
-    def _setHovered(self, node_id, on: bool) -> None:
-        """Drive the graph's own hover outline rather than inventing one.
-
-        QDMGraphicsNode already paints a 3px #FF37A6FF outline off this flag
-        (nodeeditor/node_graphics_node.py:257), so pointing at a row reads
-        exactly like pointing at the node.
-        """
-        if node_id is None:
-            return
-        node = self._sceneNode(node_id)
-        gr_node = getattr(node, "grNode", None)
-        if gr_node is None:
-            return
-        gr_node.hovered = on
-        gr_node.update()
-
-    def eventFilter(self, obj, event):
-        # The pointer can leave the tree without ever entering another row,
-        # which itemEntered alone would never tell us about.
-        if obj is self.tree.viewport() and event.type() == QEvent.Leave:
-            self._highlight(None)
-        return super().eventFilter(obj, event)
-
-    # Both dismissal paths, because they deliver different events: the dock
-    # hides this window, the Close button closes it.
-    def hideEvent(self, event):
-        self._highlight(None)
-        super().hideEvent(event)
-
-    def closeEvent(self, event):
-        self._highlight(None)
-        super().closeEvent(event)
 
     # -- applying ---------------------------------------------------------
 

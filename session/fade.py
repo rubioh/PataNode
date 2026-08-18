@@ -26,12 +26,6 @@ from session.propagation import values_for_kind
 DEFAULT_DURATION = 1.0
 DEFAULT_CURVE = "smoothstep"
 
-# What an unset GPU uniform holds: program_base.IDENTITY_EXPRESSION, the
-# pass-through that getAdaptableEvaluationForUniform short-circuits before any
-# eval machinery runs. Duplicated rather than imported -- this module is
-# deliberately free of GL imports, and program_base pulls in the whole renderer.
-DEFAULT_EXPRESSION = "x"
-
 CURVES = {
     "linear": lambda a: a,
     "smoothstep": lambda a: a * a * (3.0 - 2.0 * a),
@@ -215,23 +209,15 @@ class ActiveFade:
 def fade_candidates(prev_scene: dict, next_scene: dict) -> list:
     """Every GPU uniform that could be faded between two scene snapshots.
 
-    Driven by the *target* scene. A node the previous state does not carry
-    is still offered: it has a value to ease into, and the union model keeps
-    it resident (model.py:compute_union), so it also has a live value to
-    ease out of. Its missing outgoing side reads as DEFAULT_EXPRESSION here
-    -- a stand-in for display, since an untouched endpoint persists as null
-    and resolves live at switch time. `from_missing` tells the GUI which
-    rows those are, so it can show the node's real current value instead.
+    Only nodes present in *both* scenes: the union model keeps every node
+    resident, so a node missing from one side has no meaningful "from" or
+    "to" value to ease between.
 
-    A node only the *previous* scene has is excluded for free: there is
-    nothing to fade into.
-
-    Every uniform of every listed node is offered, not only the ones that
+    Every uniform of every common node is offered, not only the ones that
     differ. A Blend node routinely stores the same baseBlend in both states
     -- what changes is the wiring -- and sweeping it is exactly what makes
     the transition a crossfade. `differs` marks the ones the GUI
-    pre-selects; an introduced node's untouched uniforms sit at
-    DEFAULT_EXPRESSION on both sides, so they do not flood that heuristic.
+    pre-selects.
 
     CPU parameters are excluded on purpose: they are read as raw strings
     with no eval (ProgramBase.getSingleCpuParameters), so a blend
@@ -242,19 +228,12 @@ def fade_candidates(prev_scene: dict, next_scene: dict) -> list:
     candidates = []
     for next_node in next_scene.get("nodes", []):
         prev_node = prev_nodes.get(next_node["id"])
+        if prev_node is None:
+            continue
 
         params = []
         for program, uniform, new_value in values_for_kind(next_node, "gpu"):
-            old_value = (
-                _lookup(prev_node, program, uniform) if prev_node is not None else None
-            )
-            # Absent, not blank. A missing node or a missing uniform means the
-            # outgoing side is simply the default. A value that is present but
-            # empty is a malformed expression, and defaulting it would offer a
-            # row the user deliberately blanked -- leave it dropped below.
-            from_missing = old_value is None
-            if from_missing:
-                old_value = DEFAULT_EXPRESSION
+            old_value = _lookup(prev_node, program, uniform)
             if not (is_blendable(old_value) and is_blendable(new_value)):
                 continue
             params.append(
@@ -263,7 +242,6 @@ def fade_candidates(prev_scene: dict, next_scene: dict) -> list:
                     "uniform": uniform,
                     "from": old_value,
                     "to": new_value,
-                    "from_missing": from_missing,
                     "differs": old_value != new_value,
                 }
             )
