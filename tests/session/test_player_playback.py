@@ -187,3 +187,30 @@ def test_cold_start_does_not_advance_on_stale_baseline(scene):
 
     built.tick({"kick_count": 5008}, 102.0)
     assert built.current_index == 1
+
+
+def test_playback_wraps_to_the_first_state_when_looping(scene):
+    """The looping counterpart of test_playback_stops_at_the_last_state:
+    the last state's own trigger fires and playback rolls back to state 0.
+    """
+    session = LiveSession(
+        states=[
+            SessionState("a", {"type": "manual"}, make_scene([node(1)])),
+            SessionState(
+                "b",
+                {"type": "audio", "feature": "kick_count", "count": 4},
+                make_scene([node(1), node(2)]),
+            ),
+        ],
+        loop=True,
+    )
+    built = SessionPlayer(scene)
+    built.load(session, {100}, {"kick_count"})
+    built.goTo(1)
+    built.play()
+
+    built.tick({"kick_count": 10}, 1.0)  # anchors the baseline
+    assert built.current_index == 1
+
+    built.tick({"kick_count": 14}, 2.0)  # delta 4 -> fires, wrapping
+    assert built.current_index == 0

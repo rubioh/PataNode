@@ -1,6 +1,7 @@
 """Live session dock: state list, transport, and the validation banner."""
 
 from PyQt5.QtWidgets import (
+    QCheckBox,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -69,6 +70,12 @@ class QDMSessionDock(QWidget):
             self.btn_fade,
         ):
             transport.addWidget(button)
+        self.chk_loop = QCheckBox("Loop")
+        self.chk_loop.setToolTip(
+            "Advancing past the last state returns to the first one"
+        )
+        self.chk_loop.setEnabled(False)
+        transport.addWidget(self.chk_loop)
         layout.addLayout(transport)
 
         self.setLayout(layout)
@@ -80,6 +87,7 @@ class QDMSessionDock(QWidget):
         self.btn_reload.clicked.connect(self.onFixAndReload)
         self.btn_capture.clicked.connect(self.onCapture)
         self.btn_fade.clicked.connect(self.onFade)
+        self.chk_loop.toggled.connect(self.onLoopToggled)
 
     def setPlayer(self, player):
         self.player = player
@@ -149,6 +157,7 @@ class QDMSessionDock(QWidget):
 
     def refresh(self):
         self.state_list.clear()
+        self._refreshLoopCheckbox()
         if self.player is None or self.player.session is None:
             return
 
@@ -170,6 +179,23 @@ class QDMSessionDock(QWidget):
             self.state_list.addItem(item)
 
         self.btn_play.setText("❚❚ Pause" if self.player.is_playing else "▶ Play")
+
+    def _refreshLoopCheckbox(self):
+        """Display the session's loop flag without writing it back.
+
+        Signals are blocked around setChecked: a refresh is a read of the
+        model, so it must not re-enter onLoopToggled, which is a write.
+        """
+        session = self.player.session if self.player is not None else None
+        self.chk_loop.blockSignals(True)
+        self.chk_loop.setEnabled(session is not None)
+        self.chk_loop.setChecked(session is not None and session.loop)
+        self.chk_loop.blockSignals(False)
+
+    def onLoopToggled(self, checked):
+        if self.player is None or self.player.session is None:
+            return
+        self.player.session.loop = checked
 
     @staticmethod
     def _fade_summary(state):

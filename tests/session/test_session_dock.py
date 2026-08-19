@@ -431,3 +431,46 @@ def test_capture_resets_the_trigger_entry_baseline():
     node.onSessionCapture()
 
     assert player._entry is None
+
+
+def test_loop_checkbox_reflects_the_loaded_session(qapp):
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, make_scene())])
+    dock = QDMSessionDock()
+    dock.setPlayer(StubPlayer(session, current_index=0))
+
+    assert dock.chk_loop.isChecked() is False
+
+    session.loop = True
+    dock.refresh()
+    assert dock.chk_loop.isChecked() is True
+
+
+def test_toggling_the_loop_checkbox_updates_the_session(qapp):
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, make_scene())])
+    dock = QDMSessionDock()
+    dock.setPlayer(StubPlayer(session, current_index=0))
+
+    dock.chk_loop.setChecked(True)
+    assert session.loop is True
+
+    dock.chk_loop.setChecked(False)
+    assert session.loop is False
+
+
+def test_loop_checkbox_is_disabled_without_a_session(qapp):
+    dock = QDMSessionDock()
+    dock.refresh()
+
+    assert dock.chk_loop.isEnabled() is False
+    assert dock.chk_loop.isChecked() is False
+
+
+def test_loop_toggle_is_inert_without_a_player(qapp):
+    """onFixAndReload drops the player and refreshes, which unchecks the
+    box and fires this handler. Without the guard it would raise inside a
+    Qt slot -- where PyQt swallows the traceback and the dock is left in a
+    half-updated state nobody sees reported.
+    """
+    dock = QDMSessionDock()
+    dock.onLoopToggled(True)  # must not raise
+    assert dock.player is None

@@ -178,3 +178,28 @@ def test_saved_file_is_valid_json_with_states(tmp_path):
     data = json.loads(path.read_text())
     assert data["version"] == SESSION_VERSION
     assert len(data["states"]) == 2
+
+
+def test_loop_defaults_off():
+    assert make_session().loop is False
+
+
+def test_loop_key_is_omitted_when_off():
+    """A session that never used looping round-trips byte-identically, the
+    same reason `fade` is omitted -- see the SESSION_VERSION comment."""
+    assert "loop" not in make_session().to_dict()
+
+
+def test_loop_round_trips_when_on():
+    session = make_session()
+    session.loop = True
+
+    data = session.to_dict()
+    assert data["loop"] is True
+    assert LiveSession.from_dict(data).loop is True
+
+
+def test_loop_defaults_off_for_a_file_written_before_the_feature():
+    data = make_session().to_dict()
+    data.pop("loop", None)
+    assert LiveSession.from_dict(data).loop is False
