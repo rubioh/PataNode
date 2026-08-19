@@ -23,6 +23,12 @@ class TriggerResult(NamedTuple):
 
 def make_entry_snapshot(trigger: dict, features: dict, now: float) -> dict:
     """Capture whatever state this trigger needs to measure from."""
+    if trigger.get("type") == "time":
+        # Anchored on arrival: `now` is time.monotonic() (app.py), already
+        # large when the app has been up a while, so a timer must measure
+        # elapsed-since-entry rather than compare `now` against `seconds`.
+        return {"entered_at": now}
+
     if trigger.get("type") != "audio":
         return {}
 
@@ -39,6 +45,16 @@ def evaluate_trigger(
     trigger: dict, features: dict, entry: dict, now: float
 ) -> TriggerResult:
     """Decide whether playback should advance."""
+    if trigger.get("type") == "time":
+        # trigger["seconds"] unguarded on purpose: a timer with no duration
+        # is a malformed trigger, and SessionPlayer.tick's KeyError guard
+        # turns it into "never advances" plus one status warning. Defaulting
+        # to some number here would instead invent a tempo the set never
+        # asked for. validate_session rejects the shape at load time.
+        return TriggerResult(
+            now - entry.get("entered_at", now) >= trigger["seconds"], entry
+        )
+
     if trigger.get("type") != "audio":
         return TriggerResult(False, entry)
 

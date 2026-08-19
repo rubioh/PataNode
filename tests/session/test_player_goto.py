@@ -427,3 +427,51 @@ def test_goto_restores_edges_when_rewire_raises(loaded, monkeypatch):
     assert loaded.scene.edges[0].end_socket.id == 20
 
     assert messages
+
+
+def test_next_wraps_to_the_first_state_when_looping(loaded):
+    loaded.session.loop = True
+    loaded.goTo(1)
+
+    assert loaded.next() is True
+    assert loaded.current_index == 0
+
+
+def test_prev_wraps_to_the_last_state_when_looping(loaded):
+    loaded.session.loop = True
+    loaded.goTo(0)
+
+    assert loaded.prev() is True
+    assert loaded.current_index == 1
+
+
+def test_looping_next_before_the_first_goto_still_starts_at_state_zero(loaded):
+    """load() leaves current_index at -1. Wrapping must not turn that into
+    a jump to the last state -- the first Next still opens the set."""
+    loaded.session.loop = True
+    assert loaded.current_index == -1
+
+    assert loaded.next() is True
+    assert loaded.current_index == 0
+
+
+def test_looping_next_on_a_single_state_session_re_enters_it(scene):
+    session = LiveSession(
+        states=[SessionState("only", {"type": "manual"}, make_scene([node(1)]))],
+        loop=True,
+    )
+    player = SessionPlayer(scene)
+    player.load(session, OPCODES, FEATURES)
+    player.goTo(0)
+
+    assert player.next() is True
+    assert player.current_index == 0
+
+
+def test_looping_next_on_an_empty_session_does_nothing(scene):
+    player = SessionPlayer(scene)
+    player.load(LiveSession(loop=True), OPCODES, FEATURES)
+
+    assert player.next() is False
+    assert player.prev() is False
+    assert player.current_index == -1

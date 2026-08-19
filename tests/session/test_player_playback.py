@@ -187,3 +187,104 @@ def test_cold_start_does_not_advance_on_stale_baseline(scene):
 
     built.tick({"kick_count": 5008}, 102.0)
     assert built.current_index == 1
+
+
+def test_playback_wraps_to_the_first_state_when_looping(scene):
+    """The looping counterpart of test_playback_stops_at_the_last_state:
+    the last state's own trigger fires and playback rolls back to state 0.
+    """
+    session = LiveSession(
+        states=[
+            SessionState("a", {"type": "manual"}, make_scene([node(1)])),
+            SessionState(
+                "b",
+                {"type": "audio", "feature": "kick_count", "count": 4},
+                make_scene([node(1), node(2)]),
+            ),
+        ],
+        loop=True,
+    )
+    built = SessionPlayer(scene)
+    built.load(session, {100}, {"kick_count"})
+    built.goTo(1)
+    built.play()
+
+    built.tick({"kick_count": 10}, 1.0)  # anchors the baseline
+    assert built.current_index == 1
+
+    built.tick({"kick_count": 14}, 2.0)  # delta 4 -> fires, wrapping
+    assert built.current_index == 0
+
+
+def timed_player(scene, seconds=8.0, loop=False):
+    session = LiveSession(
+        states=[
+            SessionState(
+                "a", {"type": "time", "seconds": seconds}, make_scene([node(1)])
+            ),
+            SessionState(
+                "b",
+                {"type": "time", "seconds": seconds},
+                make_scene([node(1), node(2)]),
+            ),
+        ],
+        loop=loop,
+    )
+    built = SessionPlayer(scene)
+    built.load(session, {100}, set())
+    built.goTo(0)
+    return built
+
+
+def test_timed_states_advance_on_their_own(scene):
+    player = timed_player(scene, seconds=8.0)
+    player.play()
+
+    player.tick({}, 1000.0)  # anchors the timer
+    assert player.current_index == 0
+
+    player.tick({}, 1007.9)
+    assert player.current_index == 0
+
+    player.tick({}, 1008.0)
+    assert player.current_index == 1
+
+
+def test_a_timed_loop_runs_scene_to_scene_without_stopping(scene):
+    player = timed_player(scene, seconds=5.0, loop=True)
+    player.play()
+
+    now = 1000.0
+    seen = []
+    for _ in range(120):  # two minutes of ticks at 0.5 s
+        player.tick({}, now)
+        seen.append(player.current_index)
+        now += 0.5
+
+    assert seen[-1] in (0, 1)
+    # 60 s of playback at 5 s per state: the set must have cycled several
+    # times, which only happens if the last state wraps back to the first.
+    assert seen.count(0) > 1 and seen.count(1) > 1
+    assert any(seen[i] == 1 and seen[i + 1] == 0 for i in range(len(seen) - 1))
+
+
+def test_pausing_restarts_the_timer_instead_of_banking_the_pause(scene):
+    """Pause for a minute on an 8 s scene and hit Play: without re-anchoring
+    on resume, the first tick sees a 60 s elapsed time and flips the state
+    instantly, mid-note.
+    """
+    player = timed_player(scene, seconds=8.0)
+    player.play()
+    player.tick({}, 1000.0)  # anchors at 1000
+
+    player.pause()
+    player.play()
+
+    player.tick({}, 1060.0)  # 60 s later: re-anchors, does not advance
+    assert player.current_index == 0
+
+    player.tick({}, 1065.0)  # only 5 s since the resume
+    assert player.current_index == 0
+
+    player.tick({}, 1068.0)  # a full 8 s since the resume
+    assert player.current_index == 1

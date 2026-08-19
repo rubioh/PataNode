@@ -150,12 +150,28 @@ class SessionPlayer:
         return True
 
     def next(self) -> bool:
+        if self._loops() and self.current_index == len(self.session.states) - 1:
+            return self.goTo(0)
         return self.goTo(self.current_index + 1)
 
     def prev(self) -> bool:
         if self.current_index <= 0:
+            # current_index is -1 before the first goTo: nothing is showing
+            # yet, so there is nothing to step back from, looping or not.
+            if self.current_index == 0 and self._loops():
+                return self.goTo(len(self.session.states) - 1)
             return False
         return self.goTo(self.current_index - 1)
+
+    def _loops(self) -> bool:
+        """Whether the ends of the session are joined.
+
+        An empty session never wraps -- there is no state to wrap onto, and
+        the index arithmetic in next/prev would otherwise run past the ends.
+        """
+        return (
+            self.session is not None and self.session.loop and bool(self.session.states)
+        )
 
     # -- internals --------------------------------------------------------
 
@@ -395,6 +411,13 @@ class SessionPlayer:
 
     def pause(self) -> None:
         self.is_playing = False
+        # Re-anchor on resume rather than banking the pause: a paused
+        # session still receives ticks, and without this a state paused for
+        # a minute would see a 60 s elapsed time on the first tick after
+        # Play and flip instantly -- a timer trigger outright, and an audio
+        # counter through whatever accumulated meanwhile. Same stale-baseline
+        # protection goTo applies, for the same reason.
+        self._entry = None
 
     def tick(self, features: dict, now: float) -> None:
         """Called from the audio timer. Advances if the trigger fires."""

@@ -431,3 +431,185 @@ def test_capture_resets_the_trigger_entry_baseline():
     node.onSessionCapture()
 
     assert player._entry is None
+
+
+def test_loop_checkbox_reflects_the_loaded_session(qapp):
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, make_scene())])
+    dock = QDMSessionDock()
+    dock.setPlayer(StubPlayer(session, current_index=0))
+
+    assert dock.chk_loop.isChecked() is False
+
+    session.loop = True
+    dock.refresh()
+    assert dock.chk_loop.isChecked() is True
+
+
+def test_toggling_the_loop_checkbox_updates_the_session(qapp):
+    session = LiveSession(states=[SessionState("a", {"type": "manual"}, make_scene())])
+    dock = QDMSessionDock()
+    dock.setPlayer(StubPlayer(session, current_index=0))
+
+    dock.chk_loop.setChecked(True)
+    assert session.loop is True
+
+    dock.chk_loop.setChecked(False)
+    assert session.loop is False
+
+
+def test_loop_checkbox_is_disabled_without_a_session(qapp):
+    dock = QDMSessionDock()
+    dock.refresh()
+
+    assert dock.chk_loop.isEnabled() is False
+    assert dock.chk_loop.isChecked() is False
+
+
+def test_loop_toggle_is_inert_without_a_player(qapp):
+    """onFixAndReload drops the player and refreshes, which unchecks the
+    box and fires this handler. Without the guard it would raise inside a
+    Qt slot -- where PyQt swallows the traceback and the dock is left in a
+    half-updated state nobody sees reported.
+    """
+    dock = QDMSessionDock()
+    dock.onLoopToggled(True)  # must not raise
+    assert dock.player is None
+
+
+def timed_dock(qapp, triggers):
+    session = LiveSession(
+        states=[
+            SessionState("s%d" % i, trigger, make_scene())
+            for i, trigger in enumerate(triggers)
+        ]
+    )
+    dock = QDMSessionDock()
+    dock.setPlayer(StubPlayer(session, current_index=0))
+    return dock, session
+
+
+def test_timer_spinbox_shows_the_selected_states_duration(qapp):
+    dock, _ = timed_dock(qapp, [{"type": "manual"}, {"type": "time", "seconds": 8.0}])
+
+    dock.state_list.setCurrentRow(1)
+    assert dock.spin_timer.value() == 8.0
+
+    dock.state_list.setCurrentRow(0)
+    assert dock.spin_timer.value() == 0.0
+
+
+def test_setting_the_timer_writes_a_time_trigger_to_the_selected_state(qapp):
+    dock, session = timed_dock(qapp, [{"type": "manual"}, {"type": "manual"}])
+
+    dock.state_list.setCurrentRow(1)
+    dock.spin_timer.setValue(12.5)
+
+    assert session.states[1].trigger == {"type": "time", "seconds": 12.5}
+    assert session.states[0].trigger == {"type": "manual"}
+
+
+def test_zero_seconds_clears_the_timer_back_to_manual(qapp):
+    dock, session = timed_dock(qapp, [{"type": "time", "seconds": 8.0}])
+
+    dock.state_list.setCurrentRow(0)
+    dock.spin_timer.setValue(0.0)
+
+    assert session.states[0].trigger == {"type": "manual"}
+
+
+def test_timer_spinbox_is_disabled_on_an_audio_triggered_state(qapp):
+    """Audio triggers can only be hand-authored in the .pnlive today, so no
+    dock control may silently overwrite one."""
+    dock, _ = timed_dock(
+        qapp,
+        [
+            {"type": "manual"},
+            {"type": "audio", "feature": "kick_count", "count": 4},
+        ],
+    )
+
+    dock.state_list.setCurrentRow(1)
+    assert dock.spin_timer.isEnabled() is False
+
+    dock.state_list.setCurrentRow(0)
+    assert dock.spin_timer.isEnabled() is True
+
+
+def test_apply_to_all_times_every_state_but_leaves_audio_triggers_alone(qapp):
+    dock, session = timed_dock(
+        qapp,
+        [
+            {"type": "manual"},
+            {"type": "audio", "feature": "kick_count", "count": 4},
+            {"type": "time", "seconds": 2.0},
+        ],
+    )
+
+    dock.spin_timer.setValue(6.0)
+    dock.onApplyTimerToAll()
+
+    assert session.states[0].trigger == {"type": "time", "seconds": 6.0}
+    assert session.states[1].trigger["type"] == "audio"
+    assert session.states[2].trigger == {"type": "time", "seconds": 6.0}
+
+
+def test_apply_to_all_with_zero_seconds_makes_every_state_manual(qapp):
+    dock, session = timed_dock(
+        qapp, [{"type": "time", "seconds": 4.0}, {"type": "time", "seconds": 9.0}]
+    )
+
+    dock.spin_timer.setValue(0.0)
+    dock.onApplyTimerToAll()
+
+    assert [s.trigger for s in session.states] == [{"type": "manual"}] * 2
+
+
+def test_refresh_keeps_the_state_selected(qapp):
+    """refresh() rebuilds the list, and editing a timer refreshes it to
+    redraw the label. Losing the selection there would point the next
+    spinbox edit at a different state than the one the user is looking at.
+    """
+    dock, _ = timed_dock(qapp, [{"type": "manual"}, {"type": "manual"}])
+
+    dock.state_list.setCurrentRow(1)
+    dock.refresh()
+
+    assert dock.state_list.currentRow() == 1
+
+
+def test_timer_summary_is_visible_in_the_state_list(qapp):
+    dock, _ = timed_dock(qapp, [{"type": "time", "seconds": 8.0}])
+
+    assert "8s" in dock.state_list.item(0).text()
+
+
+def test_timer_controls_are_inert_without_a_player(qapp):
+    dock = QDMSessionDock()
+    dock.onTimerChanged(5.0)  # must not raise
+    dock.onApplyTimerToAll()  # must not raise
+    dock.refresh()
+
+    assert dock.spin_timer.isEnabled() is False
+    # Disabled for want of a session, not because anything here is
+    # audio-triggered.
+    assert dock.spin_timer.text() == "manual"
+
+
+def test_the_timer_box_does_not_read_manual_on_an_audio_state(qapp):
+    """The spinbox sits at 0 for any untimed state, and 0 displays as
+    "manual" -- which is a lie about an audio-triggered state. It is
+    disabled there, but a disabled box still shows text.
+    """
+    dock, _ = timed_dock(
+        qapp,
+        [
+            {"type": "manual"},
+            {"type": "audio", "feature": "kick_count", "count": 4},
+        ],
+    )
+
+    dock.state_list.setCurrentRow(1)
+    assert dock.spin_timer.text() == "audio"
+
+    dock.state_list.setCurrentRow(0)
+    assert dock.spin_timer.text() == "manual"

@@ -55,18 +55,27 @@ class SessionState:
 
 
 class LiveSession:
-    def __init__(self, name: str = "", states: list = None):
+    def __init__(self, name: str = "", states: list = None, loop: bool = False):
         self.name = name
         self.states = states if states is not None else []
+        # When set, advancing past the last state wraps to the first (and
+        # stepping back from the first wraps to the last) instead of
+        # dead-ending. See SessionPlayer.next/prev.
+        self.loop = loop
 
     # -- serialization ----------------------------------------------------
 
     def to_dict(self) -> dict:
-        return {
+        data = {
             "version": SESSION_VERSION,
             "name": self.name,
             "states": [state.to_dict() for state in self.states],
         }
+        # Omitted when off, like `fade` above: a session that never used
+        # looping round-trips byte-identically.
+        if self.loop:
+            data["loop"] = True
+        return data
 
     @classmethod
     def from_dict(cls, data: dict) -> "LiveSession":
@@ -79,6 +88,7 @@ class LiveSession:
         return cls(
             name=data.get("name", ""),
             states=[SessionState.from_dict(s) for s in data.get("states", [])],
+            loop=bool(data.get("loop", False)),
         )
 
     @classmethod
