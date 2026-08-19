@@ -1,5 +1,6 @@
 """Live session dock: state list, transport, and the validation banner."""
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QCheckBox,
     QDoubleSpinBox,
@@ -7,6 +8,7 @@ from PyQt5.QtWidgets import (
     QLabel,
     QListWidget,
     QListWidgetItem,
+    QMenu,
     QPushButton,
     QVBoxLayout,
     QWidget,
@@ -32,6 +34,12 @@ class QDMSessionDock(QWidget):
         # (PataNode.createSessionDock) so the dock's Capture button and the
         # Session -> Capture State menu action run the same code.
         self.on_capture_requested = None
+        # Deleting needs the confirmation dialog and a real window to parent
+        # it to, so it goes back to the owner the same way.
+        self.on_delete_requested = None
+        # Right-clicking a row deletes *that* state, which is not
+        # necessarily the current one, so the index travels with the call.
+        self.on_delete_index_requested = None
 
         layout = QVBoxLayout()
 
@@ -55,6 +63,8 @@ class QDMSessionDock(QWidget):
 
         self.state_list = QListWidget()
         self.state_list.itemDoubleClicked.connect(self.onStateActivated)
+        self.state_list.setContextMenuPolicy(Qt.CustomContextMenu)
+        self.state_list.customContextMenuRequested.connect(self.onStateContextMenu)
         layout.addWidget(self.state_list)
 
         transport = QHBoxLayout()
@@ -63,12 +73,14 @@ class QDMSessionDock(QWidget):
         self.btn_next = QPushButton("Next ▶")
         self.btn_capture = QPushButton("Capture")
         self.btn_fade = QPushButton("Fade…")
+        self.btn_delete = QPushButton("Delete")
         for button in (
             self.btn_prev,
             self.btn_play,
             self.btn_next,
             self.btn_capture,
             self.btn_fade,
+            self.btn_delete,
         ):
             transport.addWidget(button)
         self.chk_loop = QCheckBox("Loop")
@@ -108,6 +120,7 @@ class QDMSessionDock(QWidget):
         self.btn_reload.clicked.connect(self.onFixAndReload)
         self.btn_capture.clicked.connect(self.onCapture)
         self.btn_fade.clicked.connect(self.onFade)
+        self.btn_delete.clicked.connect(self.onDelete)
         self.chk_loop.toggled.connect(self.onLoopToggled)
         self.spin_timer.valueChanged.connect(self.onTimerChanged)
         self.btn_apply_timer.clicked.connect(self.onApplyTimerToAll)
@@ -395,6 +408,27 @@ class QDMSessionDock(QWidget):
         if self._fade_window is not None:
             self._fade_window.close()
             self._fade_window = None
+
+    def onDelete(self):
+        if self.on_delete_requested is not None:
+            self.on_delete_requested()
+
+    def onStateContextMenu(self, point):
+        """Right-click a row to delete that state, current or not."""
+        if self.player is None or self.player.session is None:
+            return
+
+        item = self.state_list.itemAt(point)
+        if item is None:
+            return
+        row = self.state_list.row(item)
+
+        menu = QMenu(self)
+        delete_action = menu.addAction("Delete State")
+        chosen = menu.exec_(self.state_list.mapToGlobal(point))
+
+        if chosen is delete_action and self.on_delete_index_requested is not None:
+            self.on_delete_index_requested(row)
 
     def onTogglePlay(self):
         if self.player is None:
