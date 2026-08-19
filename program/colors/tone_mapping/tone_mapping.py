@@ -1,10 +1,9 @@
 from os.path import dirname, join
 
 from node.node_conf import register_node
-from node.shader_node_base import ShaderNode, Colors
+from node.shader_node_base import Colors, ShaderNode
 from program.program_base import ProgramBase
-from program.program_conf import SQUARE_VERT_PATH, register_program, name_to_opcode
-
+from program.program_conf import SQUARE_VERT_PATH, name_to_opcode, register_program
 
 OP_CODE_TONEMAPPING = name_to_opcode("tonemappingggg")
 
@@ -40,12 +39,26 @@ class ToneMapping(ProgramBase):
         self.iChannel0 = 1
         self.compression = 2.5
         self.gamma = 2.0
+        self.dry_wet = 1
+
+        self.initParameterDoc(
+            "dry_wet",
+            "How much of the effect is mixed over the node's input. 1.0 is "
+            "the effect at full strength, which is what every scene saved "
+            "before this parameter existed renders; 0 passes the input "
+            "through untouched, so the node can be faded out without being "
+            "unplugged.",
+            default=1.0,
+            minimum=0.0,
+            maximum=1.0,
+        )
 
     def initUniformsBinding(self):
         binding = {
             "iResolution": "win_size",
             "iChannel0": "iChannel0",
             "compression": "compression",
+            "dry_wet": "dry_wet",
             "gamma": "gamma",
         }
         super().initUniformsBinding(binding, program_name="")

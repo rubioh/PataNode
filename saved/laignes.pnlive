@@ -1250,6 +1250,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -1282,6 +1291,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -1363,6 +1376,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": ".5",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -1452,6 +1474,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -2827,6 +2853,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -2859,6 +2894,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -2940,6 +2979,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": ".5",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -3029,6 +3077,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -4572,6 +4624,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -4604,6 +4665,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -4685,6 +4750,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": ".5",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -4774,6 +4848,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -6317,6 +6395,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -6349,6 +6436,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -6430,6 +6521,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": ".5",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -6519,6 +6619,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -7991,6 +8095,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -8023,6 +8136,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -8104,6 +8221,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": ".5",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -8193,6 +8319,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -9962,6 +10092,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -9994,6 +10133,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -10075,6 +10218,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -10164,6 +10316,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -10723,6 +10879,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -10751,6 +10916,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -12049,6 +12218,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -12081,6 +12259,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -12162,6 +12344,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -12251,6 +12442,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -12810,6 +13005,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -12838,6 +13042,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -14136,6 +14344,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -14168,6 +14385,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -14249,6 +14470,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -14338,6 +14568,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -14897,6 +15131,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -14925,6 +15168,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -16223,6 +16470,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -16255,6 +16511,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -16336,6 +16596,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -16425,6 +16694,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -16984,6 +17257,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -17012,6 +17294,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -18310,6 +18596,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -18342,6 +18637,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -18423,6 +18722,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -18512,6 +18820,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -19071,6 +19383,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -19099,6 +19420,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -19306,6 +19631,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -19392,6 +19726,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -20732,6 +21070,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -20764,6 +21111,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -20845,6 +21196,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -20934,6 +21294,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -21493,6 +21857,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -21521,6 +21894,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -21728,6 +22105,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -21814,6 +22200,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -23154,6 +23544,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -23186,6 +23585,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -23267,6 +23670,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "2",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -23356,6 +23768,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -23915,6 +24331,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -23943,6 +24368,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -24150,6 +24579,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -24236,6 +24674,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -24354,6 +24796,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -24382,6 +24833,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -25692,6 +26147,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -25724,6 +26188,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -25805,6 +26273,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "2",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -25894,6 +26371,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -26453,6 +26934,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -26481,6 +26971,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -26688,6 +27182,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -26774,6 +27277,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -26892,6 +27399,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -26920,6 +27436,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -28307,6 +28827,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -28339,6 +28868,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -28420,6 +28953,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -28509,6 +29051,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -29068,6 +29614,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -29096,6 +29651,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -29303,6 +29862,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -29389,6 +29957,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -29507,6 +30079,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -29535,6 +30116,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -31128,6 +31713,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -31160,6 +31754,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -31241,6 +31839,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -31330,6 +31937,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -31889,6 +32500,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -31917,6 +32537,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -32124,6 +32748,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -32210,6 +32843,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -32328,6 +32965,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -32356,6 +33002,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -33949,6 +34599,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -33981,6 +34640,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -34062,6 +34725,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -34151,6 +34823,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -34710,6 +35386,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -34738,6 +35423,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -34945,6 +35634,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -35031,6 +35729,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -35149,6 +35851,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -35177,6 +35888,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -36905,6 +37620,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -36937,6 +37661,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -37018,6 +37746,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -37107,6 +37844,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -37666,6 +38407,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -37694,6 +38444,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -37901,6 +38655,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -37987,6 +38750,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -38105,6 +38872,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -38133,6 +38909,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -39861,6 +40641,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -39893,6 +40682,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -39974,6 +40767,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -40063,6 +40865,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -40622,6 +41428,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -40650,6 +41465,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -40857,6 +41676,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -40943,6 +41771,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -41061,6 +41893,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -41089,6 +41930,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -42933,6 +43778,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -42965,6 +43819,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -43046,6 +43904,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -43135,6 +44002,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -43694,6 +44565,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -43722,6 +44602,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -43929,6 +44813,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -44015,6 +44908,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -44133,6 +45030,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -44161,6 +45067,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -44755,6 +45665,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -44783,6 +45702,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -46380,6 +47303,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -46412,6 +47344,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -46493,6 +47429,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -46582,6 +47527,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -47141,6 +48090,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -47169,6 +48127,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -47376,6 +48338,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -47462,6 +48433,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -47580,6 +48555,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -47608,6 +48592,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -48202,6 +49190,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -48230,6 +49227,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -49827,6 +50828,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -49859,6 +50869,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -49940,6 +50954,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -50029,6 +51052,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -50588,6 +51615,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -50616,6 +51652,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -50823,6 +51863,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -50909,6 +51958,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -51027,6 +52080,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -51055,6 +52117,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -51649,6 +52715,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -51677,6 +52752,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -53403,6 +54482,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -53435,6 +54523,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -53516,6 +54608,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -53605,6 +54706,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -54164,6 +55269,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -54192,6 +55306,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -54399,6 +55517,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -54485,6 +55612,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -54603,6 +55734,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -54631,6 +55771,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -55225,6 +56369,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -55253,6 +56406,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -56979,6 +58136,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -57011,6 +58177,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -57092,6 +58262,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -57181,6 +58360,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -57740,6 +58923,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -57768,6 +58960,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -57975,6 +59171,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -58061,6 +59266,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -58179,6 +59388,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -58207,6 +59425,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -58801,6 +60023,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -58829,6 +60060,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -60555,6 +61790,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -60587,6 +61831,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -60668,6 +61916,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -60757,6 +62014,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -61316,6 +62577,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -61344,6 +62614,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -61551,6 +62825,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -61637,6 +62920,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -61755,6 +63042,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -61783,6 +63079,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -62377,6 +63677,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -62405,6 +63714,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -64131,6 +65444,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -64163,6 +65485,10 @@
                                 "saturation": {
                                     "type": null,
                                     "param_name": "saturation"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -64244,6 +65570,15 @@
                                         "name": "eval_function",
                                         "type": "f4",
                                         "value": "1",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
@@ -64333,6 +65668,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -64892,6 +66231,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -64920,6 +66268,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -65127,6 +66479,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             },
                             "vblur_program": {
@@ -65213,6 +66574,10 @@
                                 "bloom_rate": {
                                     "type": null,
                                     "param_name": "bloom_rate"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             },
                             "vblur_": {
@@ -65331,6 +66696,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -65359,6 +66733,10 @@
                                 "value_offset": {
                                     "type": null,
                                     "param_name": "value_offset"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },
@@ -65953,6 +67331,15 @@
                                         "widget": "TextEdit",
                                         "protected": false
                                     }
+                                },
+                                "dry_wet": {
+                                    "eval_function": {
+                                        "name": "eval_function",
+                                        "type": "f4",
+                                        "value": "x",
+                                        "widget": "TextEdit",
+                                        "protected": false
+                                    }
                                 }
                             }
                         },
@@ -65981,6 +67368,10 @@
                                 "value_pow_factor": {
                                     "type": null,
                                     "param_name": "value_pow_factor"
+                                },
+                                "dry_wet": {
+                                    "type": null,
+                                    "param_name": "dry_wet"
                                 }
                             }
                         },

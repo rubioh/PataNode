@@ -8,6 +8,7 @@ uniform sampler2D GradientMap;
 uniform float hue_offset;
 uniform float saturation_offset;
 uniform float value_offset;
+uniform float dry_wet;
 
 #define R iResolution
 
@@ -30,7 +31,7 @@ vec3 hsv2rgb(vec3 c)
 }
 
 
-vec2 hash2( vec2 p ) 
+vec2 hash2( vec2 p )
 {
     const vec2 k = vec2( 0.3183099, 0.3678794 );
     float n = 111.0*p.x + 113.0*p.y;
@@ -53,7 +54,7 @@ void main()
 {
     // Normalized pixel coordinates (from 0 to 1)
     vec2 uv = gl_FragCoord.xy;
-    
+
     vec2 st = (.5*R-uv)/R.y*4.;
 
 
@@ -62,6 +63,9 @@ void main()
 
 
     vec3 col = texture(iChannel0, uv/R).rgb;
+    // The untouched input, captured before this shader works on it:
+    // the dry end of dry_wet must be a true bypass.
+    vec3 dry = col;
     col = clamp(col, vec3(0.), vec3(1.));
     float L = length(col/sqrt(3));
     vec3 hsv = rgb2hsv(col);
@@ -77,6 +81,6 @@ void main()
 
     vec3 rgb = hsv2rgb(hsv);
     rgb = clamp(rgb, vec3(0.), vec3(1.)) * smoothstep(.0, .05, L);
-    fragColor = vec4(rgb, 1.0);
+    fragColor = vec4(mix(dry, rgb, dry_wet), 1.0);
 
 }

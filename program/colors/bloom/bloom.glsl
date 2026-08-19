@@ -7,6 +7,7 @@ uniform sampler2D iChannel0;
 uniform sampler2D Bloom;
 uniform float compression;
 uniform float bloom_rate;
+uniform float dry_wet;
 
 
 float gamma = 2.2;
@@ -57,18 +58,18 @@ vec4 BicubicTexture(in sampler2D tex, in vec2 coord)
 
 vec3 ColorFetch(vec2 coord)
 {
- 	return texture(iChannel0, coord).rgb;   
+ 	return texture(iChannel0, coord).rgb;
 }
 
 vec3 Grab(vec2 coord, sampler2D level)
 {
- 	return BicubicTexture(level, coord).rgb;   
+ 	return BicubicTexture(level, coord).rgb;
 }
 
 vec3 GetBloom(vec2 coord)
 {
  	vec3 bloom = vec3(0.0);
-    
+
     //Reconstruct bloom from multiple blurred images
     bloom += Grab(coord, Bloom) * 1.;
 
@@ -82,19 +83,19 @@ vec3 saturate(vec3 x)
 vec3 baseToneMapping(vec3 col){
 
     vec3 color = col*2.;
-    
+
 
     //Tonemapping and color grading
     color = pow(color, vec3(1.5));
     color = color / (1.0 + color);
     color = pow(color, vec3(1.0 / 1.5));
 
-    
+
     color = mix(color, color * color * (3.0 - 2.0 * color), vec3(1.0));
-    color = pow(color, vec3(1.3, 1.20, 1.0));    
+    color = pow(color, vec3(1.3, 1.20, 1.0));
 
 	color = saturate(color * 1.01);
-    
+
     color = pow(color, vec3(.7 / gamma));
     return color;
 }
@@ -132,11 +133,14 @@ vec3 RomBinDaHouseToneMapping(vec3 color)
 }
 void main()
 {
-    
+
     vec2 uv = gl_FragCoord.xy / iResolution.xy;
-    
+
     vec3 color = ColorFetch(uv);
-    
+    // The untouched input, captured before this shader works on it:
+    // the dry end of dry_wet must be a true bypass.
+    vec3 dry = color;
+
     if (uv.x>1.5){
         color += GetBloom(uv)*.05;
         color = baseToneMapping(color);
@@ -148,7 +152,7 @@ void main()
         //color = simpleReinhardToneMapping(color);
     }
 
-    fragColor = vec4(color, 1.0);
+    fragColor = vec4(mix(dry, color, dry_wet), 1.0);
 
 
 }

@@ -8,6 +8,7 @@ uniform float phase_r;
 uniform float phase_g;
 uniform float phase_b;
 uniform float saturation;
+uniform float dry_wet;
 
 #define R iResolution
 
@@ -33,6 +34,9 @@ void main()
 {
     vec2 uv = gl_FragCoord.xy;
     vec3 col = texture(iChannel0, uv / R).rgb;
+    // The untouched input, captured before this shader works on it:
+    // the dry end of dry_wet must be a true bypass.
+    vec3 dry = col;
 
     // Clamped because the FBOs are f4: an upstream Bloom or Tone Mapping
     // can deliver channels outside [0,1], and this value is used twice --
@@ -47,5 +51,5 @@ void main()
     vec3 palette_hsv = rgb2hsv(palette);
     vec3 rgb = hsv2rgb(vec3(palette_hsv.x, palette_hsv.y * saturation, v));
 
-    fragColor = vec4(clamp(rgb, vec3(0.), vec3(1.)), 1.0);
+    fragColor = vec4(mix(dry, clamp(rgb, vec3(0.), vec3(1.)), dry_wet), 1.0);
 }

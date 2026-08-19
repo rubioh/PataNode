@@ -7,6 +7,7 @@ uniform sampler2D iChannel0;
 uniform float hue_offset;
 uniform float saturation_offset;
 uniform float value_offset;
+uniform float dry_wet;
 
 #define R iResolution
 
@@ -33,6 +34,9 @@ void main()
     vec2 uv = gl_FragCoord.xy;
 
     vec3 col = texture(iChannel0, uv/R).rgb;
+    // The untouched input, captured before this shader works on it:
+    // the dry end of dry_wet must be a true bypass.
+    vec3 dry = col;
     col = clamp(col, vec3(0.), vec3(1.));
     float L = length(col/sqrt(3));
     vec3 hsv = rgb2hsv(col);
@@ -43,6 +47,6 @@ void main()
 
     vec3 rgb = hsv2rgb(hsv);
     rgb = clamp(rgb, vec3(0.), vec3(1.)) * smoothstep(.0, .05, L);
-    fragColor = vec4(rgb, 1.0);
+    fragColor = vec4(mix(dry, rgb, dry_wet), 1.0);
 
 }

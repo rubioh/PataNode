@@ -45,6 +45,19 @@ class ValueGradient(ProgramBase):
         self.phase_g = 0.33
         self.phase_b = 0.67
         self.saturation = 1.0
+        self.dry_wet = 1
+
+        self.initParameterDoc(
+            "dry_wet",
+            "How much of the effect is mixed over the node's input. 1.0 is "
+            "the effect at full strength, which is what every scene saved "
+            "before this parameter existed renders; 0 passes the input "
+            "through untouched, so the node can be faded out without being "
+            "unplugged.",
+            default=1.0,
+            minimum=0.0,
+            maximum=1.0,
+        )
 
     def initUniformsBinding(self):
         binding = {
@@ -55,6 +68,7 @@ class ValueGradient(ProgramBase):
             "phase_g": "phase_g",
             "phase_b": "phase_b",
             "saturation": "saturation",
+            "dry_wet": "dry_wet",
         }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0"])

@@ -1,10 +1,9 @@
 from os.path import dirname, join
 
 from node.node_conf import register_node
-from node.shader_node_base import ShaderNode, Colors
+from node.shader_node_base import Colors, ShaderNode
 from program.program_base import ProgramBase
 from program.program_conf import SQUARE_VERT_PATH, name_to_opcode
-
 
 OP_CODE_BLOOM = name_to_opcode("bloom")
 
@@ -63,6 +62,8 @@ class Bloom(ProgramBase):
         self.iChannel0 = 10
         self.Bloom = 1
 
+        self.dry_wet = 1
+
     def initUniformsBinding(self):
         binding = {"iChannel0": "ViChannel0", "Prev": "HPrev"}
         super().initUniformsBinding(binding, program_name="vblur_")
@@ -76,9 +77,25 @@ class Bloom(ProgramBase):
             "iResolution": "win_size",
             "compression": "compression",
             "bloom_rate": "bloom_rate",
+            "dry_wet": "dry_wet",
         }
         super().initUniformsBinding(binding, program_name="")
         self.addProtectedUniforms(["iChannel0", "Prev", "Bloom"])
+
+        # Not in initParams: Bloom builds its params before loading its
+        # programs (initFBOSpecifications needs self.level), and there is
+        # nothing to annotate until the shader has been parsed.
+        self.initParameterDoc(
+            "dry_wet",
+            "How much of the effect is mixed over the node's input. 1.0 is "
+            "the effect at full strength, which is what every scene saved "
+            "before this parameter existed renders; 0 passes the input "
+            "through untouched, so the node can be faded out without being "
+            "unplugged.",
+            default=1.0,
+            minimum=0.0,
+            maximum=1.0,
+        )
 
     def bindUniform(self, af):
         super().bindUniform(af)

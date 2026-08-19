@@ -6,6 +6,7 @@ uniform vec2 iResolution;
 uniform sampler2D iChannel0;
 uniform float gamma;
 uniform float compression;
+uniform float dry_wet;
 
 #define R iResolution
 
@@ -22,7 +23,10 @@ void main()
     vec2 uv = gl_FragCoord.xy;
 
     vec3 col = texture(iChannel0, uv/R).rgb;
+    // The untouched input, captured before this shader works on it:
+    // the dry end of dry_wet must be a true bypass.
+    vec3 dry = col;
     col = RomBinDaHouseToneMapping(col);
-    fragColor = vec4(col, 1.0);
+    fragColor = vec4(mix(dry, col, dry_wet), 1.0);
 
 }
