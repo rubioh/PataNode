@@ -419,6 +419,13 @@ class SessionPlayer:
 
     def pause(self) -> None:
         self.is_playing = False
+        # Re-anchor on resume rather than banking the pause: a paused
+        # session still receives ticks, and without this a state paused for
+        # a minute would see a 60 s elapsed time on the first tick after
+        # Play and flip instantly -- a timer trigger outright, and an audio
+        # counter through whatever accumulated meanwhile. Same stale-baseline
+        # protection goTo applies, for the same reason.
+        self._entry = None
 
     def tick(self, features: dict, now: float) -> None:
         """Called from the audio timer. Advances if the trigger fires."""

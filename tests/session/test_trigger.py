@@ -1,3 +1,5 @@
+import pytest
+
 from session.trigger import (
     COUNTER_FEATURES,
     evaluate_trigger,
@@ -70,3 +72,45 @@ def test_missing_feature_never_advances():
 
 def test_counter_features_are_the_three_real_counters():
     assert COUNTER_FEATURES == ("kick_count", "hat_count", "snare_count")
+
+
+def test_time_trigger_advances_once_the_duration_has_elapsed():
+    trigger = {"type": "time", "seconds": 8.0}
+    entry = make_entry_snapshot(trigger, {}, 100.0)
+
+    result = evaluate_trigger(trigger, {}, entry, 107.9)
+    assert result.should_advance is False
+
+    result = evaluate_trigger(trigger, {}, entry, 108.0)
+    assert result.should_advance is True
+
+
+def test_time_trigger_measures_from_entry_not_from_zero():
+    """The app has been up for a while, so `now` is a large monotonic
+    value. Without anchoring on entry, `now >= seconds` would be true on
+    the very first tick and every timed state would flip instantly."""
+    trigger = {"type": "time", "seconds": 8.0}
+    entry = make_entry_snapshot(trigger, {}, 5000.0)
+
+    assert evaluate_trigger(trigger, {}, entry, 5001.0).should_advance is False
+
+
+def test_time_trigger_ignores_audio_features():
+    trigger = {"type": "time", "seconds": 8.0}
+    entry = make_entry_snapshot(trigger, {"kick_count": 5}, 0.0)
+
+    assert (
+        evaluate_trigger(trigger, {"kick_count": 9999}, entry, 1.0).should_advance
+        is False
+    )
+
+
+def test_time_trigger_missing_seconds_raises_for_the_tick_guard():
+    """SessionPlayer.tick catches KeyError and degrades to 'never
+    advances' with one status warning -- same contract as a threshold
+    trigger missing 'hold'."""
+    trigger = {"type": "time"}
+    entry = make_entry_snapshot(trigger, {}, 0.0)
+
+    with pytest.raises(KeyError):
+        evaluate_trigger(trigger, {}, entry, 100.0)

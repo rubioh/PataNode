@@ -270,3 +270,43 @@ def test_a_state_without_a_fade_is_never_flagged():
         states=[SessionState("a", {"type": "manual"}, scene([faded_node(1, {})]))]
     )
     assert validate_session(session, OPCODES, FEATURES) == []
+
+
+def timed(trigger):
+    return LiveSession(states=[SessionState("a", trigger, scene([node(1)]))])
+
+
+def test_a_valid_time_trigger_is_accepted():
+    assert (
+        validate_session(timed({"type": "time", "seconds": 8}), OPCODES, FEATURES) == []
+    )
+
+
+def test_a_time_trigger_missing_seconds_is_reported():
+    """trigger.py reads trigger["seconds"] unguarded, so this would reach
+    SessionPlayer.tick as a KeyError and the state would never advance."""
+    findings = validate_session(timed({"type": "time"}), OPCODES, FEATURES)
+
+    assert len(findings) == 1
+    assert findings[0].category == "trigger"
+    assert "seconds" in findings[0].message
+
+
+def test_a_non_positive_time_trigger_is_reported():
+    """Zero seconds advances on every tick -- a 60 Hz strobe through the
+    whole set, not a timer anyone asked for."""
+    for seconds in (0, -1):
+        findings = validate_session(
+            timed({"type": "time", "seconds": seconds}), OPCODES, FEATURES
+        )
+        assert len(findings) == 1, seconds
+        assert findings[0].category == "trigger"
+
+
+def test_a_non_numeric_time_trigger_is_reported():
+    findings = validate_session(
+        timed({"type": "time", "seconds": "8"}), OPCODES, FEATURES
+    )
+
+    assert len(findings) == 1
+    assert findings[0].category == "trigger"

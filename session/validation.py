@@ -93,6 +93,10 @@ def _validate_edges(index, state):
 
 def _validate_trigger(index, state, known_features):
     trigger = state.trigger or {}
+
+    if trigger.get("type") == "time":
+        return _validate_time_trigger(index, trigger)
+
     if trigger.get("type") != "audio":
         return []
 
@@ -137,6 +141,41 @@ def _validate_trigger(index, state, known_features):
                 index,
                 "trigger",
                 "Threshold trigger on '%s' is missing 'hold'" % feature,
+            )
+        ]
+
+    return []
+
+
+def _validate_time_trigger(index, trigger):
+    """A timer must carry a positive duration.
+
+    Missing: trigger.py reads trigger["seconds"] unguarded, so the state
+    never advances (SessionPlayer.tick's KeyError guard) and silently
+    strands the set. Zero or negative: the elapsed check is true on the
+    first tick, flipping states at 60 Hz.
+    """
+    if "seconds" not in trigger:
+        return [
+            Finding(index, "trigger", "Timer trigger is missing 'seconds'"),
+        ]
+
+    seconds = trigger["seconds"]
+    if isinstance(seconds, bool) or not isinstance(seconds, (int, float)):
+        return [
+            Finding(
+                index,
+                "trigger",
+                "Timer trigger's 'seconds' is %r, which is not a number" % (seconds,),
+            )
+        ]
+
+    if seconds <= 0:
+        return [
+            Finding(
+                index,
+                "trigger",
+                "Timer trigger lasts %g seconds; it must be greater than 0" % seconds,
             )
         ]
 

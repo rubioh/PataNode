@@ -2,6 +2,7 @@
 
 from PyQt5.QtWidgets import (
     QCheckBox,
+    QDoubleSpinBox,
     QHBoxLayout,
     QLabel,
     QListWidget,
@@ -78,6 +79,26 @@ class QDMSessionDock(QWidget):
         transport.addWidget(self.chk_loop)
         layout.addLayout(transport)
 
+        timer_row = QHBoxLayout()
+        timer_row.addWidget(QLabel("Timer:"))
+        self.spin_timer = QDoubleSpinBox()
+        self.spin_timer.setRange(0.0, 3600.0)
+        self.spin_timer.setDecimals(1)
+        self.spin_timer.setSingleStep(0.5)
+        self.spin_timer.setSuffix(" s")
+        # 0 is how a timer is taken off again, so it reads as what it does.
+        self.spin_timer.setSpecialValueText("manual")
+        self.spin_timer.setToolTip(
+            "How long the selected state holds before advancing (0 = manual)"
+        )
+        self.spin_timer.setEnabled(False)
+        timer_row.addWidget(self.spin_timer)
+        self.btn_apply_timer = QPushButton("Apply to all")
+        self.btn_apply_timer.setEnabled(False)
+        timer_row.addWidget(self.btn_apply_timer)
+        timer_row.addStretch()
+        layout.addLayout(timer_row)
+
         self.setLayout(layout)
 
         self.btn_prev.clicked.connect(self.onPrev)
@@ -88,6 +109,9 @@ class QDMSessionDock(QWidget):
         self.btn_capture.clicked.connect(self.onCapture)
         self.btn_fade.clicked.connect(self.onFade)
         self.chk_loop.toggled.connect(self.onLoopToggled)
+        self.spin_timer.valueChanged.connect(self.onTimerChanged)
+        self.btn_apply_timer.clicked.connect(self.onApplyTimerToAll)
+        self.state_list.currentRowChanged.connect(self.onSelectionChanged)
 
     def setPlayer(self, player):
         self.player = player
@@ -156,9 +180,16 @@ class QDMSessionDock(QWidget):
         self.refresh()
 
     def refresh(self):
+        # Rebuilding the list drops the selection, and editing a timer
+        # refreshes to redraw that state's label -- without restoring it,
+        # the next edit would land on a different state than the one the
+        # user is looking at.
+        selected = self.state_list.currentRow()
+
         self.state_list.clear()
         self._refreshLoopCheckbox()
         if self.player is None or self.player.session is None:
+            self._refreshTimerControls()
             return
 
         for index, state in enumerate(self.player.session.states):
@@ -178,7 +209,11 @@ class QDMSessionDock(QWidget):
             item = QListWidgetItem(label)
             self.state_list.addItem(item)
 
+        if 0 <= selected < self.state_list.count():
+            self.state_list.setCurrentRow(selected)
+
         self.btn_play.setText("❚❚ Pause" if self.player.is_playing else "▶ Play")
+        self._refreshTimerControls()
 
     def _refreshLoopCheckbox(self):
         """Display the session's loop flag without writing it back.
@@ -197,6 +232,98 @@ class QDMSessionDock(QWidget):
             return
         self.player.session.loop = checked
 
+    # -- per-state timer ----------------------------------------------------
+
+    def _selectedIndex(self):
+        """The state the per-state controls act on, or -1 for none.
+
+        Falls back to the playing state so the controls still mean
+        something before anything has been clicked in the list.
+        """
+        if self.player is None or self.player.session is None:
+            return -1
+        states = self.player.session.states
+        index = self.state_list.currentRow()
+        if index < 0:
+            index = max(self.player.current_index, 0)
+        return index if 0 <= index < len(states) else -1
+
+    @staticmethod
+    def _timer_seconds(trigger):
+        """The duration a trigger displays as, 0 for anything untimed.
+
+        A hand-edited file can carry a timer with a non-numeric duration;
+        validate_session reports it, and here it simply reads as 0 rather
+        than raising while the dock is being drawn.
+        """
+        if not trigger or trigger.get("type") != "time":
+            return 0.0
+        try:
+            return float(trigger["seconds"])
+        except (KeyError, TypeError, ValueError):
+            return 0.0
+
+    def _refreshTimerControls(self):
+        """Display the selected state's timer without writing it back.
+
+        Signals are blocked around setValue for the same reason as the loop
+        checkbox: a refresh reads the model, onTimerChanged writes it.
+        """
+        index = self._selectedIndex()
+        trigger = (
+            self.player.session.states[index].trigger if index >= 0 else None
+        ) or {}
+        # Audio triggers are only authorable by hand in the .pnlive today,
+        # so the spinbox must not offer to overwrite one.
+        is_audio = trigger.get("type") == "audio"
+        editable = index >= 0 and not is_audio
+
+        self.spin_timer.blockSignals(True)
+        self.spin_timer.setEnabled(editable)
+        # The box sits at 0 for every untimed state, and 0 shows as its
+        # special text -- which must not claim "manual" on a state that is
+        # actually driven by audio.
+        self.spin_timer.setSpecialValueText("audio" if is_audio else "manual")
+        self.spin_timer.setValue(self._timer_seconds(trigger))
+        self.spin_timer.blockSignals(False)
+        self.btn_apply_timer.setEnabled(index >= 0)
+
+    @staticmethod
+    def _makeTrigger(seconds):
+        if seconds <= 0:
+            return {"type": "manual"}
+        return {"type": "time", "seconds": seconds}
+
+    def onSelectionChanged(self, row):
+        self._refreshTimerControls()
+
+    def onTimerChanged(self, seconds):
+        index = self._selectedIndex()
+        if index < 0:
+            return
+        state = self.player.session.states[index]
+        if (state.trigger or {}).get("type") == "audio":
+            return
+        state.trigger = self._makeTrigger(seconds)
+        self.refresh()
+
+    def onApplyTimerToAll(self):
+        """Time every state at once -- the usual way to start a set running.
+
+        Audio-triggered states keep their trigger: they were hand-authored,
+        and a blanket timer would quietly throw that work away.
+        """
+        if self.player is None or self.player.session is None:
+            return
+        seconds = self.spin_timer.value()
+        for state in self.player.session.states:
+            if (state.trigger or {}).get("type") == "audio":
+                continue
+            # A fresh dict per state: sharing one would make a later edit
+            # of any single state silently retime all of them.
+            state.trigger = self._makeTrigger(seconds)
+        self.refresh()
+
     @staticmethod
     def _fade_summary(state):
         """Which states ease in, visible at a glance during a set."""
@@ -207,6 +334,9 @@ class QDMSessionDock(QWidget):
 
     @staticmethod
     def _trigger_summary(trigger):
+        if trigger and trigger.get("type") == "time":
+            seconds = QDMSessionDock._timer_seconds(trigger)
+            return "timer %gs" % seconds if seconds > 0 else "timer ?"
         if not trigger or trigger.get("type") != "audio":
             return "manual"
         if "count" in trigger:
